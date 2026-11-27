@@ -141,9 +141,8 @@ func _simulation() -> Dictionary:
 	var mid_hash := _hash(a)
 	var saved_text := JSON.stringify(a.save_state())
 	var midday := a.summary()
-	var kinds := {}
-	for event: Dictionary in a.state.events:
-		kinds[event.kind] = int(kinds.get(event.kind, 0)) + 1
+	# A single snapshot is only the last MAX_EVENTS, not the day's history.
+	# Collect the live event stream in run B while leaving A uninterrupted.
 	a.advance_to(end, 0)
 	var final_hash := _hash(a)
 
@@ -155,9 +154,19 @@ func _simulation() -> Dictionary:
 	var worst := 0
 	var unfinished := 0
 	var over_budget := 0
-	while now < end or not b.advance_to(end, 500).done:
+	var kinds := {}
+	var last_seq := 0
+	var missed_events := 0
+	while true:
 		now = mini(end, now + 37 + frames % 29)
 		var report := b.advance_to(now, 500)
+		# Consume after every actual advance, including catch-up at the end.
+		# An overrun is a failure; never mistake a dropped trade for no trade.
+		for event: Dictionary in b.events_since(last_seq):
+			var seq := int(event.seq)
+			missed_events += maxi(0, seq - last_seq - 1)
+			last_seq = seq
+			kinds[event.kind] = int(kinds.get(event.kind, 0)) + 1
 		frames += 1
 		worst = maxi(worst, int(report.usec))
 		if not report.done:
@@ -165,8 +174,10 @@ func _simulation() -> Dictionary:
 		# One batch of eight events may finish after the budget ran out.
 		if int(report.usec) > 500 + 4000:
 			over_budget += 1
-		if frames > 400000:
+		if (now == end and report.done) or frames > 400000:
 			break
+	check(missed_events == 0 and last_seq == int(b.state.event_seq), "budgeted observer consumes every published event without gaps")
+	check(int(kinds.get("purchase", 0)) == int(a.state.stats.purchases), "every booked purchase produces exactly one visible event")
 	check(_hash(b) == final_hash, "budgeted, irregular stepping reaches the identical world state")
 	check(unfinished > 0, "the budget really deferred work to later frames")
 	check(over_budget * 200 <= frames, "calls stay near the budget (%d of %d over, worst %d usec)" % [over_budget, frames, worst])
@@ -193,8 +204,8 @@ func _simulation() -> Dictionary:
 	check(int(a.state.closed_day) >= 1, "the day was closed")
 	check(int(midday.activities.get("vend", 0)) >= 40, "stalls are staffed before noon (%d)" % int(midday.activities.get("vend", 0)))
 	check(int(midday.outdoors) > 150, "streets are busy before noon (%d outdoors)" % int(midday.outdoors))
-	check(kinds.has("purchase") or kinds.has("haggle"), "the event log shows trade")
-	check(kinds.has("conversation"), "the event log shows a conversation")
+	check(kinds.has("purchase") or kinds.has("haggle"), "the observed event stream shows trade")
+	check(kinds.has("conversation"), "the observed event stream shows a conversation")
 
 	# At night the streets empty, guards stay out.
 	var night := Life.new()

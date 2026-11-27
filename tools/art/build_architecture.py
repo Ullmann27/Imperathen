@@ -23,6 +23,12 @@ from mathutils import Matrix, Vector
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import box, cylinder, export_asset, material, mesh, reset_scene
 
+# Runtime I-01 moves these original meshes independently. Never bake them
+# into static stone/wood/rope batches or replace their semantic node names.
+WELL_MOVING_PREFIXES = (
+    "Well_Bucket_", "Well_Hanging_Rope", "Well_Winding_Axle",
+    "Well_Axle_Rope_Stop_", "Well_Wound_Rope", "Well_Crank",
+)
 SEED = 73122
 HOUSE_WIDTH = 6.0
 HOUSE_DEPTH = 5.0
@@ -670,7 +676,8 @@ def main():
         report['assets'][asset_id]=metric(objects)
         if key == 'house':
             report['assets'][asset_id]['openings'] = verify_house_openings()
-        export_asset(asset_id,objects,args.output_dir)
+        export_asset(asset_id,objects,args.output_dir,
+                     preserve_prefixes=WELL_MOVING_PREFIXES if key == 'well' else ())
         if args.render_previews:
             report['assets'][asset_id]['review_image'] = render_review(asset_id,args.output_dir)
         print('ARCHITECTURE_ASSET',json.dumps({'asset_id':asset_id,**report['assets'][asset_id]}))

@@ -1,0 +1,129 @@
+name: Aeterna interactive well reconstruction and event regression
+on:
+  push:
+    branches: ['fix/aeterna-well-export-city-event-20261127']
+    paths:
+      - 'tools/art/common.py'
+      - 'tools/art/build_architecture.py'
+      - 'tools/art/validate_interactive_well.py'
+      - 'prototype/scripts/world/village/i01_water_motion.gd'
+      - 'prototype/tests/city_life_test.gd'
+      - '.github/workflows/aeterna-well-event-recovery.yml'
+permissions:
+  contents: read
+concurrency:
+  group: aeterna-well-event-recovery
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Rebuild named original well meshes with pinned Blender
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/aeterna-well/generated
+          git rev-parse HEAD > artifacts/aeterna-well/source-commit.txt
+          bash tools/characters/install_marcus_blender.sh "$RUNNER_TEMP/well-blender"
+          python3 -m py_compile tools/art/common.py tools/art/build_architecture.py tools/art/validate_interactive_well.py
+          "$RUNNER_TEMP/well-blender/blender" -b --factory-startup -t 4 --python-exit-code 1 -P tools/art/build_architecture.py -- --asset well --output-dir "$PWD/artifacts/aeterna-well/generated" 2>&1 | tee artifacts/aeterna-well/blender.log
+          python3 tools/art/validate_interactive_well.py artifacts/aeterna-well/generated/village_well.glb > artifacts/aeterna-well/well-validation.json
+          python3 - <<'PY'
+          import json, pathlib
+          p = pathlib.Path('artifacts/aeterna-well/generated')
+          before = json.loads(pathlib.Path('art/visual_benchmark/assets/architecture/village_well.json').read_text())
+          after = json.loads((p/'village_well.json').read_text())
+          assert before['triangles'] == after['triangles'], (before['triangles'], after['triangles'])
+          assert after['mesh_batches'] > before['mesh_batches'], after
+          PY
+          cp artifacts/aeterna-well/generated/village_well.glb prototype/assets/architecture/village_well.glb
+          cp artifacts/aeterna-well/generated/village_well.{glb,blend,json} art/visual_benchmark/assets/architecture/
+          python3 tools/art/validate_visual_assets.py --output artifacts/aeterna-well/static-assets.json
+      - name: Install checksum-verified Godot and software renderer
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends xvfb xauth libgl1-mesa-dri
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: City conservation, daylight and real I-01 playthrough
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$GITHUB_WORKSPACE/artifacts/aeterna-well"
+          mkdir -p "$RUNNER_TEMP/well-state"/{data,config,cache}
+          export XDG_DATA_HOME="$RUNNER_TEMP/well-state/data"
+          export XDG_CONFIG_HOME="$RUNNER_TEMP/well-state/config"
+          export XDG_CACHE_HOME="$RUNNER_TEMP/well-state/cache"
+          timeout --kill-after=10s 300s "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee "$out/import.log"
+          timeout --kill-after=10s 240s "$GODOT_BIN" --headless --path prototype --script res://tests/city_life_test.gd 2>&1 | tee "$out/city.log"
+          grep -Fq CITY_LIFE_PASS "$out/city.log"
+          timeout --kill-after=10s 180s "$GODOT_BIN" --headless --path prototype --script res://tests/local_weather_test.gd 2>&1 | tee "$out/weather.log"
+          grep -Fq LOCAL_WEATHER_PASS "$out/weather.log"
+          timeout --kill-after=15s 1500s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --fixed-fps 60 --script res://tests/i01_flow_test.gd -- --capture-dir="$out" --size=1280x720 2>&1 | tee "$out/flow.log"
+          grep -Fq I01_FLOW_PASS "$out/flow.log"
+          python3 - "$out" <<'PY'
+          import json, pathlib, sys
+          out = pathlib.Path(sys.argv[1])
+          report = json.loads((out / "i01-flow-report.json").read_text())
+          assert not report["failures"], report["failures"]
+          for name in ("well-rope-lift", "well-bucket-pour", "film-first-cup-pour", "film-second-cup-pour", "film-third-cup-pour"):
+              files = list(out.glob("*" + name + "*.png"))
+              assert files and all(p.stat().st_size > 1024 for p in files), name
+          PY
+      - name: Preserve generated assets, logs and genuine engine captures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: aeterna-well-evidence-${{ github.run_id }}
+          path: artifacts/aeterna-well/
+          if-no-files-found: error
+          retention-days: 30
+  stage-validated-asset:
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/fix/aeterna-well-export-city-event-20261127'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@v4
+        with:
+          name: aeterna-well-evidence-${{ github.run_id }}
+          path: validated-well
+      - name: Commit only verified generated assets to isolated branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(cat validated-well/source-commit.txt)" = "$GITHUB_SHA"
+          test "$(git ls-remote origin "$GITHUB_REF" | cut -f1)" = "$GITHUB_SHA"
+          grep -Fq I01_FLOW_PASS validated-well/flow.log
+          grep -Fq CITY_LIFE_PASS validated-well/city.log
+          grep -Fq LOCAL_WEATHER_PASS validated-well/weather.log
+          cp validated-well/generated/village_well.{glb,blend,json} art/visual_benchmark/assets/architecture/
+          cp validated-well/generated/village_well.glb prototype/assets/architecture/village_well.glb
+          python3 tools/art/validate_interactive_well.py prototype/assets/architecture/village_well.glb
+          git add art/visual_benchmark/assets/architecture/village_well.{glb,blend,json} prototype/assets/architecture/village_well.glb
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m "Stage verified original interactive well GLB (CI $GITHUB_RUN_ID)"
+          git push origin HEAD:"$GITHUB_REF"
