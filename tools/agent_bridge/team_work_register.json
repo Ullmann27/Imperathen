@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 69,
+  "version": 70,
   "tasks": [
     {
       "id": "K101",
@@ -356,16 +356,16 @@
     {
       "id": "FORMATION-CASUALTY-GAPS",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "553ceab39d7d9a4a9936f24c69ac4672a789edce",
-      "run_id": null,
+      "run_id": "46026104912",
       "scope": [
         "prototype/scripts/battle/battle_model.gd",
         "prototype/tests/battle_command_test.gd",
         "prototype/tests/formation_slot_authority_test.gd"
       ],
       "access": "edit",
-      "note": "Independent child of tested #175; preserve ordinary rank ownership but assign actual vacant slots after casualties using prior ranks, nearest appropriate living soldier and stable same-rank preference. No position teleport, saved schema or movement limit changes. Original 8-step closing gate remains unchanged; add controlled actual casualty and UID regression, rerun battle and formation tests."
+      "note": "PR #177 candidate 158e22df72a8fafb1ab690bd55011a16f27b801d, child of #175. Real rule casualty matching captures old UID ranks, fills front first, preserves surviving same-rank members within capacity, picks closest appropriate reserve and reorders exact UID-position pairs without moving bodies. Added actual controlled casualty regression and unchanged existing eight-step, speed, battle and 60/180-person gates. CI in_progress. Preserve all original branches and CI; no release or blind merge."
     }
   ]
 }
