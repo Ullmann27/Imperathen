@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 139,
+  "version": 143,
   "tasks": [
     {
       "id": "K101",
@@ -644,7 +644,7 @@
     {
       "id": "VIS-FAMILY-JUG-GRIP",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "review_pending",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
       "run_id": "46063412333",
       "scope": [
@@ -653,28 +653,28 @@
         ".github/workflows/aeterna-family-jug-regression.yml"
       ],
       "access": "edit",
-      "note": "PR #188 c48b0121e2173cc22937b0abdd0ce102a890e74c: I01 old offset branch removed, measured 2 mm grip and upright assertions for empty/full/father handoff, extra father-delivery screenshot. Existing graphical PR workflow 46063412333 observed in_progress; no result, no finger/visual/device claim. Separate from failed market PR."
+      "note": "PR #188 c48b0121: actual graphical CI 46063412333/job 140722857932 success, I01_FLOW_PASS 300/300, 20 1280x720 captures. Source receipt 8571e9bd1a67d031ab4636b1a43bf23d518e304c compare to PR head: zero changed files, exact two source blobs. Artifact 15229328974 SHA256 efde551fb9250c3ed9ff5033076d0f8f4a44dd39e084909570b31119ea055cce. Six images independently opened; father-delivery SHA256 fa99fc00de371f95f7307ec84223fa721b89ed75d91d4c951e8e713d4ae0a8fe shows huge player head obscures grip, pour camera also hides hands. Anchor contract passed, actual visible finger grip/real owner youth/visual/device not accepted. Focused push 46063390811 success."
     },
     {
       "id": "VIS-MARKET-JUG-PHYSICS-SYNC",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "c9fe2960008cf52787fa51c4afe09c4528d236b1",
-      "run_id": null,
+      "run_id": "46063582273",
       "scope": [
         "prototype/scripts/world/village/i03_props.gd",
         "prototype/tests/i03_flow_test.gd",
         ".github/workflows/aeterna-market-jug-regression.yml"
       ],
       "access": "edit",
-      "note": "Follow-up to measured I03 grip failure before LOD in 46062934470 (54.444 mm). Runtime GameWorld physics changes player root before regular idle callbacks; props only update on idle and skeleton_updated. Hypothesis of stale world transform, not proven. Add late physics attachment update only while carrying, retain original idle and skeleton synchronization and strict 5mm assertions, measure several successive frames. No visual/finger/device acceptance; stack on #187, no merge."
+      "note": "PR #189 head 39e1a6ab124ecaedc4f0f1eccaad15613a4409b6, focused push workflow 46063582273/job 140723419374 observed in_progress. Story 46063600171 and NPC 46063600239 passed separately; no confirmation of 5mm grip or actual render yet."
     },
     {
       "id": "VIS-I00-TERRAIN-CLEARANCE",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
-      "run_id": null,
+      "run_id": "46064658673",
       "scope": [
         "prototype/scripts/cinematic/i00_stage.gd",
         "prototype/scripts/cinematic/i00_camp_scenery.gd",
@@ -684,7 +684,22 @@
         "docs/44_integration/AETERNA_VISUAL_30_MILESTONES_20261127.md"
       ],
       "access": "edit",
-      "note": "VIS-006: source calculation proves I00 fixed y=0 intersects existing regional terrain at x180/z160. Actual rank centre ground approx +5.031m; final legions camera below terrain by 1.268m. Preserve original authored x/z, slot counts, story, camera edit lease and simulation. Ground stage above exact regional mesh grid bounds, taper platform edge; test floor clearance and actual camera path and real Compatibility captures. Thirty-milestone ledger linked to existing VIS-001–015/RQG. No claim of full scene reconstruction or visual/device acceptance."
+      "note": "PR #190 head 9d3a08cc63758f4f6d8064c4c7347cc3aaaf4c81: six commits, terrain-aligned stage, apron, mesh-vertex negative control, actual five-shot dual-aspect 30-frame capture test and 30-milestone ledger. Focused push run 46064658673 terrain job 140726953601, capture 140726954021 both observed in_progress. Source-calculated rank centre 5.031m and max enclosing grid 5.862m; not engine measurements yet. No visual/device acceptance."
+    },
+    {
+      "id": "VIS-INDOOR-CAMERA-SPACING",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/world/camera_obstruction.gd",
+        "prototype/scripts/world/game_world.gd",
+        "prototype/tests/camera_collision_test.gd",
+        ".github/workflows/aeterna-indoor-camera-spacing.yml"
+      ],
+      "access": "edit",
+      "note": "M06/M24 follow-up from actual I01 father-delivery frame artifact 15229328974. Existing camera obstruction excludes player and retracts into arbitrarily close clear poses. Candidate bounded alternative sweep for shoulder camera only when too close; retain current collision sphere, ray, overview, history, and sealed-volume contracts. Add real physics negative-control fixture; no full visual/device acceptance."
     }
   ]
 }
