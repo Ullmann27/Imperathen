@@ -26,6 +26,8 @@ func _run() -> void:
 			check(actor.body != null and actor.detail == level and actor.resident_id == id, id + " retains its real identity and LOD")
 			if actor.body == null:
 				continue
+			if require_morphs:
+				check(actor.active_model_path == Person.PARENT_PATH % [id,level], id + " uses dedicated parent model rather than generic civilian")
 			var body := actor.body.find_child("HeroBody", true, false) as MeshInstance3D
 			check(body != null and body.mesh != null, id + " real skinned body exists")
 			if body == null or body.mesh == null:

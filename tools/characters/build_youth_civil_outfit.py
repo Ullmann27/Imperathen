@@ -467,6 +467,8 @@ def garment_weights(joint_names, gv, kind, gparam, gf, old_v, old_j, old_w, rig)
     # Skirt: wool hangs from the pelvis; the lower it is the more it follows
     # the thigh on its own side. No arm influence at all.
     m = kind == PART_KIND["skirt"]
+    skirt_ids = [joint_names.index(x) for x in ("Pelvis","Lumbar","Thigh_L","Thigh_R")]
+    allowed[np.ix_(m, skirt_ids)] = True
     y = gv[m, 1]
     theta = gparam[m, 0]
     h = np.clip((BELT_Y - y) / (BELT_Y - HEM_Y), 0, 1)
@@ -506,11 +508,16 @@ def garment_weights(joint_names, gv, kind, gparam, gf, old_v, old_j, old_w, rig)
         np.add.at(deg, we[:, 0], 1)
         np.add.at(deg, we[:, 1], 1)
         smooth = 0.5 * node + 0.5 * nb / np.maximum(deg, 1)[:, None]
-        dense = np.where(allowed | (kind == PART_KIND["skirt"])[:, None], smooth[welded], 0.0)
+        dense = np.where(allowed, smooth[welded], 0.0)
         dense /= dense.sum(1, keepdims=True)
     order = np.argsort(-dense, axis=1)[:, :4]
     wts = np.take_along_axis(dense, order, 1)
     wts /= wts.sum(1, keepdims=True)
+    if np.any((wts[m] > 1e-7) & ~np.isin(order[m], skirt_ids)):
+        raise ValueError("Skirt weights escaped the pelvis/thigh contract")
+    forbidden = [i for i,n in enumerate(joint_names) if n.startswith(("Forearm_","Hand_","Palm_","FingerCurl_","Thumb_","ForearmTwist_"))]
+    if np.any((wts > 1e-7) & np.isin(order, forbidden)):
+        raise ValueError("Garment was incorrectly weighted to a hand or forearm")
     return order.astype(np.uint16), wts.astype(np.float32)
 
 
@@ -835,7 +842,26 @@ def build_lod(raw: bytes, level: int, garment: Garment, reference, plan: Plan) -
                        "WEIGHTS_0": glb.append(gw, "VEC4", target=34962)},
         "indices": glb.append(gf.astype(np.uint32), "SCALAR", 5125, target=34963),
         "material": len(d["materials"]) - 1, "mode": 4})
+    # Two modest lower-hem shapes on the actual generated wool primitive.
+    # Every preexisting body primitive receives zero deltas; no face, hand,
+    # sole or original body geometry changes. Distant tiers stay morph-free.
+    if level < 2:
+        if any(p.get("targets") for p in mesh["primitives"]):
+            raise ValueError("Unexpected source morphs; do not overwrite them")
+        skirt = gkind == PART_KIND["skirt"]
+        h = np.clip((BELT_Y-gv[:,1])/(BELT_Y-HEM_Y),0,1)
+        fade = smoothstep(0.45,1.0,h) * skirt
+        delta = np.zeros_like(gv,dtype=np.float32)
+        delta[:,0] = 0.012*fade
+        for part in mesh["primitives"]:
+            count = d["accessors"][part["attributes"]["POSITION"]]["count"]
+            displacement = delta if part is mesh["primitives"][-1] else np.zeros((count,3),np.float32)
+            part["targets"] = [{"POSITION":glb.append(-displacement,"VEC3",target=34962)}, {"POSITION":glb.append(displacement,"VEC3",target=34962)}]
+        mesh.setdefault("extras",{})["targetNames"] = ["ClothHemLeft","ClothHemRight"]
+        mesh["weights"] = [0.0,0.0]
     report = {
+        "cloth_hem_morphs": level < 2,
+        "skirt_hand_weight_max": 0.0,
         "level": level,
         "old_shell_faces": int(len(f)), "deleted_faces": int(delete.sum()), "kept_faces": int(keep.sum()),
         "old_shell_vertices": int(len(v)), "kept_vertices": int(len(used)),

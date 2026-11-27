@@ -9,6 +9,8 @@ const EYE_PITCH := deg_to_rad(8.0)
 var skeleton: Skeleton3D
 var head := -1
 var neck := -1
+var chest := -1
+var _free_time := 0.0
 var eyes: Array[int] = []
 var _saved: Dictionary = {}
 var _written: Dictionary = {}
@@ -25,6 +27,7 @@ func bind(rig: Skeleton3D, preserve_angles: bool = false, mature_offsets: Dictio
 	skeleton = rig
 	head = -1
 	neck = -1
+	chest = -1
 	eyes.clear()
 	_eye_offsets.clear()
 	_initialized = _initialized and preserve_angles
@@ -33,6 +36,9 @@ func bind(rig: Skeleton3D, preserve_angles: bool = false, mature_offsets: Dictio
 		return
 	head = rig.find_bone("Head")
 	neck = rig.find_bone("Neck")
+	chest = rig.find_bone("Chest")
+	if not preserve_angles:
+		_free_time = 0.0
 	# The authored Marcus pair is independently weighted; the private youth
 	# still uses the head-only fallback. Require an actual head hierarchy.
 	for names: Array in [["Eye_L", "Eye_R"], ["LeftEye", "RightEye"]]:
@@ -137,10 +143,26 @@ func _aim(index: int, world_direction: Vector3, weight: float = 1.0) -> void:
 	skeleton.set_bone_pose_rotation(index, rotation)
 	skeleton.force_update_all_bone_transforms()
 
-func apply(delta: float, actor_basis: Basis, point: Vector3, action: String, enabled: bool) -> void:
+## Additive chest movement preserves the sampled rotation and never writes
+## root, pelvis, legs or pose translations.
+func _chest_motion(yaw: float, pitch: float) -> void:
+	if chest < 0:
+		return
+	var parent := skeleton.get_bone_parent(chest)
+	var basis := skeleton.get_bone_global_pose(parent).basis.orthonormalized() if parent >= 0 else Basis.IDENTITY
+	var old := skeleton.get_bone_pose_rotation(chest)
+	var rotation := (Quaternion(basis.inverse() * Vector3.UP, yaw) * Quaternion(basis.inverse() * Vector3.RIGHT, pitch) * old).normalized()
+	_saved[chest] = old
+	_written[chest] = rotation
+	skeleton.set_bone_pose_rotation(chest, rotation)
+	skeleton.force_update_all_bone_transforms()
+
+
+func apply(delta: float, actor_basis: Basis, point: Vector3, action: String, enabled: bool, natural_scan: bool = false, upper_body: bool = false) -> void:
 	restore()
 	if not available() or not enabled or action not in ["idle", "march", "talk"] or not is_finite(delta) or delta < 0.0:
 		_initialized = false
+		_free_time = 0.0
 		return
 	delta = minf(delta, 0.10)
 	_time += delta
@@ -150,13 +172,33 @@ func apply(delta: float, actor_basis: Basis, point: Vector3, action: String, ena
 		_initialized = true
 	var goal := Vector2(deg_to_rad(1.2) * sin(_time * 0.83), deg_to_rad(0.7) * sin(_time * 1.11))
 	var anchor := anchor_world()
-	if point.is_finite() and anchor.is_finite() and point.distance_squared_to(anchor) > 0.01:
+	var focused := point.is_finite() and anchor.is_finite() and point.distance_squared_to(anchor) > 0.01
+	if focused:
+		_free_time = 0.0
 		goal = angles_for(point - anchor, actor_basis)
+	elif natural_scan:
+		_free_time += delta
+		# Brief glances with dwell and smooth return, not a constant rotating head.
+		# Preserve immediate neutral after a conversation or combat.
+		var scan_time := maxf(0.0,_free_time-1.7)
+		var slot := floori(scan_time/3.8)
+		var local := fposmod(scan_time,3.8)
+		var envelope := smoothstep(0.2,0.9,local)*(1.0-smoothstep(2.0,3.0,local))
+		var headings := [17.0,-13.0,24.0,-19.0,10.0,-24.0]
+		var limit := 0.55 if action == "march" else 1.0
+		goal.x += deg_to_rad(float(headings[slot%headings.size()]))*envelope*limit
+		goal.y += deg_to_rad(-3.0 if slot%2 == 0 else 4.0)*envelope*limit
+	else:
+		_free_time = 0.0
 	var yaw_limit := HEAD_YAW if action != "march" else deg_to_rad(40.0)
 	var pitch_limit := HEAD_PITCH if action != "march" else deg_to_rad(18.0)
 	var head_goal := Vector2(clampf(goal.x, -yaw_limit, yaw_limit), clampf(goal.y, -pitch_limit, pitch_limit))
 	_head_angles = damp(_head_angles, head_goal, 5.5 if point.is_finite() else 7.0, delta)
 	_eye_angles = damp(_eye_angles, goal, 20.0, delta)
+	if upper_body and chest >= 0:
+		var chest_yaw := clampf(_head_angles.x*0.10,deg_to_rad(-3.0),deg_to_rad(3.0))
+		var breath := deg_to_rad(0.45)*sin(_time*1.85)
+		_chest_motion(chest_yaw,breath)
 	var desired := direction_for(_head_angles, actor_basis)
 	# The youth Neck is a weighted sibling rather than a parent of Head.
 	# Use a small shared correction on either topology, then solve Head in

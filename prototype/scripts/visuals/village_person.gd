@@ -41,6 +41,7 @@ const MESHY_YOUTH_OUTFITS := {
 # The retarget report and the source-specific test verify these values.
 const YOUTH_MOCAP_STRIDES := {"march":1.36795,"run":2.38253}
 const FRONTIER_PATH := "res://assets/characters/frontier_%s_%d.glb"
+const PARENT_PATH := "res://assets/characters/frontier_parent_%s_%d.glb"
 const APPEARANCES := ["civilian_man", "civilian_woman", "elder", "legionary", "officer", "spearman", "archer"]
 const CLOTH_TINTS := [Color(1.0, 1.0, 1.0), Color(0.72, 0.90, 1.10), Color(1.10, 0.75, 0.60), Color(0.75, 1.05, 0.79), Color(1.15, 1.06, 0.76), Color(0.76, 0.73, 0.84)]
 const RESIDENT_HEIGHTS := [0.97, 1.03, 1.0, 0.95, 1.04, 0.99]
@@ -74,6 +75,8 @@ var _blade: MeshInstance3D
 var _face := FacialMotion.new()
 var _gaze := HeadGaze.new()
 var _social_focus := SocialFocus.new()
+var _cloth_targets: Array[Dictionary] = []
+var _cloth_weight := Vector2.ZERO
 var _motion := CharacterMotion.new()
 var _carrying_jug := false
 const ResidentActivity := preload("res://scripts/visuals/resident_activity.gd")
@@ -278,6 +281,13 @@ func _path(level: int) -> String:
 				complete_set = false
 		if complete_set:
 			return HERO_PATH % level
+	if role == "resident" and age >= 18 and resident_id in ["julia", "silvanus"]:
+		var complete_parent := true
+		for tier in 4:
+			if not ResourceLoader.exists(PARENT_PATH % [resident_id, tier], "PackedScene"):
+				complete_parent = false
+		if complete_parent:
+			return PARENT_PATH % [resident_id, level]
 	var frontier := _frontier_identity()
 	if not frontier.is_empty():
 		var complete_set := true
@@ -364,6 +374,7 @@ func _reload(level: int) -> void:
 	if active_model_path.begins_with("res://assets/characters/frontier_") and (level < 2 or not look.is_empty()):
 		preload("res://scripts/visuals/roman_faces.gd").apply(body, face_seed, look)
 	_face.bind(body, identity)
+	_bind_cloth_sway()
 	var imported_youth := active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
 	var civilian_motion := role in ["player", "companion", "regional_worker"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"])
 	_motion.bind(body, civilian_motion and not imported_youth, identity)
@@ -591,6 +602,7 @@ func sample_service_combat(style: String, normalized: float) -> bool:
 
 
 func sample_combat(technique: String, normalized: float) -> void:
+	_set_cloth_sway(Vector2.ZERO)
 	_gaze.suspend()
 	if not technique in CharacterMotion.TECHNIQUES:
 		return
@@ -845,6 +857,7 @@ func locomotion_stride(action: String) -> float:
 
 
 func sample_pose(action: String, normalized: float) -> void:
+	_set_cloth_sway(Vector2.ZERO)
 	if action in CharacterMotion.TECHNIQUES:
 		sample_combat(action, normalized)
 		return
@@ -1118,6 +1131,7 @@ func _process(delta: float) -> void:
 		_check_lod = 0.32
 		refresh_lod(get_viewport().get_camera_3d())
 	if not _combat_id.is_empty():
+		_set_cloth_sway(Vector2.ZERO)
 		if is_instance_valid(_resident_prop):
 			_resident_prop.hide()
 		if not _combat_external and _combat_duration > 0.0:
@@ -1131,6 +1145,7 @@ func _process(delta: float) -> void:
 		_ground_youth()
 		return
 	if _posed or _service_external:
+		_set_cloth_sway(Vector2.ZERO)
 		if is_instance_valid(_resident_prop):
 			_resident_prop.hide()
 		_ground_youth()
@@ -1171,6 +1186,7 @@ func _process(delta: float) -> void:
 	_ground_youth()
 	_face.advance(delta,clip,detail)
 	_apply_gaze(delta)
+	_update_cloth_sway(delta)
 
 
 func gaze_anchor() -> Vector3:
@@ -1225,7 +1241,43 @@ func _physics_process(delta: float) -> void:
 
 func _apply_gaze(delta: float) -> void:
 	var relevant := role in ["player", "companion"] or is_instance_valid(_social_focus.target())
-	_gaze.apply(delta, global_basis, _social_focus.point(), clip, relevant and _gaze_allowed())
+	# The original youth has a chest/neck but no independent eyeball rig.
+	# Only add subtle torso motion when it cannot disturb held props or combat.
+	var natural_scan := role == "player" and _social_focus.ambient_enabled and not _posed
+	var upper_body := role == "player" and _uses_youth_mocap() and not _carrying_jug and not _posed and not _loaned_gear
+	_gaze.apply(delta, global_basis, _social_focus.point(), clip, relevant and _gaze_allowed(), natural_scan, upper_body)
+
+
+func _bind_cloth_sway() -> void:
+	_cloth_targets.clear()
+	for mesh: MeshInstance3D in body.find_children("*", "MeshInstance3D", true, false):
+		var left := mesh.find_blend_shape_by_name("ClothHemLeft")
+		var right := mesh.find_blend_shape_by_name("ClothHemRight")
+		if left >= 0 and right >= 0:
+			_cloth_targets.append({"mesh":mesh,"left":left,"right":right})
+	_set_cloth_sway(_cloth_weight if clip in ["march","run"] and detail < 2 else Vector2.ZERO)
+
+
+func _set_cloth_sway(weights: Vector2) -> void:
+	_cloth_weight = weights
+	for entry: Dictionary in _cloth_targets:
+		var mesh: MeshInstance3D = entry.mesh
+		if is_instance_valid(mesh):
+			mesh.set_blend_shape_value(int(entry.left), weights.x)
+			mesh.set_blend_shape_value(int(entry.right), weights.y)
+
+
+func _update_cloth_sway(delta: float) -> void:
+	if _cloth_targets.is_empty():
+		return
+	var swing := 0.0
+	if clip in ["march","run"] and detail < 2:
+		# Phase-lagged lower hem only. Sleeves, body and hands have zero
+		# morph delta. This is bounded secondary animation, not cloth physics.
+		var intensity := clampf(speed / 3.5, 0.0, 1.0)
+		swing = intensity * sin(phase * TAU - 0.55)
+	var target := Vector2(maxf(-swing,0.0), maxf(swing,0.0))
+	_set_cloth_sway(_cloth_weight.lerp(target,1.0-exp(-12.0*clampf(delta,0.0,0.1))))
 
 
 func _ground_youth() -> void:

@@ -43,6 +43,7 @@ hero = module("frontier_hero_source", ROOT / "tools/characters/build_hero.py")
 soldier = module("frontier_soldier_source", ROOT / "art/soldiers/build.py")
 skirt_seam = module("frontier_skirt_seam", ROOT / "tools/characters/smooth_frontier_skirt_seam.py")
 identity_shapes = module("frontier_identity_shapes", ROOT / "tools/characters/sculpt_roman_faces.py")
+adult_rig = module("frontier_adult_rig", ROOT / "tools/characters/extend_adult_rig.py")
 kit_rivets = module("frontier_kit_rivets", ROOT / "tools/characters/rebind_frontier_kit_rivets.py")
 
 

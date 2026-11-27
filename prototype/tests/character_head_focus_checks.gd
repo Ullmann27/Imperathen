@@ -81,6 +81,17 @@ static func run(tree: SceneTree, check: Callable) -> void:
 	first.position = Vector3(-8, 0, -1.5)
 	_tick(player, 0.8)
 	check.call(absf(_angle(player)) < 4.0, "Departing person releases focus")
+	# No nearby character: the idle player still explores the scene with brief
+	# bounded head turns instead of staring forward indefinitely.
+	var scan_min := 180.0
+	var scan_max := -180.0
+	for i in 600:
+		player._physics_process(1.0/60.0)
+		player._process(1.0/60.0)
+		var yaw := _angle(player)
+		scan_min = minf(scan_min,yaw)
+		scan_max = maxf(scan_max,yaw)
+	check.call(scan_min < -7.0 and scan_max > 9.0 and scan_max-scan_min < 65.0, "Idle player performs restrained left/right environmental glances")
 	player.set_ambient_gaze(false)
 	first.position = Vector3(-1, 0, -2)
 	player.set_gaze_target(first)

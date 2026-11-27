@@ -7,7 +7,9 @@ const PROFILES := ["low", "balanced", "high", "very_high"]
 var output := ""
 var profiles: Array = ["balanced", "very_high"]
 var ids: Array = ["julia", "silvanus", "sextus", "cassia", "aurelia", "decimus", "nerva", "livia", "priscilla", "fabius"]
-var game
+const World := preload("res://scripts/world/game_world.gd")
+const Model := preload("res://scripts/domain/world_model.gd")
+var world: World
 var report := {"captures": [], "errors": []}
 
 
@@ -28,10 +30,10 @@ func _initialize() -> void:
 
 func _figure(id: String) -> Node3D:
 	for path: String in ["VillageLife/Resident_" + id + "/Figure"]:
-		var node = game.world.get_node_or_null(path)
+		var node = world.get_node_or_null(path)
 		if node:
 			return node
-	for node: Node in game.world.find_children(id, "", true, false):
+	for node: Node in world.find_children(id, "", true, false):
 		var figure := node.get_node_or_null("Figure") as Node3D
 		if figure:
 			return figure
@@ -39,29 +41,25 @@ func _figure(id: String) -> Node3D:
 
 
 func _run() -> void:
-	game = preload("res://main.tscn").instantiate()
-	root.add_child(game)
+	# Setup the real game world from a clean model rather than waiting through
+	# the interactive opening film and its mandatory choices on a CPU renderer.
+	var model := Model.new()
+	model.new_game("italia", true, true, false, true)
+	world = World.new()
+	root.add_child(world)
+	world.setup(model.data)
+	world.set_physics_process(false)
+	world.set_process(false)
+	world.set_presentation_time(4.0)
+	for node: Node in world.get_tree().get_nodes_in_group("village_people"):
+		if world.is_ancestor_of(node):
+			node.set_process(false)
+			node.set_physics_process(false)
+	var camera: Camera3D = world._camera
+	camera.current = true
 	await process_frame
-	game.ui._finish_intro()
-	game._start_new_game()
-	for attempt in 4:
-		if game.screen != "opening":
-			break
-		game._opening_skip()
-		game._opening_next()
-		await process_frame
-	for i in 12: await physics_frame
-	game._refresh()
-	game.set_process(false)
-	game.world.set_physics_process(false)
-	game.world._camera_initialized = false
-	game.world._update_camera(0)
-	game.ui.hide()
-	game.world.set_presentation_time(4.0)
-	Engine.time_scale = 0
-	var camera: Camera3D = game.world._camera
 	for profile: String in profiles:
-		game.ui.set_quality(profile)
+		world.set_quality(profile)
 		for id: String in ids:
 			var figure := _figure(id)
 			if figure == null or not figure.is_visible_in_tree():
@@ -70,7 +68,11 @@ func _run() -> void:
 			figure.sample_pose("idle", 0.25)
 			var ground: Vector3 = figure.global_position - Vector3.UP * 0.9
 			var facing: Vector3 = -figure.global_basis.z
-			var rig := figure.body.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
+			var rigs: Array[Node] = figure.body.find_children("*", "Skeleton3D", true, false)
+			if rigs.is_empty():
+				report.errors.append("missing rig " + id)
+				continue
+			var rig := rigs[0] as Skeleton3D
 			var head: Vector3 = rig.global_transform * rig.get_bone_global_pose(rig.find_bone("Head")).origin
 			var target := head + Vector3.UP * 0.07
 			camera.fov = 34
@@ -91,5 +93,5 @@ func _run() -> void:
 	file.store_string(JSON.stringify(report, "  ") + "\n")
 	file.close()
 	print("RESIDENT_LIVE_REVIEW ", JSON.stringify(report.errors))
-	game.free()
+	world.free()
 	quit(0 if report.errors.is_empty() else 1)

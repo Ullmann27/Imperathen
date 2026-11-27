@@ -51,6 +51,9 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p artifacts/parent-anatomy
+          bash tools/characters/install_marcus_blender.sh "$RUNNER_TEMP/adult-blender" > artifacts/parent-anatomy/blender-install.log 2>&1
+          export PATH="$RUNNER_TEMP/adult-blender:$PATH"
+          blender --version
           git rev-parse HEAD > artifacts/parent-anatomy/commit.txt
           sha256sum art/hero_quality/hero.blend prototype/assets/characters/hero_quality_*.glb > "$RUNNER_TEMP/original-hero.sha256"
           for pair in julia:civilian_woman silvanus:civilian_man; do
@@ -64,6 +67,14 @@ jobs:
           blender -b -t 2 --python-exit-code 1 -P art/village_characters/build_resident_identity.py -- --kinds civilian_man civilian_woman 2>&1 | tee artifacts/parent-anatomy/identity-export.log
           sha256sum --check "$RUNNER_TEMP/original-hero.sha256"
           cp art/village_characters/resident_identity_report.json artifacts/parent-anatomy/
+          # The new anatomies belong only to the two story parents. Never
+          # replace the same generic model for every civilian in the village.
+          for level in 0 1 2 3; do
+            cp "prototype/assets/characters/frontier_civilian_woman_$level.glb" "prototype/assets/characters/frontier_parent_julia_$level.glb"
+            cp "prototype/assets/characters/frontier_civilian_man_$level.glb" "prototype/assets/characters/frontier_parent_silvanus_$level.glb"
+          done
+          git restore -- prototype/assets/characters/frontier_civilian_{man,woman}_*.glb
+          sha256sum prototype/assets/characters/frontier_parent_*.glb > artifacts/parent-anatomy/parent-models.sha256
       - name: Capture actual closeups and living village in Godot
         shell: bash
         run: |
@@ -78,7 +89,7 @@ jobs:
           for profile in high very_high; do
             timeout --kill-after=10s 180s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --resolution 1280x720 --fixed-fps 60 --script res://tests/resident_identity_review.gd -- "$out/studio" "$profile" close,talk,full,walk julia,silvanus 2>&1 | tee "$out/studio-$profile.log" || status=1
           done
-          timeout --kill-after=10s 240s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --resolution 1280x720 --fixed-fps 60 --script res://tests/resident_live_review.gd -- "$out/live" high,very_high julia,silvanus 2>&1 | tee "$out/live.log" || status=1
+          timeout --kill-after=10s 600s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --resolution 1280x720 --fixed-fps 60 --script res://tests/resident_live_review.gd -- "$out/live" high,very_high julia,silvanus 2>&1 | tee "$out/live.log" || status=1
           python3 - "$out" <<'PY'
           import json, pathlib, sys
           root = pathlib.Path(sys.argv[1])
@@ -101,9 +112,8 @@ jobs:
         if: always()
         run: |
           mkdir -p artifacts/parent-anatomy/candidate
-          if test -f art/village_characters/resident_identity_report.json; then
-            cp prototype/assets/characters/frontier_civilian_{man,woman}_*.glb artifacts/parent-anatomy/candidate/
-          fi
+          shopt -s nullglob
+          for file in prototype/assets/characters/frontier_parent_*.glb; do cp "$file" artifacts/parent-anatomy/candidate/; done
       - name: Save candidate renders and logs
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
