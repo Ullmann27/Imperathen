@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 180,
+  "version": 182,
   "tasks": [
     {
       "id": "K101",
@@ -839,7 +839,7 @@
       "id": "N29",
       "owner": "Nemotron",
       "access": "read",
-      "status": "submitted",
+      "status": "review_pending",
       "revision": "6d1aad82174764751cb2e2d3c0f610804518d512",
       "run_id": "46075607650",
       "scope": [
@@ -848,7 +848,7 @@
         "prototype/scripts/world/mounted_rider_pose.gd",
         "prototype/tests/valley_muster_test.gd"
       ],
-      "note": "New independently evidenced scope: actual 46066402676/job 140732645272, valley 52/53, mounted socket test fails after Germanic rig fairness candidate. Distinguish missing first UID, quota/LOD eligibility, available pose, stale bone attachment and transform residual; not a repeat of N28 Germanic identity or N19 player mount. One bounded read-only request, 8192 maximum completion tokens, concise minimal diff or diagnostic; no automatic retry. Prior N27/N28 ended truncated, not quota denial; actual remaining provider credit not exposed. No model patch may execute automatically. Actual bridge HEAD 9af16fdaa275072b8593e69ca71ee4df19957578 and run 46075607650 observed in_progress; no provider result yet."
+      "note": "Actual N29 run 46075607650/job 140762615929 succeeded; complete NVIDIA response, finish_reason=stop, model nvidia/nemotron-3-ultra-550b-a55b. Artifact 15234214921 ZIP SHA256 deb29c5e194d5d54f484c4b92487003ab6da8815f00f0535977dcb11a242aa5d; answer hash verified after removing bridge-added newline, all four pinned input SHA256 hashes independently matched. Three-line patch proposes force_update_all_bone_transforms after manual seek. Not applied blindly: Godot docs mark this internal/deprecated; answer does not discriminate absent rig vs stale socket. Next actual diagnostic preserves 3cm gate and measures direct bone, attachment and pelvis at multiple gait phases and original UID availability."
     },
     {
       "id": "CONSOLIDATED-VISUAL-CANDIDATE",
@@ -861,6 +861,19 @@
       ],
       "access": "edit",
       "note": "Draft PR #195 on integration/aeterna-visual-candidate-20261127, exact commit d5cdcf3edb14dce44a11f1beed1942c131f5339f. Seven disjoint individually tested candidate sets copied with exact Git blob IDs (27 original files plus new focused CI; 28 total). Base Preview 1327bd6 unchanged; source compare ahead 1 behind 0. Real combined CI 46075904136 observed in_progress; 11 Godot groups incl. import, Prolog, family/market, camera, backdrop, rain, night/route lights. No full combined result, no main merge, no release or visual/device acceptance. Formation and valley mounted socket still blocked; Nemotron N29 independent. Do not duplicate this run."
+    },
+    {
+      "id": "N29-SOCKET-DIAGNOSTIC",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "6d1aad82174764751cb2e2d3c0f610804518d512",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/valley_muster_test.gd",
+        ".github/workflows/aeterna-mounted-socket-diagnostic.yml"
+      ],
+      "note": "Independent actual Godot diagnosis of N29 response, on exact valley fairness candidate 6d1aad8. Keep existing first-UID and 3cm gate. Add direct production rig measurements for manual seek, bone attachment and pelvis, plus original allocation/pose provenance. No runtime patch until measured, no formation gate weakening, no repeated model dispatch."
     }
   ]
 }
