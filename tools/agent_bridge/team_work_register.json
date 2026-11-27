@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 112,
+  "version": 113,
   "tasks": [
     {
       "id": "K101",
@@ -548,6 +548,18 @@
       ],
       "access": "read",
       "note": "AETERNA Schritt 01, unabhängiger Read-only-Review. Preview 1327bd623dc5a67ce1b3611a743b481addd8bf26 erneut bestätigt. Tatsächlicher Nemotron-Probe-Run 46055100225 vollständig erfolgreich, Offline 13/13, Probe-Artefakt 15226231715. Auftragsdateien in e814cbc14727ba4440e878b62d1f32a5e2d50317; Register-Kandidat e2fd0180 erfolgreich 46055184796, Validator- und Testblobs identisch mit aktueller gemeinsamer Basis. Alte Befunde nicht als aktuelle Reproduktion ausgeben. Kein Edit-Lease, keine Freigabe und kein Wiederholen N23–N26."
+    },
+    {
+      "id": "BACKDROP-RAY-PROVENANCE",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/village_backdrop_test.gd"
+      ],
+      "access": "edit",
+      "note": "Roadmap phase 01 only: existing full regression 46038086118/job 140638526143 had 2/760 downward rays hit other/missing body and 11/225 horizontal faults, while walk and terrain height passed. Preserve all original assertions, add actual collider path/position/shape and expected mesh coordinates for failures. Isolated focused Godot diagnostic; no preview push or duplicate Nemotron request while APK #221 runs."
     }
   ]
 }
