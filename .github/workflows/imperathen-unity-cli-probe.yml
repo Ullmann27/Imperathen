@@ -91,6 +91,31 @@ jobs:
             echo "UNITY_CLOUD_PROJECT_QUERY_SUCCEEDED" >> unity-cli-evidence/checks.txt
           else
             echo "UNITY_CLOUD_PROJECT_QUERY_FAILED" >> unity-cli-evidence/checks.txt
+            # Keep full Unity response private. Publish only bounded error classes,
+            # never original messages, keys, org IDs or authentication tokens.
+            python3 - "$RUNNER_TEMP/unity-cloud-projects-private.json" <<'PY'
+          import json, pathlib, sys
+          value = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8", errors="replace")
+          try:
+              root = json.loads(value)
+          except (ValueError, TypeError):
+              root = {}
+          error = root.get("error", {}) if isinstance(root, dict) else {}
+          code = str(error.get("code", root.get("code", ""))) if isinstance(error, dict) else ""
+          code = code.upper()
+          allowed_codes = {"FORBIDDEN", "UNAUTHORIZED", "INSUFFICIENT_PERMISSIONS", "ORG_NOT_FOUND",
+                           "ORGANIZATION_REQUIRED", "NOT_FOUND", "ACCESS_DENIED", "NO_DEFAULT_ORG",
+                           "NETWORK_ERROR", "TIMEOUT", "AUTH_REQUIRED", "AUTH_EXPIRED"}
+          safe = code if code in allowed_codes else "UNCLASSIFIED"
+          with open("unity-cli-evidence/checks.txt", "a", encoding="utf-8") as file:
+              file.write("UNITY_CLOUD_PROJECT_ERROR_CLASS=" + safe + "\n")
+          PY
+            if unity cloud orgs --format json > "$RUNNER_TEMP/unity-cloud-orgs-private.json" 2>&1; then
+              echo "UNITY_CLOUD_ORG_QUERY_SUCCEEDED" >> unity-cli-evidence/checks.txt
+            else
+              echo "UNITY_CLOUD_ORG_QUERY_FAILED" >> unity-cli-evidence/checks.txt
+            fi
+            unity cloud projects --help > unity-cli-evidence/cloud-projects-help.txt 2>&1 || true
             exit 1
           fi
           python3 - "$RUNNER_TEMP/unity-cloud-projects-private.json" <<'PY'
