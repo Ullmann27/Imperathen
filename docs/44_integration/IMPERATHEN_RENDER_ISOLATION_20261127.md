@@ -1,0 +1,7 @@
+# IMPERATHEN – unabhängiger Rendering-Kanal
+
+Nur Rendering. Kein Continuum-App-Code, kein Zugriff auf deren KI/Gedächtnis oder API-Schlüssel. Der ursprüngliche Continuum-Git-Baum wurde exakt wiederhergestellt; das alte Test-JSON ist nur in seiner Historie erhalten. Das Prinzip eines versionierten Datenauftrags wird in diesem separaten Branch nachgebildet. Keine Kopie von Continuum-Code.
+
+Erster Auftrag: zwei vorhandene echte geriggte Spielfiguren (erwachsener Bürger und älterer Bürger), unveränderte Original-GLBs. Keine Brutus-Neuschöpfung oder primitiven Figuren; das ist eine technische Wiederverwendungs-/Renderprüfung. Der eigene Blender auf dem Mobilgerät ist in diesem Chat nicht erreichbar; die vorhandene Blender-4.3.2-GitHub-Pipeline dient als getrennte Renderumgebung. Die originale Erweiterung v0.2.0 bleibt unverändert. Kein automatischer Import auf dem Telefon, keine neue KI-Verbindung, keine Keys.
+
+Daten-only JSON, beschränkte geprüfte Pfade, exakte Git-Blob-Prüfung, keine frei ausführbaren Jobs. Blender liest das echte GLB, rendert drei Ansichten, speichert eine separate .blend, lädt diese erneut und prüft unveränderte Rig-/Aktionsnamen. Original-GLB bleibt bytegleich. Die Veröffentlichung betrifft nur art/review/render-atelier auf diesem Renderzweig, nur nach tatsächlichem Erfolg und unverändertem Branch-HEAD. Die Galerie zeigt direkt die Figuren, keine technischen Werte. Laufzeit-, Godot- und visuelle Freigabe bleiben getrennt. Keine neuen kostenpflichtigen Dienste oder GPU-Miete.

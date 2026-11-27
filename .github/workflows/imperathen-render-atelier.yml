@@ -1,0 +1,62 @@
+name: IMPERATHEN isolated Blender figures atelier
+on:
+  push:
+    branches: ['render/imperathen-atelier-20261127']
+    paths:
+      - 'render_bridge/jobs/**'
+      - 'tools/render_bridge/**'
+      - '.github/workflows/imperathen-render-atelier.yml'
+permissions:
+  contents: read
+concurrency:
+  group: imperathen-render-atelier
+  cancel-in-progress: false
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Validate data-only job and original animated GLB bytes
+        run: python3 -m unittest discover -s tools/render_bridge -p 'test_*.py' -v
+      - name: Install existing checksum-verified Blender 4.3.2
+        run: bash tools/characters/install_marcus_blender.sh "$RUNNER_TEMP/atelier-blender"
+      - name: Render imported real characters and reopen saved Blender files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/imperathen-render
+          "$RUNNER_TEMP/atelier-blender/blender" -b -t 4 --python-exit-code 1 -P tools/render_bridge/render_job.py -- --job render_bridge/jobs/current.json --output artifacts/imperathen-render --checkout "$GITHUB_SHA" 2>&1 | tee artifacts/imperathen-render/blender.log
+          grep -Fq IMPERATHEN_RENDER_ATELIER_PASS artifacts/imperathen-render/blender.log
+      - name: Retain editable review, renders and unmodified original models
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-figurenatelier-${{ github.run_id }}
+          path: artifacts/imperathen-render/
+          if-no-files-found: warn
+          retention-days: 30
+  publish:
+    needs: render
+    if: github.ref == 'refs/heads/render/imperathen-atelier-20261127'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@v4
+        with:
+          name: imperathen-figurenatelier-${{ github.run_id }}
+          path: verified
+      - name: Preserve verified render evidence only on isolated render branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git ls-remote origin "$GITHUB_REF" | cut -f1)" = "$GITHUB_SHA"
+          python3 tools/render_bridge/publish_review.py --input verified --checkout "$GITHUB_SHA"
+          git add -- art/review/render-atelier/
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m "Render-only: preserve verified Blender figures and direct gallery (CI $GITHUB_RUN_ID)"
+          git push origin HEAD:"$GITHUB_REF"
