@@ -347,6 +347,13 @@ func _test_vid_b_and_service() -> void:
 	await frames(4)
 	check(_sp().i03_task == "service_bring" and props.jug_in_hand(), "The filled jug is really in the boy's hand")
 	_check_market_grip(props, "Before LOD switch")
+	check(props.is_physics_processing(), "Carried pitcher reconciles after player physics")
+	# process_frame fires before idle processing. Keep the original assertion
+	# and inspect consecutive completed physics steps, not an explicit snap.
+	for frame_index in range(4):
+		await physics_frame
+		await process_frame
+		_check_market_grip(props, "Consecutive physics frame %d" % frame_index)
 	var carried: Node3D = props._jug
 	var actor = game.world._figure
 	actor._reload((actor.detail+1)%4)
@@ -359,6 +366,7 @@ func _test_vid_b_and_service() -> void:
 	var bring: Dictionary = game._command("village_childhood_action", {"action_id":"i03_service_bring"})
 	await frames(4)
 	check(bool(bring.get("ok", false)) and not props.jug_in_hand() and not props.coins_visible() and props.pot_fill() == "large", "After the service the jug is gone, Cassia has the coins, the pot holds the large measure")
+	check(not props.is_physics_processing() and not props.is_processing(), "Released pitcher no longer schedules pose synchronization")
 	var again: Dictionary = game._command("village_childhood_action", {"action_id":"i03_service_bring"})
 	check(not again.get("ok", false) and str(again.get("message", "")).contains("bereits"), "Gegenstand bereits bezahlt: " + str(again.get("message", "")))
 	await capture("stall-paid")
