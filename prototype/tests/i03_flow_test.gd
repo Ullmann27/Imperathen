@@ -346,11 +346,13 @@ func _test_vid_b_and_service() -> void:
 	game.ui.action_requested.emit("interact", {})
 	await frames(4)
 	check(_sp().i03_task == "service_bring" and props.jug_in_hand(), "The filled jug is really in the boy's hand")
+	_check_market_grip(props, "Before LOD switch")
 	var carried: Node3D = props._jug
 	var actor = game.world._figure
 	actor._reload((actor.detail+1)%4)
 	await frames(6)
 	check(is_instance_valid(carried) and carried == props._jug and carried.get_parent() == props and props.jug_in_hand(),"Market jug survives LOD replacement without being duplicated or freed")
+	_check_market_grip(props, "After LOD switch")
 	await capture("well-jug")
 	_place((_ctx().cassia as Vector2) + Vector2(0.4, 2.2))
 	game.model.capture_npc_observations()
@@ -364,6 +366,22 @@ func _test_vid_b_and_service() -> void:
 		game._opening_skip()
 		game._opening_next()
 		await frames(4)
+
+
+# Test the measured local handle point on the live model against the hand
+# pose rather than treating visibility as a contact test. The former origin
+# offset fails this check even when the pitcher is visible.
+func _check_market_grip(props: Node3D, label: String) -> void:
+	var rig: Skeleton3D = props._skeleton
+	var jug: Node3D = props._jug
+	if not check(is_instance_valid(rig) and is_instance_valid(jug) and props._left_bone >= 0, label + ": live hand and pitcher"):
+		return
+	var wrist := rig.to_global(rig.get_bone_global_pose(props._left_bone).origin)
+	var basis := jug.global_basis.orthonormalized()
+	var grip := jug.to_global(Vector3(0.168, 0.28, 0.0))
+	var palm := wrist + basis * Vector3(0.0, 0.0, 0.035)
+	check(grip.distance_to(palm) <= 0.005, label + ": measured handle is within 5 mm of palm target (" + str(grip.distance_to(palm)) + ")")
+	check(basis.y.dot(Vector3.UP) > 0.98, label + ": carried pitcher stays upright")
 
 
 func _test_farewell() -> void:
