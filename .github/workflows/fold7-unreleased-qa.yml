@@ -1,7 +1,7 @@
 name: IMPERATHEN isolated installable ARM64 QA – NOT a release
 on:
   push:
-    branches: ['feature/fold7-qa-installable-not-release-20261125', 'fix/hero-identity-city-motion-20261125', 'build/imperathen-integrated-arm64-qa-20261126', 'feat/marcus-authored-character-20261126', 'fix/android-vegetation-render-20261126', 'fix/fold7-device-visual-gameplay-recovery-20261126']
+    branches: ['feature/fold7-qa-installable-not-release-20261125', 'fix/hero-identity-city-motion-20261125', 'build/imperathen-integrated-arm64-qa-20261126', 'feat/marcus-authored-character-20261126', 'fix/android-vegetation-render-20261126', 'fix/fold7-device-visual-gameplay-recovery-20261126', 'integration/aeterna-preview-20261127']
   pull_request:
     paths:
       - 'tools/build_unreleased_city_qa.py'
