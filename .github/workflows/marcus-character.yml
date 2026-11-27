@@ -1,7 +1,7 @@
 name: Marcus – authored Blender character and actual campaign review
 on:
   push:
-    branches: ['feat/marcus-authored-character-20261126']
+    branches: ['feat/marcus-authored-character-20261126', 'feat/facial-eye-rig-20261127']
 permissions:
   contents: read
 jobs:
@@ -27,7 +27,7 @@ jobs:
           "$RUNNER_TEMP/marcus-blender/blender" -b -t 4 --python-exit-code 1 -P tools/characters/build_marcus.py -- --evidence artifacts/marcus 2>&1 | tee artifacts/marcus/blender.log
           python3 tools/characters/validate_hero.py prototype/assets/characters/marcus_quality_{0,1,2,3}.glb --report artifacts/marcus/validation.json
           mkdir -p artifacts/marcus/runtime
-          cp prototype/assets/characters/marcus_quality_*.glb artifacts/marcus/runtime/
+          cp prototype/assets/characters/marcus_quality_*.glb prototype/assets/characters/marcus_eye_calibration.json artifacts/marcus/runtime/
           sha256sum artifacts/marcus/runtime/*.glb > artifacts/marcus/GLB_SHA256SUMS.txt
       - name: Install checksum-verified Godot 4.7.2
         run: |

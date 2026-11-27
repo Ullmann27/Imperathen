@@ -190,7 +190,7 @@ def toe_global(target,side,foot,bend):
     return R.from_rotvec(unit(axis)*(-bend)).as_matrix()@neutral
 
 def neutral_idle(target,read_access):
-    """Retain the original upper-body idle and rebuild its actual feet."""
+    """Rebuild actual standing feet and remove persistent head yaw at source."""
     source=next(a for a in target.d["animations"] if a.get("name")=="idle")
     d,b=target.d,target.b
     channels={}
@@ -214,6 +214,10 @@ def neutral_idle(target,read_access):
         if len(ts)==1:tracks[node]=np.repeat(R.from_quat(qs).as_matrix(),count,axis=0)
         else:tracks[node]=Slerp(ts,R.from_quat(qs))(np.clip(timeline,ts[0],ts[-1])).as_matrix()
     rotations=[];shifts=[];difference=[]
+    original_head_angles=[]; corrected_head_angles=[]
+    forward=np.array([0.,0.,1.])
+    head_id=target.ids['Head']
+    rest_forward_local=target.rest_r[head_id].T@forward
     for i in range(count):
         local={};glob={}
         for node in target.order:
@@ -224,6 +228,17 @@ def neutral_idle(target,read_access):
                 g=target.rest_r[node]
             elif name.startswith("Foot_"):g=foot_global(target,name[-1],0.)
             elif name.startswith("Toe_"):g=toe_global(target,name[-1],pr,0.)
+            elif name == "Head":
+                original=pr@(tracks[node][i] if node in tracks else target.r[node])
+                direction=original@rest_forward_local
+                original_head_angles.append(float(np.degrees(np.arctan2(direction[0],direction[2]))))
+                # The retargeted upper torso may move, but the neutral head
+                # must face the model's +Z axis. Add bounded breath only.
+                yaw=np.deg2rad(1.0)*np.sin(2*np.pi*i/max(1,count-1))
+                pitch=np.deg2rad(.65)*np.sin(4*np.pi*i/max(1,count-1))
+                g=R.from_rotvec(np.array([pitch,yaw,0.])).as_matrix()@target.rest_r[node]
+                direction=g@rest_forward_local
+                corrected_head_angles.append(float(np.degrees(np.arctan2(direction[0],direction[2]))))
             else:g=pr@(tracks[node][i] if node in tracks else target.r[node])
             local[node]=pr.T@g;glob[node]=g
         g,p=target.fk(local)
@@ -234,7 +249,11 @@ def neutral_idle(target,read_access):
         rotations.append(local);shifts.append(shift)
     target.animation("idle",duration,rotations,shifts)
     target.review_poses["idle"]=(rotations,shifts)
-    return {"source":"existing original idle upper-body tracks; mesh-calibrated standing legs",
+    if not corrected_head_angles or max(map(abs,corrected_head_angles)) > 1.1:
+        raise ValueError("Neutral head bake did not converge")
+    return {"source":"existing original idle torso; rest-forward head with bounded breath; mesh-calibrated standing legs",
+            "original_head_yaw_deg":{"min":min(original_head_angles),"max":max(original_head_angles)},
+            "corrected_head_yaw_deg":{"min":min(corrected_head_angles),"max":max(corrected_head_angles)},
             "frames":count,"seconds":duration,"max_two_sole_height_difference_m":max(difference),
             "sole_frames":{k:{"samples":v["samples"],"rest_normal":v["rest_normal"]} for k,v in target.sole_frames.items()}}
 

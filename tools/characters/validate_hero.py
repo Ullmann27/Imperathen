@@ -200,6 +200,43 @@ def belt_topology(document: dict, inspection) -> dict:
             "scope": "Rest topology only; animated garment clearance is checked separately"}
 
 
+def validate_marcus_eyes(document, inspection, mesh_skins):
+    """Verify actual eye-only weights, not merely extra named nodes."""
+    eye_names = {"Eye_L", "Eye_R"}
+    parent = {c: i for i, n in enumerate(document["nodes"]) for c in n.get("children", [])}
+    eyes = [i for i, n in enumerate(document["nodes"]) if n.get("name") in eye_names]
+    GATE.require(len(eyes) == 2 and all(document["nodes"][parent[i]].get("name") == "Head" for i in eyes),
+                 "Marcus eye bones must be independent children of Head")
+    eye_meshes = {n["mesh"] for n in document["nodes"] if n.get("name") == "HeroEyes" and "mesh" in n}
+    GATE.require(len(eye_meshes) == 1, "Marcus must have the original separate eye mesh")
+    counts = {"Eye_L": 0, "Eye_R": 0}
+    for mesh_id, skins in mesh_skins.items():
+        GATE.require(len(skins) == 1, "Ambiguous Marcus skin")
+        skin = document["skins"][next(iter(skins))]
+        names = [document["nodes"][i]["name"] for i in skin["joints"]]
+        for primitive in document["meshes"][mesh_id]["primitives"]:
+            attrs = primitive["attributes"]
+            for joint_key in sorted(k for k in attrs if k.startswith("JOINTS_")):
+                weight_key = joint_key.replace("JOINTS_", "WEIGHTS_")
+                weights = inspection.decode(attrs[weight_key])
+                component = document["accessors"][attrs[weight_key]]["componentType"]
+                scale = {5121: 255., 5123: 65535.}.get(component, 1.)
+                joints = inspection.decode(attrs[joint_key])
+                for joint_row, weight_row in zip(joints, weights):
+                    for joint, weight in zip(joint_row, weight_row):
+                        if weight <= 1e-6:
+                            continue
+                        name = names[joint]
+                        if mesh_id in eye_meshes:
+                            GATE.require(name in eye_names and abs(weight / scale - 1.) < 1e-4,
+                                         "Eye vertices must be rigidly attached to one actual eye")
+                            counts[name] += 1
+                        else:
+                            GATE.require(name not in eye_names, "Eye bone deforms eyelid/body mesh")
+    GATE.require(all(n >= 12 for n in counts.values()), "Missing weighted eyeball surface")
+    return counts
+
+
 def inspect_asset(path: Path, level: int) -> dict:
     result = {"path": display_path(path), "lod": level, "status": "failed",
               "errors": [], "warnings": []}
@@ -226,8 +263,9 @@ def inspect_asset(path: Path, level: int) -> dict:
         skins = []
         for skin in document.get("skins", []):
             names = [document["nodes"][index].get("name") for index in skin["joints"]]
-            GATE.require(len(names) == 15 and set(names) == BONES,
-                         f"Skin must contain the fifteen runtime bones; got {names}")
+            expected = BONES | {"Eye_L", "Eye_R"} if path.name.startswith("marcus_quality_") else BONES
+            GATE.require(len(names) == len(expected) and set(names) == expected,
+                         f"Skin must contain the exact character runtime bones; got {names}")
             skins.append(names)
         GATE.require(skins, "Hero GLB contains no skin")
         mesh_skins = {}
@@ -236,6 +274,8 @@ def inspect_asset(path: Path, level: int) -> dict:
                 mesh_skins.setdefault(node["mesh"], set()).add(node["skin"])
         result["skin_bones"] = skins
         result["skin_weights"] = skin_weights(document, inspection, mesh_skins)
+        if path.name.startswith("marcus_quality_"):
+            result["independent_eye_vertices"] = validate_marcus_eyes(document, inspection, mesh_skins)
         result["body_morphs"] = body_morphs(document, inspection, mesh_skins)
         result["clips"] = animations(document, inspection)
         result["belt_topology"] = belt_topology(document, inspection)
