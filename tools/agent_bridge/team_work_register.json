@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 138,
+  "version": 139,
   "tasks": [
     {
       "id": "K101",
@@ -668,6 +668,23 @@
       ],
       "access": "edit",
       "note": "Follow-up to measured I03 grip failure before LOD in 46062934470 (54.444 mm). Runtime GameWorld physics changes player root before regular idle callbacks; props only update on idle and skeleton_updated. Hypothesis of stale world transform, not proven. Add late physics attachment update only while carrying, retain original idle and skeleton synchronization and strict 5mm assertions, measure several successive frames. No visual/finger/device acceptance; stack on #187, no merge."
+    },
+    {
+      "id": "VIS-I00-TERRAIN-CLEARANCE",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/cinematic/i00_stage.gd",
+        "prototype/scripts/cinematic/i00_camp_scenery.gd",
+        "prototype/tests/i00_stage_test.gd",
+        "prototype/tests/i00_terrain_capture_test.gd",
+        ".github/workflows/aeterna-i00-terrain-clearance.yml",
+        "docs/44_integration/AETERNA_VISUAL_30_MILESTONES_20261127.md"
+      ],
+      "access": "edit",
+      "note": "VIS-006: source calculation proves I00 fixed y=0 intersects existing regional terrain at x180/z160. Actual rank centre ground approx +5.031m; final legions camera below terrain by 1.268m. Preserve original authored x/z, slot counts, story, camera edit lease and simulation. Ground stage above exact regional mesh grid bounds, taper platform edge; test floor clearance and actual camera path and real Compatibility captures. Thirty-milestone ledger linked to existing VIS-001–015/RQG. No claim of full scene reconstruction or visual/device acceptance."
     }
   ]
 }
