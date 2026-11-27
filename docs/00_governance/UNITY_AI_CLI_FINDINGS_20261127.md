@@ -32,3 +32,17 @@ Vor einem KI-Assetauftrag muss eine **tatsächliche** Unity-Cloud-Authentifizier
 6. **Spielabnahme**: Figur/Gebäude/Ausrüstung sichtbar an echter Produktionsstelle testen; Kamera, Kollision, Performance, Motion, Texturen, Save/Load, Android-Export und Fold7-Hardware-Abnahme getrennt belegen. Ohne bestandene Abnahme kein Merge nach `main`.
 
 **Dies ist der verbindliche Status für diesen Integrationsversuch, keine Behauptung, ein neues Modell sei bereits generiert oder im Android-Spiel vorhanden.**
+
+## Zusätzliche reale Diagnose vom 27.11.2026
+
+- [GitHub Run 46041704768](https://github.com/Ullmann27/Imperathen/actions/runs/46041704768), vollständiger sanitiserter Prüfbeleg `imperathen-unity-cli-probe-46041704768`.
+- `auth_status` und `cloud_status` meldeten jeweils Exitcode **0**.
+- `cloud_orgs`, `cloud_projects_default` und `cloud_projects_org_candidate` meldeten jeweils Exitcode **3**. Der Test hat den vorhandenen Cloud-Projektnamen **Imperathen nicht gefunden**, auch nicht mit explizitem Organisationskandidaten.
+- Nach den offiziellen [Unity-CLI-Änderungen für November 2026](https://docs.unity.com/en-us/unity-cli/release-notes/2026/november) kann Exitcode 3 bei Cloud-Befehlen sowohl für **HTTP 401 als auch HTTP 403** nach erfolgreichem Login stehen. Somit wäre die sichere Aussage **Cloud-Autorisierung abgewiesen**, nicht „Schlüssel falsch“ oder „kein Konto“. Die Behebung kann eine passende Projekt-/Organisationsrolle erfordern; das ist noch nicht nachgewiesen.
+- Für Unity AI erfordern die [offiziellen Voraussetzungen](https://docs.unity.com/en-us/ai/generators-cli/get-started) ein Unity-AI-Abonnement mit Sitz, aktivierte Generators, Unity Credits und akzeptierte Bedingungen. Der bestehende kostenlose `unity ai doctor`-Test meldet weiterhin `NEEDS_SETUP`; kein kostenpflichtiger Erzeugungsauftrag wurde gesendet.
+
+### Technische Importbrücke im selben Draft-PR
+
+`tools/unity_bridge/stage_asset.py` verwendet ausdrücklich die bereits vorhandene, tatsächlich im Godot-Projekt genutzte `tools/art/inspect_meshy_glb.py`-Inspektion. Ein Unity-generiertes **echtes GLB** wird erst nach GLB-v2-Prüfung, PBR-/Textur-/UV-/Geometrietest und optionalem SHA-256 abgelegt. Für `--kind character` sind Skin und Animationen zwingend; statische Architektur/Requisiten benötigen kein fiktives Rig. Nur `prototype/assets/unity/review/<id>.glb` darf als unfreigegebene Prüfkopie verwendet werden. Keine bestehenden ungleichen Dateiinhalte werden überschrieben. Das Ergebnis enthält immer `runtime_ready: false`, `visual_acceptance: false` und `fold7_device_test: false`.
+
+**Dies ersetzt keine tatsächliche Unity-Generierung, Godot-Importprüfung oder Spielintegration.** Ein neu erstelltes Asset ist erst nach realem Modell, geprüften Dateibytes und sichtbarer Engine-Abnahme im Spiel angekommen. Die beiden neuen Testmodule sind `tests/unity_bridge_probe_access_test.py` und `tests/unity_bridge_stage_asset_test.py`.
