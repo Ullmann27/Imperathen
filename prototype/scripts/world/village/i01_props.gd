@@ -363,9 +363,11 @@ func _sample_well(seconds: float) -> void:
 		var lift := smoothstep(.75,3.15,seconds)
 		bucket = lowered.interpolate_with(raised,lift)
 		amount = 1.0
-		# Hand follows the working rope toward the accessible side of the rim.
-		var rope_contact := center+outward*.78+Vector3.UP*(1.25+.17*sin(lift*TAU*2.0))
-		_wrists(rope_contact+Vector3.UP*.12,rope_contact,Basis.IDENTITY)
+		# Animate the existing windlass, not a fictitious rope in empty air.
+		# Reach residual is retained for visual QA; long arms are never invented.
+		var crank_contact := _water_motion.windlass(bucket.origin.y-lowered.origin.y)
+		if crank_contact.is_finite():
+			_wrists(Vector3.INF,crank_contact,Basis.IDENTITY)
 	elif seconds < 5.35:
 		_jug.global_transform = jar_pose
 		var phase := (seconds-3.15)/2.2
@@ -425,8 +427,8 @@ func _sample_pour(seconds: float) -> void:
 		var flow := smoothstep(.48,.53,phase)*(1.0-smoothstep(.74,.79,phase))
 		_water_motion.water_between(pose*JUG_MOUTH,_cup_mouth(owner),flow)
 	else:
-		var final := _pour_pose(I01.CUPS[-1],0)
-		_jug.global_transform = final.interpolate_with(_jug_goal,smoothstep(start+span*I01.CUPS.size(),POUR_DURATION,seconds))
+		var end_pose := _pour_pose(I01.CUPS[-1],0)
+		_jug.global_transform = end_pose.interpolate_with(_jug_goal,smoothstep(start+span*I01.CUPS.size(),POUR_DURATION,seconds))
 	_grip(_jug.global_transform,true)
 
 

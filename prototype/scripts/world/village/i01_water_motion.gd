@@ -11,6 +11,8 @@ const BUCKET_LIP := Vector3(0,.3075,0)
 var well: Node3D
 var hanging: Node3D
 var parts: Array[Dictionary] = []
+var winding_parts: Array[Dictionary] = []
+var crank: Node3D
 var rope: MeshInstance3D
 var stream: Array[MeshInstance3D] = []
 var bucket_surface: MeshInstance3D
@@ -55,7 +57,9 @@ func bind_well() -> bool:
 	if is_instance_valid(well) and parts.size() == BUCKET_PARTS.size():
 		return true
 	parts.clear()
-	well = root.get_parent().find_child("I01Well",true,false) as Node3D
+	winding_parts.clear()
+	var regional: Node3D = root.get_parent().get("regional")
+	well = regional.get("water_well") as Node3D if is_instance_valid(regional) else null
 	if not is_instance_valid(well):
 		return false
 	var base := well.global_transform*Transform3D(Basis.IDENTITY,BASE)
@@ -70,7 +74,27 @@ func bind_well() -> bool:
 		parts.clear()
 		return false
 	_rope_was_visible = hanging.visible
+	crank = well.find_child("Well_Crank*",true,false) as Node3D
+	var pivot := well.global_transform*Transform3D(Basis.IDENTITY,Vector3(0,1.74,0))
+	for pattern: String in ["Well_Winding_Axle*","Well_Axle_Rope_Stop*","Well_Wound_Rope*","Well_Crank*"]:
+		for item: Node in well.find_children(pattern,"Node3D",true,false):
+			var node := item as Node3D
+			winding_parts.append({"node":node,"rest":node.transform,"offset":pivot.affine_inverse()*node.global_transform})
 	return true
+
+## The existing axle, wound rope and crank rotate by the actual lift distance.
+func windlass(lift_m: float) -> Vector3:
+	if not bind_well():
+		return Vector3.INF
+	var angle := lift_m/.105
+	var rotation := Basis(Vector3.RIGHT,angle)
+	var pivot := well.global_transform*Transform3D(rotation,Vector3(0,1.74,0))
+	for part: Dictionary in winding_parts:
+		var node: Node3D = part.node
+		if is_instance_valid(node):
+			node.global_transform = pivot*part.offset
+	return well.to_global(Vector3(1.56,1.74,0)+rotation*Vector3(0,-.38,0)) if is_instance_valid(crank) else Vector3.INF
+
 
 func bucket_base() -> Transform3D:
 	return well.global_transform*Transform3D(Basis.IDENTITY,BASE) if is_instance_valid(well) else Transform3D.IDENTITY
@@ -124,6 +148,9 @@ func finish() -> void:
 	if not _active:
 		return
 	for part: Dictionary in parts:
+		if is_instance_valid(part.node):
+			part.node.transform = part.rest
+	for part: Dictionary in winding_parts:
 		if is_instance_valid(part.node):
 			part.node.transform = part.rest
 	if is_instance_valid(hanging):

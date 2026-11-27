@@ -13,6 +13,11 @@ on:
       - 'prototype/tests/village_childhood_test.gd'
       - 'prototype/tests/i01_slice_test.gd'
       - 'prototype/tests/i01_flow_test.gd'
+      - 'prototype/tests/key_mission_attempts_test.gd'
+      - 'prototype/tests/mission_cinematics_test.gd'
+      - 'prototype/scripts/world/village/i01_*.gd'
+      - 'prototype/scripts/visuals/character_motion.gd'
+      - 'prototype/scripts/visuals/village_person.gd'
       - 'prototype/tests/i03_slice_test.gd'
       - 'prototype/tests/i03_flow_test.gd'
       - 'prototype/tests/i03_support.gd'
@@ -85,6 +90,8 @@ jobs:
           run_story_test --script res://tests/campaign_bible_test.gd
           run_story_test --script res://tests/village_childhood_test.gd
           run_story_test --script res://tests/i01_slice_test.gd
+          run_story_test --script res://tests/key_mission_attempts_test.gd
+          run_story_test --script res://tests/mission_cinematics_test.gd
           run_story_test --script res://tests/i03_slice_test.gd
           run_story_test --fixed-fps 60 --script res://tests/childhood_integration_test.gd
       - name: Run opening and I-00 cinematic contracts

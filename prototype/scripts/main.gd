@@ -1054,7 +1054,7 @@ func _opening_present() -> void:
 	_update_opening_voice(beat)
 	opening_director.mission_actor_id = str(cut.actor_id)
 	opening_director.focus_key = str(beat.get("anchor", ""))
-	opening_director.speaking = not bool(beat.get("silent", false))
+	opening_director.speaking = _film_actor_speaks(beat,str(cut.actor_id))
 	opening_director.play(str(cut.shot_id), maxf(0.1, maxf(float(beat.duration), opening_voice_duration) * float(cut.span)), bool(ui.opening_preferences().reduce_motion))
 	# One clock drives subtitle timing and camera travel. Reading mode can hold
 	# the finished composition without skipping a sentence or simulating time.
@@ -1075,7 +1075,7 @@ func _update_opening_voice(beat: Dictionary) -> void:
 		return
 	var phrase := str(beat.get("text", ""))
 	var speaker := str(beat.get("speaker", ""))
-	var line := VoiceLines.find(phrase)
+	var line := VoiceLines.find(phrase,speaker)
 	if line.is_empty() or str(line.speaker_id) != VoiceLines.speaker_id(speaker):
 		return
 	var stream := VoiceLines.stream_for(line)
@@ -1116,6 +1116,7 @@ func _opening_process(delta: float) -> void:
 	if str(cut.shot_id) != opening_director.shot_id or str(cut.actor_id) != opening_director.mission_actor_id:
 		# A cut inside the line (reaction shot): same clock, new composition.
 		opening_director.mission_actor_id = str(cut.actor_id)
+		opening_director.speaking = _film_actor_speaks(beat,str(cut.actor_id))
 		opening_director.play(str(cut.shot_id), maxf(0.1, duration * float(cut.span)), bool(ui.opening_preferences().reduce_motion))
 		opening_director.set_process(false)
 		opening_director.set_paused(opening_paused)
@@ -1131,6 +1132,15 @@ func _opening_process(delta: float) -> void:
 ## ([{at, shot_id, actor_id}], ascending "at" in 0..1) to change the shot size
 ## or show a reaction while the same line continues. Returns the shot, the
 ## actor it frames, the cut's share of the beat and the time inside the cut.
+func _film_actor_speaks(beat: Dictionary, actor_id: String) -> bool:
+	if bool(beat.get("silent",false)) or bool(beat.get("final",false)) or bool(beat.get("await_choice",false)):
+		return false
+	var speaker := VoiceLines.speaker_id(str(beat.get("speaker_id",beat.get("speaker",""))))
+	if speaker in ["","narrator","player"]:
+		return false
+	return actor_id.is_empty() or VoiceLines.speaker_id(actor_id) == speaker
+
+
 func _beat_cut(beat: Dictionary, fraction: float) -> Dictionary:
 	var result := {"shot_id":str(beat.shot_id), "actor_id":str(beat.get("actor_id", "")), "span":1.0, "local":clampf(fraction, 0.0, 1.0)}
 	var cuts: Array = beat.get("cuts", [])

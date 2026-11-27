@@ -9,6 +9,7 @@ const Opening = preload("res://scripts/story/opening_story.gd")
 const MissionData = preload("res://scripts/story/mission_data.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const VoiceLines = preload("res://scripts/audio/voice_lines.gd")
+const Direction := preload("res://scripts/story/campaign_direction.gd")
 
 var _lines: Array[Dictionary] = []
 var _seen := {}
@@ -47,6 +48,10 @@ func _initialize() -> void:
 			var contacts: Dictionary = mission.get("slice", {}).get("contact_lines", {})
 			for id: String in contacts:
 				_add(mission_id, mission_id + ".contact." + id, id, str(contacts[id]), "missions/" + band + "/" + mission_id + ".json:slice.contact_lines")
+	# Only intros for installed mission files enter the current voice inventory.
+	for mission: Dictionary in MissionData.mission_files("band1"):
+		var id := str(mission.mission)
+		_add(id,id+".directed_intro","Chronik",Direction.introduction(id),"campaign_direction.INTRO")
 	for id: String in Childhood.NEIGHBORS:
 		_add("village", "village.idle." + id, id, Childhood._idle_text(id), "village_childhood.NEIGHBORS")
 	for id: String in ["julia", "silvanus", "sextus"]:
