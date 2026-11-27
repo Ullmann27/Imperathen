@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 161,
+  "version": 162,
   "tasks": [
     {
       "id": "K101",
@@ -798,15 +798,15 @@
       "id": "RAIN-SURFACE-CONTRACT",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
-      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
-      "run_id": null,
+      "status": "submitted",
+      "revision": "d4dabb8f6890b0b3a2acc472dcb550dd141577e4",
+      "run_id": "46066632490",
       "scope": [
         "prototype/scripts/world/village/village_scenery.gd",
         "art/village/verify.gd",
         ".github/workflows/aeterna-rain-surface-contract.yml"
       ],
-      "note": "Reserve independent rain support provenance candidate; same submitted CPU transforms stored in bounded array and independently re-raycast, plus actual Compatibility MultiMesh readback and matching real captures. Keep 0.02m physical threshold, all original geometry, seasonal/density/doorway checks and render budgets. Hypothesis only: headless dummy getter may not preserve instance data. No production visual claim or integration before both checks."
+      "note": "Reserve independent rain support provenance candidate; same submitted CPU transforms stored in bounded array and independently re-raycast, plus actual Compatibility MultiMesh readback and matching real captures. Keep 0.02m physical threshold, all original geometry, seasonal/density/doorway checks and render budgets. Hypothesis only: headless dummy getter may not preserve instance data. No production visual claim or integration before both checks. Exact candidate committed on fix/aeterna-rain-surface-contract-20261127; compared to Preview (three files only). CI observed in_progress. CPU surface check covers all visible instances, 2cm threshold, explicit rain/dry transitions and original geometry; real Compatibility renderer must match submitted transform within 1mm and produce four PNG receipts. Headless readback difference recorded, not silently counted as GPU success. No runtime visual change or device acceptance claimed."
     }
   ]
 }
