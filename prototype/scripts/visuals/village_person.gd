@@ -55,6 +55,7 @@ const OVERLAY_RATE := deg_to_rad(240.0)
 const CROWD_LOD_DISTANCES := [6.0,15.0,30.0]
 static var scenes := {}
 static var materials := {}
+static var _far_foot_contacts := {}
 var role := "player"
 var home := "italia"
 var age := 12
@@ -1308,7 +1309,22 @@ func _ground_youth() -> void:
 		_youth_soles.apply_to_floor(youth_ground_floor_y,clip,phase)
 
 
+static func far_foot_contacts(profile_id: String) -> bool:
+	if _far_foot_contacts.is_empty():
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://assets/quality_profiles.json"))
+		var profiles: Dictionary = parsed.get("profiles",{}) if parsed is Dictionary else {}
+		for id: String in profiles:
+			_far_foot_contacts[id] = bool(profiles[id].get("far_actor_foot_contacts",true))
+		_far_foot_contacts["__loaded"] = true
+	return bool(_far_foot_contacts.get(profile_id,true))
+
+
 func _plant_contacts(delta: float) -> void:
+	# Recovered profile-gated far-foot optimisation. Never remove near,
+	# story, player, companion or combat contacts; authored gait remains.
+	if detail == 3 and role == "resident" and resident_id.is_empty() and clip in ["idle","march","run"] and not far_foot_contacts(profile):
+		_motion.reset_world_contacts()
+		return
 	# The recorded defensive step already includes its own foot placement.
 	# Do not lock both ankles through a captured guard or flatten toe roll.
 	if _uses_youth_mocap() and clip in ["idle","block"]:
