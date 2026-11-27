@@ -9,8 +9,15 @@ var failures: Array[String] = []
 
 
 func _initialize() -> void:
+	# SceneTree._initialize runs before the root enters the tree. Defer the
+	# real integration test instead of weakening the global anchor assertion.
+	call_deferred("_run")
+
+
+func _run() -> void:
 	var stage := Stage.new()
 	root.add_child(stage)
+	_check(stage.is_inside_tree(), "I-00 integration is mounted before global-space queries")
 	stage.ensure_built()
 	var ranks: Node3D = stage.get_node_or_null("LegionBlocks")
 	_check(ranks != null and ranks._batches.has("spear"),"I-00 uses the shared animated soldier silhouette batch")
