@@ -1,7 +1,7 @@
 name: Kimi transport and adaptive queue offline checks
 on:
   push:
-    branches: ['fix/kimi-api-diagnostics-adaptive-20261127']
+    branches: ['fix/kimi-api-diagnostics-adaptive-20261127', 'fix/kimi-register-workflow-scope-20261127']
 permissions:
   contents: read
 jobs:
