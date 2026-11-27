@@ -136,7 +136,11 @@ func move(body: CharacterBody3D, target: Vector3, delta: float, speed := 3.8, st
 		# stride beyond the legs' reach and makes the contact solve snap back.
 		body.rotation.y = rotate_toward(body.rotation.y,atan2(-direction.x,-direction.z),minf(delta,0.1)*MAX_TURN_RATE)
 		var forward := Vector3.FORWARD.rotated(Vector3.UP,body.rotation.y)
-		requested *= maxf(0.0,forward.dot(direction))
+		# A partially turned body would otherwise travel laterally at nearly
+		# running speed while a planted foot still supports its old heading.
+		# Ease travel by the squared alignment; retain full speed once aligned.
+		var alignment := clampf(forward.dot(direction),0.0,1.0)
+		requested *= alignment * alignment
 	# Match the player's running start: a resumed actor must not cover an
 	# entire planted stride while its standing pose is still blending out.
 	# Keep command acceleration separate from collision-limited displacement;

@@ -72,6 +72,8 @@ func _turn_and_retarget(hz: int, sign: float) -> void:
 	var backwards_running := 0
 	var backward_speed := 0.0
 	var aligned_speed := 0.0
+	var partial_turn_samples := 0
+	var partial_turn_speed := 0.0
 	var max_turn := 0.0
 	var max_step := 0.0
 	var previous_speed := 0.0
@@ -106,6 +108,9 @@ func _turn_and_retarget(hz: int, sign: float) -> void:
 			backward_speed = maxf(backward_speed, speed)
 			if figure.clip == "run":
 				backwards_running += 1
+		if alignment > 0.0 and alignment <= 0.5:
+			partial_turn_samples += 1
+			partial_turn_speed = maxf(partial_turn_speed, speed)
 		if alignment > 0.999:
 			aligned_speed = maxf(aligned_speed, speed)
 	var label := "%d Hz, turn %+.0f: " % [hz, sign]
@@ -115,13 +120,15 @@ func _turn_and_retarget(hz: int, sign: float) -> void:
 	_check(backward_speed <= 0.001, label + "a rearward destination turns on the spot before forward travel")
 	_check(backwards_running == 0, label + "the actual pose driver leaves running for the grounded turn")
 	_check(aligned_speed >= 4.09, label + "aligned travel retains the full requested running speed")
+	_check(partial_turn_samples > 0 and partial_turn_speed <= 1.035, label + "partially turned body eases real travel to at most one quarter of running speed")
 	_check(maximum_acceleration <= 8.1, label + "a start or retarget uses the existing player running acceleration")
 	_check(max_turn <= Follow.MAX_TURN_RATE * dt + 0.00001, label + "keeps the existing angular limit")
 	_check(max_step <= 4.1 * dt + 0.0001, label + "turns and retargets never teleport the body")
 	_check(nav.status == "arrived" and Vector2(actor.position.x - target.x, actor.position.z - target.z).length() <= 0.185, label + "reaches the changed destination through physics")
 	_check(sample.finite and sample.contact_samples > hz, label + "samples finite actual bones and planted feet")
 	_check(float(sample.metrics.max_support_slip_m) <= 0.015, label + "turning and starting retain the strict planted-foot limit")
-	metrics.append({"hz":hz, "turn":sign, "backward_speed_m_s":backward_speed,
+	print("COMPANION_CASE ", JSON.stringify({"hz":hz,"turn":sign,"slip_m":sample.metrics.max_support_slip_m,"worst":sample.worst.get("max_support_slip_m",{}),"partial_turn_speed_m_s":partial_turn_speed}))
+	metrics.append({"hz":hz, "turn":sign, "partial_turn_samples":partial_turn_samples,"partial_turn_speed_m_s":partial_turn_speed, "backward_speed_m_s":backward_speed,
 		"backwards_running_frames":backwards_running, "aligned_speed_m_s":aligned_speed,
 		"maximum_acceleration_m_s2":maximum_acceleration, "maximum_root_turn_deg":rad_to_deg(max_turn), "world_motion":sample.metrics,
 		"world_worst":sample.worst})
