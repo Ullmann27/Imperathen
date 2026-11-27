@@ -8,6 +8,7 @@ const Life = preload("res://scripts/domain/city_life.gd")
 const Anchors = preload("res://scripts/domain/city_anchors.gd")
 const Barks = preload("res://scripts/domain/city_barks.gd")
 const Calendar = preload("res://scripts/domain/world_calendar.gd")
+const Activities := preload("res://scripts/visuals/resident_activity.gd")
 const SEED := 20261126
 
 var failures: Array[String] = []
@@ -23,6 +24,7 @@ func check(condition: bool, label: String) -> void:
 
 func _initialize() -> void:
 	_anchor_schema()
+	_conversation_projection()
 	var metrics := _simulation()
 	print("CITY_LIFE_METRICS " + JSON.stringify(metrics))
 	if failures.is_empty():
@@ -38,6 +40,25 @@ func _entry(overrides: Dictionary = {}) -> Dictionary:
 	for key: String in overrides:
 		entry[key] = overrides[key]
 	return entry
+
+
+func _conversation_projection() -> void:
+	# A mutual conversation cannot be overwritten by a third resident's stale
+	# request, and the result is independent of body streaming order.
+	var mutual := Activities.conversation_pairs({3: 2, 2: 1, 1: 2}, {})
+	check(mutual == {1: 2, 2: 1}, "mutual city conversation excludes unrelated requests")
+	var reversed := Activities.conversation_pairs({1: 2, 2: 1, 3: 2}, {})
+	check(mutual == reversed, "city conversation projection is independent of streaming order")
+	var buyers := Activities.conversation_pairs({8: 5, 7: 5}, {8: true, 7: true})
+	check(buyers == {7: 5, 5: 7}, "one vendor addresses one buyer with a stable tie break")
+	var busy := Activities.conversation_pairs({7: 5, 5: 6, 6: 5}, {7: true})
+	check(busy == {5: 6, 6: 5}, "mutual social contact takes priority over a third-party request")
+	var independent := Activities.conversation_pairs({1: 2, 2: 1, 3: 4}, {3: true})
+	check(independent == {1: 2, 2: 1, 3: 4, 4: 3}, "independent conversations and haggling coexist")
+	check(Activities.conversation_pairs({1: 1, 2: -1, 3: 4}, {1: true, 2: true}).is_empty(), "self-contact, missing peer and unilateral non-market requests are rejected")
+	for now in [0, 5, 10, 15]:
+		check(Activities.speaker(5, 7, now) == Activities.speaker(7, 5, now), "paired NPCs agree on a single speaking turn")
+	check(Activities.speaker(5, 7, 0) != Activities.speaker(5, 7, 5), "the speaking turn alternates")
 
 
 func _anchor_schema() -> void:
