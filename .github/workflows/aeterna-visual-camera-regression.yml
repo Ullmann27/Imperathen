@@ -1,0 +1,60 @@
+name: AETERNA visual camera regression
+on:
+  pull_request:
+    paths:
+      - 'prototype/scripts/cinematic/opening_director.gd'
+      - 'prototype/scripts/visuals/head_gaze.gd'
+      - 'prototype/scripts/visuals/village_person.gd'
+      - 'prototype/tests/opening_director_test.gd'
+      - '.github/workflows/aeterna-visual-camera-regression.yml'
+permissions:
+  contents: read
+concurrency:
+  group: visual-camera-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install checksum-verified Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 --connect-timeout 15 --max-time 120 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 --connect-timeout 15 --max-time 300 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Import and run actual camera contract tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/visual-camera
+          git rev-parse HEAD > artifacts/visual-camera/source.txt
+          timeout --kill-after=10s 420s "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee artifacts/visual-camera/import.log
+          timeout --kill-after=10s 180s "$GODOT_BIN" --headless --path prototype --script res://tests/opening_director_test.gd 2>&1 | tee artifacts/visual-camera/test.log
+          grep -Eq '^OPENING_DIRECTOR_TEST .* checks \[\]' artifacts/visual-camera/test.log
+          if grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/visual-camera/test.log; then exit 1; fi
+          printf '%s\n' 'Engine camera contract only; actual rendered and physical review pending.' > artifacts/visual-camera/REVIEW_PENDING.txt
+      - name: Preserve camera contract evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: visual-camera-contract-${{ github.run_id }}
+          path: artifacts/visual-camera/
+          if-no-files-found: warn
+          retention-days: 14

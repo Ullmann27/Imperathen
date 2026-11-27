@@ -110,7 +110,7 @@ func _run() -> void:
 		var beat: Dictionary = game.opening_sequence.beats[game.opening_index]
 		if not _check(str(beat.shot_id) == shot, "Real production beat " + shot):
 			break
-		var all_three := false
+		var all_three := true
 		for fraction: float in [0.0,0.5,1.0]:
 			director.reduced_motion = false
 			director.sample(shot,fraction,float(beat.duration)*fraction)
@@ -121,8 +121,8 @@ func _run() -> void:
 			var ranks := _projected_ranks(stage,camera)
 			var subject_in_frame := true
 			if shot in ["legions_rain","legions_depart"]:
-				subject_in_frame = ranks[0] + ranks[1] + ranks[2] > 0
-				all_three = all_three or (ranks[0] > 0 and ranks[1] > 0 and ranks[2] > 0)
+				subject_in_frame = ranks[0] > 0 and ranks[1] > 0 and ranks[2] > 0
+				all_three = all_three and subject_in_frame
 			elif shot == "aquileia_detail":
 				var banner: Node3D = stage._standards[0]
 				subject_in_frame = camera.is_position_in_frustum(banner.to_global(Vector3(0,Vexillum.TOP - Vexillum.HEIGHT * 0.5,Vexillum.FRONT)))
@@ -138,7 +138,7 @@ func _run() -> void:
 		if shot in ["legions_rain","legions_depart"]:
 			wide_coverage[shot] = all_three
 			if not all_three:
-				coverage_failures.append(shot + ": no sampled frame includes centres from all three legion blocks")
+				coverage_failures.append(shot + ": at least one sampled frame loses a legion block")
 		game._opening_next()
 		await _frames(2)
 	RenderingServer.render_loop_enabled = original_loop
