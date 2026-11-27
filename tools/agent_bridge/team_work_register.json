@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 126,
+  "version": 127,
   "tasks": [
     {
       "id": "K101",
@@ -611,6 +611,21 @@
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
       "run_id": "46055915040",
       "access": "edit"
+    },
+    {
+      "id": "VIS-CAMERA-EYE-REGRESSION",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/cinematic/opening_director.gd",
+        "prototype/tests/opening_director_test.gd",
+        "docs/44_integration/USER_VISUAL_REGRESSION_20261127.md",
+        ".github/workflows/aeterna-visual-camera-regression.yml"
+      ],
+      "access": "edit",
+      "note": "Nutzerbilder 27.11.2026: I-01/I-03 Gesicht verdeckt bzw. Rumpf statt Gesicht, I-00 leere Einstellungen, Hand-/Prop-Artefakte. Isolierter erster Fix für belegte starre Augenhöhenheuristik: tatsächlichen gaze_anchor der Figuren verwenden, Regressionen für Kopfposition, Framing und Fallback. Separater visueller QA-Vertrag für alle Bildbefunde. Kein Anspruch auf vollständige Occlusion- oder Arm-/Prop-Reparatur; keine private Asset- oder Bildveröffentlichung."
     }
   ]
 }
