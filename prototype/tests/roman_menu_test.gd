@@ -31,6 +31,7 @@ func _run() -> void:
 	await _check_timeline()
 	await _check_trailer_and_profiles()
 	await _check_menu_buttons()
+	await _check_campaign_action_priority()
 	await _check_menu_layout()
 	await _check_menu_look()
 	await _check_settings_and_music()
@@ -239,6 +240,33 @@ func _check_menu_buttons() -> void:
 	await _frames()
 	var resume := _find_button(_ui.get("_screen"), "Fortsetzen")
 	_check(resume.disabled and resume.tooltip_text != "", "continue without a save is disabled and explains why")
+
+
+func _check_campaign_action_priority() -> void:
+	# The main campaign is the only primary action; independent demo modes
+	# remain enabled, but may not compete visually with the life path.
+	for can_continue in [false, true]:
+		_ui.show_menu(can_continue)
+		await _frames()
+		var screen: Control = _ui.get("_screen")
+		var primary_caption := "Fortsetzen" if can_continue else "Neues Leben"
+		var buttons: Array[Button] = []
+		_collect_buttons(screen, buttons)
+		var primary_count := 0
+		for button in buttons:
+			if button.disabled:
+				continue
+			var box := button.get_theme_stylebox("normal") as RomanStyle.TabulaBox
+			_check(box != null, button.text + " has a Roman style")
+			if box == null:
+				continue
+			if box.top == RomanStyle.CRIMSON_TOP:
+				primary_count += 1
+				_check(button.text == primary_caption, button.text + " is the expected campaign primary action")
+		_check(primary_count == 1, "exactly one enabled primary campaign action")
+		for caption in ["Stadt frei erkunden", "Rom 100 n. Chr. · Kolosseum"]:
+			var demo := _find_button(screen, caption)
+			_check(demo != null and not demo.disabled, caption + " remains accessible")
 
 
 func _check_menu_layout() -> void:
