@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 70,
+  "version": 81,
   "tasks": [
     {
       "id": "K101",
@@ -231,8 +231,8 @@
         "prototype/tests/formation_motion_measurement.gd"
       ],
       "access": "read",
-      "note": "Run 46020399670/job 140578522143 completed success; full NVIDIA_ANSWER proposes removal of first zero-time rig present call. Independent analysis required, domain formation/wheeling and physical foot continuity not proven; do not blindly patch. Independent source review confirms _match() early model_slot return lacks last_match evidence; baseline also fails domain wheeling, ownership, position and gait continuity. Removing a first visual present() alone cannot explain or resolve all these failures; do not apply without targeted authoritative slot and actual A/B measurement.",
-      "status": "review_pending"
+      "note": "Complete model answer reviewed; proposed removal of first zero-time rig sample not applied, insufficient evidence. #177 actual logs show remaining balanced position/phase and strict foot failures; N24 is a new bounded investigation of displacement debt/interpolation, not a resubmission.",
+      "status": "done"
     },
     {
       "id": "N22",
@@ -314,14 +314,14 @@
     {
       "id": "N20-FIX",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "done",
       "revision": "f1f3fb96e64c4e6bc49a458e656eabcf01eef1a5",
       "run_id": "46024129297",
       "scope": [
         "prototype/tests/adult_path_test.gd"
       ],
       "access": "edit",
-      "note": "Existing Coordinator lease fulfilled by isolated PR #174, candidate 6fce2e98f61958afea69359bcd587d462bb9b04e; actual CI in_progress/pending. Verified scaled youth track: adult first post contact at 0.6m frame 8 (not peak 13); 1.3m miss. Raider 0.7m contact frame 9; 1m miss. Added negative controls and no premature/double credit/damage. No production reach/damage or gate changes. Do not duplicate this task."
+      "note": "46024129297 completed success: combat 314/314, adult path 228/228. Exact source blob unchanged in #176; fast-forwarded common campaign candidate to 2e761e5."
     },
     {
       "id": "FORMATION-ORDER-CONTINUITY",
@@ -341,7 +341,7 @@
     {
       "id": "MEASURED-COMBAT-TARGETS",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "done",
       "revision": "6fce2e98f61958afea69359bcd587d462bb9b04e",
       "run_id": "46025782969",
       "scope": [
@@ -351,12 +351,12 @@
         "prototype/tests/gear_market_test.gd"
       ],
       "access": "edit",
-      "note": "PR #176 candidate 2e761e5, real input-only swept-target preference, actual physics wall regression, measured legacy village and gear training fixtures. CI in_progress. Preserve actual damage authority and all gates. No integration until tests."
+      "note": "46025782969 completed success on 2e761e5: combat 314, adapter 66, real world 56, adult 228, gear 445, village 249 checks, all zero failures (1358 total). Exact tested commit now on common campaign branch. No physical Fold7 or release claim."
     },
     {
       "id": "FORMATION-CASUALTY-GAPS",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "553ceab39d7d9a4a9936f24c69ac4672a789edce",
       "run_id": "46026104912",
       "scope": [
@@ -365,7 +365,82 @@
         "prototype/tests/formation_slot_authority_test.gd"
       ],
       "access": "edit",
-      "note": "PR #177 candidate 158e22df72a8fafb1ab690bd55011a16f27b801d, child of #175. Real rule casualty matching captures old UID ranks, fills front first, preserves surviving same-rank members within capacity, picks closest appropriate reserve and reorders exact UID-position pairs without moving bodies. Added actual controlled casualty regression and unchanged existing eight-step, speed, battle and 60/180-person gates. CI in_progress. Preserve all original branches and CI; no release or blind merge."
+      "note": "Run 46026104912 completed failure: slot 19/19, battle command 411/411 (closing_up_steps=4), battle rules 146/146; original formation 60 82/87 and 180 18/22. Balanced/180 root step 0.6322m, phase 0.1408, foot jump 0.0858m, very_high foot 0.0928m. Do not integrate failed entire tree; preserve independent candidates. New read-only N24 review."
+    },
+    {
+      "id": "N23",
+      "revision": "2e761e544022d03b0a813ee7cbc0c3f095ce7329",
+      "scope": [
+        "prototype/scripts/visuals/character_motion.gd",
+        "prototype/scripts/visuals/village_person.gd",
+        "prototype/scripts/story/companion_follow.gd",
+        "prototype/tests/companion_turn_motion_test.gd",
+        "prototype/tests/motion_world_measurement.gd"
+      ],
+      "note": "New bounded investigation of real Marcus 60Hz negative turn strict 0.015m failure in ARM64 runs 46020295729/46021801237. No false support flags, no skelettlocal/world confusion; one reproducible targeted repair.",
+      "owner": "Nemotron",
+      "status": "reserved",
+      "run_id": null,
+      "access": "read"
+    },
+    {
+      "id": "N24",
+      "revision": "158e22df72a8fafb1ab690bd55011a16f27b801d",
+      "scope": [
+        "prototype/scripts/formation/formation_agents.gd",
+        "prototype/scripts/tactics/valley_scene.gd",
+        "prototype/scripts/visuals/soldier_visual.gd",
+        "prototype/scripts/visuals/far_ranks.gd",
+        "prototype/tests/formation_agents_test.gd"
+      ],
+      "note": "New analysis after real PR #177 results; actual position/phase spikes balanced 180, not earlier N21 zero-time present guess. Read-only; no active edit conflict.",
+      "owner": "Nemotron",
+      "status": "reserved",
+      "run_id": null,
+      "access": "read"
+    },
+    {
+      "id": "N25",
+      "revision": "2e761e544022d03b0a813ee7cbc0c3f095ce7329",
+      "scope": [
+        "prototype/scripts/domain/npc_behavior.gd",
+        "prototype/scripts/domain/village_economy.gd",
+        "prototype/scripts/story/village_life.gd",
+        "prototype/tests/commerce_transaction_test.gd"
+      ],
+      "note": "Five observed reassigned-guard production failures in 46020295723; distinguish deterministic rain/attendance and stale duty. Real economy/state contract, no artificial production.",
+      "owner": "Nemotron",
+      "status": "reserved",
+      "run_id": null,
+      "access": "read"
+    },
+    {
+      "id": "N26",
+      "revision": "1b87724a9fe62c751d02a04668f8c924b7c7c7a0",
+      "scope": [
+        "prototype/scripts/world/village/house_interiors.gd",
+        "prototype/scripts/world/village/household_designs.gd",
+        "prototype/tests/house_interiors_test.gd"
+      ],
+      "note": "Real 7989-check interior run 46021975525: three drawn-shell window opening failures after parser repair. Diagnose geometry vs ray-test error using full pinned sources, preserve original physical/collision gate.",
+      "owner": "Nemotron",
+      "status": "reserved",
+      "run_id": null,
+      "access": "read"
+    },
+    {
+      "id": "K103",
+      "owner": "Kimi",
+      "status": "blocked",
+      "revision": "2e761e544022d03b0a813ee7cbc0c3f095ce7329",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/ui/roman_hud/menu_kit.gd",
+        "prototype/scripts/world/game_world.gd",
+        "art/review/campaign-start/menu.png"
+      ],
+      "access": "read",
+      "note": "New prepared MENU V3 single MAX task, no K102 repeat. Official https://build.nvidia.com/moonshotai/kimi-k3_1-pro/build explicitly says no programmatic API access despite Free Endpoint label; K102 HTTP 504, no accepted UUID. Offline manifest tools/agent_bridge/kimi_prepared_k103.json, NOT active push-trigger manifest. Submit only after confirmed eligible live access; do not activate paid provider or advance Journey."
     }
   ]
 }

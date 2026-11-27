@@ -1,0 +1,22 @@
+{
+  "K103": {
+    "revision": "2e761e544022d03b0a813ee7cbc0c3f095ce7329",
+    "task": "K103 — neue einzelne visuelle MENU-Etappe, kein K102-Retry: Prüfe anhand des hashgebundenen tatsächlichen V2-Godot-Menürenders und der beiden Originalquellen, welche kleinste Menü-exklusive Änderung die zu dunkle Hintergrundstadt, Vegetation und Standarte bei unverändert gut lesbaren Menütasten besser sichtbar macht. Unterscheide Overlay-Vignette, Kamerabelichtung und Weltbeleuchtung; ändere nicht das eigentliche Tag-/Nacht-Gameplay, die Qualitätsprofile oder die bereits geprüfte einzige primäre Aktion. Liefere genau einen vollständigen kleinen Unified Diff oder eine konkret begründete Ablehnung mit einem V3-Vergleichsverfahren und objektiven Bildkriterien. Kein neuer Storyabschnitt, keine behaupteten Render-/Gerätetests, MAX/RQG unverändert.",
+    "files": [
+      "prototype/scripts/ui/roman_hud/menu_kit.gd",
+      "prototype/scripts/world/game_world.gd"
+    ],
+    "images": [],
+    "evidence_images": [
+      {
+        "revision": "b3f28fa11ed9de4ed03eb8495680d28ea55ba407",
+        "path": "art/review/campaign-start/menu.png",
+        "sha256": "b9b3df173e85fda116e8bc3336b7006ddfb937d4da2a5c18fc9508b06a95b9c5",
+        "label": "V2"
+      }
+    ],
+    "max_tokens": 16384,
+    "reasoning_effort": "max",
+    "response_mode": "json"
+  }
+}
