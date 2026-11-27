@@ -88,24 +88,61 @@ func attack() -> void:
 	var facing := Vector2(direction.x, direction.z).normalized()
 	var source := Vector2(world._player.position.x, world._player.position.z)
 	var spec: Dictionary = Combat.TECHNIQUES[selected]
-	# Measured strike reach at this body size plus the target capsule.
 	var strike_reach := float(Combat.measured(selected).reach) * Combat.strike_scale(state, selected)
-	var closest := strike_reach + float(Tracks.kit("raider").radius) + AIM_MARGIN
-	var target_id := "air"
 	var targets: Array = []
 	if bool(state.village.raid.active):
 		targets.append_array(state.village.raid.enemies)
 	if bool(state.encounter.active):
 		targets.append_array(state.encounter.enemies)
-	for enemy: Dictionary in targets:
-		var offset := Vector2(float(enemy.x), float(enemy.z)) - source
-		if int(enemy.health) > 0 and offset.length() > 0.05 and offset.length() < closest and facing.dot(offset.normalized()) >= float(spec.arc_dot):
-			closest = offset.length()
-			target_id = str(enemy.id)
+	var target_id := _select_enemy_target(source, facing, targets, selected)
 	var practice := Combat.PRACTICE_POINT - source
 	if target_id == "air" and practice.length() > 0.05 and practice.length() <= strike_reach + Combat.PRACTICE_RADIUS + AIM_MARGIN and facing.dot(practice.normalized()) >= float(spec.arc_dot):
 		target_id = "practice"
 	world.action_requested.emit("village_unarmed_attack", {"technique":selected, "target_id":target_id, "facing_x":facing.x, "facing_z":facing.y})
+
+
+## Selection only: prefer a presently plausible swept contact to a closer
+## broad-phase candidate which the displayed strike cannot reach. A moving
+## target may still enter reach during windup, so preserve the original aim
+## fallback. The authoritative resolver rechecks geometry on the actual
+## contact frame; this helper cannot book damage, practice or experience.
+func _select_enemy_target(source: Vector2, facing: Vector2, targets: Array, technique: String) -> String:
+	var spec: Dictionary = Combat.TECHNIQUES[technique]
+	var timing := Combat.measured(technique)
+	var scale := Combat.strike_scale(state, technique)
+	var body := Tracks.kit("raider")
+	var radius := float(body.radius)
+	var height := float(body.height)
+	var aim_limit := float(timing.reach) * scale + radius + AIM_MARGIN
+	var fallback_distance := aim_limit
+	var preferred_distance := aim_limit
+	var fallback := "air"
+	var preferred := "air"
+	var yaw := atan2(-facing.x, -facing.y)
+	var origin := Vector3(source.x, 0.0, source.y)
+	for enemy: Dictionary in targets:
+		var point := Vector2(float(enemy.x), float(enemy.z))
+		var offset := point - source
+		var distance := offset.length()
+		if int(enemy.health) <= 0 or distance <= 0.05 or distance >= aim_limit or facing.dot(offset.normalized()) < float(spec.arc_dot):
+			continue
+		if distance < fallback_distance:
+			fallback = str(enemy.id)
+			fallback_distance = distance
+		if distance < Combat.MIN_CONTACT_DISTANCE or distance >= preferred_distance:
+			continue
+		var foot := Vector3(point.x, 0.0, point.y)
+		for frame in range(maxi(1, int(timing.start)), int(timing.end) + 1):
+			var contact := Tracks.sweep_body(Combat.strike_kit(technique), technique, scale, origin, yaw, frame, foot, radius, height)
+			if contact.is_empty():
+				continue
+			# One obstruction query per geometrically reachable candidate,
+			# not one query per clip frame or render tick.
+			if sight_clear(source, point):
+				preferred = str(enemy.id)
+				preferred_distance = distance
+			break
+	return preferred if preferred != "air" else fallback
 
 
 func sight_clear(from: Vector2, to: Vector2) -> bool:

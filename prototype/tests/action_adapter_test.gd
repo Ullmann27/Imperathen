@@ -4,6 +4,7 @@ extends SceneTree
 const WorldModel = preload("res://scripts/domain/world_model.gd")
 const WorldScene = preload("res://scripts/world/game_world.gd")
 const Combat = preload("res://scripts/domain/combat_actions.gd")
+const Art = preload("res://scripts/world/village_art.gd")
 var model = WorldModel.new()
 var world = WorldScene.new()
 var checks := 0
@@ -24,6 +25,7 @@ func _run() -> void:
 	await _test_dodge_authority_interrupt()
 	_test_damage_pose_priority()
 	_test_air_contact()
+	await _test_measured_target_priority()
 	await _test_participant_identity()
 	_test_legacy_collision_reset()
 	world.free()
@@ -141,6 +143,36 @@ func _test_air_contact() -> void:
 	model.advance(0.6)
 	world.sync_combat_state(model.data)
 	_check(not Combat.busy(model.data) and world._figure.clip == "idle", "Air strike completes recovery and releases its pose")
+
+
+func _test_measured_target_priority() -> void:
+	_reset()
+	# Candidate records isolate selection. The sight test uses actual scene
+	# physics; the full village journey below the CI gate exercises live actors.
+	world._player.global_position = Vector3(100.0, 1.0, 100.0)
+	await physics_frame
+	var source := Vector2(100.0, 100.0)
+	var forward := Vector2(0.0, -1.0)
+	var miss := {"id":"near_miss", "x":100.35, "z":99.55, "health":45}
+	var far_hit := {"id":"far_hit", "x":100.0, "z":99.3, "health":45}
+	var near_hit := {"id":"near_hit", "x":99.75, "z":99.6, "health":45}
+	var before := JSON.stringify(model.data)
+	_check(world.combat_sight_clear(source, Vector2(far_hit.x, far_hit.z)), "Unobstructed contact-control ray")
+	_check(world._actions._select_enemy_target(source, forward, [miss, far_hit], "jab_left") == "far_hit", "A nearer body outside the measured left jab does not steal a possible contact")
+	_check(world._actions._select_enemy_target(source, forward, [far_hit, miss], "jab_left") == "far_hit", "Selection does not depend on roster order for different distances")
+	_check(world._actions._select_enemy_target(source, forward, [far_hit, near_hit], "jab_left") == "near_hit", "Among reachable bodies the nearer clear contact wins")
+	var dead: Dictionary = near_hit.duplicate()
+	dead.health = 0
+	_check(world._actions._select_enemy_target(source, forward, [dead, far_hit], "jab_left") == "far_hit", "A defeated body cannot steal aim")
+	var wall := Art.box_collider(world, Vector3(0.10, 2.0, 0.07), Vector3(99.85, 1.0, 99.76))
+	await physics_frame
+	_check(not world.combat_sight_clear(source, Vector2(near_hit.x, near_hit.z)) and world.combat_sight_clear(source, Vector2(far_hit.x, far_hit.z)), "Real wall blocks only the nearer contact ray")
+	_check(world._actions._select_enemy_target(source, forward, [near_hit, far_hit], "jab_left") == "far_hit", "The clear reachable target is preferred over an obstructed target")
+	_check(world._actions._select_enemy_target(source, forward, [miss], "jab_left") == "near_miss", "Broad-phase fallback still allows a target to move into the live window")
+	_check(world._actions._select_enemy_target(source, forward, [], "jab_left") == "air", "No target stays an ordinary air strike")
+	_check(JSON.stringify(model.data) == before, "Target selection cannot mutate combat, health, rewards or the campaign")
+	wall.queue_free()
+	await physics_frame
 
 
 func _test_participant_identity() -> void:
