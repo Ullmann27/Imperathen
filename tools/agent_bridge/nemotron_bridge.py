@@ -39,7 +39,47 @@ SYSTEM = (
 )
 
 class BridgeError(Exception):
-    pass
+    def __init__(self, message, code="bridge_contract"):
+        super().__init__(message)
+        self.code = code
+
+# Only coordinator-defined labels are allowed in public failure artifacts.
+STAGES = {"request_validation", "source_collection", "provider_request",
+          "provider_probe", "artifact_write"}
+CODES = {"bridge_contract", "response_deadline", "oversized_event",
+         "stream_error", "answer_limit", "incomplete_response",
+         "unexpected_response_type", "probe_mismatch"}
+
+def failure_details(stage, exc):
+    stage = stage if stage in STAGES else "request_validation"
+    result = {"status": "blocked", "stage": stage, "requested_model": MODEL,
+              "provider_outcome": ("unknown" if stage in
+                  {"provider_request", "provider_probe", "artifact_write"} else "not_sent")}
+    if isinstance(exc, HTTPError):
+        result["category"] = "http_error"
+        result["http_status"] = exc.code if type(exc.code) is int and 100 <= exc.code <= 599 else None
+    elif isinstance(exc, TimeoutError) or (isinstance(exc, URLError) and isinstance(exc.reason, TimeoutError)):
+        result["category"] = "transport_timeout"
+    elif isinstance(exc, URLError):
+        result["category"] = "transport_error"
+    elif isinstance(exc, BridgeError):
+        result["category"] = exc.code if exc.code in CODES else "bridge_contract"
+    elif isinstance(exc, (ValueError, TypeError, KeyError, AttributeError)):
+        result["category"] = "data_contract"
+    else:
+        result["category"] = "io_error"
+    return result
+
+def record_failure(output, stage, exc):
+    details = failure_details(stage, exc)
+    safe = json.dumps(details, sort_keys=True)
+    # Never serialize exception text, URLs, response bodies, headers, keys or prompts.
+    print("NVIDIA_BRIDGE_FAILURE " + safe, file=sys.stderr)
+    try:
+        output.mkdir(parents=True, exist_ok=True)
+        (output / "failure.json").write_text(safe + "\n", encoding="utf-8")
+    except OSError:
+        print("NVIDIA_BRIDGE_FAILURE_ARTIFACT_UNAVAILABLE", file=sys.stderr)
 
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
@@ -90,12 +130,12 @@ def parse_stream(response, deadline):
     chunks, size, finish, usage, response_id, model, done = [], 0, None, None, None, None, False
     while True:
         if time.monotonic() > deadline:
-            raise BridgeError("NVIDIA response deadline exceeded")
+            raise BridgeError("NVIDIA response deadline exceeded", "response_deadline")
         line = response.readline(MAX_EVENT + 1)
         if not line:
             break
         if len(line) > MAX_EVENT:
-            raise BridgeError("Oversized stream event")
+            raise BridgeError("Oversized stream event", "oversized_event")
         line = line.strip()
         if not line.startswith(b"data:"):
             continue
@@ -105,7 +145,7 @@ def parse_stream(response, deadline):
             break
         event = json.loads(data)
         if not isinstance(event, dict) or event.get("error"):
-            raise BridgeError("NVIDIA stream returned an error")
+            raise BridgeError("NVIDIA stream returned an error", "stream_error")
         response_id = event.get("id") or response_id
         model = event.get("model") or model
         usage = event.get("usage") or usage
@@ -118,13 +158,13 @@ def parse_stream(response, deadline):
             if isinstance(content, str):
                 size += len(content.encode("utf-8"))
                 if size > MAX_ANSWER:
-                    raise BridgeError("Answer size limit exceeded")
+                    raise BridgeError("Answer size limit exceeded", "answer_limit")
                 chunks.append(content)
             if choice.get("finish_reason"):
                 finish = choice["finish_reason"]
     answer = "".join(chunks).strip()
     if not answer or not done or finish not in ("stop", "length"):
-        raise BridgeError("Missing or incomplete final NVIDIA response")
+        raise BridgeError("Missing or incomplete final NVIDIA response", "incomplete_response")
     return answer, {"response_id": response_id, "response_model": model,
                     "finish_reason": finish, "usage": usage, "complete": finish == "stop"}
 
@@ -139,12 +179,24 @@ def request_nvidia(prompt, tokens, key, opener):
     deadline = time.monotonic() + MAX_SECONDS
     with opener.open(request, timeout=180) as response:
         if response.status != 200 or "text/event-stream" not in response.headers.get("Content-Type", "").lower():
-            raise BridgeError("NVIDIA did not return an immediate SSE response")
+            raise BridgeError("NVIDIA did not return an immediate SSE response", "unexpected_response_type")
         return parse_stream(response, deadline)
+
+PROBE_MARKER = "IMPERATHEN_PROBE_OK"
+
+def probe_nvidia(key, opener):
+    # One bounded request to the existing model, without repository or user data.
+    answer, meta = request_nvidia("Return exactly " + PROBE_MARKER + " as your final answer.", 1024, key, opener)
+    if not meta.get("complete") or answer.strip() != PROBE_MARKER:
+        raise BridgeError("Probe did not return the exact complete marker", "probe_mismatch")
+    return {"status": "probe_passed", "requested_model": MODEL,
+            "complete": True, "completion_token_limit": 1024}
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--request", type=Path, required=True)
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--request", type=Path)
+    mode.add_argument("--probe", action="store_true")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     key = os.environ.get("NVIDIA_API_KEY", "").strip()
@@ -154,12 +206,24 @@ def main():
     if len(key) > 512 or any(ord(c) < 33 or ord(c) > 126 for c in key):
         print("NVIDIA_BRIDGE_ERROR: invalid credential format", file=sys.stderr)
         return 2
+    stage = "request_validation"
     try:
+        opener = build_opener(NoRedirect())
+        if args.probe:
+            stage = "provider_probe"
+            receipt = probe_nvidia(key, opener)
+            stage = "artifact_write"
+            args.output.mkdir(parents=True, exist_ok=True)
+            (args.output / "probe.json").write_text(json.dumps(receipt, sort_keys=True) + "\n", encoding="utf-8")
+            print("NVIDIA_BRIDGE_PROBE_PASSED")
+            return 0
         request = json.loads(args.request.read_text(encoding="utf-8"))
         validate_request(request)
-        opener = build_opener(NoRedirect())
+        stage = "source_collection"
         prompt, hashes = collect(request, opener)
+        stage = "provider_request"
         answer, meta = request_nvidia(prompt, request["max_tokens"], key, opener)
+        stage = "artifact_write"
         answer = KEY_PATTERN.sub("[REDACTED]", answer.replace(key, "[REDACTED]"))
         receipt = {"requested_model": MODEL, "source_revision": request["revision"],
                    "files_sha256": hashes, "answer_sha256": hashlib.sha256(answer.encode()).hexdigest(),
@@ -176,11 +240,8 @@ def main():
             print("NVIDIA_ANSWER | " + safe_line.replace("::", ": :"))
         print("NVIDIA_BRIDGE_RECEIPT " + json.dumps({"status": receipt["status"], "source_revision": request["revision"]}))
         return 0 if meta["complete"] else 3
-    except HTTPError as exc:
-        print(f"NVIDIA_BRIDGE_ERROR: HTTP {exc.code}; check key, service access or quota.", file=sys.stderr)
-    except (BridgeError, URLError, TimeoutError, OSError, ValueError, TypeError, KeyError, AttributeError):
-        # No external body, URL, credential, or traceback in public logs.
-        print("NVIDIA_BRIDGE_ERROR: validation, transport or response contract failed.", file=sys.stderr)
+    except (BridgeError, URLError, TimeoutError, OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
+        record_failure(args.output, stage, exc)
     return 1
 
 if __name__ == "__main__":

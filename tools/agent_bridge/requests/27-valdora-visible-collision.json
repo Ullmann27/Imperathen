@@ -1,0 +1,12 @@
+{
+  "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+  "task": "AETERNA Schritt 01.2, ausschließlich unabhängige Read-only-Analyse. Alter Full-Fold7-Lauf 46038086118 meldete village_backdrop 2/60 Fehler; auf diesem neueren Preview-Commit ist der Befund noch nicht reproduziert. Vergleiche Original-Mesh, Collider, Raycast und begehbare Übergänge. Benenne genau eine überprüfbare Fehlersignatur und ein reproduzierbares Experiment mit Originalgrenzen; falls nur Hypothese, ausdrücklich kennzeichnen. Kein fertiger Fix ohne Engine-Beleg, keine Änderung am Testmaßstab. Liefere vollständigen kleinen Unified Diff nur wenn aus dem Quellcode begründbar, sonst konkrete Diagnose.",
+  "files": [
+    "prototype/tests/village_backdrop_test.gd",
+    "prototype/scripts/world/village/backdrop_hills.gd",
+    "prototype/scripts/world/village/village_scenery.gd",
+    "prototype/scripts/world/village/valdora_land.gd",
+    "prototype/scripts/world/regional_terrain.gd"
+  ],
+  "max_tokens": 4096
+}
