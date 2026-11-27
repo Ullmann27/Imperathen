@@ -54,12 +54,25 @@ func _cylinder(id: String, radius: float, material: Material) -> MeshInstance3D:
 	return item
 
 func bind_well() -> bool:
-	if is_instance_valid(well) and parts.size() == BUCKET_PARTS.size():
-		return true
+	var regional: Node3D = root.get_parent().get("regional")
+	var current := regional.get("water_well") as Node3D if is_instance_valid(regional) else null
+	if is_instance_valid(current) and current == well and parts.size() == BUCKET_PARTS.size() \
+		and is_instance_valid(hanging) and is_instance_valid(crank) and not winding_parts.is_empty():
+		var complete := true
+		for part: Dictionary in parts + winding_parts:
+			if not is_instance_valid(part.node):
+				complete = false
+				break
+		if complete:
+			return true
+	# Origin changes can replace the imported scene. Restore the old assembly
+	# before dropping cached references; never animate a previous village.
+	finish()
 	parts.clear()
 	winding_parts.clear()
-	var regional: Node3D = root.get_parent().get("regional")
-	well = regional.get("water_well") as Node3D if is_instance_valid(regional) else null
+	hanging = null
+	crank = null
+	well = current
 	if not is_instance_valid(well):
 		return false
 	var base := well.global_transform*Transform3D(Basis.IDENTITY,BASE)
@@ -75,9 +88,17 @@ func bind_well() -> bool:
 		return false
 	_rope_was_visible = hanging.visible
 	crank = well.find_child("Well_Crank*",true,false) as Node3D
+	if not is_instance_valid(crank):
+		parts.clear()
+		return false
 	var pivot := well.global_transform*Transform3D(Basis.IDENTITY,Vector3(0,1.74,0))
 	for pattern: String in ["Well_Winding_Axle*","Well_Axle_Rope_Stop*","Well_Wound_Rope*","Well_Crank*"]:
-		for item: Node in well.find_children(pattern,"Node3D",true,false):
+		var matches := well.find_children(pattern,"Node3D",true,false)
+		if matches.is_empty():
+			parts.clear()
+			winding_parts.clear()
+			return false
+		for item: Node in matches:
 			var node := item as Node3D
 			winding_parts.append({"node":node,"rest":node.transform,"offset":pivot.affine_inverse()*node.global_transform})
 	return true
@@ -86,6 +107,7 @@ func bind_well() -> bool:
 func windlass(lift_m: float) -> Vector3:
 	if not bind_well():
 		return Vector3.INF
+	_active = true
 	var angle := lift_m/.105
 	var rotation := Basis(Vector3.RIGHT,angle)
 	var pivot := well.global_transform*Transform3D(rotation,Vector3(0,1.74,0))

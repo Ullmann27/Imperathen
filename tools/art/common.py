@@ -144,11 +144,13 @@ def _bake_modifiers(obj):
     obj.select_set(False)
 
 
-def export_asset(asset_id, objects, output_dir):
+def export_asset(asset_id, objects, output_dir, *, preserve_prefixes=()):
     """Bake bevels and batch geometry by material; keep portable self-contained GLB.
 
     Source geometry is saved before batching for editing. No collider is implied.
     Shared scene export uses only the supplied object's list, never lights/cameras.
+    Independently animated objects retain their names and must not be joined
+    into static material batches. The default preserves prior export behavior.
     """
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -165,10 +167,13 @@ def export_asset(asset_id, objects, output_dir):
     bpy.ops.wm.save_as_mainfile(filepath=str(source_path), compress=True)
     groups = {}
     for obj in meshes:
-        key = tuple(slot.material.name if slot.material else "none" for slot in obj.material_slots)
+        if obj.name.startswith(preserve_prefixes):
+            key = ("object", obj.name)
+        else:
+            key = ("material", *(slot.material.name if slot.material else "none" for slot in obj.material_slots))
         groups.setdefault(key, []).append(obj)
     batched = []
-    for index, group in enumerate(groups.values()):
+    for index, (key, group) in enumerate(groups.items()):
         bpy.ops.object.select_all(action="DESELECT")
         for obj in group:
             obj.select_set(True)
@@ -176,9 +181,10 @@ def export_asset(asset_id, objects, output_dir):
         if len(group) > 1:
             bpy.ops.object.join()
         obj = bpy.context.object
-        obj.name = f"{asset_id}_{index:02d}"
-        bpy.context.scene.cursor.location = (0, 0, 0)
-        bpy.ops.object.origin_set(type="ORIGIN_CURSOR")
+        if key[0] == "material":
+            obj.name = f"{asset_id}_{index:02d}"
+            bpy.context.scene.cursor.location = (0, 0, 0)
+            bpy.ops.object.origin_set(type="ORIGIN_CURSOR")
         batched.append(obj)
     bpy.ops.object.select_all(action="DESELECT")
     points = []
