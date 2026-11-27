@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 129,
+  "version": 134,
   "tasks": [
     {
       "id": "K101",
@@ -552,14 +552,14 @@
     {
       "id": "BACKDROP-RAY-PROVENANCE",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "review_pending",
       "revision": "ffbea5820907f8c517818235d435ffea9638ec48",
       "run_id": "46061712090",
       "scope": [
         "prototype/tests/village_backdrop_test.gd"
       ],
       "access": "edit",
-      "note": "Roadmap phase 01 only: existing full regression 46038086118/job 140638526143 had 2/760 downward rays hit other/missing body and 11/225 horizontal faults, while walk and terrain height passed. Preserve all original assertions, add actual collider path/position/shape and expected mesh coordinates for failures. Isolated focused Godot diagnostic; no preview push or duplicate Nemotron request while APK #221 runs. New isolated branch fix/aeterna-backdrop-ray-provenance-20261127, actual head bba33d9f45d43d02ca70c39304a6e848fafcac98; workflow 46055508471 in_progress, actual engine baseline (no private model staging) and unchanged checks. N27 is separately registered as read-only, no duplicate API call. No result or repair claimed. Actual run 46055508471 completed failure 58/60; collider path Landscape/Vegetation appears in all eight retained individual ray faults, 11/225 horizontal faults and 2/760 downward failures in the original gate. Original walking, slope and corridor checks passed. Candidate ffbea5820907f8c517818235d435ffea9638ec48 independently checks raw vegetation hits against exact body RID, shape index/transform/dimensions, ecology entry and real render batch; then repeats same segment with only verified trunk RID excluded to measure terrain. Existing numerical terrain and movement checks unchanged, adds two verification assertions. No runtime change or green claim; independent focused CI required."
+      "note": "Actual focused Godot run 46061712090/job 140717292534 passed import and village_backdrop, artifact 15228458606. Prior candidate ffbea582 reconciles vegetation collider provenance while preserving original measured terrain/walking gates; no runtime change or device/visual acceptance. Independent review remains required."
     },
     {
       "id": "PARALLEL-NIGHT-EVIDENCE",
@@ -605,9 +605,9 @@
         "prototype/tests/resident_catalog_bridge_test.gd",
         "prototype/tests/soldier_visual_test.gd"
       ],
-      "note": "Roadmap 01.1/01.4 and PR #180 read-through. Check exact original frontier civilian woman and legionary GLB references actually selected by existing runtime actors. Preserve original tests and animations. Hash source files; report catalog and equipment gates. No generation or replacement, no private assets or other projects. Candidate 0e996ed8cb2af81ef721572e223786c457cee253; observed four independent GitHub jobs in_progress. QA #221 is separately successful on 1327bd6, artifact 15226547072, no physical device acceptance. This candidate has no results yet.",
+      "note": "Actual run 46055915040/job 140698244361 passed 7 checks: import, resident_catalog_bridge, troop_catalog, soldier_visuals, meshy_registry, meshy_characters, meshy_equipment. Artifact 15226552406; runtime catalog/equipment evidence only; no universal visual or device acceptance.",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "review_pending",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
       "run_id": "46055915040",
       "access": "edit"
@@ -615,9 +615,9 @@
     {
       "id": "VIS-CAMERA-EYE-REGRESSION",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "review_pending",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
-      "run_id": null,
+      "run_id": "46061403644",
       "scope": [
         "prototype/scripts/cinematic/opening_director.gd",
         "prototype/tests/opening_director_test.gd",
@@ -625,21 +625,21 @@
         ".github/workflows/aeterna-visual-camera-regression.yml"
       ],
       "access": "edit",
-      "note": "Nutzerbilder 27.11.2026: I-01/I-03 Gesicht verdeckt bzw. Rumpf statt Gesicht, I-00 leere Einstellungen, Hand-/Prop-Artefakte. Isolierter erster Fix für belegte starre Augenhöhenheuristik: tatsächlichen gaze_anchor der Figuren verwenden, Regressionen für Kopfposition, Framing und Fallback. Separater visueller QA-Vertrag für alle Bildbefunde. Kein Anspruch auf vollständige Occlusion- oder Arm-/Prop-Reparatur; keine private Asset- oder Bildveröffentlichung."
+      "note": "PR #186 head f0925a30c99b6e17bfdcfc9cd870290e4e81c96f; verified actual Godot CI 46061403644/job 140716288121 success, OPENING_DIRECTOR_TEST 368 checks []; story contract 46061403624 success. Broader ARM64 and city image checks still in_progress. Camera eye target only, no occlusion, RQG visual/device pending."
     },
     {
       "id": "VIS-MARKET-JUG-GRIP",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
-      "run_id": null,
+      "run_id": "46062934470",
       "scope": [
         "prototype/scripts/world/village/i03_props.gd",
         "prototype/tests/i03_flow_test.gd",
         ".github/workflows/aeterna-market-jug-regression.yml"
       ],
       "access": "edit",
-      "note": "VIS-002 market service: I03 uses old fixed root-relative offset on same measured pitcher as I01. Align actual handle grip point with live left wrist/palm offset, preserve upright vessel and LOD ownership; no finger/skin/occlusion acceptance. Real I03 flow regression before/after LOD change and delivery. Separate branch and CI; no provider dispatch."
+      "note": "PR #187 head c9fe2960008cf52787fa51c4afe09c4528d236b1. Actual focused push workflow 46062934470/job 140721300780 observed in_progress; live I03 flow, 6 contact/upright checks before/after LOD, Compatibility screenshot and SHA256 receipt. No measured contact, finger or visual/device acceptance yet. Own coordinator patch; no Kimi/Nemotron output."
     }
   ]
 }
