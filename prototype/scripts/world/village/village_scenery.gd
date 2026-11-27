@@ -41,6 +41,9 @@ var _rain_cursor := 0
 var _rain_valid := 0
 var _rain_anchor := Vector3.INF
 var _rain_offsets: Array[Vector2] = []
+# CPU record of the exact surface transforms submitted to the native batch.
+# Headless renderers need not support MultiMesh instance readback.
+var _rain_surface_transforms: Array[Transform3D] = []
 var _weather_wind := 1.0
 var _weather_wet := 0.0
 var _gravel: Array[MultiMeshInstance3D] = []
@@ -140,6 +143,7 @@ func set_weather_state(sample: Dictionary) -> void:
 		_rain_anchor = Vector3.INF
 		_rain_cursor = 0
 		_rain_valid = 0
+		_rain_surface_transforms.clear()
 	_update_rain_count()
 
 func _apply_wetness(wet: float) -> void:
@@ -169,6 +173,7 @@ func _physics_process(_delta: float) -> void:
 		_rain.global_position=next
 		_rain_cursor=0
 		_rain_valid=0
+		_rain_surface_transforms.clear()
 	var space := get_world_3d().direct_space_state
 	# Up to 32 exact static-surface queries per physics frame. Rain starts
 	# ABOVE roof/terrain hits rather than continuing through interiors.
@@ -180,7 +185,9 @@ func _physics_process(_delta: float) -> void:
 		if not hit.is_empty():
 			var surface: Vector3=hit.position
 			var yaw := float(posmod(probe*137,360))*PI/180.0
-			_rain.multimesh.set_instance_transform(_rain_valid,Transform3D(Basis(Vector3.UP,yaw),surface-_rain_anchor))
+			var transform := Transform3D(Basis(Vector3.UP,yaw),surface-_rain_anchor)
+			_rain_surface_transforms.append(transform)
+			_rain.multimesh.set_instance_transform(_rain_valid,transform)
 			_rain_valid+=1
 		_rain_cursor=probe+1
 	_update_rain_count()
