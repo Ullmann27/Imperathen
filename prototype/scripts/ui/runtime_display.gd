@@ -5,6 +5,9 @@ const SafeArea = preload("res://scripts/ui/safe_area.gd")
 const SustainedQuality = preload("res://scripts/rendering/fold7_quality_policy.gd")
 const RenderProfile = preload("res://scripts/rendering/render_profile.gd")
 const BACKGROUND_FPS := 15
+const GOVERNOR_WINDOW_MS := 2000.0
+const GOVERNOR_MAX_WINDOW_MS := 5000.0
+const GOVERNOR_MAX_FRAMES := 360
 
 var _profiles: Dictionary
 var _quality := "balanced"
@@ -15,7 +18,14 @@ var _sample_start := 0
 var _sample_frames := 0
 var _adapter_line := ""
 var _previous_frame_usec := 0
+# One-second diagnostic intervals are independent of governor windows.
 var _recent_times: Array[float] = []
+var _cpu_times: Array[float] = []
+var _gpu_times: Array[float] = []
+var _governor_frame_times: Array[float] = []
+var _governor_gpu_times: Array[float] = []
+var _governor_elapsed_ms := 0.0
+var _last_gpu_observations: Dictionary = {}
 var _foreground_fps := 60
 var _application_focused := true
 var _application_paused := false
@@ -143,7 +153,7 @@ func quality_report() -> Dictionary:
 		"effective_3d_scale":get_viewport().scaling_3d_scale,
 		"renderer":RenderingServer.get_current_rendering_method(),
 		"engine_switches":_render_applied.duplicate(true),
-		"gpu_timing_available":RenderingServer.viewport_get_measured_render_time_gpu(get_viewport().get_viewport_rid())>0.0,
+		"gpu_timing_available":float(_last_gpu_observations.get("p95",-1.0))>0.0,
 		"thermal_measured":false}
 
 
@@ -184,12 +194,26 @@ func _place_overlay() -> void:
 func _restart_sample() -> void:
 	_sample_start = Time.get_ticks_usec()
 	_sample_frames = 0
+	_recent_times.clear()
+	_cpu_times.clear()
+	_gpu_times.clear()
+
+
+func _clear_governor_window() -> void:
+	_governor_frame_times.clear()
+	_governor_gpu_times.clear()
+	_governor_elapsed_ms = 0.0
 
 
 func _reset_measurements() -> void:
 	_previous_frame_usec = 0
-	_recent_times.clear()
 	_restart_sample()
+	_clear_governor_window()
+	_last_gpu_observations.clear()
+	# Focus, pause, resize and profile changes break consecutive evidence.
+	# Keep the selected scale and any active post-adjustment cooldown.
+	_governor.slow = 0
+	_governor.fast = 0
 	if is_instance_valid(_panel) and _panel.visible:
 		_label.text = "Bildzeiten werden erfasst …" if _application_active() else "Bildzeitmessung pausiert."
 
@@ -216,88 +240,126 @@ func _notification(what: int) -> void:
 			_place_overlay.call_deferred()
 
 
+## Consume each disjoint gameplay window at most once. A slow 30 FPS
+## profile still gathers enough observations. A very slow or interrupted
+## window cannot grow indefinitely or continue a previous pressure streak.
+func _sample_governor(frame_ms: float, gpu_ms: float) -> bool:
+	if not _sustained_scene or _sustained_paused or not _application_active() or not SustainedQuality.adaptive(_quality):
+		return false
+	if not is_finite(frame_ms) or frame_ms <= 0.0:
+		return false
+	_governor_frame_times.append(frame_ms)
+	_governor_elapsed_ms += frame_ms
+	if is_finite(gpu_ms) and gpu_ms > 0.0:
+		_governor_gpu_times.append(gpu_ms)
+	var count := _governor_frame_times.size()
+	var ready := _governor_elapsed_ms >= GOVERNOR_WINDOW_MS and count >= SustainedQuality.MIN_SAMPLES
+	if not ready and _governor_elapsed_ms < GOVERNOR_MAX_WINDOW_MS and count < GOVERNOR_MAX_FRAMES:
+		return false
+	if not ready:
+		_clear_governor_window()
+		_governor.slow = 0
+		_governor.fast = 0
+		return false
+	var wall := SustainedQuality.observation_summary(_governor_frame_times,count)
+	var gpu := SustainedQuality.observation_summary(_governor_gpu_times,count)
+	_clear_governor_window()
+	var before := float(_governor.ratio)
+	_governor = SustainedQuality.step(_quality,_governor,float(wall.p95),float(gpu.p95),count,_application_active())
+	var changed := absf(float(_governor.ratio)-before)>0.0001
+	if changed and OS.is_debug_build():
+		print("IMPERATHEN_ADAPTIVE_QUALITY " + JSON.stringify({
+			"quality":_quality,"ratio":_governor.ratio,"reason":_governor.reason,
+			"p95_ms":wall.p95,"gpu_observation_p95_ms":gpu.p95 if float(gpu.p95)>0.0 else null,
+			"gpu_observations":gpu.count,"frame_intervals":count,
+			"thermal_measured":false}))
+	return changed
+
+
 func _process(_delta: float) -> void:
 	if not _application_active() or not (_panel.visible or (_sustained_scene and not _sustained_paused)):
 		return
 	var now := Time.get_ticks_usec()
-	if _previous_frame_usec > 0:
-		_recent_times.append((now - _previous_frame_usec) * 0.001)
-		if _recent_times.size() > 180:
-			_recent_times.pop_front()
-	_previous_frame_usec = now
-	_sample_frames += 1
-	var interval := now - _sample_start
-	if interval < 1000000:
-		return
 	var viewport := get_viewport()
 	var rid := viewport.get_viewport_rid()
-	var frame_ms := interval / (1000.0 * _sample_frames)
-	var cpu_ms := RenderingServer.viewport_get_measured_render_time_cpu(rid)
-	var gpu_ms := RenderingServer.viewport_get_measured_render_time_gpu(rid)
+	var cpu_ms := -1.0
+	var gpu_ms := -1.0
+	if _previous_frame_usec > 0:
+		var frame_ms := (now - _previous_frame_usec) * 0.001
+		if is_finite(frame_ms) and frame_ms > 0.0:
+			# Godot exposes the latest completed render timing, not its frame ID.
+			# Poll once per process interval without assuming unique GPU frames.
+			if DisplayServer.get_name() != "headless":
+				cpu_ms = RenderingServer.viewport_get_measured_render_time_cpu(rid)
+				gpu_ms = RenderingServer.viewport_get_measured_render_time_gpu(rid)
+			_recent_times.append(frame_ms)
+			_sample_frames += 1
+			if is_finite(cpu_ms) and cpu_ms > 0.0:
+				_cpu_times.append(cpu_ms)
+			if is_finite(gpu_ms) and gpu_ms > 0.0:
+				_gpu_times.append(gpu_ms)
+			if _sample_governor(frame_ms,gpu_ms):
+				_on_size_changed()
+				return
+	_previous_frame_usec = now
+	if now - _sample_start < 1000000 and _recent_times.size() < GOVERNOR_MAX_FRAMES:
+		return
+	var count := _recent_times.size()
+	if count == 0:
+		_restart_sample()
+		return
+	var frame_total := 0.0
+	for value: float in _recent_times:
+		frame_total += value
+	var mean_ms := frame_total / float(count)
+	var wall := SustainedQuality.observation_summary(_recent_times,count)
+	var cpu := SustainedQuality.observation_summary(_cpu_times,count)
+	var gpu := SustainedQuality.observation_summary(_gpu_times,count)
+	_last_gpu_observations = gpu.duplicate()
+	# A release build with the HUD hidden needs no memory-file reads or
+	# diagnostic formatting. Debug Android retains one-second ADB telemetry.
+	var publish := OS.is_debug_build() and OS.has_feature("android")
+	if not _panel.visible and not publish:
+		_restart_sample()
+		return
 	var ram := _resident_memory_kib()
 	var draws := viewport.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE, Viewport.RENDER_INFO_DRAW_CALLS_IN_FRAME)
 	var primitives := viewport.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE, Viewport.RENDER_INFO_PRIMITIVES_IN_FRAME)
-	_label.text = "%.1f FPS · %.1f ms/Bild\nRender-CPU %s · GPU %s\nRAM (RSS) %s · %d Draw Calls\n%d sichtbare Primitive" % [
-		1000.0 / frame_ms, frame_ms, _timing(cpu_ms), _timing(gpu_ms),
-		"%.1f MiB" % (ram / 1024.0) if ram > 0 else "unbekannt", draws, primitives]
-	if _recent_times.size() >= 10:
-		var sorted := _recent_times.duplicate()
-		sorted.sort()
-		var n := sorted.size()
-		_label.text += "\nBildzeit P50/P95/P99: %.1f / %.1f / %.1f ms" % [
-			sorted[ceili(n * 0.50)-1], sorted[ceili(n * 0.95)-1], sorted[ceili(n * 0.99)-1]]
-		if n == 180 and sorted[ceili(n * 0.95)-1] > 1000.0 / 30.0:
-			_label.text += "\nÜber 33 ms: Grafikstufe bei Bedarf senken."
-
-	# Only measured frame intervals may change the 3D buffer. The HUD remains
-	# at native output resolution, and timing absence is never invented as 0 ms.
-	if _sustained_scene and not _sustained_paused and _recent_times.size() >= SustainedQuality.MIN_SAMPLES:
-		var measured := _recent_times.duplicate()
-		measured.sort()
-		var p95: float = measured[ceili(float(measured.size())*0.95)-1]
-		var before_ratio := float(_governor.ratio)
-		_governor = SustainedQuality.step(_quality,_governor,p95,gpu_ms,
-			_recent_times.size(),_application_active())
-		if absf(float(_governor.ratio)-before_ratio)>0.0001:
-			_on_size_changed()
-			if OS.is_debug_build():
-				print("IMPERATHEN_ADAPTIVE_QUALITY " + JSON.stringify({
-					"quality":_quality,"ratio":_governor.ratio,"reason":_governor.reason,
-					"p95_ms":p95,"gpu_ms":gpu_ms if gpu_ms>0 else null,
-					"thermal_measured":false}))
-			return
-	if _panel.visible and _sustained_scene:
-		_label.text += "\n3D-Adaption: %d %% · Profil %s" % [roundi(float(_governor.ratio)*100.0),_quality]
 	var output := get_window().size
-	var internal := Vector2i((Vector2(output) * viewport.scaling_3d_scale).round())
-	_label.text += "\n%s\n3D %d × %d · Ausgabe %d × %d" % [_adapter_line, internal.x, internal.y, output.x, output.y]
-	if _units.x >= 0:
-		_label.text += "\nSoldaten nah / mittel / fern: %d / %d / %d" % [_units.x, _units.y, _units.z]
-	if OS.is_debug_build() and OS.has_feature("android"):
-		var frame_p50: Variant = null
-		var frame_p95: Variant = null
-		var frame_p99: Variant = null
-		if _recent_times.size() >= 10:
-			var frame_values := _recent_times.duplicate()
-			frame_values.sort()
-			var amount := frame_values.size()
-			frame_p50 = frame_values[ceili(amount*0.50)-1]
-			frame_p95 = frame_values[ceili(amount*0.95)-1]
-			frame_p99 = frame_values[ceili(amount*0.99)-1]
+	if _panel.visible:
+		_label.text = "%.1f FPS · %.1f ms/Bild\nRender-CPU P95 %s · GPU-Beobachtungen P95 %s\nRAM (RSS) %s · %d Draw Calls\n%d sichtbare Primitive" % [
+			1000.0 / mean_ms, mean_ms, _timing(float(cpu.p95)), _timing(float(gpu.p95)),
+			"%.1f MiB" % (ram / 1024.0) if ram > 0 else "unbekannt", draws, primitives]
+		if count >= 10:
+			_label.text += "\nBildzeit P50/P95/P99: %.1f / %.1f / %.1f ms" % [wall.p50,wall.p95,wall.p99]
+		if _sustained_scene:
+			_label.text += "\n3D-Adaption: %d %% · Profil %s" % [roundi(float(_governor.ratio)*100.0),_quality]
+		var internal := Vector2i((Vector2(output) * viewport.scaling_3d_scale).round())
+		_label.text += "\n%s\n3D %d × %d · Ausgabe %d × %d" % [_adapter_line, internal.x, internal.y, output.x, output.y]
+		if _units.x >= 0:
+			_label.text += "\nSoldaten nah / mittel / fern: %d / %d / %d" % [_units.x, _units.y, _units.z]
+	if publish:
 		print("IMPERATHEN_DISPLAY_SAMPLE " + JSON.stringify({
 			"device_monotonic_ms": Time.get_ticks_msec(),
 			"gpu": RenderingServer.get_video_adapter_name(), "quality": _quality,
 			"renderer": RenderingServer.get_current_rendering_method(), "driver": RenderingServer.get_current_rendering_driver_name(),
-			"fps": 1000.0 / frame_ms, "frame_rate_limit": Engine.max_fps,
-			"mean_frame_ms": frame_ms, "frames": _sample_frames,
-			"frame_p50_ms": frame_p50, "frame_p95_ms": frame_p95, "frame_p99_ms": frame_p99,
+			"fps": 1000.0 / mean_ms, "frame_rate_limit": Engine.max_fps,
+			"mean_frame_ms": mean_ms, "frames": count,
+			"frame_p50_ms": wall.p50 if count>=10 else null,
+			"frame_p95_ms": wall.p95 if count>=10 else null,
+			"frame_p99_ms": wall.p99 if count>=10 else null,
 			"dynamic_3d_ratio": _governor.ratio,
 			"thermal_measured":false,
-			"render_cpu_ms": cpu_ms if cpu_ms > 0 else null,
-			"render_gpu_ms": gpu_ms if gpu_ms > 0 else null,
+			"render_cpu_ms": cpu_ms if is_finite(cpu_ms) and cpu_ms>0.0 else null,
+			"render_gpu_ms": gpu_ms if is_finite(gpu_ms) and gpu_ms>0.0 else null,
+			"render_cpu_observation_p95_ms":cpu.p95 if float(cpu.p95)>0.0 else null,
+			"render_gpu_observation_p50_ms":gpu.p50 if float(gpu.p50)>0.0 else null,
+			"render_gpu_observation_p95_ms":gpu.p95 if float(gpu.p95)>0.0 else null,
+			"render_gpu_observation_p99_ms":gpu.p99 if float(gpu.p99)>0.0 else null,
+			"gpu_observations":gpu.count,"cpu_observations":cpu.count,
 			"rss_kib": ram if ram > 0 else null, "visible_primitives": primitives,
 			"draw_calls": draws, "near_mid_far": [_units.x, _units.y, _units.z],
-			"output": [get_window().size.x, get_window().size.y], "scale_3d": viewport.scaling_3d_scale}))
+			"output": [output.x,output.y], "scale_3d": viewport.scaling_3d_scale}))
 	_restart_sample()
 
 
