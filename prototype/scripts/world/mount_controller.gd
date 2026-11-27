@@ -217,7 +217,11 @@ func _try_mount() -> void:
 		return
 	_saved_figure_basis = _figure.basis
 	_face_horse()
-	_pose.seated(0.0)
+	if not _pose.seated(0.0):
+		_pose.stop()
+		_figure.basis = _saved_figure_basis
+		action_feedback.emit("Die Sitzpose konnte nicht hergestellt werden.")
+		return
 	var seat := _saddle.global_position + origin - _pose.pelvis_world()
 	var approach_raised := Vector3(approach.x, seat.y, approach.z)
 	var walk_start := origin + Vector3.UP * FLOOR_GAP

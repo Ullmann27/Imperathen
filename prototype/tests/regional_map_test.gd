@@ -26,6 +26,11 @@ func _run() -> void:
 	for i in 8:
 		canvas.zoom(-1)
 	check(canvas.level==0,"Zoom cannot leave supported range")
+	var captions := ["20 m","100 m","500 m","2 km","8 km"]
+	for level in Map.SPANS.size():
+		canvas.level = level
+		check(canvas.scale_caption()==captions[level],"Exact valid scale caption at zoom level "+str(level))
+	canvas.level=0
 	map._select("market_town")
 	check(map.route_button.disabled,"Unbuilt town cannot be selected as a live route")
 	map._select("willow_station")
@@ -35,7 +40,7 @@ func _run() -> void:
 	if DisplayServer.get_name()!="headless" and not args.is_empty():
 		var out := args[0]
 		DirAccess.make_dir_recursive_absolute(out)
-		for step in [[0,"local"],[2,"routes"],[4,"region"]]:
+		for step in [[0,"local"],[1,"village"],[2,"routes"],[3,"district"],[4,"region"]]:
 			canvas.level = int(step[0])
 			canvas.center = Vector2(241,119) if canvas.level<4 else Vector2.ZERO
 			canvas.queue_redraw()

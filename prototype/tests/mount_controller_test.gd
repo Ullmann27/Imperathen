@@ -105,12 +105,15 @@ func _run() -> void:
 	_controller.request_interact()
 	_controller.clear_pending()
 	_check(not await _tick() and not _controller.is_mounted(), "Losing input focus cancels a queued action.")
+	# Active social body turning is a competing physics pose owner.
+	_figure.set_ambient_gaze(true)
+	_check(_figure.is_physics_processing(),"On-foot gaze has its actual physics callback enabled.")
 	var barricade := _box(Vector3(.16, 2.75, 2.10), Vector3(-.57, 1.37, .08))
 	await physics_frame
 	_check(_controller.request_interact(), "Reach offers the interaction before physics checks.")
 	await _tick()
 	_check(_changes.is_empty() and not _controller.is_mounted() and _rider.position.is_equal_approx(START), "Solid wall refuses boarding without moving the player.")
-	_check(_rider.collision_layer == ORIGINAL_LAYER and _figure.is_processing(), "Rejected ascent preserves walking and physics state.")
+	_check(_rider.collision_layer == ORIGINAL_LAYER and _figure.is_processing() and _figure.is_physics_processing(), "Rejected ascent preserves walking and both process states.")
 	barricade.free()
 	await physics_frame
 	var before := _palms()
@@ -120,7 +123,7 @@ func _run() -> void:
 	_check(Vector3(seated.Pelvis).distance_to(_saddle.global_position) < .001, "Imported pelvis is on the real socket.")
 	_check(Vector3(seated.Shin_L).distance_to(seated.Shin_R) > .32, "The seated knees separate either side of the horse.")
 	_check(Vector3(seated.Hand_L).distance_to(before.Hand_L + Vector3(seated.Pelvis) - Vector3(before.Pelvis)) > .08, "The arms adopt a real bent rein pose.")
-	_check(_rider.collision_layer == 0 and _rider.collision_mask == 0 and not _figure.is_processing(), "The rider stays in the original scene tree without competing locomotion.")
+	_check(_rider.collision_layer == 0 and _rider.collision_mask == 0 and not _figure.is_processing() and not _figure.is_physics_processing(), "The rider stays in the original scene tree without competing locomotion or physics gaze.")
 	_check(_controller.camera_exclusions().has(_horse.get_rid()) and _controller.camera_exclusions().has(_rider.get_rid()), "Camera solver can exclude the moving horse and rider.")
 	_saddle.position.y += .046
 	await _tick()
@@ -128,6 +131,12 @@ func _run() -> void:
 	_figure.refresh_lod(_camera_far())
 	await _tick()
 	_check(Vector3(_palms().Pelvis).distance_to(_saddle.global_position) < .001, "A real LOD transition rebinds the seated position.")
+	_check(not _figure.is_processing() and not _figure.is_physics_processing(),"LOD rebind does not resume a competing callback.")
+	# A fresh external gaze assignment may re-enable processing. The seated
+	# solver must reclaim both drivers at the next owner tick.
+	_figure.set_ambient_gaze(true)
+	await _tick()
+	_check(not _figure.is_physics_processing(),"Seated owner reclaims externally re-enabled gaze callback.")
 	var arch := _box(Vector3(3.0, .20, .17), Vector3(0.0, 2.01, -1.55))
 	await physics_frame
 	for _frame in 85:
@@ -159,10 +168,12 @@ func _run() -> void:
 	_controller.request_interact()
 	_check(await _tick() and not _controller.is_mounted() and _changes == [true, false], "The free alternate side dismounts in one accepted tick.")
 	_check(_rider.position.x > _horse.position.x + .9 and is_equal_approx(_rider.position.y, .925), "Dismount ends on the probed floor, clear of the horse.")
-	_check(_rider.collision_layer == ORIGINAL_LAYER and _rider.collision_mask == ORIGINAL_MASK and _figure.is_processing(), "The original walker physics and clip driver are restored.")
+	_check(_rider.collision_layer == ORIGINAL_LAYER and _rider.collision_mask == ORIGINAL_MASK and _figure.is_processing() and _figure.is_physics_processing(), "The original walker physics, gaze and clip driver are restored.")
 	_check(not _controller.camera_exclusions().has(_horse.get_rid()), "Past mount bodies block the camera normally again.")
 	left.free()
 	await physics_frame
+	_figure.set_ambient_gaze(false)
+	_check(not _figure.is_physics_processing(),"Disabled on-foot gaze is also a valid original state.")
 	_check(await _board_again(), "The same mount can be used again after dismount.")
 	_horse.position = Vector3(15.6, 0, -7.0)
 	await _tick()
@@ -172,7 +183,7 @@ func _run() -> void:
 	await _tick()
 	_check(_controller.is_mounted(), "A clear-looking exit over a ledge is rejected without a supporting floor.")
 	_controller.free()
-	_check(_figure.is_processing() and _rider.collision_layer == ORIGINAL_LAYER and _rider.position.is_equal_approx(_reboard_origin),
+	_check(_figure.is_processing() and not _figure.is_physics_processing() and _rider.collision_layer == ORIGINAL_LAYER and _rider.position.is_equal_approx(_reboard_origin),
 		"Removing the mount controller safely restores an on-foot rider.")
 	_scene.free()
 	print("MOUNT_CONTROLLER_%s checks=%d failures=%d" % ["PASS" if _failed == 0 else "FAIL", _checks, _failed])
