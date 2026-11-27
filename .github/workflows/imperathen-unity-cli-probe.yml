@@ -143,6 +143,37 @@ jobs:
           PY
           # The raw response and authentication details remain in runner temp,
           # are never printed and are never uploaded as an artifact.
+      - name: Probe free Unity AI CLI readiness without generating or spending credits
+        if: always()
+        shell: bash
+        env:
+          UNITY_SERVICE_ACCOUNT_ID: ${{ secrets.IMPERATHEN_UNITY_SA_ID }}
+          UNITY_SERVICE_ACCOUNT_SECRET: ${{ secrets.IMPERATHEN_UNITY_SA_SECRET }}
+          UNITY_NON_INTERACTIVE: "1"
+        run: |
+          set -euo pipefail
+          if [[ -z "${UNITY_SERVICE_ACCOUNT_ID:-}" || -z "${UNITY_SERVICE_ACCOUNT_SECRET:-}" ]]; then
+            echo "UNITY_AI_PROBE_SKIPPED_MISSING_SECRETS" >> unity-cli-evidence/checks.txt
+            exit 0
+          fi
+          export PATH="$HOME/.local/bin:$PATH"
+          if ! command -v unity >/dev/null 2>&1; then
+            echo "UNITY_AI_PROBE_SKIPPED_NO_CLI" >> unity-cli-evidence/checks.txt
+            exit 0
+          fi
+          # Plugin installation and doctor are not asset generation commands;
+          # no consent, quote, AI job, or Unity-Credits spending is requested.
+          if unity --non-interactive plugin install ai > "$RUNNER_TEMP/unity-ai-install-private.log" 2>&1; then
+            echo "UNITY_AI_PLUGIN_INSTALLED" >> unity-cli-evidence/checks.txt
+            if unity --non-interactive ai doctor --format json > "$RUNNER_TEMP/unity-ai-doctor-private.json" 2>&1; then
+              echo "UNITY_AI_DOCTOR_PASS" >> unity-cli-evidence/checks.txt
+            else
+              echo "UNITY_AI_DOCTOR_NEEDS_SETUP" >> unity-cli-evidence/checks.txt
+            fi
+          else
+            echo "UNITY_AI_PLUGIN_INSTALL_UNAVAILABLE" >> unity-cli-evidence/checks.txt
+          fi
+          # Never publish service account credentials, AI usage, org data or raw errors.
       - name: Keep only sanitized CLI evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
