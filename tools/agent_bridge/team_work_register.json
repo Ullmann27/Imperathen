@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 120,
+  "version": 126,
   "tasks": [
     {
       "id": "K101",
@@ -521,7 +521,7 @@
     {
       "id": "N27",
       "owner": "Nemotron",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
       "run_id": "46055347080",
       "scope": [
@@ -532,12 +532,12 @@
         "prototype/scripts/world/regional_terrain.gd"
       ],
       "access": "read",
-      "note": "AETERNA Schritt 01, unabhängiger Read-only-Review. Preview 1327bd623dc5a67ce1b3611a743b481addd8bf26 erneut bestätigt. Tatsächlicher Nemotron-Probe-Run 46055100225 vollständig erfolgreich, Offline 13/13, Probe-Artefakt 15226231715. Auftragsdateien in e814cbc14727ba4440e878b62d1f32a5e2d50317; Register-Kandidat e2fd0180 erfolgreich 46055184796, Validator- und Testblobs identisch mit aktueller gemeinsamer Basis. Alte Befunde nicht als aktuelle Reproduktion ausgeben. Kein Edit-Lease, keine Freigabe und kein Wiederholen N23–N26. Tatsächlicher NVIDIA-Bridge-Run 46055347080 auf e814cbc14727ba4440e878b62d1f32a5e2d50317 beobachtet: in_progress. Noch kein Anbieter-Ergebnis; nicht erneut dispatchen."
+      "note": "AETERNA Schritt 01, unabhängiger Read-only-Review. Preview 1327bd623dc5a67ce1b3611a743b481addd8bf26 erneut bestätigt. Tatsächlicher Nemotron-Probe-Run 46055100225 vollständig erfolgreich, Offline 13/13, Probe-Artefakt 15226231715. Auftragsdateien in e814cbc14727ba4440e878b62d1f32a5e2d50317; Register-Kandidat e2fd0180 erfolgreich 46055184796, Validator- und Testblobs identisch mit aktueller gemeinsamer Basis. Alte Befunde nicht als aktuelle Reproduktion ausgeben. Kein Edit-Lease, keine Freigabe und kein Wiederholen N23–N26. Tatsächlicher NVIDIA-Bridge-Run 46055347080 auf e814cbc14727ba4440e878b62d1f32a5e2d50317 beobachtet: in_progress. Noch kein Anbieter-Ergebnis; nicht erneut dispatchen. Final GitHub job failure with NVIDIA_BRIDGE_RECEIPT status=truncated, exit 3; artifact 15226357193 contains partial answer. No complete accepted patch; do not retry unchanged automatically. Connectivity succeeded but completion token cap reached."
     },
     {
       "id": "N28",
       "owner": "Nemotron",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
       "run_id": "46055347080",
       "scope": [
@@ -547,7 +547,7 @@
         "prototype/scripts/battle/soldier_roster.gd"
       ],
       "access": "read",
-      "note": "AETERNA Schritt 01, unabhängiger Read-only-Review. Preview 1327bd623dc5a67ce1b3611a743b481addd8bf26 erneut bestätigt. Tatsächlicher Nemotron-Probe-Run 46055100225 vollständig erfolgreich, Offline 13/13, Probe-Artefakt 15226231715. Auftragsdateien in e814cbc14727ba4440e878b62d1f32a5e2d50317; Register-Kandidat e2fd0180 erfolgreich 46055184796, Validator- und Testblobs identisch mit aktueller gemeinsamer Basis. Alte Befunde nicht als aktuelle Reproduktion ausgeben. Kein Edit-Lease, keine Freigabe und kein Wiederholen N23–N26. Tatsächlicher NVIDIA-Bridge-Run 46055347080 auf e814cbc14727ba4440e878b62d1f32a5e2d50317 beobachtet: in_progress. Noch kein Anbieter-Ergebnis; nicht erneut dispatchen."
+      "note": "AETERNA Schritt 01, unabhängiger Read-only-Review. Preview 1327bd623dc5a67ce1b3611a743b481addd8bf26 erneut bestätigt. Tatsächlicher Nemotron-Probe-Run 46055100225 vollständig erfolgreich, Offline 13/13, Probe-Artefakt 15226231715. Auftragsdateien in e814cbc14727ba4440e878b62d1f32a5e2d50317; Register-Kandidat e2fd0180 erfolgreich 46055184796, Validator- und Testblobs identisch mit aktueller gemeinsamer Basis. Alte Befunde nicht als aktuelle Reproduktion ausgeben. Kein Edit-Lease, keine Freigabe und kein Wiederholen N23–N26. Tatsächlicher NVIDIA-Bridge-Run 46055347080 auf e814cbc14727ba4440e878b62d1f32a5e2d50317 beobachtet: in_progress. Noch kein Anbieter-Ergebnis; nicht erneut dispatchen. Final GitHub job failure with NVIDIA_BRIDGE_RECEIPT status=truncated, exit 3; artifact 15225649174 contains partial answer. No complete accepted patch; do not retry unchanged automatically. Connectivity succeeded but completion token cap reached."
     },
     {
       "id": "BACKDROP-RAY-PROVENANCE",
@@ -568,11 +568,11 @@
         ".github/workflows/aeterna-parallel-stability.yml",
         "docs/44_integration/AETERNA_PARALLEL_STABILITY_20261127.md"
       ],
-      "note": "Roadmap 01.3. Old run 46038086118: night_torch 8/86 failures after genuine managed door/route lights. Keep existing light counts, shadow checks, all limits and gameplay unchanged; add profile-bound evidence and real compatibility framebuffers. Do not edit active CAMPAIGN-CONTINUITY route_fire_lights.gd or loosen review ceilings.",
+      "note": "Roadmap 01.3. Old run 46038086118: night_torch 8/86 failures after genuine managed door/route lights. Keep existing light counts, shadow checks, all limits and gameplay unchanged; add profile-bound evidence and real compatibility framebuffers. Do not edit active CAMPAIGN-CONTINUITY route_fire_lights.gd or loosen review ceilings. Candidate 0e996ed8cb2af81ef721572e223786c457cee253; observed four independent GitHub jobs in_progress. QA #221 is separately successful on 1327bd6, artifact 15226547072, no physical device acceptance. This candidate has no results yet.",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
-      "run_id": null,
+      "run_id": "46055915040",
       "access": "edit"
     },
     {
@@ -580,11 +580,11 @@
       "scope": [
         "art/village/verify.gd"
       ],
-      "note": "Roadmap 01.2. Old run 46038086118: autumn mud and drizzle fixture fails. Actual scenery uses continuous weather state and physically grounded rain rather than season alone. Preserve mesh, PBR, density and doorway tests; supply explicit dry/rain states, camera and real ground rays. Candidate fixture only, no claim of runtime repair.",
+      "note": "Roadmap 01.2. Old run 46038086118: autumn mud and drizzle fixture fails. Actual scenery uses continuous weather state and physically grounded rain rather than season alone. Preserve mesh, PBR, density and doorway tests; supply explicit dry/rain states, camera and real ground rays. Candidate fixture only, no claim of runtime repair. Candidate 0e996ed8cb2af81ef721572e223786c457cee253; observed four independent GitHub jobs in_progress. QA #221 is separately successful on 1327bd6, artifact 15226547072, no physical device acceptance. This candidate has no results yet.",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
-      "run_id": null,
+      "run_id": "46055915040",
       "access": "edit"
     },
     {
@@ -592,11 +592,11 @@
       "scope": [
         "prototype/tests/formation_agents_test.gd"
       ],
-      "note": "Roadmap 01.4. Old full regression 46038086118: 60/180 foot jump, phase and position discontinuities, wheel issue. Preserve every original numerical limit and rule/identity test. Add worst measured switch provenance; run both original check groups in independent CI. No active runtime edit; N28 is separate read-only model task.",
+      "note": "Roadmap 01.4. Old full regression 46038086118: 60/180 foot jump, phase and position discontinuities, wheel issue. Preserve every original numerical limit and rule/identity test. Add worst measured switch provenance; run both original check groups in independent CI. No active runtime edit; N28 is separate read-only model task. Candidate 0e996ed8cb2af81ef721572e223786c457cee253; observed four independent GitHub jobs in_progress. QA #221 is separately successful on 1327bd6, artifact 15226547072, no physical device acceptance. This candidate has no results yet.",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
-      "run_id": null,
+      "run_id": "46055915040",
       "access": "edit"
     },
     {
@@ -605,11 +605,11 @@
         "prototype/tests/resident_catalog_bridge_test.gd",
         "prototype/tests/soldier_visual_test.gd"
       ],
-      "note": "Roadmap 01.1/01.4 and PR #180 read-through. Check exact original frontier civilian woman and legionary GLB references actually selected by existing runtime actors. Preserve original tests and animations. Hash source files; report catalog and equipment gates. No generation or replacement, no private assets or other projects.",
+      "note": "Roadmap 01.1/01.4 and PR #180 read-through. Check exact original frontier civilian woman and legionary GLB references actually selected by existing runtime actors. Preserve original tests and animations. Hash source files; report catalog and equipment gates. No generation or replacement, no private assets or other projects. Candidate 0e996ed8cb2af81ef721572e223786c457cee253; observed four independent GitHub jobs in_progress. QA #221 is separately successful on 1327bd6, artifact 15226547072, no physical device acceptance. This candidate has no results yet.",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
-      "run_id": null,
+      "run_id": "46055915040",
       "access": "edit"
     }
   ]
