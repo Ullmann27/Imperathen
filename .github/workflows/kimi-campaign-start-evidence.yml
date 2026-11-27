@@ -1,0 +1,107 @@
+name: Kimi campaign start - real engine evidence
+on:
+  push:
+    branches: [review/kimi-campaign-start-20261127]
+    paths:
+      - '.github/workflows/kimi-campaign-start-evidence.yml'
+      - 'tools/cinematic/capture_campaign_start.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: kimi-campaign-start-evidence
+  cancel-in-progress: false
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GODOT_VERSION: '4.7.2'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install verified Godot and graphical runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends xvfb xauth libgl1-mesa-dri
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/$GODOT_VERSION-stable"
+          file="Godot_v$GODOT_VERSION-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Capture actual menu and story through I-01
+        run: python3 tools/cinematic/capture_campaign_start.py --godot "$GODOT_BIN" --output "$RUNNER_TEMP/campaign-start"
+      - name: Preserve real screenshots and logs even on failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: kimi-campaign-start-engine
+          path: ${{ runner.temp }}/campaign-start/
+          if-no-files-found: error
+          retention-days: 30
+  publish:
+    needs: capture
+    if: always() && needs.capture.result != 'cancelled' && github.ref == 'refs/heads/review/kimi-campaign-start-20261127'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+      - name: Publish only hash-checked capture evidence to isolated review branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download "$GITHUB_RUN_ID" --name kimi-campaign-start-engine --dir "$RUNNER_TEMP/evidence"
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, struct
+          src = pathlib.Path(os.environ["RUNNER_TEMP"]) / "evidence"
+          dst = pathlib.Path("art/review/campaign-start")
+          receipt = src / "campaign-start-receipt.json"
+          assert receipt.is_file() and not receipt.is_symlink() and receipt.stat().st_size < 100000
+          report = json.loads(receipt.read_text())
+          assert report["source_revision"] == os.environ["GITHUB_SHA"]
+          assert report["physical_device_pass"] is False and report["visual_acceptance"] is False
+          allowed = {"menu.png", "01-prolog.png", "02-morgenwahl.png", "03-familienhaus.png",
+                     "04-brunnen.png", "04b-gefuellter-krug.png", "05-tischgespraech.png", "06-auf-der-schwelle.png"}
+          dst.mkdir(parents=True, exist_ok=True)
+          assert not dst.is_symlink()
+          for f in dst.iterdir():
+              if f.name in allowed:
+                  assert f.is_file() and not f.is_symlink()
+                  f.unlink()
+          seen = set()
+          for item in report["images"]:
+              name = item["file"]
+              assert name in allowed and name not in seen
+              seen.add(name)
+              path = src / name
+              assert not path.is_symlink() and path.is_file() and 1024 < path.stat().st_size <= 2200000
+              data = path.read_bytes()
+              assert data[:8] == b"\x89PNG\r\n\x1a\n" and data[12:16] == b"IHDR"
+              assert hashlib.sha256(data).hexdigest() == item["sha256"]
+              assert list(struct.unpack(">II", data[16:24])) == [item["width"], item["height"]]
+              (dst / name).write_bytes(data)
+          report["workflow_run_id"] = os.environ["GITHUB_RUN_ID"]
+          (dst / "campaign-start-receipt.json").write_text(json.dumps(report, indent=2) + "\n")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- art/review/campaign-start/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "evidence: capture actual New Life story journey"
+          git push origin HEAD:refs/heads/review/kimi-campaign-start-20261127
