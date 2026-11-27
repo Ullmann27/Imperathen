@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 63,
+  "version": 64,
   "tasks": [
     {
       "id": "K101",
@@ -322,6 +322,21 @@
       ],
       "access": "edit",
       "note": "Existing Coordinator lease fulfilled by isolated PR #174, candidate 6fce2e98f61958afea69359bcd587d462bb9b04e; actual CI in_progress/pending. Verified scaled youth track: adult first post contact at 0.6m frame 8 (not peak 13); 1.3m miss. Raider 0.7m contact frame 9; 1m miss. Added negative controls and no premature/double credit/damage. No production reach/damage or gate changes. Do not duplicate this task."
+    },
+    {
+      "id": "FORMATION-ORDER-CONTINUITY",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "6fce2e98f61958afea69359bcd587d462bb9b04e",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/battle/battle_model.gd",
+        "prototype/scripts/formation/formation_agents.gd",
+        "prototype/tests/formation_agents_test.gd",
+        "prototype/tests/formation_slot_authority_test.gd"
+      ],
+      "access": "edit",
+      "note": "Independent formation integration after N20 focused success. Existing BattleModel _align_members greedily reassigns every living soldier each tick; presentation then changes roster slot owners on ordinary wheeling, and _match authoritative-slot branch omits actual last_match record. Preserve rank owners during ordinary movement; rematch only explicit layout/deployment or large discrete front change. Validate unique authority, real orders, deterministic save and existing motion gates without changing tolerances. No simultaneous N21 patch or change to shared candidate."
     }
   ]
 }
