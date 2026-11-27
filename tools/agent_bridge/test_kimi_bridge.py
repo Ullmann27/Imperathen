@@ -39,6 +39,32 @@ class KimiBridgeTests(unittest.TestCase):
         self.assertTrue(parts[1]["image_url"]["url"].startswith("data:image/png;base64,"))
         self.assertEqual(len(hashes["art/review/x.png"]), 64)
 
+
+    def test_hash_pinned_comparison_across_revisions(self):
+        import hashlib
+        data = b"\x89PNG\r\n\x1a\n" + b"fake"
+        digest = hashlib.sha256(data).hexdigest()
+        task = {"revision": "b"*40, "task": "Compare actual V1 and V2", "files": ["prototype/scripts/main.gd"],
+                "images": [], "max_tokens": 16384, "evidence_images": [
+                    {"revision": "a"*40, "path":"art/review/x.png", "sha256":digest,"label":"V1"},
+                    {"revision": "b"*40, "path":"art/review/x.png", "sha256":digest,"label":"V2"}]}
+        k.validate_task(task)
+        class FakeOpener:
+            def __init__(self): self.urls=[]
+            def open(self, request, timeout):
+                self.urls.append(request.full_url)
+                return io.BytesIO(data)
+        opener=FakeOpener()
+        parts, hashes=k.collect_images(task,opener)
+        self.assertEqual(len(hashes),2)
+        self.assertIn("V1",parts[0]["text"])
+        self.assertIn("V2",parts[2]["text"])
+        self.assertIn("a"*40,opener.urls[0])
+        self.assertIn("b"*40,opener.urls[1])
+        task["evidence_images"][0]["sha256"]="0"*64
+        with self.assertRaises(common.BridgeError):
+            k.collect_images(task,opener)
+
     def test_reject_lfs_pointer(self):
         class FakeOpener:
             def open(self, request, timeout):

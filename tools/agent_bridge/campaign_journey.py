@@ -168,12 +168,28 @@ def plan(catalog, state):
     note = item.get("findings", "")
     scope = ("Kritisiere exakt einen schwerwiegenden, aus diesen realen Aufnahmen und Quellen belegbaren Mangel."
              if phase == "critique" else "Liefere genau einen kleinen vollständigen Patch zur Behebung des dokumentierten Mangels."
-             if phase == "patch" else "Bewerte V2 und verbleibende Mängel; unabhängige V1/V2-Abnahme bleibt bei der Koordination.")
+             if phase == "patch" else "Vergleiche die gekennzeichneten V1- und V2-Aufnahmen direkt. Benenne sichtbare Verbesserungen, Regressionen und verbleibende Mängel; unabhängige Abnahme bleibt bei der Koordination.")
     task = {"revision": e["published_revision"],
             "task": f"{entry['id']} – {entry['title']}. {entry['focus']}\n{scope}\nBisherige unabhängige Befunde: {note or 'noch offen'}.\n"
                     "REALISM QUALITY GATE: historische/anatomische Plausibilität, PBR, reale V1/V2-Bilder, Animationen, persistente Spielautorität, Fold7-Profile. Keine erfundenen Test- oder Geräteergebnisse. Keine Änderung der CI oder Rechte.",
             "files": entry["files"], "images": [i["path"] for i in e["images"]],
             "max_tokens": 16384, "reasoning_effort": "max", "response_mode": "json"}
+    # Use verified checksums even in the first review. For comparison, choose
+    # the same capture name in both revisions where available.
+    def image_ref(evidence, image, label):
+        return {"revision": evidence["published_revision"], "path": image["path"],
+                "sha256": image["sha256"], "label": label}
+    if phase == "compare":
+        old = item["baseline"]
+        validate_evidence(old)
+        pairs = [(a, b) for a in old["images"] for b in e["images"]
+                 if Path(a["path"]).name == Path(b["path"]).name]
+        require(pairs, "A comparable V1/V2 capture is required")
+        a, b = pairs[0]
+        task["evidence_images"] = [image_ref(old, a, "V1"), image_ref(e, b, "V2")]
+    else:
+        task["evidence_images"] = [image_ref(e, image, "baseline") for image in e["images"]]
+    task["images"] = []
     bridge.validate_task(task)
     result.update(action="kimi_candidate", manifest={f"K{state['serial']}": task})
     return result

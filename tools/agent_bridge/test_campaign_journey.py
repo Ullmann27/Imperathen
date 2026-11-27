@@ -28,7 +28,8 @@ class JourneyTests(unittest.TestCase):
         task=next(iter(journey.plan(self.catalog,self.state)["manifest"].values()))
         self.assertEqual(task["reasoning_effort"],"max")
         self.assertEqual(task["revision"],"b"*40)
-        self.assertEqual(len(task["images"]),1)
+        self.assertEqual(len(task["evidence_images"]),1)
+        self.assertEqual(task["evidence_images"][0]["sha256"],"d"*64)
     def test_cannot_skip_or_accept_failed_run(self):
         with self.assertRaises(ValueError):
             self.event("compare",verdict="engine_reviewed",findings="looks good")
@@ -37,7 +38,10 @@ class JourneyTests(unittest.TestCase):
         self.event("patch",revision="c"*40)
         with self.assertRaises(ValueError):
             self.event("render",evidence=evidence(source="a"*40,run="11"))
-        self.event("render",evidence=evidence(source="c"*40,run="11",passed=False))
+        self.event("render",evidence=dict(evidence(source="c"*40,run="11",passed=False),published_revision="f"*40))
+        task=next(iter(journey.plan(self.catalog,self.state)["manifest"].values()))
+        self.assertEqual([x["label"] for x in task["evidence_images"]],["V1","V2"])
+        self.assertEqual([x["revision"] for x in task["evidence_images"]],["b"*40,"f"*40])
         with self.assertRaises(ValueError):
             self.event("compare",verdict="engine_reviewed",findings="no")
         self.event("compare",verdict="improve",findings="Remaining defect")

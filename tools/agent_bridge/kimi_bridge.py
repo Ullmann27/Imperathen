@@ -57,17 +57,32 @@ def allowed_image(path):
 
 def validate_task(task):
     required = {"revision", "task", "files", "images", "max_tokens"}
-    if not isinstance(task, dict) or not required <= set(task) or set(task) - required - {"reasoning_effort", "response_mode"}:
+    if not isinstance(task, dict) or not required <= set(task) or set(task) - required - {"reasoning_effort", "response_mode", "evidence_images"}:
         raise common.BridgeError("Unexpected task fields")
     if task.get("reasoning_effort", "max") not in EFFORTS:
         raise common.BridgeError("Unsupported reasoning effort")
     if task.get("response_mode", "stream") not in RESPONSE_MODES:
         raise common.BridgeError("Unsupported response mode")
-    common.validate_request({k: v for k, v in task.items() if k not in ("images", "reasoning_effort", "response_mode")})
+    common.validate_request({k: v for k, v in task.items() if k not in ("images", "reasoning_effort", "response_mode", "evidence_images")})
     images = task["images"]
     if (not isinstance(images, list) or not 0 <= len(images) <= 2
             or not all(allowed_image(x) for x in images) or len(set(images)) != len(images)):
         raise common.BridgeError("Expected zero to two distinct public review images")
+    refs = task.get("evidence_images", [])
+    if not isinstance(refs, list) or len(refs) + len(images) > 2:
+        raise common.BridgeError("Expected at most two images in total")
+    seen = set()
+    for ref in refs:
+        if (not isinstance(ref, dict) or set(ref) != {"revision", "path", "sha256", "label"}
+                or not isinstance(ref["revision"], str) or not re.fullmatch(r"[0-9a-f]{40}", ref["revision"])
+                or not allowed_image(ref["path"]) or not isinstance(ref["sha256"], str)
+                or not re.fullmatch(r"[0-9a-f]{64}", ref["sha256"])
+                or ref["label"] not in ("V1", "V2", "baseline")):
+            raise common.BridgeError("Pinned review evidence is invalid")
+        key = (ref["revision"], ref["path"])
+        if key in seen or key[0] == task["revision"] and key[1] in images:
+            raise common.BridgeError("Duplicate evidence image")
+        seen.add(key)
 
 
 def load_tasks(path):
@@ -84,8 +99,11 @@ def load_tasks(path):
 
 def collect_images(task, opener):
     parts, hashes, total = [], {}, 0
-    for path in task["images"]:
-        url = f"{common.RAW}/{task['revision']}/{quote(path, safe='/')}"
+    refs = [{"revision": task["revision"], "path": path, "sha256": None, "label": None}
+            for path in task["images"]] + task.get("evidence_images", [])
+    for ref in refs:
+        path, revision = ref["path"], ref["revision"]
+        url = f"{common.RAW}/{revision}/{quote(path, safe='/')}"
         with opener.open(Request(url, headers={"User-Agent": "IMPERATHEN-Kimi-review"}), timeout=30) as response:
             data = response.read(MAX_IMAGE + 1)
         total += len(data)
@@ -98,8 +116,15 @@ def collect_images(task, opener):
         else:
             raise common.BridgeError("Image is not a supported raster; LFS pointers are rejected")
         digest = hashlib.sha256(data).hexdigest()
-        hashes[path] = digest
-        parts.append({"type": "text", "text": f"Public review image {path} SHA256 {digest}. Its capture may predate the code revision."})
+        if ref["sha256"] is not None and digest != ref["sha256"]:
+            raise common.BridgeError("Review evidence checksum mismatch")
+        if ref["label"] is not None:
+            hashes[f"{revision}:{path}"] = digest
+            label = f"{ref['label']} — immutable revision {revision}, SHA256 {digest}, path {path}."
+        else:
+            hashes[path] = digest
+            label = f"Public review image {path} SHA256 {digest}. Its capture may predate the code revision."
+        parts.append({"type": "text", "text": label})
         parts.append({"type": "image_url", "image_url": {"url": "data:" + mime + ";base64," + base64.b64encode(data).decode("ascii")}})
     return parts, hashes
 

@@ -13,3 +13,9 @@ jobs:
         with:
           persist-credentials: false
       - run: python3 -m unittest discover -s tools/agent_bridge -p 'test_kimi*.py' -v
+      - run: python3 -m unittest discover -s tools/agent_bridge -p 'test_campaign_journey.py' -v
+      - name: Validate initial production journey
+        run: |
+          python3 tools/agent_bridge/campaign_journey.py init --state "$RUNNER_TEMP/campaign_journey_state.json"
+          cat "$RUNNER_TEMP/campaign_journey_state.json"
+          python3 tools/agent_bridge/campaign_journey.py plan --state "$RUNNER_TEMP/campaign_journey_state.json"
