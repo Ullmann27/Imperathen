@@ -148,3 +148,7 @@ Kimi ist Lead 3D World, Character, Animation and Graphics Engineer. Der direkte 
 - Eigener MENU-Kandidat [PR #171](https://github.com/Ullmann27/Imperathen/pull/171), HEAD `4f109b9853f7fa1213ed2ed548d421dca3da39d4`: zwei Explorationsaktionen sekundär, Regressionstest mit/ohne Spielstand. V2-Review `8807c03666683d564659f6f92dcd49b33a3dee99`, [Run 46015164122](https://github.com/Ullmann27/Imperathen/actions/runs/46015164122), A/B und Gerät ausstehend. Kein Modellpatch behauptet.
 - Nemotron 46008020658: 17 und 19 beantwortet, 18 abgeschnitten. Vorschläge nicht unverändert übernehmen (Lichtpriorität, Resource-Lebenszyklus, fehlerhafte Reit-Basisreihenfolge und ungesicherter Abstieg). Separate Nemotron-Automation nicht erneut ausgelöst.
 - ARM64 46008252806: 65/66 Companion-Turn-Prüfungen; 60 Hz, turn -1, strikter gepflanzter Fußkontakt fehlgeschlagen. Kein Export, keine Grenzwertsenkung. MENU bleibt blockiert; 122 Etappen und 90 Qualitätsaufträge unverändert erhalten.
+
+## Aktuelle 30 visuelle Meilensteine (Nutzer-QA)
+
+Verbindliches fortzuschreibendes [M01–M30-Ledger](../../docs/44_integration/AETERNA_VISUAL_30_MILESTONES_20261127.md). Nutze dieses vor weiteren VIS-Aufträgen; aktuelle Run-IDs, Konflikt-Leases und Status im gemeinsamen team_work_register.json prüfen. Es konkretisiert VIS-001–015, ergänzt K01–K90 und Campaign Journey, ersetzt weder das RQG noch bestehende Kosten-/Sicherheits-/Abnahmeverträge. Keine bereits bestandenen Aufträge wiederholen, keine visuelle Freigabe aus reinen Tests ableiten.
