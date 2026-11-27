@@ -144,6 +144,7 @@ func configure(kind: String, origin: String, years: int) -> void:
 	role = kind
 	_sync_gaze_physics()
 	resident_id = ""
+	meshy_asset_id = ""
 	look = {}
 	_resident_tempo = 1.0
 	home = origin
@@ -171,7 +172,7 @@ func configure_appearance(new_appearance: String, variation: int = 0) -> void:
 func configure_meshy(stable_id: String) -> bool:
 	# Keep authored child/player identity and retain the current live fallback
 	# until a complete imported derivative set exists.
-	var selected := stable_id if age >= 18 and role not in ["player", "companion"] and MeshyCharacters.has_complete_set(stable_id) and MeshyEquipment.has_complete_set(stable_id) else ""
+	var selected := stable_id if age >= 18 and role not in ["player", "companion"] and MeshyCharacters.owner_asset_allowed(stable_id, resident_id) and MeshyCharacters.has_complete_set(stable_id) and MeshyEquipment.has_complete_set(stable_id) else ""
 	if selected != meshy_asset_id:
 		meshy_asset_id = selected
 		_reload(maxi(0, detail))
@@ -215,7 +216,12 @@ func configure_resident(origin: String, years: int, new_appearance: String, vari
 	var named_id := actor_uid.trim_prefix("vil:")
 	if origin != "italia" or years < 18 or not ResidentIdentity.has_person(named_id):
 		named_id = ""
-	var changed := face_seed != seed_value or role != "resident" or home != origin or age != years or appearance_id != selected or appearance_variation != selected_variation or resident_id != named_id
+	var assigned_asset := MeshyCharacters.story_asset(named_id, origin, years, selected)
+	# Existing military call sites may still select their own vetted model.
+	# Do not carry the old person's Meshy body into a new resident identity.
+	if assigned_asset.is_empty() and named_id == resident_id and face_seed == seed_value and not MeshyCharacters.is_owner_civilian(meshy_asset_id):
+		assigned_asset = meshy_asset_id
+	var changed := face_seed != seed_value or role != "resident" or home != origin or age != years or appearance_id != selected or appearance_variation != selected_variation or resident_id != named_id or meshy_asset_id != assigned_asset
 	if role != "resident":
 		clear_gaze_target()
 	role = "resident"
@@ -227,6 +233,7 @@ func configure_resident(origin: String, years: int, new_appearance: String, vari
 	appearance_variation = selected_variation
 	identity = "resident_%s_%d" % [appearance_id, appearance_variation] if not appearance_id.is_empty() else "resident"
 	resident_id = named_id
+	meshy_asset_id = assigned_asset
 	look = {} if resident_id.is_empty() else ResidentIdentity.look(resident_id, appearance_id, appearance_variation, age)
 	# A catalog entry may not replace the live roster anatomy or equipment.
 	if str(look.get("kind", "")) != appearance_id:
@@ -377,7 +384,7 @@ func _reload(level: int) -> void:
 	_bind_cloth_sway()
 	var imported_youth := active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
 	var civilian_motion := role in ["player", "companion", "regional_worker"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"])
-	_motion.bind(body, civilian_motion and not imported_youth, identity)
+	_motion.bind(body, civilian_motion and not imported_youth and not _uses_owner_civilian(), identity)
 	var keep_gaze := _motion_identity == identity and not previous_path.is_empty()
 	var eye_offsets := MarcusModel.eye_offsets(age >= 18) if MarcusModel.owns(path) else {}
 	_gaze.bind(_motion.skeleton if is_instance_valid(_motion.skeleton) else null, keep_gaze, eye_offsets)
@@ -960,7 +967,7 @@ func _sync_resident_prop() -> void:
 	if not is_instance_valid(_resident_prop):
 		return
 	_resident_prop.hide()
-	if role != "resident" or not _motion.civilian or not _motion.available or not _combat_id.is_empty() or _service_external or _posed or clip not in ["idle","march","talk"]:
+	if role != "resident" or (not _motion.civilian and not _uses_owner_civilian()) or not _motion.available or not _combat_id.is_empty() or _service_external or _posed or clip not in ["idle","march","talk"]:
 		return
 	var skeleton := _motion.skeleton
 	if not is_instance_valid(skeleton):
@@ -994,7 +1001,16 @@ func _apply_jug_carry() -> void:
 		_hands.set_grip(.65)
 
 
+func _uses_owner_civilian() -> bool:
+	return MeshyCharacters.is_owner_civilian(meshy_asset_id) and active_model_path.begins_with(MeshyCharacters.family_prefix(meshy_asset_id))
+
+
 func _apply_motion(review: bool = false) -> void:
+	if _uses_owner_civilian():
+		# These are the actual fitted and tested imported body clips. Never
+		# replace them with the procedural base-rig pose at the same time.
+		_motion.blend_transition()
+		return
 	if active_model_path.begins_with("res://assets/characters/hero_meshy_italia_"):
 		# Preserve the fitted adolescent rig's authored limb and sword clips.
 		_motion.blend_transition()

@@ -77,6 +77,12 @@ jobs:
           bin="$PWD/${filename%.zip}"
           chmod +x "$bin"
           echo "GODOT_BIN=$bin" >> "$GITHUB_ENV"
+      - name: Stage original Sextus derivative candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/characters/stage_owner_runtime.py --archive "$RUNNER_TEMP/sextus-runtime.zip" --report "$RUNNER_TEMP/sextus-stage.json"
+          echo "IMPERATHEN_REQUIRE_SEXTUS=1" >> "$GITHUB_ENV"
       - name: Import actual project assets
         shell: bash
         run: |
@@ -110,6 +116,7 @@ jobs:
           run_check camera_collision_test 'CAMERA_COLLISION_PASS'
           run_check service_gear_test 'SERVICE_GEAR_PASS'
           run_check meshy_character_test 'MESHY_CHARACTERS_PASS'
+          run_check meshy_owner_story_test 'MESHY_OWNER_STORY_PASS'
           run_check meshy_equipment_test 'MESHY_EQUIPMENT_PASS'
           run_check motion_skin_measurement_test 'checks; 0 failed'
           run_check motion_mesh_clearance_test 'checks; 0 failed'

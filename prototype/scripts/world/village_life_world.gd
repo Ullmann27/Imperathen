@@ -239,6 +239,13 @@ func _update_attention(delta: float) -> void:
 						partner = body.get_node_or_null("Figure") as Node3D
 			figure.set_gaze_target(partner)
 			figure.set_resident_prop(Activities.village_prop(activity))
+			# The actual story smith practices his trade at his own workplace,
+			# not in a catalogue or during a conversation. The domain still
+			# owns his position, life, quest state and all resource transfers.
+			if id == "sextus" and activity == "work" and contact.is_empty() and Childhood.enabled(state):
+				var here := Vector2(actor.position.x, actor.position.z)
+				if here.distance_to(Childhood.POINTS.smith) <= 1.8 and actor.get_meta("assignment", "idle") == "idle":
+					figure.keep_working()
 		var target := player
 		if activity in ["greet","socialize"]:
 			# A social decision is not a conversation until the two *visible*
@@ -525,6 +532,8 @@ func _create_workplace(id: String, at: Vector2) -> void:
 
 func _sync_actor(id: String, caption: String, profession: String, person: Dictionary) -> void:
 	caption = Childhood.display_name(state, id, caption)
+	if id == "sextus" and Childhood.enabled(state):
+		profession = "Dorfschmied"
 	var at: Vector2 = Life.actor_position(state, id)
 	if not actors.has(id):
 		var actor := CharacterBody3D.new()

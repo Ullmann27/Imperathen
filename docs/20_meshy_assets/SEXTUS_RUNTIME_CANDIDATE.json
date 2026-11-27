@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "asset": "unit_legacy_blacksmith",
+  "story_id": "sextus",
+  "task_id": "01a208fe-236f-731b-97da-2cd94a6e2e09",
+  "source_sha256": "9f972cab24f3ea8dd896e7d19058dc2c83688942c2cfffd46357670c2aa947e0",
+  "archive": {
+    "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JBiq3Q9vttoZVrKhdbYLuTHXre/ae0d8775-458c-4af1-91f9-b86d4cf49dbe.zip",
+    "bytes": 9113619,
+    "sha256": "b34a1fb301fa494fbb0f315ec33787ed2d2b4ac6e56f3041c0665413aab914fe"
+  },
+  "bones": 15,
+  "clips": [
+    "idle",
+    "march",
+    "run",
+    "talk",
+    "work",
+    "gather",
+    "train",
+    "attack",
+    "block",
+    "hit",
+    "death"
+  ],
+  "files": [
+    {
+      "name": "unit_legacy_blacksmith_0.glb",
+      "sha256": "9087d2b653bde81b6a3542d30561884fabc6b83b9070219922a2dd39e90f0a8d",
+      "bytes": 8612260,
+      "triangles": 15484,
+      "tested_frames": 761,
+      "tear_events": 0
+    },
+    {
+      "name": "unit_legacy_blacksmith_1.glb",
+      "sha256": "b0fd3b707dc099fc26c0b09d719b1a29708304de9aeb9caefed672055dee1996",
+      "bytes": 924556,
+      "triangles": 10000,
+      "tested_frames": 761,
+      "tear_events": 0
+    },
+    {
+      "name": "unit_legacy_blacksmith_2.glb",
+      "sha256": "74350801003b757b615507b98d34f003cf7d1396bb0460424bb0421eae152b00",
+      "bytes": 434136,
+      "triangles": 3497,
+      "tested_frames": 761,
+      "tear_events": 0
+    },
+    {
+      "name": "unit_legacy_blacksmith_3.glb",
+      "sha256": "df96173a9ee3f46805cf6d96324e7dadfd32fe994107529fb0e267f19b1495eb",
+      "bytes": 252908,
+      "triangles": 1196,
+      "tested_frames": 761,
+      "tear_events": 0
+    }
+  ],
+  "status": "qa_candidate_only",
+  "scope": "Owner-authorized optimized derivative build inputs only; no original source GLB, private backup, or password."
+}

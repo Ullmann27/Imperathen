@@ -998,14 +998,14 @@ def build_hair_bound(head_bvh, L, mat, arm):
     def e_min(a):
         b = abs(a)
         if b < .55:
-            return math.radians(43) - math.radians(10) * b / .55
+            return math.radians(27) - math.radians(9) * b / .55
         if b < 1.55:
-            return math.radians(33) - math.radians(26) * (b - .55)
-        return math.radians(7) - math.radians(50) * smooth(1.55, 2.6, b)
+            return math.radians(18) - math.radians(17) * (b - .55)
+        return math.radians(1) - math.radians(44) * smooth(1.55, 2.6, b)
 
     def offset(d, hit):
         part = math.exp(-(hit[0] / .0055) ** 2) * (1.0 if hit[1] < -.005 else 0.3)
-        return .0042 + .0012 * max(0.0, d[2]) - .0028 * part
+        return .0070 + .0040 * max(0.0, d[2]) - .0018 * part
 
     def uv_fn(d, i, j):
         lateral = math.degrees(math.asin(max(-1.0, min(1.0, d[0])))) / 90.0

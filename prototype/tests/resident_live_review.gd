@@ -57,6 +57,8 @@ func _run() -> void:
 			node.set_physics_process(false)
 	var camera: Camera3D = world._camera
 	camera.current = true
+	camera.near = 0.035
+	await physics_frame
 	await process_frame
 	for profile: String in profiles:
 		world.set_quality(profile)
@@ -76,7 +78,26 @@ func _run() -> void:
 			var head: Vector3 = rig.global_transform * rig.get_bone_global_pose(rig.find_bone("Head")).origin
 			var target := head + Vector3.UP * 0.07
 			camera.fov = 34
-			camera.position = target + facing.normalized() * 1.05 + facing.cross(Vector3.UP).normalized() * 0.18 + Vector3(0, 0.03, 0)
+			# The earlier Julia frame contained only a wall. Choose a clear
+			# camera line to the actual face, not a fake success on any PNG.
+			var exclude: Array[RID] = []
+			if figure.get_parent() is CollisionObject3D:
+				exclude.append((figure.get_parent() as CollisionObject3D).get_rid())
+			var camera_clear := false
+			await physics_frame
+			for distance: float in [1.05,0.82,0.60,0.43]:
+				for angle: float in [0.0,0.35,-0.35,0.7,-0.7,1.0,-1.0]:
+					var proposed := target + facing.normalized().rotated(Vector3.UP,angle) * distance + Vector3.UP*0.03
+					var ray := PhysicsRayQueryParameters3D.create(target,proposed,1,exclude)
+					if world.get_world_3d().direct_space_state.intersect_ray(ray).is_empty():
+						camera.global_position = proposed
+						camera_clear = true
+						break
+				if camera_clear:
+					break
+			if not camera_clear:
+				report.errors.append("face occluded by world geometry: " + id)
+				continue
 			camera.look_at(target, Vector3.UP)
 			figure.refresh_lod(camera)
 			figure.sample_pose("idle", 0.25)
