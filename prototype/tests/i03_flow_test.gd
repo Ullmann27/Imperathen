@@ -129,7 +129,7 @@ func _let_marcus_walk(seconds: float, until: Callable) -> float:
 
 ## New life up to the lane: I-00/VID-A through the films, the rest of I-01
 ## and I-02 through the real commands with fixture placement.
-func _to_lane() -> void:
+func _to_lane() -> bool:
 	game._start_new_game()
 	await frames()
 	game._opening_skip()
@@ -152,6 +152,21 @@ func _to_lane() -> void:
 			game._opening_next()
 			await frames(4)
 			continue
+		# Main rejects further childhood commands while the physical I-01
+		# action is running. Wait before fixture placement, not after moving
+		# the player away from the actual interaction. Never force the clock
+		# or clear presentation state: exercise normal process frames.
+		var props = game.world.i01_props
+		if is_instance_valid(props) and props.water_interaction_active():
+			var elapsed := 0.0
+			var waited := 0
+			while props.water_interaction_active() and elapsed < 12.0 and waited < 2400:
+				await process_frame
+				elapsed += root.get_process_delta_time()
+				waited += 1
+			if not check(not props.water_interaction_active(),
+					"I-01 water action settles naturally before the next objective"):
+				return false
 		var view: Dictionary = Childhood.view(game.model.data)
 		var stage := str(view.get("stage", ""))
 		if stage == "i03_marcus":
@@ -164,13 +179,13 @@ func _to_lane() -> void:
 		var action := "basket_check" if stage == "i02_basket" else str(view.actions[0].payload.action_id)
 		var result: Dictionary = game._command("village_childhood_action", {"action_id":action})
 		if not check(bool(result.get("ok", false)), "Reach the lane, step %s: %s" % [stage, str(result.get("message", ""))]):
-			break
+			return false
 		await frames(2)
 	if game.screen == "opening":
 		game._opening_skip()
 		game._opening_next()
 		await frames(4)
-	check(_stage() == "i03_marcus" and game.screen == "playing", "The lane with Marcus is the current objective")
+	return check(_stage() == "i03_marcus" and game.screen == "playing", "The lane with Marcus is the current objective")
 
 
 func _run() -> void:
@@ -183,12 +198,14 @@ func _run() -> void:
 	game.set_physics_process(false)
 	game.ui._touch_enabled = true
 	game.ui._finish_intro()
-	await _to_lane()
-	await _test_absent_marcus()
-	await _test_vid_a()
-	await _test_stall()
-	await _test_vid_b_and_service()
-	await _test_farewell()
+	# Preserve all I-03 assertions on a valid setup. On setup failure the
+	# test exits nonzero rather than reporting unrelated cascade failures.
+	if await _to_lane():
+		await _test_absent_marcus()
+		await _test_vid_a()
+		await _test_stall()
+		await _test_vid_b_and_service()
+		await _test_farewell()
 	if not capture_dir.is_empty():
 		var file := FileAccess.open(capture_dir.path_join("i03-flow-report-%dx%d.json" % [size.x, size.y]), FileAccess.WRITE)
 		file.store_string(JSON.stringify({"checks":checks, "failures":failures, "captures":captures, "size":[size.x, size.y],
