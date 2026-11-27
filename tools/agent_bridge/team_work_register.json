@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 127,
+  "version": 128,
   "tasks": [
     {
       "id": "K101",
@@ -553,13 +553,13 @@
       "id": "BACKDROP-RAY-PROVENANCE",
       "owner": "Coordinator",
       "status": "submitted",
-      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
-      "run_id": "46055508471",
+      "revision": "ffbea5820907f8c517818235d435ffea9638ec48",
+      "run_id": "46061712090",
       "scope": [
         "prototype/tests/village_backdrop_test.gd"
       ],
       "access": "edit",
-      "note": "Roadmap phase 01 only: existing full regression 46038086118/job 140638526143 had 2/760 downward rays hit other/missing body and 11/225 horizontal faults, while walk and terrain height passed. Preserve all original assertions, add actual collider path/position/shape and expected mesh coordinates for failures. Isolated focused Godot diagnostic; no preview push or duplicate Nemotron request while APK #221 runs. New isolated branch fix/aeterna-backdrop-ray-provenance-20261127, actual head bba33d9f45d43d02ca70c39304a6e848fafcac98; workflow 46055508471 in_progress, actual engine baseline (no private model staging) and unchanged checks. N27 is separately registered as read-only, no duplicate API call. No result or repair claimed."
+      "note": "Roadmap phase 01 only: existing full regression 46038086118/job 140638526143 had 2/760 downward rays hit other/missing body and 11/225 horizontal faults, while walk and terrain height passed. Preserve all original assertions, add actual collider path/position/shape and expected mesh coordinates for failures. Isolated focused Godot diagnostic; no preview push or duplicate Nemotron request while APK #221 runs. New isolated branch fix/aeterna-backdrop-ray-provenance-20261127, actual head bba33d9f45d43d02ca70c39304a6e848fafcac98; workflow 46055508471 in_progress, actual engine baseline (no private model staging) and unchanged checks. N27 is separately registered as read-only, no duplicate API call. No result or repair claimed. Actual run 46055508471 completed failure 58/60; collider path Landscape/Vegetation appears in all eight retained individual ray faults, 11/225 horizontal faults and 2/760 downward failures in the original gate. Original walking, slope and corridor checks passed. Candidate ffbea5820907f8c517818235d435ffea9638ec48 independently checks raw vegetation hits against exact body RID, shape index/transform/dimensions, ecology entry and real render batch; then repeats same segment with only verified trunk RID excluded to measure terrain. Existing numerical terrain and movement checks unchanged, adds two verification assertions. No runtime change or green claim; independent focused CI required."
     },
     {
       "id": "PARALLEL-NIGHT-EVIDENCE",
