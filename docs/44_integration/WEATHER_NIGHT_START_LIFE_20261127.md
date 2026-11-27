@@ -1,0 +1,8 @@
+# Shared weather, night route lighting and ground detail
+Owner request: improve the playable beginning, including readable dark mission routes, weather, paths, pebbles, grass, vegetation and German dialogue. This commit addresses the weather/lighting/ground paths; it does not claim a finished new character or voice pass.
+- Calendar-seeded fictional weather (clear, cloudy, rain, mist, storm), six-hour blocks and 30-minute transition, residual ground dampness. Rendering and NPC rain decisions use the same saved time. First morning kept dry to preserve authored opening. No invented historical forecast and no save migration.
+- Visible precipitation follows the actual weather; native MultiMesh positions are sampled against static world/roof surfaces, capped at 32 probes per physics tick. The safe Android vegetation path is retained.
+- Existing fixed route fire geometry, grounded and checked for placement, has denser village and east gate sites, wider light radius and bounded selection prioritizing the player and upcoming path. The existing profile light count is preserved. No lux or visual reach claim until actual framebuffer inspection.
+- The previous texture layers remain; additional native instanced small pebble meshes and newer street-margin plant placements are decorative, not collisions. Terrain and paving wetness respond together. High profile quality/performance requires an actual Fold7 test.
+- The old test's autumn pause fixture explicitly selects a rainy clock from the shared weather sampler; the guard duty assertion is preserved.
+- Parent candidates, complete German voice delivery, farther regional routes and final visual acceptance remain separate gates. No APK is released by this change.

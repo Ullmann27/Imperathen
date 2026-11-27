@@ -8,6 +8,7 @@ uniform sampler2D scree_color : source_color, repeat_enable, filter_linear_mipma
 uniform vec3 scrub_tint = vec3(0.72, 0.86, 0.74);
 uniform vec3 stone_tint : source_color = vec3(0.86, 0.80, 0.68);
 uniform float relief_strength = 0.75;
+uniform float wetness : hint_range(0.0,1.0) = 0.0;
 varying vec3 land_position;
 varying vec3 land_normal;
 
@@ -41,11 +42,11 @@ void fragment() {
 	float wear = land_track_wear(p, grain);
 	vec2 ruv = land_road_uv(p);
 	vec3 soil = mix(vec3(.6, .49, .34) * season_tint, texture(road_color, ruv).rgb, close_up);
-	ALBEDO = land_cover(mix(ground, soil, wear), p, land_position.y, slope).rgb;
+	ALBEDO = land_cover(mix(ground, soil, wear), p, land_position.y, slope).rgb*(1.0-wetness*mix(.08,.24,wear));
 	vec3 surface = mix(texture(verge_relief, vuv).rgb, texture(road_relief, ruv).rgb, wear);
 	NORMAL_MAP = vec3(surface.rg, sqrt(max(.012, 1.0 - dot(surface.rg * 2.0 - 1.0, surface.rg * 2.0 - 1.0))) * .5 + .5);
 	NORMAL_MAP_DEPTH = relief_strength * close_up * (1.0 - rocky * .6);
-	ROUGHNESS = mix(.95, clamp(surface.b, .33, 1.0), close_up);
+	ROUGHNESS = mix(.95, clamp(surface.b-wetness*(.12+.20*wear), .33, 1.0), close_up);
 	SPECULAR = mix(.12, .27, close_up);
 	FOG = land_haze(VERTEX, land_position.y, 0.0);
 }

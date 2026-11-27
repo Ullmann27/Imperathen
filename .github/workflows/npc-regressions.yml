@@ -4,6 +4,9 @@ on:
   pull_request:
     paths:
       - 'prototype/scripts/domain/npc_behavior.gd'
+      - 'prototype/scripts/domain/local_weather.gd'
+      - 'prototype/scripts/rendering/route_fire_lights.gd'
+      - 'prototype/tests/local_weather_test.gd'
       - 'prototype/scripts/domain/world_model.gd'
       - 'prototype/scripts/world/village/**'
       - 'prototype/scripts/world/village_life_world.gd'
@@ -106,6 +109,7 @@ jobs:
           run_check recovered_population_perf_test 'RECOVERED_POPULATION_PERF_PASS'
           run_check resident_activity_test 'RESIDENT_ACTIVITY_PASS'
           run_check route_fire_test 'ROUTE_FIRE_PASS'
+          run_check local_weather_test 'LOCAL_WEATHER_PASS'
           run_check npc_behavior_test 'checks passed'
           run_check npc_behavior_world_test 'checks passed'
           run_check npc_behavior_ui_test 'NPC_BEHAVIOR_UI_PASS'

@@ -48,6 +48,8 @@ var _visible_cards := {"chunks": 0, "instances": 0, "triangles": 0}
 var _body := RID()
 var _shapes: Dictionary = {}
 var _wind_time := -1.0
+var _weather_wind := 1.0
+var _weather_wet := 0.0
 var grass: Grass
 
 
@@ -187,7 +189,7 @@ func apply_season(index: int) -> void:
 	season = posmod(index, 4)
 	for material: ShaderMaterial in Library.materials():
 		if not Safe.active():
-			material.set_shader_parameter("wind_strength", SEASON_GUST[season])
+			material.set_shader_parameter("wind_strength", SEASON_GUST[season]*_weather_wind)
 		var family: String = material.get_meta("vegetation_family","")
 		if family in ["leaf","impostor"]:
 			material.set_shader_parameter("season_tint", SEASON_TINT[season])
@@ -199,10 +201,21 @@ func apply_season(index: int) -> void:
 			material.set_shader_parameter("crop_stage", SEASON_CROP[season])
 			material.set_shader_parameter("dryness", SEASON_DRY[season])
 		elif family == "bark":
-			material.set_shader_parameter("wetness", [.25, .0, .55, .35][season])
+			material.set_shader_parameter("wetness", maxf([.25,.0,.55,.35][season]*0.3,_weather_wet))
 		elif family == "grass":
 			material.set_shader_parameter("season_tint", [Color("#f0ffd0"), Color("#ffffff"), Color("#f0dcae"), Color("#b9ab8c")][season])
 			material.set_shader_parameter("dryness", [.0, .3, .6, .75][season])
+
+
+func set_weather_state(wind: float, wet: float) -> void:
+	_weather_wind=clampf(wind,0.2,2.5)
+	_weather_wet=clampf(wet,0.0,1.0)
+	for material: ShaderMaterial in Library.materials():
+		# Android's known-safe native vegetation remains non-displaced.
+		if not Safe.active():
+			material.set_shader_parameter("wind_strength",SEASON_GUST[season]*_weather_wind)
+		if material.get_meta("vegetation_family","")=="bark":
+			material.set_shader_parameter("wetness",maxf([.25,.0,.55,.35][season]*0.3,_weather_wet))
 
 
 func set_wind_time(seconds: float) -> void:
