@@ -1,20 +1,20 @@
 {
   "version": 1,
   "project": "IMPERATHEN",
-  "job_id": "imperathen-character-atelier-20261127-01",
+  "job_id": "imperathen-character-atelier-20261127-02",
   "source_revision": "2e761e544022d03b0a813ee7cbc0c3f095ce7329",
   "assets": [
     {
-      "id": "roman-adult",
-      "label": "Römischer Bürger – erwachsen",
-      "path": "prototype/assets/characters/frontier_civilian_man_0.glb",
-      "git_blob": "24c40a142414ddbef03c8da1edeb9cdc7917f635"
+      "id": "roman-woman",
+      "label": "Römische Bürgerin",
+      "path": "prototype/assets/characters/frontier_civilian_woman_0.glb",
+      "git_blob": "832153a77e6141b108a9370ef648e5a048e08368"
     },
     {
-      "id": "roman-elder",
-      "label": "Römischer Bürger – älter",
-      "path": "prototype/assets/characters/frontier_elder_0.glb",
-      "git_blob": "b704a4035698d4405b200733bbf817b3f1b1dcde"
+      "id": "roman-legionary",
+      "label": "Römischer Legionär",
+      "path": "prototype/assets/characters/frontier_legionary_0.glb",
+      "git_blob": "a40e2a1e710dfb809fbecb48b77c640dcdfec6e7"
     }
   ]
 }

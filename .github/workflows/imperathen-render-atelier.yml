@@ -1,7 +1,7 @@
 name: IMPERATHEN isolated Blender figures atelier
 on:
   push:
-    branches: ['render/imperathen-atelier-20261127']
+    branches: ['render/imperathen-atelier-20261127', 'render/imperathen-atelier-batch2-20261127']
     paths:
       - 'render_bridge/jobs/**'
       - 'tools/render_bridge/**'
@@ -40,7 +40,7 @@ jobs:
           retention-days: 30
   publish:
     needs: render
-    if: github.ref == 'refs/heads/render/imperathen-atelier-20261127'
+    if: github.ref == 'refs/heads/render/imperathen-atelier-20261127' || github.ref == 'refs/heads/render/imperathen-atelier-batch2-20261127'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

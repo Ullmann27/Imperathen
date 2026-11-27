@@ -8,6 +8,8 @@ import struct
 ALLOW = {
     "prototype/assets/characters/frontier_civilian_man_0.glb",
     "prototype/assets/characters/frontier_elder_0.glb",
+    "prototype/assets/characters/frontier_civilian_woman_0.glb",
+    "prototype/assets/characters/frontier_legionary_0.glb",
 }
 ID = re.compile(r"[a-z0-9][a-z0-9-]{2,79}")
 SHA = re.compile(r"[a-f0-9]{40}")
