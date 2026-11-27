@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 1,
+  "version": 2,
   "tasks": [
     {
       "id": "K101",
@@ -18,14 +18,14 @@
     {
       "id": "K102",
       "owner": "Kimi",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "4f109b9853f7fa1213ed2ed548d421dca3da39d4",
-      "run_id": null,
+      "run_id": "46016053212",
       "scope": [
         "prototype/tests/roman_menu_test.gd"
       ],
       "access": "read",
-      "note": "Distinct small MAX proof; review updated menu regression, no duplicate K101 POST."
+      "note": "33 offline tests passed; MAX JSON live job 140563627074 submitted and in progress at verification. Provider completion unconfirmed."
     },
     {
       "id": "MENU-V2",
