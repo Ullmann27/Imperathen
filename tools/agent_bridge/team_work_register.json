@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 174,
+  "version": 175,
   "tasks": [
     {
       "id": "K101",
@@ -827,13 +827,13 @@
       "owner": "Coordinator",
       "access": "edit",
       "status": "submitted",
-      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
-      "run_id": null,
+      "revision": "4ebd7cb5eecd1d4d8d6d1919241ab97de83c8cf0",
+      "run_id": "46075409038",
       "scope": [
         "prototype/tests/render_bench_views_test.gd",
         ".github/workflows/aeterna-night-light-accounting.yml"
       ],
-      "note": "Independent correction of stale fixed benchmark fixture after actual 46055915040/job 140698245043: eight night accounting failures. Preserve exact existing shadow and atlas checks, require exact authored door and pooled route identities and daylight cleanup. No runtime edits or overlaps with campaign lighting; focused test only; no visual acceptance."
+      "note": "Independent correction of stale fixed benchmark fixture after actual 46055915040/job 140698245043: eight night accounting failures. Preserve exact existing shadow and atlas checks, require exact authored door and pooled route identities and daylight cleanup. No runtime edits or overlaps with campaign lighting; focused test only; no visual acceptance. Exact candidate on fix/aeterna-night-bench-light-accounting-20261127. Source check retains day inventory, total omni count, exact synthetic torch/shadow and atlas constraints; adds exact door and route sets from fixed camera and independent profile budgets. Actual push CI observed in_progress 46075409038. No acceptance or merge until actual result."
     }
   ]
 }
