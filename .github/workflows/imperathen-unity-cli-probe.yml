@@ -6,6 +6,8 @@ on:
     paths:
       - .github/workflows/imperathen-unity-cli-probe.yml
       - docs/00_governance/UNITY_CLI_ROUTE_20261127.md
+      - tools/unity_bridge/**
+      - tests/unity_bridge_probe_access_test.py
   workflow_dispatch:
 
 permissions:
@@ -200,6 +202,20 @@ jobs:
             echo "UNITY_AI_PLUGIN_INSTALL_UNAVAILABLE" >> unity-cli-evidence/checks.txt
           fi
           # Never publish service account credentials, AI usage, org data or raw errors.
+      - name: Diagnose Unity Cloud project and organization permissions without exposing data
+        if: always()
+        shell: bash
+        env:
+          UNITY_SERVICE_ACCOUNT_ID: ${{ secrets.IMPERATHEN_UNITY_SA_ID }}
+          UNITY_SERVICE_ACCOUNT_SECRET: ${{ secrets.IMPERATHEN_UNITY_SA_SECRET }}
+          UNITY_NON_INTERACTIVE: "1"
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tests -p 'unity_bridge_probe_access_test.py' -v
+          export PATH="$HOME/.local/bin:$PATH"
+          python3 tools/unity_bridge/probe_access.py \
+            --output unity-cli-evidence/cloud-probe-sanitized.json \
+            --org-candidate "heinzullmann2212"
       - name: Keep only sanitized CLI evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
