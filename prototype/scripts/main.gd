@@ -911,6 +911,7 @@ func _show_companion() -> void:
 			return
 		screen = "dialog"
 		world.set_active(false)
+		world.focus_companion_gaze()
 		ui.show_dialog("Marcus · auf dem Weg zum Markt", "»Erst das Salz. Wir sehen uns an Cassias Stand.«", [{"label":"Weitergehen", "action":"resume", "enabled":true, "reason":""}])
 		return
 	if Childhood.enabled(model.data) and not companion.get("met", false):
@@ -931,6 +932,7 @@ func _show_companion() -> void:
 			var why := Childhood.i01_reason(model.data, "i01_contact_marcus")
 			greeting_choices.append({"label":"Kurz zuhören und antworten", "action":"i01_contact_marcus", "enabled":why.is_empty(), "reason":why})
 		greeting_choices.append({"label":"Weitergehen", "action":"resume", "enabled":true, "reason":""})
+		world.focus_companion_gaze()
 		ui.show_dialog("Marcus · am Brunnen", greeting, greeting_choices)
 		return
 	if companion.get("met", false):
@@ -963,11 +965,13 @@ func _show_companion() -> void:
 		screen = "dialog"
 		village_npc = str(companion.id)
 		world.set_active(false)
+		world.focus_companion_gaze()
 		world._companion.get_node("Figure").set_conversation_focus(true)
 		ui.show_dialog(str(authored.title), str(authored.text), options)
 		return
 	screen = "dialog"
 	world.set_active(false)
+	world.focus_companion_gaze()
 	var dialogue: Dictionary = OpeningStory.companion_dialog(model.data)
 	ui.show_dialog(str(dialogue.title), str(dialogue.text), dialogue.choices)
 

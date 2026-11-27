@@ -111,10 +111,19 @@ def shape_identity():
         mouth_protect = 1.0 - .85 * gauss(h, .23, .10)
         jaw = gauss(h, .30, .17)
         cheek = gauss(h, .53, .13) * smooth((abs(p.x) - .025) / .035)
-        nose = gauss(h, .48, .13) * gauss(p.x, 0.0, .014)
-        return Vector((p.x * fade * eye_protect * mouth_protect * (-.09 * jaw + .07 * cheek),
-                       fade * front * eye_protect * mouth_protect * (.0035 * jaw - .0045 * nose - .0035 * cheek),
-                       -.003 * fade * front * gauss(h, .14, .07) * mouth_protect))
+        # Separate the nasal bridge, tip and paired alar volumes instead of
+        # extruding the entire nose as a single bump. All values are metres.
+        # The eye-protection mask leaves the eyelid/eyeball fit intact.
+        bridge = gauss(h, .61, .105) * gauss(p.x, 0.0, .010)
+        tip = gauss(h, .46, .065) * gauss(p.x, 0.0, .012)
+        alae = gauss(h, .425, .055) * gauss(abs(p.x), .017, .008)
+        root = gauss(h, .72, .09) * gauss(p.x, 0.0, .016)
+        chin = gauss(h, .16, .07) * gauss(p.x, 0.0, .032)
+        nose_profile = -.0028 * bridge - .0048 * tip - .0018 * alae + .0012 * root
+        return Vector((p.x * fade * eye_protect * mouth_protect * (-.065 * jaw + .045 * cheek)
+                       + p.x * fade * front * eye_protect * mouth_protect * .055 * alae,
+                       fade * front * eye_protect * mouth_protect * (.0024 * jaw + nose_profile - .0023 * cheek - .0015 * chin),
+                       -.0018 * fade * front * chin * mouth_protect))
 
     def haircut(p):
         h = (p.z - neck) / height

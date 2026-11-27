@@ -10,6 +10,8 @@ const LOOPS := ["idle","march","run","talk","work","retreat"]
 # (art/soldiers/build.py STRIDES, shared by the battle soldiers).
 const COMPANY_STRIDES := {"march":1.30,"run":1.75,"retreat":1.48}
 const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
+const HeadGaze := preload("res://scripts/visuals/head_gaze.gd")
+const SocialFocus := preload("res://scripts/visuals/social_focus.gd")
 const ResidentIdentity := preload("res://scripts/visuals/resident_identity.gd")
 const CharacterMotion := preload("res://scripts/visuals/character_motion.gd")
 const YouthSoleContact := preload("res://scripts/visuals/youth_sole_contact.gd")
@@ -70,6 +72,8 @@ var _check_lod := 0.0
 var _posed := false
 var _blade: MeshInstance3D
 var _face := FacialMotion.new()
+var _gaze := HeadGaze.new()
+var _social_focus := SocialFocus.new()
 var _motion := CharacterMotion.new()
 var _carrying_jug := false
 var _hands := HandPose.new()
@@ -285,6 +289,7 @@ func _legacy_path(level: int) -> String:
 
 
 func _reload(level: int) -> void:
+	_gaze.restore()
 	level = clampi(level, 0, 3)
 	var saved_phase := phase
 	var previous_path := active_model_path
@@ -351,6 +356,7 @@ func _reload(level: int) -> void:
 	var imported_youth := active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
 	var civilian_motion := role in ["player", "companion", "regional_worker"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"])
 	_motion.bind(body, civilian_motion and not imported_youth, identity)
+	_gaze.bind(_motion.skeleton)
 	_youth_soles.bind(body if imported_youth else null,detail,String(MESHY_YOUTH_OUTFITS[youth_outfit].motion))
 	_motion_identity = identity
 	_motion.restore_world_contacts(contacts)
@@ -570,6 +576,7 @@ func sample_service_combat(style: String, normalized: float) -> bool:
 
 
 func sample_combat(technique: String, normalized: float) -> void:
+	_gaze.suspend()
 	if not technique in CharacterMotion.TECHNIQUES:
 		return
 	_service_external = false
@@ -837,6 +844,7 @@ func sample_pose(action: String, normalized: float) -> void:
 
 
 func _play(action: String, normalized: float, blend: float) -> void:
+	_gaze.restore()
 	if action != "attack":
 		_strike_windup = 0.0
 	_motion.capture_transition(blend if action != clip else 0.0)
@@ -878,6 +886,7 @@ func _playback_animation(name_in_file: String, looping: bool) -> Animation:
 
 
 func set_jug_carry(enabled: bool) -> void:
+	_gaze.restore()
 	if _carrying_jug == enabled:
 		return
 	_carrying_jug = enabled
@@ -1026,6 +1035,7 @@ func refresh_lod(camera: Camera3D) -> void:
 
 
 func _process(delta: float) -> void:
+	_gaze.restore()
 	_motion.advance(delta)
 	_check_lod -= delta
 	if _check_lod <= 0:
@@ -1044,6 +1054,10 @@ func _process(delta: float) -> void:
 		return
 	if _posed or _service_external:
 		_ground_youth()
+		# Cinematic talk poses remain manually sampled; explicit social gaze
+		# is applied only after the authored pose. Combat samples stay pure.
+		if not _service_external and is_instance_valid(_social_focus.target()):
+			_apply_gaze(delta)
 		return
 	if clip != "death":
 		_remaining = maxf(0,_remaining - delta)
@@ -1075,6 +1089,49 @@ func _process(delta: float) -> void:
 	_plant_contacts(delta)
 	_ground_youth()
 	_face.advance(delta,clip,detail)
+	_apply_gaze(delta)
+
+
+func gaze_anchor() -> Vector3:
+	var anchor := _gaze.anchor_world()
+	return anchor if anchor.is_finite() else global_position + Vector3.UP * 0.42
+
+
+func set_gaze_target(target: Node3D, turn_body: bool = false) -> void:
+	_social_focus.set_dialog(target, turn_body)
+
+
+func set_gaze_speaker(target: Node3D) -> void:
+	_social_focus.set_speaker(target)
+
+
+func clear_gaze_target() -> void:
+	_social_focus.clear()
+
+
+func set_ambient_gaze(enabled: bool) -> void:
+	_social_focus.ambient_enabled = enabled
+
+
+func _gaze_allowed() -> bool:
+	return detail >= 0 and detail <= 1 and clip in ["idle", "march", "talk"] and _combat_id.is_empty() and not _service_external
+
+
+func _physics_process(delta: float) -> void:
+	if role != "player" and not is_instance_valid(_social_focus.partner) and not is_instance_valid(_social_focus.speaker):
+		return
+	_social_focus.update(self, delta, role == "player" and _gaze_allowed() and not _posed)
+	if _social_focus.face_body and role == "player" and speed < 0.10 and not _posed and _gaze_allowed() and _social_focus.point().is_finite():
+		var offset := _social_focus.point() - global_position
+		if Vector2(offset.x, offset.z).length() > 0.20:
+			var heading := global_rotation
+			heading.y = rotate_toward(heading.y, atan2(-offset.x, -offset.z), minf(delta, 0.1) * 2.8)
+			global_rotation = heading
+
+
+func _apply_gaze(delta: float) -> void:
+	var relevant := role in ["player", "companion"] or is_instance_valid(_social_focus.target())
+	_gaze.apply(delta, global_basis, _social_focus.point(), clip, relevant and _gaze_allowed())
 
 
 func _ground_youth() -> void:

@@ -533,6 +533,9 @@ func _face_mission_pair() -> void:
 	direction.y=0.0
 	if direction.length()<0.25 or direction.length()>5.5:
 		return
+	if player.has_method("set_gaze_target") and npc.has_method("set_gaze_target"):
+		player.set_gaze_target(npc)
+		npc.set_gaze_target(player)
 	for pair: Array in [[player,direction],[npc,-direction]]:
 		var figure: Node3D = pair[0]
 		var look: Vector3 = pair[1]
@@ -600,6 +603,8 @@ func _release_speaker() -> void:
 	_speaker = null
 	for entry: Dictionary in _mission_rotations:
 		if is_instance_valid(entry.node):
+			if entry.node.has_method("clear_gaze_target"):
+				entry.node.clear_gaze_target()
 			entry.node.global_rotation = entry.rotation
 	_mission_rotations.clear()
 
