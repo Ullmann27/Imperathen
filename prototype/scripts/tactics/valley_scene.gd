@@ -212,9 +212,7 @@ func _sync_units() -> void:
 		if node != null and (a.detail > Levels.DETAIL_MID or str(node.get_meta("formation_pool_key", "")) != _pool_key(a)):
 			actors.erase(a.uid)
 			_release_rig(node)
-	for a: Agents.Agent in agents.agents.values():
-		if a.detail > Levels.DETAIL_MID:
-			continue
+	for a: Agents.Agent in _rig_materialization_order():
 		var node = actors.get(a.uid)
 		if node == null:
 			node = _take_rig(a)
@@ -236,6 +234,40 @@ func _sync_units() -> void:
 	_place_agent_flags()
 	var counts: Dictionary = levels.last
 	get_node("/root/RuntimeDisplay").set_unit_counts(int(counts.rigs_near), int(counts.rigs_mid), int(counts.far_instances))
+
+
+## Allocation order only; Levels remains the authority for eligibility and caps.
+## A camera jump must not spend every new-rig slot on the first roster side.
+## Retain current rigs, offer one slot to each unrepresented visible side,
+## then fill the remaining slots by actual camera distance and stable UID.
+func _rig_materialization_order() -> Array[Agents.Agent]:
+	var retained: Array[Agents.Agent] = []
+	var pending: Array[Agents.Agent] = []
+	var represented := {}
+	for a: Agents.Agent in agents.agents.values():
+		if a.detail > Levels.DETAIL_MID:
+			continue
+		if actors.has(a.uid):
+			retained.append(a)
+			if a.visible:
+				var side := str(model.squads.get(a.squad, {}).get("side", ""))
+				if not side.is_empty():
+					represented[side] = true
+		else:
+			pending.append(a)
+	pending.sort_custom(func(x, y): return x.camera_distance < y.camera_distance or (x.camera_distance == y.camera_distance and x.uid < y.uid))
+	var priority: Array[Agents.Agent] = []
+	var remaining: Array[Agents.Agent] = []
+	for a: Agents.Agent in pending:
+		var side := str(model.squads.get(a.squad, {}).get("side", ""))
+		if a.visible and not side.is_empty() and not represented.has(side):
+			priority.append(a)
+			represented[side] = true
+		else:
+			remaining.append(a)
+	retained.append_array(priority)
+	retained.append_array(remaining)
+	return retained
 
 
 func _is_cavalry(a: Agents.Agent) -> bool:

@@ -192,8 +192,13 @@ func _ui(bench: Dictionary) -> void:
 		scene.distance = 14.5
 		scene.azimuth = 0.72
 		scene._place_camera()
+		var before_promotions: int = scene.rig_instantiations
 		scene._sync_units()
+		check(scene.rig_instantiations - before_promotions <= scene.INSTANCES_PER_PASS, "Combat camera promotion respects the existing per-pass creation limit")
 		scene._process(0.0)
+		var budget: Dictionary = scene.levels.last.budget
+		check(int(scene.levels.last.animated) <= int(budget.near_rigs) + int(budget.mid_rigs) and int(scene.levels.last.rigs_near) <= int(budget.near_rigs), "Combat camera keeps the existing animated and near rig caps")
+		check(scene.formation_duplicate_count() == 0, "Combat camera promotion does not duplicate identities")
 		var saw_highland := false
 		for uid: String in scene.model.squads.ridge_guard.uids:
 			var figure = scene.actors.get(uid)

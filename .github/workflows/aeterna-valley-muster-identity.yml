@@ -37,7 +37,7 @@ jobs:
           set -euo pipefail
           mkdir -p artifacts/valley-muster-identity
           git rev-parse HEAD > artifacts/valley-muster-identity/source-commit.txt
-          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --only import valley_muster --report artifacts/valley-muster-identity
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --only import valley_muster formation_agents formation_levels --report artifacts/valley-muster-identity
       - name: Print source-bound identity evidence
         if: always()
         shell: bash
