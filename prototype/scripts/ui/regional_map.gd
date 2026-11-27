@@ -9,7 +9,7 @@ const Plan := preload("res://scripts/world/world_stream_plan.gd")
 const Footpath := preload("res://scripts/world/regional_footpath.gd")
 const Layout := preload("res://scripts/world/village/village_layout.gd")
 const SPANS := [90.0,360.0,1800.0,8000.0,32000.0]
-var canvas: Control
+var canvas: MapCanvas
 var details: Label
 var route_button: Button
 var selected := ""
@@ -94,6 +94,7 @@ class MapCanvas extends Control:
 	var center := Vector2.ZERO
 	var level := 1
 	var selected := ""
+	static var _cached_terrain: Texture2D
 	var terrain: Texture2D
 	var _dragged := false
 	var _press := Vector2.ZERO
@@ -103,7 +104,9 @@ class MapCanvas extends Control:
 		mouse_filter = Control.MOUSE_FILTER_STOP
 		clip_contents = true
 		resized.connect(queue_redraw)
-		terrain = _terrain_texture()
+		if _cached_terrain==null:
+			_cached_terrain = _terrain_texture()
+		terrain = _cached_terrain
 
 	func update_view(next: Dictionary) -> void:
 		if view!=next:
@@ -278,7 +281,7 @@ class MapCanvas extends Control:
 			draw_circle(player_at,11,Color(.08,.12,.10,.8))
 			draw_colored_polygon(PackedVector2Array([player_at+direction*10,player_at-direction*6+direction.orthogonal()*6,player_at-direction*3,player_at-direction*6-direction.orthogonal()*6]),Color("ffffff"))
 		draw_string(font,Vector2(14,23),"N ↑",HORIZONTAL_ALIGNMENT_LEFT,-1,15,Color("fff0cf"))
-		var ruler := [20.0,100.0,500.0,2000.0,8000.0][level] as float
+		var ruler := float([20.0,100.0,500.0,2000.0,8000.0][level])
 		var start := Vector2(14,size.y-20)
 		draw_line(start,start+Vector2(ruler*scale,0),Color("fff0cf"),2.0)
 		draw_string(font,start+Vector2(0,-5),("%g km" % (ruler/1000.0)) if ruler>=1000 else ("%d m" % int(ruler)),HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("fff0cf"))

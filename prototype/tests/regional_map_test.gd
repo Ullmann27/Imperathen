@@ -11,7 +11,8 @@ func _initialize() -> void:
 func _run() -> void:
 	var map := Map.new()
 	root.add_child(map)
-	map.size=Vector2(1000,620)
+	root.size=Vector2i(1280,720)
+	map.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	map.update_view({"player":Vector2(241,119),"heading":0.0})
 	await process_frame
 	var canvas = map.canvas
@@ -30,6 +31,18 @@ func _run() -> void:
 	map._select("willow_station")
 	check(not map.route_button.disabled,"Actual waystation is navigable")
 	check(map.view.player==Vector2(241,119),"Panning or selecting cannot move player")
+	var args := OS.get_cmdline_user_args()
+	if DisplayServer.get_name()!="headless" and not args.is_empty():
+		var out := args[0]
+		DirAccess.make_dir_recursive_absolute(out)
+		for step in [[0,"local"],[2,"routes"],[4,"region"]]:
+			canvas.level = int(step[0])
+			canvas.center = Vector2(241,119) if canvas.level<4 else Vector2.ZERO
+			canvas.queue_redraw()
+			await RenderingServer.frame_post_draw
+			await RenderingServer.frame_post_draw
+			var image := root.get_texture().get_image()
+			check(image!=null and not image.is_empty() and image.save_png(out.path_join("map-"+str(step[1])+".png"))==OK,"Actual rendered map: "+str(step[1]))
 	map.free()
 	print("REGIONAL_MAP_PASS" if failed==0 else "REGIONAL_MAP_FAIL")
 	quit(0 if failed==0 else 1)

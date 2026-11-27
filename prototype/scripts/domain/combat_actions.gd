@@ -196,10 +196,16 @@ static func advance(data: Dictionary, delta: float, sight_check: Callable = Call
 				event.practice = true
 			elif apply_hit.is_valid():
 				combat.resolved = true
+				var before_health := int(target.get("health",-1))
+				var target_position := Vector2(float(target.x),float(target.z))
 				var accepted: Variant = apply_hit.call(data, combat.target_id, hit_damage(data, combat.technique, frame))
 				if typeof(accepted) == TYPE_BOOL and accepted:
 					combat.resolved_hits = mini(1000000, int(combat.resolved_hits) + 1)
 					event.hit = true
+					event["before_health"] = before_health
+					event["after_health"] = _recorded_enemy_health(data,str(combat.target_id))
+					event["target_position"] = target_position
+					event["armed"] = is_armed(str(combat.technique))
 	if Tracks.frame_of(elapsed) >= int(timing.end):
 		combat.resolved = true
 	if elapsed + EPSILON >= float(spec.duration):
@@ -356,6 +362,16 @@ static func _swept_contact(data: Dictionary, technique: String, frame: int, targ
 		return {}
 	var clear: Variant = sight_check.call(from, to)
 	return contact if typeof(clear) == TYPE_BOOL and clear else {}
+
+
+## After the final hit the encounter may already be marked inactive. Read
+## the committed health without requiring an enemy to still be targetable.
+static func _recorded_enemy_health(data: Dictionary,id: String) -> int:
+	for encounter: Dictionary in [data.get("village",{}).get("raid",{}),data.get("encounter",{})]:
+		for enemy: Dictionary in encounter.get("enemies",[]):
+			if str(enemy.get("id",""))==id:
+				return int(enemy.get("health",-1))
+	return -1
 
 
 static func _enemy(data: Dictionary, id: String) -> Dictionary:

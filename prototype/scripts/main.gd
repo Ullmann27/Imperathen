@@ -87,6 +87,7 @@ func _ready() -> void:
 	world.setup(model.data)
 	world.action_requested.connect(_on_world_action)
 	model.combat_sight_check = world.combat_sight_clear
+	model.confirmed_combat_contact.connect(_on_confirmed_combat_contact)
 	model.npc_sight_check = world.npc_sight_clear
 	model.combat_motion_check = world.combat_safe_motion
 	model.npc_observations = world.npc_observations
@@ -156,6 +157,11 @@ func _physics_process(delta: float) -> void:
 	else:
 		model.advance(delta)
 	world.sync_combat_state(model.data)
+
+
+func _on_confirmed_combat_contact(event: Dictionary) -> void:
+	if screen=="playing" and is_instance_valid(world) and is_instance_valid(ui):
+		world.show_confirmed_impact(event,int(model.data.player.age),not bool(ui.opening_preferences().reduce_motion))
 
 
 func _flush_simulation() -> void:

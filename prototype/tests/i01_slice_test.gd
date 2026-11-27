@@ -134,7 +134,7 @@ func _test_help_path() -> void:
 	_check(Life.actor_position(model.data, "julia") == I01.POINTS.julia_table and Life.actor_position(model.data, "silvanus") == Childhood.POINTS.father, "After breakfast Julia clears the table and Silvanus goes to his door work")
 	_check(I01.presentation(model.data).cups.values() == ["table", "table", "table"], "Cups stay where they were placed")
 	var events: Array = _sp(model).i01_events
-	_check(events.size() == 10 and events.has("I-01.topic.workshop") and events.has("I-01.cups.table"), "Event ledger holds each decision exactly once: " + str(events))
+	_check(events.size() == 11 and events.count("I-01.jug.taken") == 1 and events.has("I-01.topic.workshop") and events.has("I-01.cups.table"), "Event ledger holds each decision exactly once: " + str(events))
 	_check(model.data.village.history.events.any(func(e): return e.kind == "I-01.meal"), "Chronicle event carries the ledger event id")
 	# Delayed hook: the workshop question returns in I-04.
 	var hook := I01.hook_lines(model.data, "woodcutter_request")

@@ -141,7 +141,7 @@ func load_state(saved: Variant) -> bool:
 	_rebuild_runtime()
 	# Old saves may still have a three-hour weather appointment. Bring only
 	# that future appointment forward; never alter residents or booked trade.
-	state.sys.weather = mini(int(state.sys.weather), (int(state.t)/WEATHER_SAMPLE_SECONDS+1)*WEATHER_SAMPLE_SECONDS)
+	state.sys.weather = mini(int(state.sys.weather), (floori(float(state.t)/WEATHER_SAMPLE_SECONDS)+1)*WEATHER_SAMPLE_SECONDS)
 	_push(int(state.sys.day) * KEY + SYS_DAY)
 	_push(int(state.sys.weather) * KEY + SYS_WEATHER)
 	for person in state.residents.size():
@@ -1553,12 +1553,12 @@ func _nearest_anchor_to(point: Vector3, kinds: Array) -> String:
 # --- weather -----------------------------------------------------------------------
 
 func _weather_tick(t: int) -> void:
-	state.sys.weather = (t/WEATHER_SAMPLE_SECONDS+1)*WEATHER_SAMPLE_SECONDS
+	state.sys.weather = (floori(float(t)/WEATHER_SAMPLE_SECONDS)+1)*WEATHER_SAMPLE_SECONDS
 	_push(int(state.sys.weather) * KEY + SYS_WEATHER)
 	if state.weather_forced:
 		return
-	var jdn := int(state.origin_jdn) + t / DAY
-	var sample_second := (posmod(t,DAY)/WEATHER_SAMPLE_SECONDS)*WEATHER_SAMPLE_SECONDS
+	var jdn := int(state.origin_jdn) + floori(float(t)/DAY)
+	var sample_second := floori(float(posmod(t,DAY))/WEATHER_SAMPLE_SECONDS)*WEATHER_SAMPLE_SECONDS
 	_set_weather(LocalWeather.city_kind(Calendar.new_clock(jdn,sample_second)),t)
 
 
