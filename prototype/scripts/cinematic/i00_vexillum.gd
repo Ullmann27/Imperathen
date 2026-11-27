@@ -23,15 +23,16 @@ func build(wood: Material, bronze: Material, phase_offset: float) -> void:
 	if ResourceLoader.exists(ASSET, "PackedScene"):
 		var scene := load(ASSET) as PackedScene
 		if scene:
-			var model := scene.instantiate() as Node3D
+			var instance := scene.instantiate()
+			var model := instance as Node3D
 			if model:
 				var candidate := model.find_child("VexillumCloth", true, false) as MeshInstance3D
-				if candidate and candidate.mesh and candidate.mesh.get_surface_count() == 1:
+				if has_original_textile(candidate):
 					add_child(model)
 					cloth = candidate
 					imported = true
-				else:
-					model.free()
+			if not imported and is_instance_valid(instance):
+				instance.free()
 	if cloth == null:
 		_build_fallback(wood, bronze)
 	var source := cloth.mesh.surface_get_material(0) as StandardMaterial3D
@@ -45,6 +46,25 @@ func build(wood: Material, bronze: Material, phase_offset: float) -> void:
 	cloth.material_override = textile
 	cloth.extra_cull_margin = .25
 	cloth.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+
+
+## Accept the original asset only if its deformable mesh and baked textile
+## are both present. A broken import must never be reported as original.
+static func has_original_textile(candidate: MeshInstance3D) -> bool:
+	if not is_instance_valid(candidate) or not candidate.mesh is ArrayMesh:
+		return false
+	var mesh := candidate.mesh as ArrayMesh
+	if mesh.get_surface_count() != 1 or mesh.surface_get_array_len(0) <= 500:
+		return false
+	var arrays := mesh.surface_get_arrays(0)
+	if not arrays[Mesh.ARRAY_VERTEX] is PackedVector3Array or not arrays[Mesh.ARRAY_TEX_UV] is PackedVector2Array:
+		return false
+	var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+	var uvs: PackedVector2Array = arrays[Mesh.ARRAY_TEX_UV]
+	if vertices.is_empty() or uvs.size() != vertices.size():
+		return false
+	var source := mesh.surface_get_material(0) as StandardMaterial3D
+	return source != null and source.albedo_texture != null
 
 
 func sample_wind(seconds: float) -> void:
