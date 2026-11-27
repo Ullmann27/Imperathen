@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 135,
+  "version": 137,
   "tasks": [
     {
       "id": "K101",
@@ -630,7 +630,7 @@
     {
       "id": "VIS-MARKET-JUG-GRIP",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
       "run_id": "46062934470",
       "scope": [
@@ -639,21 +639,21 @@
         ".github/workflows/aeterna-market-jug-regression.yml"
       ],
       "access": "edit",
-      "note": "PR #187 head c9fe2960008cf52787fa51c4afe09c4528d236b1. Actual focused push workflow 46062934470/job 140721300780 observed in_progress; live I03 flow, 6 contact/upright checks before/after LOD, Compatibility screenshot and SHA256 receipt. No measured contact, finger or visual/device acceptance yet. Own coordinator patch; no Kimi/Nemotron output."
+      "note": "PR #187 c9fe296: actual CI 46062934470/job 140721300780 completed failure: 74 checks, one failed. Before LOD handle-to-palm error 0.05444431304932 m vs 0.005 m; after LOD passes. Artifact 15228624744 logs; render skipped. Investigate physics/idle transform synchronization, not yet proven cause. Preserve limit; no visual acceptance."
     },
     {
       "id": "VIS-FAMILY-JUG-GRIP",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
-      "run_id": null,
+      "run_id": "46063412333",
       "scope": [
         "prototype/scripts/world/village/i01_props.gd",
         "prototype/tests/i01_flow_test.gd",
         ".github/workflows/aeterna-family-jug-regression.yml"
       ],
       "access": "edit",
-      "note": "VIS-002: I01 _carry_transform uses obsolete origin offset when _family_carry false (later father delivery/legacy/gate carry). Existing regression asserts incorrect origin offset. Use existing measured GLB handle target for all carry states, retain family IK/pour/state semantics. Test empty, full and father handoff, same object identity across model switches. Independent of active market I03 PR #187. No finger/visual/device acceptance before real captures and review."
+      "note": "PR #188 c48b0121e2173cc22937b0abdd0ce102a890e74c: I01 old offset branch removed, measured 2 mm grip and upright assertions for empty/full/father handoff, extra father-delivery screenshot. Existing graphical PR workflow 46063412333 observed in_progress; no result, no finger/visual/device claim. Separate from failed market PR."
     }
   ]
 }
