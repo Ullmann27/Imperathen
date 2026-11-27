@@ -36,7 +36,7 @@ const CONTACT_SETTLE_M := 0.45
 const CONTACT_DRESS_M_S := 0.8
 const CONTACT_HOLD_M := 2.0
 const ROCK_CLEARANCE_M := 0.3
-const REFILE_DEG := 75.0
+const REFILE_DEG := Rules.REFILE_DEG
 const WHEEL_SHARE := 0.8
 const LEAD_MAX_M := 2.2
 const LEAD_RATE := 1.5
@@ -414,13 +414,25 @@ func _match(u: Unit, frame_center: Vector2) -> void:
 	for offset in u.offsets:
 		world.append(Field.project(frame_center + offset.rotated(-u.facing)))
 	var provided := true
+	var occupied := {}
 	for uid: String in u.members:
 		var slot: int = agents[uid].model_slot
-		provided = provided and slot >= 0 and slot < u.offsets.size()
+		if slot < 0 or slot >= u.offsets.size() or occupied.has(slot):
+			provided = false
+			break
+		occupied[slot] = true
 	if provided:
+		# Record real assignments, including the authoritative fast path.
+		# This evidence does not introduce a second slot authority.
+		var authority_record := {"unit":u.id, "tick":tick, "source":"authority", "uids":[], "from":[], "to":[], "by_index":world.duplicate()}
 		for uid: String in u.members:
-			u.owners[agents[uid].model_slot] = uid
-			agents[uid].slot = agents[uid].model_slot
+			var slot: int = agents[uid].model_slot
+			u.owners[slot] = uid
+			agents[uid].slot = slot
+			authority_record.uids.append(uid)
+			authority_record.from.append(agents[uid].pos)
+			authority_record.to.append(world[slot])
+		last_match[u.id] = authority_record
 		return
 	var pairs := []
 	for i in n:
@@ -457,10 +469,11 @@ func _match(u: Unit, frame_center: Vector2) -> void:
 					improved = true
 		if not improved:
 			break
-	var record := {"unit": u.id, "tick": tick, "from": [], "to": [], "by_index": world.duplicate()}
+	var record := {"unit": u.id, "tick": tick, "source":"fallback", "uids":[], "from": [], "to": [], "by_index": world.duplicate()}
 	for i in n:
 		agents[u.members[i]].slot = slot_of[i]
 		u.owners[slot_of[i]] = u.members[i]
+		record.uids.append(u.members[i])
 		record.from.append(agents[u.members[i]].pos)
 		record.to.append(world[slot_of[i]])
 	last_match[u.id] = record

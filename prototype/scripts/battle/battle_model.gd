@@ -43,6 +43,8 @@ const ENEMY_TARGETED := ["attack", "flank", "focus_fire", "charge", "pila", "adv
 const MOVING_COMMANDS := ["move", "attack_move", "deploy", "attack", "flank", "retreat", "follow", "advance", "fall_back", "charge"]
 ## Orders (design values, P4).
 const TURN_RATE := 3.6
+## Small front changes wheel in existing rank order; discrete larger turns re-file.
+const REFILE_DEG := 75.0
 const ADVANCE_STANDOFF := 6.0
 const FALL_BACK_DISTANCE := 10.0
 const FALL_BACK_SPEED := 1.0
@@ -846,7 +848,12 @@ func _step() -> void:
 	for s: Dictionary in squads.values():
 		if s.strength == 0 or s.status == "withdrawn":
 			continue
+		var previous_facing := float(s.facing)
+		# Only the deliberate deployment or applied formation may reassign
+		# ordinary rank owners; small turns are a wheel, not a new layout.
+		var rematch: bool = s.command == "deploy" and steps == int(s.ready_at)
 		if s.pending_formation != "" and steps >= s.formation_at:
+			rematch = true
 			s.formation = s.pending_formation
 			s.pending_formation = ""
 			s.formation_at = 0
@@ -862,7 +869,8 @@ func _step() -> void:
 			_rally_step(s, enemy)
 		else:
 			_act(s, enemy, hits)
-		_align_members(s)
+		rematch = rematch or absf(angle_difference(previous_facing, float(s.facing))) > deg_to_rad(REFILE_DEG)
+		_align_members(s, rematch)
 	_apply_hits(hits)
 	_evaluate()
 
@@ -1346,14 +1354,18 @@ func _walk(s: Dictionary, dest: Vector2, speed: float, keep_facing: bool = false
 	return next.distance_to(dest) < 0.02
 
 
-## Members take the nearest free slot (greedy nearest-sort), so rear ranks step up into
-## gaps instead of the whole line shuffling by index. Nobody moves more than MEMBER_STEP.
-func _align_members(s: Dictionary) -> void:
+## Normal movement and wheeling keep each living soldier's slot. Casualties
+## remove the actual UID and compress the rank; survivors move to the
+## resulting slots without continually reassigning the whole company.
+## Only an intentional layout or discrete large front change re-matches.
+## Nobody moves more than MEMBER_STEP.
+func _align_members(s: Dictionary, rematch: bool = false) -> void:
 	var slots := _company_slots(s, s.formation, s.width, _pos(s), s.facing)
 	var goals: Array[Vector2] = []
 	for slot in slots:
 		goals.append(Field.project(slot))
-	_assign_slots(s, goals)
+	if rematch:
+		_assign_slots(s, goals)
 	var deviation := 0.0
 	for i in range(goals.size()):
 		var at := Vector2(s.members[i][0], s.members[i][1])
@@ -1389,6 +1401,24 @@ func _assign_slots(s: Dictionary, goals: Array[Vector2]) -> void:
 			placed += 1
 			if placed == n:
 				break
+	# Improve the greedy match only when a re-formation is actually due.
+	# Bounded deterministic pair exchanges reduce total walking distance.
+	for sweep in mini(32, n):
+		var improved := false
+		for i in n:
+			for j in range(i + 1, n):
+				var a := Vector2(s.members[member_of[i]][0], s.members[member_of[i]][1])
+				var b := Vector2(s.members[member_of[j]][0], s.members[member_of[j]][1])
+				var current := a.distance_to(goals[i]) + b.distance_to(goals[j])
+				var alternate := a.distance_to(goals[j]) + b.distance_to(goals[i])
+				var tie := absf(current - alternate) <= 0.0001 and a.distance_squared_to(goals[j]) + b.distance_squared_to(goals[i]) < a.distance_squared_to(goals[i]) + b.distance_squared_to(goals[j]) - 0.000001
+				if alternate < current - 0.0001 or tie:
+					var keep: int = member_of[i]
+					member_of[i] = member_of[j]
+					member_of[j] = keep
+					improved = true
+		if not improved:
+			break
 	var members := []
 	var uids := []
 	for j in range(n):
