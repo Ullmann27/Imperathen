@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 47,
+  "version": 58,
   "tasks": [
     {
       "id": "K101",
@@ -30,7 +30,7 @@
     {
       "id": "MENU-V2",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "review_pending",
       "revision": "8807c03666683d564659f6f92dcd49b33a3dee99",
       "run_id": "46015164122",
       "scope": [
@@ -38,7 +38,7 @@
         "prototype/tests/roman_menu_test.gd"
       ],
       "access": "read",
-      "note": "Independent visual candidate; check actual V2 status."
+      "note": "Real engine capture run 46015164122 source 8807c03 and receipt published b3f28fa; menu_contract and I01 actual playthrough pass, identical game_ui/roman_menu_test blobs to #171. Visual/device acceptance explicitly false; source included for combined technical QA, no RQG advancement."
     },
     {
       "id": "N17",
@@ -213,8 +213,8 @@
         "prototype/scripts/domain/melee/melee_track_data.gd"
       ],
       "access": "read",
-      "note": "Actual bounded batch in_progress at d1d9aea. Independent engineering only; no response yet, no edit permission or merge.",
-      "status": "submitted"
+      "note": "Run 46020399670/job 140578522207 completed success; full NVIDIA_ANSWER proposes close-range adult training fixture and active-frame timing. Independently validate original tracks, contact physics and actual production commands before any test/production patch; claimed green is unverified.",
+      "status": "review_pending"
     },
     {
       "id": "N21",
@@ -231,8 +231,8 @@
         "prototype/tests/formation_motion_measurement.gd"
       ],
       "access": "read",
-      "note": "Actual bounded batch in_progress at d1d9aea. Independent engineering only; no response yet, no edit permission or merge.",
-      "status": "submitted"
+      "note": "Run 46020399670/job 140578522143 completed success; full NVIDIA_ANSWER proposes removal of first zero-time rig present call. Independent analysis required, domain formation/wheeling and physical foot continuity not proven; do not blindly patch.",
+      "status": "review_pending"
     },
     {
       "id": "N22",
@@ -248,8 +248,8 @@
         "prototype/tests/village_look_test.gd"
       ],
       "access": "read",
-      "note": "Actual bounded batch in_progress at d1d9aea. Independent engineering only; no response yet, no edit permission or merge.",
-      "status": "submitted"
+      "note": "Run 46020399670/job 140578522079 completed failure in provider answer step; partial NVIDIA_ANSWER cannot be treated as finished patch. Preserve actual night light caps, no blind resubmission.",
+      "status": "blocked"
     },
     {
       "id": "N17-FIX-TYPE",
@@ -261,8 +261,8 @@
         "prototype/tests/route_fire_test.gd"
       ],
       "access": "edit",
-      "note": "Explicit WeakRef typing and pre-replacement identity regression. Prior lighting implementation unchanged. CI in_progress. Await actual results before integration.",
-      "status": "submitted"
+      "note": "Focused real Godot run 46021669947 completed success at e535446. Exact source/test blobs now included in isolated CAMPAIGN-CONTINUITY; final candidate CI/device gates remain open.",
+      "status": "done"
     },
     {
       "id": "MAP-MOUNT-INTEGRATE",
@@ -277,8 +277,8 @@
         "prototype/tests/regional_map_test.gd"
       ],
       "access": "edit",
-      "note": "Draft #173 exact source/test blobs from passed runs 46020024550 and 46020155432, combined base 9fa7b14. Combined mount 46021766345 in_progress, map 46021766333 in_progress. Keep #162 ref and running full CI unchanged until safe and relevant tests green.",
-      "status": "submitted"
+      "note": "Combined map 46021766333 and mount 46021766345 completed success at e113d4d, exact code/test blobs. #173 remains isolated while ARM64 and Fold7 checks run; subsequent campaign branch descends from it.",
+      "status": "done"
     },
     {
       "id": "HOUSE-INTERIOR-PARSE",
@@ -289,7 +289,26 @@
         "prototype/tests/house_interiors_test.gd"
       ],
       "access": "edit",
-      "note": "Confirmed prior full regression 46001919674 line 569 inference failure on unchanged candidate test blob. Explicit bool only; genuine complete house/forge fixture CI in_progress. No claims about actual mesh or geometry acceptance.",
+      "note": "Run 46021975525 parsed and executed full fixture: 7989 checks, 3 failures (two south and one east visible wall opening). Repair scope now genuine geometry/ray evidence, not parser. Do not waive or mark green; separate branch 1b87724 remains outside campaign candidate.",
+      "status": "blocked"
+    },
+    {
+      "id": "CAMPAIGN-CONTINUITY",
+      "owner": "Coordinator",
+      "revision": "f1f3fb96e64c4e6bc49a458e656eabcf01eef1a5",
+      "run_id": "46023103096",
+      "scope": [
+        "prototype/scripts/main.gd",
+        "prototype/scripts/story/i04_film.gd",
+        "prototype/tests/i04_slice_test.gd",
+        "prototype/tests/campaign_forge_continuity_test.gd",
+        "prototype/scripts/rendering/route_fire_lights.gd",
+        "prototype/tests/route_fire_test.gd",
+        "prototype/scripts/ui/game_ui.gd",
+        "prototype/tests/roman_menu_test.gd"
+      ],
+      "access": "edit",
+      "note": "User-directed whole-game integration on integration/aeterna-campaign-continuity-20261127; base e113d4d (#173), exact passed night/menu sources, production I04 watch-to-anvil film handoff and preserved checkpoint. CI in_progress; do not change this branch while run active. Keep #162 and #173 refs until their running checks complete. Next: verify continuous I00–I05 real Main regression; repair Marcus strict .015m, real combat, interiors and other failures on independent branches. Chronological Journey and RQG unchanged; no release.",
       "status": "submitted"
     }
   ]
