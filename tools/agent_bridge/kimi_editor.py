@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import re
 import sys
+import time
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 from urllib.request import Request, build_opener
@@ -18,7 +19,8 @@ import kimi_bridge as visual
 import nemotron_bridge as common
 
 MAX_ROUNDS = 4
-TOKENS_PER_ROUND = 4096
+TOKENS_PER_ROUND = 8192
+EDITOR_DEADLINE = 1500
 MAX_TOOL_CALLS = 12
 MAX_EDIT_BYTES = 90_000
 MAX_NEW_FILES = 4
@@ -155,15 +157,17 @@ class Workspace:
         return changes, patch
 
 
-def request_model(messages, key, opener):
+def request_model(messages, key, opener, deadline=None):
     body = {"model": visual.MODEL, "messages": messages, "tools": TOOLS,
-            "tool_choice": "auto", "reasoning_effort": "max", "max_tokens": TOKENS_PER_ROUND,
+            "reasoning_effort": "max", "max_tokens": TOKENS_PER_ROUND,
             "stream": False}
-    req = Request(common.ENDPOINT, data=json.dumps(body).encode("utf-8"), method="POST",
-                  headers={"Authorization": "Bearer " + key, "Content-Type": "application/json",
-                           "Accept": "application/json"})
-    with opener.open(req, timeout=160) as response:
-        raw = response.read(visual.MAX_JSON + 1)
+    def decode(response, _deadline):
+        if "application/json" not in response.headers.get("Content-Type", "").lower():
+            raise common.BridgeError("Unexpected response type")
+        return response.read(visual.MAX_JSON + 1)
+    raw = visual.call_response(body, key, opener,
+                               deadline if deadline is not None else time.monotonic() + visual.KIMI_DEADLINE,
+                               decode)
     if len(raw) > visual.MAX_JSON:
         raise common.BridgeError("Oversized API response")
     value = json.loads(raw)
@@ -187,8 +191,10 @@ def edit(task, key, opener):
         {"type": "text", "text": instructions}, *images]}]
     count = 0
     final = ""
-    for _ in range(MAX_ROUNDS):
-        message, finish = request_model(messages, key, opener)
+    deadline = time.monotonic() + EDITOR_DEADLINE
+    for index in range(MAX_ROUNDS):
+        print(f"KIMI_EDITOR_ROUND {index + 1}/{MAX_ROUNDS} prior_tool_calls={count}", flush=True)
+        message, finish = request_model(messages, key, opener, deadline)
         calls = message.get("tool_calls") or []
         if not isinstance(calls, list) or len(calls) + count > MAX_TOOL_CALLS:
             raise common.BridgeError("Tool call budget exceeded")
@@ -249,8 +255,8 @@ def main():
         return 0
     except HTTPError as exc:
         print(f"KIMI_EDITOR_ERROR HTTP {exc.code}", file=sys.stderr)
-    except (common.BridgeError, URLError, TimeoutError, OSError, ValueError, TypeError, KeyError, AttributeError):
-        print("KIMI_EDITOR_ERROR validation, transport or budget", file=sys.stderr)
+    except (common.BridgeError, URLError, TimeoutError, OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
+        print(f"KIMI_EDITOR_ERROR kind={visual.failure_kind(exc)}", file=sys.stderr)
     return 1
 
 

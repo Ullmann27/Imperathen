@@ -1,0 +1,21 @@
+name: Kimi transport and adaptive queue offline checks
+on:
+  push:
+    branches: ['fix/kimi-api-diagnostics-adaptive-20261127']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest discover -s tools/agent_bridge -p 'test_kimi*.py' -v
+      - run: python3 -m unittest discover -s tools/agent_bridge -p 'test_campaign_journey.py' -v
+      - name: Validate initial production journey
+        run: |
+          python3 tools/agent_bridge/campaign_journey.py init --state "$RUNNER_TEMP/campaign_journey_state.json"
+          cat "$RUNNER_TEMP/campaign_journey_state.json"
+          python3 tools/agent_bridge/campaign_journey.py plan --state "$RUNNER_TEMP/campaign_journey_state.json"

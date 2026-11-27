@@ -1,0 +1,14 @@
+{
+  "K101": {
+    "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
+    "task": "K01.1 / erste textbasierte MAX-Etappe: Prüfe ausschließlich die vorhandene Mimik-Implementierung facial_motion.gd und ihren Gesichtstest auf eine einzige konkret belegte Verbesserung. Liefere höchstens einen kleinen vollständigen Patch oder eine begründete konkrete Testverbesserung. Keine umfassende Neuentwicklung, keine Bildanalyse in dieser Etappe. REALISM QUALITY GATE: historische/anatomische Plausibilität, PBR und reproduzierbare V1/V2-Renderprüfung; keine erfundenen Test- oder Geräteergebnisse. Erhalte bestehende Story, Rigs, Spielautorität und Fold7-Qualitätsprofile. Nur einen konkreten vollständigen kleinen Schritt liefern, der nach unabhängiger Prüfung in den nächsten Auftrag übernommen werden kann. Interne Denkspuren nicht ausgeben.",
+    "files": [
+      "prototype/scripts/visuals/facial_motion.gd",
+      "prototype/tests/hero_face_test.gd"
+    ],
+    "images": [],
+    "max_tokens": 16384,
+    "reasoning_effort": "max",
+    "response_mode": "json"
+  }
+}

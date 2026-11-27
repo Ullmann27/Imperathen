@@ -1,0 +1,1585 @@
+{
+  "schema": 1,
+  "source_revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+  "source_file": "prototype/assets/story/campaign_arc.json",
+  "purpose": "Ordered journey; authored mission registry is not a claim of runtime availability.",
+  "entries": [
+    {
+      "id": "MENU",
+      "title": "Hauptmenü / Neues Leben beginnen",
+      "kind": "system",
+      "files": [
+        "prototype/scripts/ui/roman_hud/menu_kit.gd",
+        "prototype/tests/roman_menu_test.gd"
+      ],
+      "focus": "Bedienbarkeit, Schrift, Bildkomposition, Hintergrund, Story-Start und Fortsetzen; tatsächliche Schaltfläche benutzen.",
+      "baseline_images": [
+        "menu.png"
+      ]
+    },
+    {
+      "id": "I-00",
+      "title": "Drei Legionen im Regen",
+      "kind": "mission",
+      "band": 1,
+      "location": "Aquileia und Umland",
+      "files": [
+        "prototype/scripts/story/opening_story.gd",
+        "prototype/tests/opening_flow_test.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Cold Open: Caesar mobilisiert die bei Aquileia liegenden Legionen; die große Politik wird anschließend auf das kleine Valdora und seine drei Becher heruntergebrochen. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": [
+        "01-prolog.png"
+      ]
+    },
+    {
+      "id": "I-01",
+      "title": "Die drei Becher",
+      "kind": "mission",
+      "band": 1,
+      "location": "Familienhaus Valdora",
+      "files": [
+        "prototype/scripts/story/i01_three_cups.gd",
+        "prototype/tests/i01_playthrough_test.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Der erste spielbare Morgen macht Eltern, Zuhause, Essen, Arbeit und kleine Wahlmöglichkeiten vertraut, bevor Gefahr existiert. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": [
+        "03-familienhaus.png",
+        "04-brunnen.png"
+      ]
+    },
+    {
+      "id": "I-02",
+      "title": "Der falsche Korb",
+      "kind": "mission",
+      "band": 1,
+      "location": "Nachbarhaus und Backgasse",
+      "files": [
+        "prototype/assets/story/missions/band1/I-02.json",
+        "prototype/scripts/story/village_childhood.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Ein einfacher Botengang beweist, dass Fehler neue Situationen erzeugen statt sofortige Missionsabbrüche. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": [
+        "06-auf-der-schwelle.png"
+      ]
+    },
+    {
+      "id": "I-03",
+      "title": "Marcus kennt eine Abkürzung",
+      "kind": "mission",
+      "band": 1,
+      "location": "Gassen, Brunnen, Markt",
+      "files": [
+        "prototype/assets/story/missions/band1/I-03.json",
+        "prototype/scripts/story/village_childhood.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Marcus wird als echter Freund oder beginnender Rivale eingeführt; ein Münzstreit und Marktweg legen Beziehung und Handel an. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "WORLD-MAP",
+      "title": "Open-World-Karte, Städte und historische Platzierung",
+      "files": [
+        "prototype/scripts/ui/regional_map.gd",
+        "prototype/assets/world/city_catalog.json"
+      ],
+      "focus": "Ortspositionen, Epoche, Gelände, Routen, Entdeckungswissen, Zoomstufen, Kartenlesbarkeit und tatsächlicher Weltzugang.",
+      "kind": "system",
+      "baseline_images": []
+    },
+    {
+      "id": "WORLD-TRAVEL",
+      "title": "Reisen, Straßen, Übergänge und Erkundung",
+      "files": [
+        "prototype/scripts/world/regional_footpath.gd",
+        "prototype/tests/regional_terrain_test.gd"
+      ],
+      "focus": "Begehbare Wege, Kollisionsgrenzen, Distanzen, Anschluss an Siedlungen, Streaming und Orientierung.",
+      "kind": "system",
+      "baseline_images": []
+    },
+    {
+      "id": "I-04",
+      "title": "Der Freund meines Vaters",
+      "kind": "mission",
+      "band": 1,
+      "location": "Schmiede des Sextus",
+      "files": [
+        "prototype/assets/story/missions/band1/I-04.json",
+        "prototype/scripts/story/village_childhood.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Silvanus bringt den Jungen zu seinem ältesten Freund; die Erwachsenenbeziehung wird durch Arbeit, alte Scherze und konkrete Hilfe gezeigt. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-05",
+      "title": "Sieh hin, bevor du Kraft brauchst",
+      "kind": "mission",
+      "band": 1,
+      "location": "Schmiede",
+      "files": [
+        "prototype/assets/story/missions/band1/I-05.json",
+        "prototype/scripts/story/village_childhood.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Die erste echte Lehre verbindet Beobachtung, Handwerk und spätere Kampfphilosophie; ein beschädigter Griff wird geprüft statt blind bearbeitet. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-06",
+      "title": "Ein Preis ist eine Zusage",
+      "kind": "mission",
+      "band": 1,
+      "location": "Markt Valdora",
+      "files": [
+        "prototype/assets/story/missions/band1/I-06.json",
+        "prototype/scripts/story/village_childhood.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Handel wird als Beziehung und echte Bestandsbewegung eingeführt: endliche Waren, Wechselgeld, Lieferzusagen und Ruf. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "CITY-LIFE",
+      "title": "Stadtleben, Bewohner, Gebäude und Innenräume",
+      "files": [
+        "prototype/scripts/world/city_exploration.gd",
+        "prototype/tests/city_life_test.gd"
+      ],
+      "focus": "Siedlungskonstruktion, Türen, Innenräume, Tagesablauf, NPC-Reaktion, Licht, physische und soziale Interaktion.",
+      "kind": "system",
+      "baseline_images": []
+    },
+    {
+      "id": "CITY-SHOPS",
+      "title": "Einkaufen, Händler und Waren",
+      "files": [
+        "prototype/scripts/world/city_market_bridge.gd",
+        "prototype/tests/city_campaign_trade_test.gd"
+      ],
+      "focus": "Warenbestand, Preis, Geld, Ruf, Kauf/Verkauf, tatsächliche Ladenpositionen und sichtbare Waren.",
+      "kind": "system",
+      "baseline_images": []
+    },
+    {
+      "id": "I-07",
+      "title": "Der kranke Wachmann",
+      "kind": "mission",
+      "band": 1,
+      "location": "Wachposten und Dorfrand",
+      "files": [
+        "prototype/assets/story/missions/band1/I-07.json",
+        "prototype/scripts/story/village_childhood.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Der Zwölfjährige hilft beaufsichtigt mit Wasser, Nachricht und kurzer Kontrollrunde, ohne als regulärer Kindersoldat dargestellt zu werden. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-08",
+      "title": "Hufspuren im Regen",
+      "kind": "mission",
+      "band": 1,
+      "location": "Nordweg, Felder, Bach",
+      "files": [
+        "prototype/assets/story/missions/band1/I-08.json",
+        "prototype/scripts/story/village_childhood.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Frische Spuren und widersprüchliche Aussagen erzeugen Unruhe, ohne einen Täter oder ein Volk vorschnell festzulegen. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "QUEST-OBJECTS",
+      "title": "Missionsgegenstände und Suchaufträge",
+      "files": [
+        "prototype/scripts/story/mission_data.gd",
+        "prototype/tests/mission_bridge_data_test.gd"
+      ],
+      "focus": "Eindeutige Gegenstands-ID, plausibler Fundort, beobachtbare Hinweise, Aufnahme/Abgabe, Persistenz, keine Duplikate oder Sackgassen.",
+      "kind": "system",
+      "baseline_images": []
+    },
+    {
+      "id": "I-09",
+      "title": "Der letzte gewöhnliche Abend",
+      "kind": "mission",
+      "band": 1,
+      "location": "Familienhaus und Dorf",
+      "files": [
+        "prototype/assets/story/missions/band1/I-09.json",
+        "prototype/scripts/story/village_childhood.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Ein normaler Abend mit Essen, Zukunftsplänen und optionalen Besuchen baut Verlust auf, ohne Todesvorahnungen zu plakatieren. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "WORLD-NIGHT",
+      "title": "Nacht, Licht, Orientierung und Reiten",
+      "files": [
+        "prototype/scripts/rendering/route_fire_lights.gd",
+        "prototype/tests/route_fire_test.gd"
+      ],
+      "focus": "Mond-/Fackelbeleuchtung, lesbare Wege und Hindernisse, sichere Bewegung, realistische Atmosphäre ohne künstliche Tageshelligkeit.",
+      "kind": "system",
+      "baseline_images": []
+    },
+    {
+      "id": "I-10",
+      "title": "Die Nacht der Reiter",
+      "kind": "mission",
+      "band": 1,
+      "location": "Valdora bei Nacht",
+      "files": [
+        "prototype/assets/story/missions/band1/I-10.json",
+        "prototype/scripts/story/village_childhood.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Etwa dreißig Reiter greifen an; Feuer, Pferde, Gedränge und bekannte Wege werden zur Krise. Der Spieler wählt ausdrücklich Verteidigung/Rettung oder Verstecken mit den Eltern. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-11",
+      "title": "Die Schmiede im Feuer",
+      "kind": "mission",
+      "band": 1,
+      "location": "Schmiede",
+      "files": [
+        "prototype/assets/story/missions/band1/I-11.json",
+        "prototype/scripts/story/village_childhood.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Sextus hält einen Fluchtweg offen; sein Tod spiegelt die Lehre über Aufmerksamkeit und Kontrolle, während die Werkstatt real ihren Arbeiter verliert. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-12",
+      "title": "Der letzte Weg des Vaters",
+      "kind": "mission",
+      "band": 1,
+      "location": "Familiengasse und Palisade",
+      "files": [
+        "prototype/assets/story/missions/band1/I-12.json",
+        "prototype/scripts/story/village_childhood.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Silvanus schützt Menschen so, wie seine Figur aufgebaut wurde. Er stirbt in beiden Hauptwegen; Julias Überleben hängt von tatsächlich ausgeführter Hilfe ab. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-13",
+      "title": "Morgen ohne Stimmen",
+      "kind": "mission",
+      "band": 1,
+      "location": "Valdora nach dem Angriff",
+      "files": [
+        "prototype/assets/story/missions/band1/I-13.json",
+        "prototype/scripts/story/village_childhood.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Am Morgen erzählen leere Arbeitsplätze, beschädigte Vorräte und fehlende Personen konkrete Folgen statt einer austauschbaren Ruinenkulisse. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-14",
+      "title": "Der Schwur",
+      "kind": "mission",
+      "band": 1,
+      "location": "Waldrand oberhalb Valdoras",
+      "files": [
+        "prototype/assets/story/missions/band1/I-14.json",
+        "prototype/scripts/story/village_childhood.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Der Junge nimmt ein Erinnerungsstück, spricht mit Überlebenden und schwört: „Ich werde euch rächen. Ich finde die Verantwortlichen.“ Der Schwur eröffnet Ermittlung statt sofortige Soldatenkarriere. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-15",
+      "title": "Asche hat Namen",
+      "kind": "mission",
+      "band": 1,
+      "location": "Brandstellen, Lager, Bachfurt",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Pferdebeschlag, Stoffrest, Liefermarke und rotes Wachssiegel werden methodisch verglichen; die Spur führt zu einer fiktiven Handelsorganisation. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-16",
+      "title": "Valdora steht wieder",
+      "kind": "mission",
+      "band": 1,
+      "location": "Valdora",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Der Wiederaufbau dauert Monate: Holz, Stein, Nahrung, Arbeitskräfte und Prioritäten verändern Häuser, Markt, Schmiede, Felder und Palisade sichtbar. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-17",
+      "title": "Der Preis des Holzes",
+      "kind": "mission",
+      "band": 1,
+      "location": "Wald, Holzplatz, Nachbardorf",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Ressourcenknappheit macht Moral und Ökonomie gegeneinander spürbar; dasselbe Holz wird von Valdora und einem Nachbardorf gebraucht. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-18",
+      "title": "Der erste Winter ohne ihn",
+      "kind": "mission",
+      "band": 1,
+      "location": "Valdora und Aquileia-Straße",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Wintervorräte, eine leere Schmiede und die Frage nach einem Nachfolger zeigen, dass Trauer und Wirtschaft zugleich weiterlaufen. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "LIFE-AGES",
+      "title": "Alterung, Körper, Beziehungen und Lebenszeit",
+      "files": [
+        "prototype/scripts/domain/world_calendar.gd",
+        "prototype/scripts/story/life_path_policy.gd"
+      ],
+      "focus": "Altersstufen, persistente Beziehungen, historische Zeit, sichtbare anatomische Entwicklung und keine widersprüchlichen Story-Zustände.",
+      "kind": "system",
+      "baseline_images": []
+    },
+    {
+      "id": "I-19",
+      "title": "Der Mann, den alle ansehen",
+      "kind": "mission",
+      "band": 1,
+      "location": "Aquileia, Forum und Hafen",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Der Junge sieht Caesar aus der Nähe, ohne Auserwählter zu sein. Die Stadt zeigt Rangbarrieren, Handel, Wachen und die Macht des römischen Systems. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-20",
+      "title": "Das rote Siegel",
+      "kind": "mission",
+      "band": 1,
+      "location": "Aquileia, Lagerhäuser",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Die Überfallspur führt zu einer fiktiven Handelsgesellschaft. Ein Lagervertrag nennt Gaius Varro Serranus, beweist seine Schuld aber noch nicht. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-21",
+      "title": "Marcus entscheidet sich",
+      "kind": "mission",
+      "band": 1,
+      "location": "Valdora, Straßenkreuzung",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Marcus bekommt eigene Zukunftswünsche und kann Handel, Wache, Ausbildung oder getrennte Wege wählen; Freundschaft wird nicht zur permanenten Begleiterpflicht. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-22",
+      "title": "Die zweite Klinge",
+      "kind": "mission",
+      "band": 1,
+      "location": "Werkstatt und Übungsplatz",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Bewaffnete Grundlagen beginnen erst nach Jahren: Schwert, Schild oder Speer werden ausgeliehen oder erworben, mit Reichweite, Ausdauer und kontrollierten Trainingsfenstern. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-23",
+      "title": "Die Straße über die Alpen",
+      "kind": "mission",
+      "band": 1,
+      "location": "Alpenroute Richtung Gallien",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Eine große Karawane verbindet Reise, Wetter, Packtiere, Versorgung und die Spur des roten Siegels mit gallischen Regionen. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "WORLD-EXPANSION",
+      "title": "Regionale Siedlungen, Handelsrouten und wirtschaftliche Entwicklung",
+      "files": [
+        "prototype/scripts/world_expansion/settlement_layout.gd",
+        "prototype/tests/settlement_geometry_test.gd"
+      ],
+      "focus": "Historische regionale Unterschiede, physisch begehbare Orte, Straßen, Berufe, Markt und spätere freischaltbare Reisen.",
+      "kind": "system",
+      "baseline_images": []
+    },
+    {
+      "id": "I-24",
+      "title": "Ein Dorf, das nicht deins ist",
+      "kind": "mission",
+      "band": 1,
+      "location": "Gallische Siedlung",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Ein Konflikt um beschlagnahmte Vorräte zeigt, dass lokale Menschen keine Kulisse oder pauschalen Feinde sind. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-25",
+      "title": "Der Veteran am Feuer",
+      "kind": "mission",
+      "band": 1,
+      "location": "Römisches Marschlager",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Lagerbau, Wache, Marschordnung und Disziplin werden als Arbeit erklärt; militärischer Dienst wird vorbereitet statt romantisiert. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-26",
+      "title": "Ein Name in der Liste",
+      "kind": "mission",
+      "band": 1,
+      "location": "Cisalpinische Rekrutierungsstelle",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Dokumente, Status, Ausrüstung, Abschied und Verpflichtungen bestimmen, ob der Spieler Legion, Logistik, Handel oder Heimatdienst wählt. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-27",
+      "title": "Nach Norden",
+      "kind": "mission",
+      "band": 1,
+      "location": "Marsch durch Gallien",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Eine Armee wird als kilometerlange Versorgungskette erlebt: Wagen, Nahrung, Krankheit, Streit und Befehle sind genauso wichtig wie Kampf. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-28",
+      "title": "Vor Alesia",
+      "kind": "mission",
+      "band": 1,
+      "location": "Alesia-Umland",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Belagerung wird als Ingenieur-, Hunger- und Moralproblem aufgebaut. Der Spieler arbeitet an Befestigung, Meldungen, Aufklärung oder Versorgung. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-29",
+      "title": "Der Ring schließt sich",
+      "kind": "mission",
+      "band": 1,
+      "location": "Alesia, römische Linien",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Innen- und Entsatzangriffe treffen aufeinander. Third-Person-Kampf und taktische Übersicht greifen auf denselben Weltzustand zu. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-30",
+      "title": "Der Gefangene und der Blick",
+      "kind": "mission",
+      "band": 1,
+      "location": "Nach Alesia",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Nach dem Sieg stehen Gefangene, Verwundete und Beute im Vordergrund; Triumph wird mit menschlichen Folgen kontrastiert. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "I-31",
+      "title": "Der Quartiermeister mit dem roten Wachs",
+      "kind": "mission",
+      "band": 1,
+      "location": "Römisches Nachschublager",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen. Serranus’ Netz taucht im Nachschub wieder auf. Beweise können offiziell gemeldet, kopiert, verkauft oder für eine spätere Konfrontation zurückgehalten werden. Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-00",
+      "title": "Nach dem Sieg ist vor der Schuld",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-01",
+      "title": "Heimkehr nach Valdora",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-02",
+      "title": "Eine Rechnung in Aquileia",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-03",
+      "title": "Briefe aus Rom",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-04",
+      "title": "Labienus geht",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-05",
+      "title": "Der Fluss, den man nicht zurücknimmt",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-06",
+      "title": "Ariminum vor Sonnenaufgang",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-07",
+      "title": "Corfinium",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-08",
+      "title": "Rom ohne Herren",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-09",
+      "title": "Das versiegelte Archiv",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-10",
+      "title": "Massilia schließt die Tore",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-11",
+      "title": "Ilerda: Der Regen gewinnt zuerst",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-12",
+      "title": "Der Mann aus dem Dorf im gegnerischen Lager",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-13",
+      "title": "Das Meer im Winter",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-14",
+      "title": "Dyrrhachium",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-15",
+      "title": "Kein Heldentod",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-16",
+      "title": "Pharsalos: Staub vor der Sonne",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-17",
+      "title": "Ein Zelt bleibt leer",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-18",
+      "title": "Der Weg des Pompeius",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-19",
+      "title": "Die Küste von Pelusion",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-20",
+      "title": "Alexandria: Eine Stadt aus Stimmen",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-21",
+      "title": "Die Königin im Schatten",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-22",
+      "title": "Das Buch, das Serranus nicht besitzt",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-23",
+      "title": "Die Stadt brennt",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "II-24",
+      "title": "Der Nil entscheidet nicht allein",
+      "kind": "mission",
+      "band": 2,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-00",
+      "title": "Zela: Fünf Tage sind kein Märchen",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-01",
+      "title": "Rom empfängt den Sieger",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-02",
+      "title": "Afrika ruft",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-03",
+      "title": "Thapsus",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-04",
+      "title": "Nach Utica",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-05",
+      "title": "Die letzte Armee in Hispania",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-06",
+      "title": "Munda",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-07",
+      "title": "Das Haus des roten Siegels",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-08",
+      "title": "Gerechtigkeit ist langsamer als Stahl",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-09",
+      "title": "Stahl fordert Stahl",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-10",
+      "title": "Der Mann, der Befehle kaufte",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-11",
+      "title": "Der letzte Satz des Sextus",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-12",
+      "title": "Caesar in Rom",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-13",
+      "title": "Land für die Lebenden",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-14",
+      "title": "Marcus trägt einen anderen Mantel",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-15",
+      "title": "Eine Mutter wartet nicht ewig",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-16",
+      "title": "Brot und Spiele, aber kein Schweigen",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-17",
+      "title": "Flüstern im Portikus",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-18",
+      "title": "Brutus’ Frage",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-19",
+      "title": "Cassius zählt Risiken",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-20",
+      "title": "Antonius lacht zu laut",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-21",
+      "title": "Warnzeichen",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-22",
+      "title": "Der Morgen der Iden",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-23",
+      "title": "Das Theater des Pompeius",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "III-24",
+      "title": "Blut auf Marmor",
+      "kind": "mission",
+      "band": 3,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-00",
+      "title": "Die Stadt nach Caesar",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-01",
+      "title": "Ein Erbe kommt nach Italien",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-02",
+      "title": "Antonius will Zeit",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-03",
+      "title": "Ciceros Feder",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-04",
+      "title": "Mutina",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-05",
+      "title": "Drei Männer teilen eine Republik",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-06",
+      "title": "Die Listen",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-07",
+      "title": "Ciceros letzter Weg",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-08",
+      "title": "Über die Adria nach Osten",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-09",
+      "title": "Philippi I",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-10",
+      "title": "Philippi II",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-11",
+      "title": "Land für Sieger",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-12",
+      "title": "Perusia",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-13",
+      "title": "Der Mann, der das Meer hält",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-14",
+      "title": "Brotpreis",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-15",
+      "title": "Misenum",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-16",
+      "title": "Naulochus",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-17",
+      "title": "Der Osten des Antonius",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-18",
+      "title": "Zwei Höfe, eine Propagandaschlacht",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-19",
+      "title": "Vor Actium",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-20",
+      "title": "Actium",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-21",
+      "title": "Alexandria danach",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-22",
+      "title": "27 v. Chr.: Ein neuer Name für Macht",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-23",
+      "title": "Das Haus, das geblieben ist",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-24",
+      "title": "Historisches Ende: Statthalter",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-25",
+      "title": "Historisches Ende: Veteran und Erbauer",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-26",
+      "title": "Historisches Ende: Handelsfürst",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-27",
+      "title": "Historisches Ende: Verbannt",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-28",
+      "title": "Divergenz: Caesar lebt",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-29",
+      "title": "Divergenz: Der Spieler greift nach der Krone",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    },
+    {
+      "id": "IV-30",
+      "title": "Die Chronik deines Lebens",
+      "kind": "mission",
+      "band": 4,
+      "location": "",
+      "files": [
+        "prototype/assets/story/campaign_arc.json",
+        "prototype/scripts/story/campaign_direction.gd"
+      ],
+      "focus": "Kanonischen Auftrag und reale Erreichbarkeit prüfen.  Sichtbare Figuren, Umgebung, Interaktionen, Questgegenstände, Hinweise, Zustandswechsel, Wahlfolgen und Speichern/Laden überprüfen. Fehlende Implementierung ausdrücklich belegen.",
+      "baseline_images": []
+    }
+  ]
+}
