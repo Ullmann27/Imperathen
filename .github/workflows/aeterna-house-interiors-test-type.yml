@@ -1,7 +1,7 @@
 name: Aeterna furnished interiors and forge regression
 on:
   push:
-    branches: ['fix/aeterna-house-interiors-test-type-20261127', 'fix/aeterna-house-window-hit-provenance-20261127']
+    branches: ['fix/aeterna-house-interiors-test-type-20261127', 'fix/aeterna-house-window-hit-provenance-20261127', 'fix/aeterna-house-grille-contract-20261127']
 permissions:
   contents: read
 jobs:

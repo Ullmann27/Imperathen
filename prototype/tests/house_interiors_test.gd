@@ -632,8 +632,14 @@ func _check_openings(house: Node3D) -> void:
 		for hole: Rect2 in frame.openings[side]:
 			total += 1
 			var open := true
-			# Quarter points: the window lattice crosses the middle of the opening.
-			for u: float in [.25, .75]:
+			# The authored eave variant has three vertical iron bars at quarter,
+			# centre and three-quarter width on its south/east windows. Keep the
+			# original rays as explicit bar checks rather than deleting the lattice.
+			var grilled := house.name == &"weaver_home" and side in ["S", "E"] and not is_zero_approx(hole.position.y)
+			var sample_us: Array[float] = [.25, .75]
+			if grilled:
+				sample_us.append_array([.125, .375, .625, .875])
+			for u: float in sample_us:
 				for v: float in [.25, .75]:
 					var a := hole.position.x + hole.size.x * u
 					var y := hole.position.y + hole.size.y * v
@@ -642,16 +648,36 @@ func _check_openings(house: Node3D) -> void:
 						a = hole.position.x + hole.size.x * lerpf(.4, .9, u)
 					var from := Vector3(a, y, plane - out * .05) if side in ["N", "S"] else Vector3(plane - out * .05, y, a)
 					var to := from + (Vector3(0, 0, out) if side in ["N", "S"] else Vector3(out, 0, 0)) * .5
-					# Always execute each ray, even after an earlier blocked quarter.
 					var hit: Dictionary = space.intersect_ray(PhysicsRayQueryParameters3D.create(room * from, room * to, TEST_LAYER))
-					var probe: Dictionary = {"side": side, "opening": str(hole), "from": str(from), "to": str(to), "blocked": not hit.is_empty()}
+					var expect_bar := grilled and (is_equal_approx(u, .25) or is_equal_approx(u, .75))
+					var probe: Dictionary = {"side": side, "opening": str(hole), "from": str(from), "to": str(to), "blocked": not hit.is_empty(), "expected_bar": expect_bar}
+					var valid_bar := false
 					if not hit.is_empty():
-						var collider := hit.get("collider") as Node
+						var collider := hit.get("collider") as StaticBody3D
 						probe["source"] = String(collider.get_meta("opening_probe_source", str(collider.get_path()))) if is_instance_valid(collider) else "unknown"
-						probe["hit_local"] = str(room.affine_inverse() * (hit.position as Vector3))
+						var local_hit: Vector3 = room.affine_inverse() * (hit.position as Vector3)
+						probe["hit_local"] = str(local_hit)
 						probe["face_index"] = int(hit.get("face_index", -1))
-						print("HOUSE_OPENING_BLOCKED ", JSON.stringify(probe))
-						open = false
+						var depth := ((local_hit.z if side in ["N", "S"] else local_hit.x) - plane) * out
+						# Match the pinned source's 0.12 m inset and measured
+						# 0.1944 m depth from interior plaster. No other collider
+						# is allowed to be ignored, even on an expected bar ray.
+						valid_bar = expect_bar and is_instance_valid(collider) and String(probe["source"]).ends_with("/valdora_t2_eave_detail") and absf(depth - .1944) <= .02
+						if valid_bar:
+							var behind := space.intersect_ray(PhysicsRayQueryParameters3D.create(room * from, room * to, TEST_LAYER, [collider.get_rid()]))
+							probe["shell_behind_bar_clear"] = behind.is_empty()
+							_check(behind.is_empty(), "%s window %s has no solid shell behind its iron bar" % [side, hole])
+							if not behind.is_empty():
+								open = false
+						else:
+							print("HOUSE_OPENING_BLOCKED ", JSON.stringify(probe))
+							open = false
+					if expect_bar:
+						_check(valid_bar, "%s window %s has its authored iron bar at %.3f/%.3f" % [side, hole, u, v])
+						if not valid_bar:
+							open = false
+					elif grilled:
+						_check(hit.is_empty(), "%s window %s has a clear gap between iron bars at %.3f/%.3f" % [side, hole, u, v])
 					probes.append(probe)
 			_check(open, "%s wall opening %s is open in the drawn shell" % [side, hole])
 			for beside: float in [hole.position.x - .2, hole.end.x + .2]:
