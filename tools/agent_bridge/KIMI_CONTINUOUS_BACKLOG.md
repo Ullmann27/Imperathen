@@ -1,6 +1,6 @@
 # Kimi K3.1 Pro – permanenter Entwicklungsauftrag
 
-90 initiale, adaptive Arbeitspakete (K01–K90). K01–K06 sind die erste bereits eingereichte Spezialrunde. Die folgenden IDs sind **Backlog**, nicht bereits gestartete API-Anfragen oder fertiggestellte Änderungen. Nach jeder Runde Status, aktuellsten Branch, Abhängigkeiten und reale Tests prüfen; neue Aufgaben ergänzen, obsolete schließen, Konflikte vermeiden. Nacht K07–K12, Alterung K13–K22 und individuelle Haushalte K61–K70 haben nächste Priorität. Kanonische Storydateien und vorhandene Alters-/Kalenderlogik sind verbindlich, keine willkürlichen Storyänderungen.
+90 initiale, adaptive Arbeitspakete (K01–K90). K01–K06 sind die erste bereits eingereichte Spezialrunde. Die folgenden IDs sind **Backlog**, nicht bereits gestartete API-Anfragen oder fertiggestellte Änderungen. Nach jeder Runde Status, aktuellsten Branch, Abhängigkeiten und reale Tests prüfen; neue Aufgaben ergänzen, obsolete schließen, Konflikte vermeiden. Die chronologische Kampagnen-Journey (MENU, I-00, I-01 usw.) bestimmt die Reihenfolge; K01–K90 bleiben als Qualitätsanforderungen zugeordnet. Kanonische Storydateien und vorhandene Alters-/Kalenderlogik sind verbindlich, keine willkürlichen Storyänderungen.
 
 ## Produktionsvertrag
 
@@ -138,3 +138,13 @@ Kimi ist Lead 3D World, Character, Animation and Graphics Engineer. Der direkte 
 - [ ] **K88:** Arbeit im Haus: Griff-, Werkzeug- und Objektkontakte.
 - [ ] **K89:** Sitzen, Essen, Schlafen, Gespräche: IK und Synchronisierung.
 - [ ] **K90:** Objektinteraktionen, Story-/Weltintegration und reproduzierbare Regressionen.
+
+
+## Entwicklungsnachweis 27.11.2026 – MENU, Transport und unabhängige Prüfung
+
+- K01–K06: Run 46005265450 fehlgeschlagen; K61 Editor 46006942728 fehlgeschlagen; kein erfolgreicher MAX-Editor. K101 Run 46013490508: socket_timeout nach 300.4 s, ohne HTTP-Status/UUID/Antwort, kein Antwortartefakt; serverseitiger Zustand unbekannt. Kein automatischer Retry.
+- Transportkandidat [PR #172](https://github.com/Ullmann27/Imperathen/pull/172), HEAD `1b453c2a0262bc0a62a704e32f09fdeab77e04f2`: JSON-Wartehinweis 60 s, bereinigtes Fehlerreceipt, MAX/16384 unverändert, ein POST. Offline [46015278218](https://github.com/Ullmann27/Imperathen/actions/runs/46015278218) und Foundation 46015287348 erfolgreich; Live-Nachweis ausstehend. Nicht in den Live-Trigger-Branch übernehmen, solange dadurch K101 erneut abgesendet würde.
+- Godot-V1 [46012575656](https://github.com/Ullmann27/Imperathen/actions/runs/46012575656), Quellrevision `2a286cec428940e4c7d09d0c12745e2cac5a30f8`, publizierter Beleg `8a2d2304d55bdd3adf78c8b6c45dc66889c594a7`: 3 erfolgreiche Stufen, 8 PNG (1280×720) im Publisher hashgeprüft, 4/8 zusätzlich unabhängig nachgerechnet und visuell geprüft. Linux-Software-Renderer, keine Gerätefreigabe. Menü: konkurrierende rote Aktionen; I-00: schwebende Vegetation, harte Lichtkanten; I-01: Überbelichtung, karge Innenräume. Keine RQG-Abnahme.
+- Eigener MENU-Kandidat [PR #171](https://github.com/Ullmann27/Imperathen/pull/171), HEAD `4f109b9853f7fa1213ed2ed548d421dca3da39d4`: zwei Explorationsaktionen sekundär, Regressionstest mit/ohne Spielstand. V2-Review `8807c03666683d564659f6f92dcd49b33a3dee99`, [Run 46015164122](https://github.com/Ullmann27/Imperathen/actions/runs/46015164122), A/B und Gerät ausstehend. Kein Modellpatch behauptet.
+- Nemotron 46008020658: 17 und 19 beantwortet, 18 abgeschnitten. Vorschläge nicht unverändert übernehmen (Lichtpriorität, Resource-Lebenszyklus, fehlerhafte Reit-Basisreihenfolge und ungesicherter Abstieg). Separate Nemotron-Automation nicht erneut ausgelöst.
+- ARM64 46008252806: 65/66 Companion-Turn-Prüfungen; 60 Hz, turn -1, strikter gepflanzter Fußkontakt fehlgeschlagen. Kein Export, keine Grenzwertsenkung. MENU bleibt blockiert; 122 Etappen und 90 Qualitätsaufträge unverändert erhalten.
