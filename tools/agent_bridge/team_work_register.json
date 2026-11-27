@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 87,
+  "version": 94,
   "tasks": [
     {
       "id": "K101",
@@ -193,7 +193,7 @@
         "prototype/scripts/cinematic/opening_director.gd",
         "prototype/tests/i00_stage_test.gd",
         "prototype/assets/cinematic/i00_vexillum.glb",
-        "art/cinematic/i00/"
+        "art/cinematic/i00"
       ],
       "access": "read",
       "note": "Candidate #162 fast-forwarded from db4d663 to exact 9fa7b14 after verified original Blender render run 46003302682, strict import 46008231545 and story 46008252851 (I00 82, opening director 357 checks). Blob comparison: six original asset files byte-identical to 7558579; full failed-test names identical to baseline. Candidate only, visual device acceptance and release gates still open.",
@@ -377,9 +377,9 @@
         "prototype/tests/companion_turn_motion_test.gd",
         "prototype/tests/motion_world_measurement.gd"
       ],
-      "note": "New bounded investigation of real Marcus 60Hz negative turn strict 0.015m failure in ARM64 runs 46020295729/46021801237. No false support flags, no skelettlocal/world confusion; one reproducible targeted repair. Submitted via actual bridge commit 2830b97fc02514c871873f64fb4538875da03e44, run 46028465853, observed in_progress. No completion claim; review full answer before any implementation.",
+      "note": "New bounded investigation of real Marcus 60Hz negative turn strict 0.015m failure in ARM64 runs 46020295729/46021801237. No false support flags, no skelettlocal/world confusion; one reproducible targeted repair. Submitted via actual bridge commit 2830b97fc02514c871873f64fb4538875da03e44, run 46028465853, observed in_progress. No completion claim; review full answer before any implementation. Verified run 46028465853 ended with all four consult jobs failed and no uploaded artifacts; no usable response. No duplicate provider request.",
       "owner": "Nemotron",
-      "status": "submitted",
+      "status": "blocked",
       "run_id": "46028465853",
       "access": "read"
     },
@@ -393,9 +393,9 @@
         "prototype/scripts/visuals/far_ranks.gd",
         "prototype/tests/formation_agents_test.gd"
       ],
-      "note": "New analysis after real PR #177 results; actual position/phase spikes balanced 180, not earlier N21 zero-time present guess. Read-only; no active edit conflict. Submitted via actual bridge commit 2830b97fc02514c871873f64fb4538875da03e44, run 46028465853, observed in_progress. No completion claim; review full answer before any implementation.",
+      "note": "New analysis after real PR #177 results; actual position/phase spikes balanced 180, not earlier N21 zero-time present guess. Read-only; no active edit conflict. Submitted via actual bridge commit 2830b97fc02514c871873f64fb4538875da03e44, run 46028465853, observed in_progress. No completion claim; review full answer before any implementation. Verified run 46028465853 ended with all four consult jobs failed and no uploaded artifacts; no usable response. No duplicate provider request.",
       "owner": "Nemotron",
-      "status": "submitted",
+      "status": "blocked",
       "run_id": "46028465853",
       "access": "read"
     },
@@ -408,9 +408,9 @@
         "prototype/scripts/story/village_life.gd",
         "prototype/tests/commerce_transaction_test.gd"
       ],
-      "note": "Five observed reassigned-guard production failures in 46020295723; distinguish deterministic rain/attendance and stale duty. Real economy/state contract, no artificial production. Submitted via actual bridge commit 2830b97fc02514c871873f64fb4538875da03e44, run 46028465853, observed in_progress. No completion claim; review full answer before any implementation.",
+      "note": "Five observed reassigned-guard production failures in 46020295723; distinguish deterministic rain/attendance and stale duty. Real economy/state contract, no artificial production. Submitted via actual bridge commit 2830b97fc02514c871873f64fb4538875da03e44, run 46028465853, observed in_progress. No completion claim; review full answer before any implementation. Verified run 46028465853 ended with all four consult jobs failed and no uploaded artifacts; no usable response. No duplicate provider request.",
       "owner": "Nemotron",
-      "status": "submitted",
+      "status": "blocked",
       "run_id": "46028465853",
       "access": "read"
     },
@@ -422,9 +422,9 @@
         "prototype/scripts/world/village/household_designs.gd",
         "prototype/tests/house_interiors_test.gd"
       ],
-      "note": "Real 7989-check interior run 46021975525: three drawn-shell window opening failures after parser repair. Diagnose geometry vs ray-test error using full pinned sources, preserve original physical/collision gate. Submitted via actual bridge commit 2830b97fc02514c871873f64fb4538875da03e44, run 46028465853, observed in_progress. No completion claim; review full answer before any implementation.",
+      "note": "Real 7989-check interior run 46021975525: three drawn-shell window opening failures after parser repair. Diagnose geometry vs ray-test error using full pinned sources, preserve original physical/collision gate. Submitted via actual bridge commit 2830b97fc02514c871873f64fb4538875da03e44, run 46028465853, observed in_progress. No completion claim; review full answer before any implementation. Verified run 46028465853 ended with all four consult jobs failed and no uploaded artifacts; no usable response. No duplicate provider request.",
       "owner": "Nemotron",
-      "status": "submitted",
+      "status": "blocked",
       "run_id": "46028465853",
       "access": "read"
     },
@@ -445,14 +445,26 @@
     {
       "id": "I01-RENDER-CHECKPOINT",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "review_pending",
       "revision": "2e761e544022d03b0a813ee7cbc0c3f095ce7329",
       "run_id": "46029016493",
       "scope": [
         "prototype/tests/i01_flow_test.gd"
       ],
       "access": "edit",
-      "note": "Independent I-01 software-render evidence timeout 46020295748/job 140577885552 (1500s after continued). Scoped opt-in checkpoint rasterization on isolated branch and matching CI invocation, preserve every simulation step, all existing asserts, required real 1280x720 captures, no FPS/temporal or physical claim; continuous mode remains available. Map formatting already corrected on campaign head. Actual isolated commit e1fde65250271592d6309a056d1c4d5e352a87bd, PR #178, CI 46029016493 (in_progress); all original capture checkpoints retained and CI PNG dimensions additionally verified. No integration before success."
+      "note": "Independent I-01 software-render evidence timeout 46020295748/job 140577885552 (1500s after continued). Scoped opt-in checkpoint rasterization on isolated branch and matching CI invocation, preserve every simulation step, all existing asserts, required real 1280x720 captures, no FPS/temporal or physical claim; continuous mode remains available. Map formatting already corrected on campaign head. Actual isolated commit e1fde65250271592d6309a056d1c4d5e352a87bd, PR #178, CI 46029016493 (in_progress); all original capture checkpoints retained and CI PNG dimensions additionally verified. No integration before success. Actual run completed success: I01_FLOW_PASS 287/287, 19 logged 1280x720 captures, artifact 15214470708 (22,272,307 bytes). No visual/device acceptance."
+    },
+    {
+      "id": "HOUSE-WINDOW-HIT-PROVENANCE",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "1b87724a9fe62c751d02a04668f8c924b7c7c7a0",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/house_interiors_test.gd"
+      ],
+      "access": "edit",
+      "note": "Independent diagnostic-only correction: identify exact rendered shell/item collider and every failed quarter-point ray instead of short-circuiting after first hit. Preserve all prior 7989 assertions, geometry, collision and quality limits. No fix or acceptance before new engine evidence."
     }
   ]
 }
