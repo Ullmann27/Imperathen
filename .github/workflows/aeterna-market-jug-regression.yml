@@ -1,7 +1,7 @@
 name: AETERNA market pitcher contact regression
 on:
   push:
-    branches: ['fix/aeterna-market-jug-grip-20261127']
+    branches: ['fix/aeterna-market-jug-grip-20261127', 'fix/aeterna-market-jug-physics-sync-20261127']
 permissions:
   contents: read
 concurrency:
