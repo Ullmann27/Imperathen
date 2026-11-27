@@ -162,6 +162,11 @@ func present(state: String, phase: float, _elapsed: float) -> void:
 		_animation.play(clip)
 	var length := _animation.get_animation(clip).length
 	_animation.seek(fposmod(phase, 1.0) * length, true)
+	# Manual seek writes the bone pose now, but BoneAttachment3D normally
+	# refreshes at the skeleton's deferred update. Sample the same bone in
+	# skeleton-local space before positioning the saddle and rider this frame.
+	var skeleton := _seat.get_parent() as Skeleton3D
+	_seat.transform = skeleton.get_bone_global_pose(_seat.bone_idx)
 	_saddle.global_position = _seat.global_position - Vector3.UP * 0.08
 	if not _mounted:
 		var foot_clip := "march" if state == "run" or state == "retreat" else state
