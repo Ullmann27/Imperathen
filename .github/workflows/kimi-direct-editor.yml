@@ -1,0 +1,33 @@
+name: Kimi bounded direct source editor
+on:
+  push:
+    branches: ['feat/kimi-3d-special-operations-20261127']
+    paths: ['tools/agent_bridge/kimi_editor_request.json']
+permissions:
+  contents: read
+concurrency:
+  group: imperathen-kimi-3d-specialist
+  cancel-in-progress: false
+jobs:
+  verify-and-edit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Validate direct editor offline
+        run: |
+          python3 -m unittest discover -s tools/agent_bridge -p 'test_kimi*.py' -v
+      - name: Edit source in bounded workspace through Kimi tool calls
+        env:
+          NVIDIA_KIMI_API_KEY: ${{ secrets.NVIDIA_KIMI_API_KEY }}
+        run: python3 tools/agent_bridge/kimi_editor.py --request tools/agent_bridge/kimi_editor_request.json --output artifacts/kimi-editor
+      - name: Save reviewable source candidate, not executed or merged
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: kimi-editor-${{ github.run_id }}
+          path: artifacts/kimi-editor/
+          if-no-files-found: warn
+          retention-days: 14
