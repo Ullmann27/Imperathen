@@ -23,7 +23,7 @@ MAX_EVENT = 1_000_000
 MAX_SECONDS = 840
 EXACT = {"prototype/project.godot", "prototype/assets/quality_profiles.json",
          "tools/check_prototype.py", "tools/fold7_physical_qa.py",
-         "tools/android_graphics_benchmark.py"}
+         "tools/android_graphics_benchmark.py", "prototype/assets/story/campaign_arc.json"}
 PREFIXES = ("prototype/scripts/", "prototype/tests/", "tools/perf/", "tools/render/", "tools/art/")
 SUFFIXES = {".gd", ".gdshader", ".py", ".json", ".tscn", ".godot"}
 KEY_PATTERN = re.compile(r"nvapi-[A-Za-z0-9_-]{12,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}")

@@ -1,0 +1,12 @@
+{
+  "requests": [
+    "01-water-cinematics",
+    "02-render-frame-pacing",
+    "03-character-motion",
+    "04-world-streaming",
+    "05-world-rendering",
+    "06-living-npcs-economy",
+    "07-campaign-settlements",
+    "08-combat-equipment"
+  ]
+}
