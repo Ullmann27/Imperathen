@@ -111,16 +111,31 @@ func _exercise(model) -> void:
 	act(enlisted,"recruit",{},false)
 	act(enlisted,"train",{},false)
 	act(enlisted,"training_hit",{},false)
+	# The adult uses the measured youth jab track at body scale 1.14.
+	# The old 1.3 m fixture is outside the actual swept capsule. Keep it
+	# as a negative control instead of broadening the production hit reach.
 	enlisted.set_player_position(Vector3(0,1,-5.7))
 	enlisted.combat_sight_check = func(_from: Vector2, _to: Vector2): return true
+	var practice_before := int(enlisted.data.village.unarmed.practice_hits)
+	if not act(enlisted,"village_unarmed_attack",{"technique":"jab_left","target_id":"practice","facing_x":0.0,"facing_z":-1.0}):
+		return
+	enlisted.advance(1.0)
+	check(int(enlisted.data.progress.training_hits) == 0 and int(enlisted.data.village.unarmed.practice_hits) == practice_before,
+		"Out-of-reach adult jab grants neither training nor practice")
+	# At 0.6 m the scaled measured jab first contacts on clip frame 8
+	# (60 Hz); the nominal peak frame 13 is not the first contact.
+	enlisted.set_player_position(Vector3(0,1,-6.4))
 	for hit in 3:
 		if not act(enlisted,"village_unarmed_attack",{"technique":"jab_left","target_id":"practice","facing_x":0.0,"facing_z":-1.0}):
 			return
-		enlisted.advance(0.1)
+		enlisted.advance(0.05)
 		check(int(enlisted.data.progress.training_hits) == hit, "Windup grants no training hit")
-		enlisted.advance(0.1)
-		check(int(enlisted.data.progress.training_hits) == hit + 1, "Training contact once in the active window")
-		enlisted.advance(0.8)
+		enlisted.advance(0.05)
+		check(int(enlisted.data.progress.training_hits) == hit, "Active window before physical contact grants no hit")
+		enlisted.advance(0.05)
+		check(int(enlisted.data.progress.training_hits) == hit + 1, "Training contact once after the measured crossing")
+		enlisted.advance(0.85)
+		check(int(enlisted.data.progress.training_hits) == hit + 1, "Remaining active and recovery frames cannot repeat training credit")
 	check(enlisted.data.player.role == "soldier" and enlisted.data.progress.training_complete, "Three actual hits finish the training")
 	if not act(enlisted,"recruit",{}):
 		return
@@ -134,15 +149,33 @@ func _exercise(model) -> void:
 	if not act(enlisted,"start_skirmish",{}):
 		return
 	for enemy: Dictionary in enlisted.data.encounter.enemies.duplicate(true):
+		# The same measured adult jab cannot reach a raider at 1 m.
+		# A 0.7 m separation permits real capsule contact.
 		enlisted.set_player_position(Vector3(enemy.x,1,float(enemy.z) + 1.0))
+		if not act(enlisted,"village_unarmed_attack",{"technique":"jab_left","target_id":enemy.id,"facing_x":0.0,"facing_z":-1.0}):
+			return
+		enlisted.advance(1.0)
+		var missed: Dictionary = enlisted.data.encounter.enemies.filter(func(row): return row.id == enemy.id)[0]
+		check(int(missed.health) == int(enemy.health), "Out-of-reach strike cannot injure the patrol opponent")
+		enlisted.set_player_position(Vector3(enemy.x,1,float(enemy.z) + 0.7))
 		for strike in 10:
 			var actual: Dictionary = enlisted.data.encounter.enemies.filter(func(row): return row.id == enemy.id)[0]
 			if actual.health <= 0:
 				break
+			var before_health := int(actual.health)
 			if not act(enlisted,"village_unarmed_attack",{"technique":"jab_left","target_id":enemy.id,"facing_x":0.0,"facing_z":-1.0}):
 				return
-			enlisted.advance(0.2)
+			enlisted.advance(0.05)
+			var early: Dictionary = enlisted.data.encounter.enemies.filter(func(row): return row.id == enemy.id)[0]
+			check(int(early.health) == before_health, "Patrol windup cannot injure the opponent")
+			enlisted.advance(0.15)
+			var contacted: Dictionary = enlisted.data.encounter.enemies.filter(func(row): return row.id == enemy.id)[0]
+			var after_contact := int(contacted.health)
+			if not check(after_contact < before_health, "Patrol health changes only on genuine swept contact"):
+				return
 			enlisted.advance(2.0)
+			var recovered: Dictionary = enlisted.data.encounter.enemies.filter(func(row): return row.id == enemy.id)[0]
+			check(int(recovered.health) == after_contact, "One strike cannot damage an opponent twice")
 	if not check(enlisted.data.progress.skirmish_won,"Real contacts finish the adult patrol encounter"):
 		return
 	if not act(enlisted,"choose_story",{"choice":"protect"}):
