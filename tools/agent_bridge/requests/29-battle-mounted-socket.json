@@ -1,0 +1,11 @@
+{
+  "revision": "6d1aad82174764751cb2e2d3c0f610804518d512",
+  "task": "N29: ausschließlich der neue konkrete Mount-Befund auf dem isolierten Fairness-Kandidaten (nicht Preview). Echter Godot-Run 46066402676: 52/53, 'Visible mounted soldier sits on moving skeletal socket' scheitert nach _rig_materialization_order. Unterscheide zuerst actor fehlt/LOD oder Quota vs. vorhandener Actor mit fehlender Pose vs. geometrischer Pelvis-Socket-Fehler. Weder N28 Germanic-Identität noch Spieler-Mount N19 erneut bearbeiten. Prüfe nur diese vier Dateien. Liefere genau EIN minimales begründetes Unified Diff mit fokussierter Regression ODER eindeutigen diagnostischen Patch, wenn Ursache nicht beweisbar. Bestehende 30mm Socket-Grenze, Instanzquota, LOD und Identitäts-/Kampfprüfungen unverändert, keine pauschalen Änderungen. Maximal 800 Ausgabewörter, keine Gedankenkette, keine ausgeführten Tests behaupten. Ziel: vollständige kurze Antwort statt Trunkierung.",
+  "files": [
+    "prototype/scripts/tactics/valley_scene.gd",
+    "prototype/scripts/visuals/valley_rider.gd",
+    "prototype/scripts/world/mounted_rider_pose.gd",
+    "prototype/tests/valley_muster_test.gd"
+  ],
+  "max_tokens": 8192
+}
