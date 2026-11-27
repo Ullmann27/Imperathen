@@ -67,6 +67,7 @@ func show_origin(id: String) -> void:
 		atrium.name = "AtriumHouse"
 		_static_collision(atrium,"atrium")
 		var well := _add_scene("res://assets/architecture/village_well.glb",Vector3(-7,0,6))
+		well.name = "I01Well"
 		for i in 10:
 			var a := TAU*i/10.0
 			Art.box_collider(well,Vector3(.55,.80,.22),Vector3(sin(a)*.82,.40,cos(a)*.82)).rotation.y = a

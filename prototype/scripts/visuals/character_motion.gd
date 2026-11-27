@@ -702,6 +702,37 @@ func carry_left() -> void:
 	skeleton.force_update_all_bone_transforms()
 
 
+## Target a wrist in world metres without changing the imported bone lengths.
+## Returns residual distance; unreachable contacts are not claimed to be exact.
+func reach_world_wrist(side: String, target: Vector3, world_basis: Basis) -> float:
+	if not available or not is_instance_valid(skeleton) or not target.is_finite():
+		return INF
+	var arm: int = _ids["Arm_"+side]
+	var fore: int = _ids["Forearm_"+side]
+	var hand: int = _ids["Hand_"+side]
+	skeleton.force_update_all_bone_transforms()
+	var shoulder := skeleton.get_bone_global_pose(arm).origin
+	var wrist := skeleton.to_local(target)
+	var upper := _rest[fore].origin.length()
+	var lower := _rest[hand].origin.length()
+	if upper+lower < .05:
+		return INF
+	var axis := wrist-shoulder
+	if axis.length() < .001:
+		axis = Vector3.BACK*.001
+	var distance := clampf(axis.length(),absf(upper-lower)+.001,upper+lower-.001)
+	var reachable := shoulder+axis.normalized()*distance
+	var sign_side := 1.0 if _global_rest[arm].origin.x>=0.0 else -1.0
+	var elbow := _joint(shoulder,reachable,upper,lower,Vector3(sign_side*.8,-1.0,-.2))
+	_aim_live_segment(arm,fore,elbow-shoulder)
+	_aim_live_segment(fore,hand,reachable-skeleton.get_bone_global_pose(fore).origin)
+	var local_basis := skeleton.global_basis.orthonormalized().inverse()*world_basis.orthonormalized()*_global_rest[hand].basis.orthonormalized()
+	var parent_basis := skeleton.get_bone_global_pose(fore).basis.orthonormalized()
+	skeleton.set_bone_pose_rotation(hand,(parent_basis.inverse()*local_basis).get_rotation_quaternion())
+	skeleton.force_update_all_bone_transforms()
+	return skeleton.to_global(skeleton.get_bone_global_pose(hand).origin).distance_to(target)
+
+
 func _aim_live_segment(bone: int,child: int,toward: Vector3) -> void:
 	var current := skeleton.get_bone_global_pose(bone)
 	var segment := skeleton.get_bone_global_pose(child).origin-current.origin

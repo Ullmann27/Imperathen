@@ -1365,6 +1365,8 @@ func _at_active_work_station() -> bool:
 
 func _move_player(delta: float) -> void:
 	var axis := _movement_axis()
+	if is_instance_valid(i01_props) and i01_props.water_interaction_active():
+		axis = Vector2.ZERO
 	var direction := Vector3(axis.x, 0, axis.y).rotated(Vector3.UP, _camera_yaw)
 	var focus: Control = get_viewport().gui_get_focus_owner()
 	var editing_text := focus is LineEdit or focus is TextEdit

@@ -576,6 +576,8 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 	var gear_choice := screen == "gear_panel" and GearMarket.COMMAND_FIELDS.has(command)
 	if screen != "playing" and not chapter_choice and not village_choice and not political_choice and not party_choice and not gear_choice and not _film_committing:
 		return {"ok": false, "message": "Die Welt ist pausiert."}
+	if command == "village_childhood_action" and screen == "playing" and is_instance_valid(world.i01_props) and world.i01_props.water_interaction_active() and str(payload.get("action_id","")) != "i01_meal":
+		return {"ok":false,"message":"Warte, bis die Wasserhandlung abgeschlossen ist."}
 	_flush_simulation()
 	model.set_player_position(world.get_player_position())
 	command_serial += 1
@@ -613,6 +615,14 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 				save_feedback = "Der Ladeschein konnte nicht gespeichert werden. Getreide und Denare bleiben am Ausgangsort."
 			ui.notify(save_feedback)
 			return {"ok": false, "message": save_feedback}
+	# The return with water starts the next film; do not make the boy repeat
+	# breakfast as a second interaction after his actual pouring action.
+	if result.get("ok",false) and persisted and screen == "playing" and command == "village_childhood_action" and str(payload.get("action_id","")) == "i01_pour":
+		world.i01_props.begin_film_pour()
+		var breakfast := _command("village_childhood_action",{"action_id":"i01_meal"})
+		if not breakfast.get("ok",false):
+			world.i01_props.settle_film_pour()
+		return result
 	if result.get("ok", false) and command == "train" and not Childhood.enabled(model.data):
 		if persisted:
 			_begin_opening(OpeningStory.adulthood(model.data))
@@ -1025,6 +1035,8 @@ func _opening_present() -> void:
 	if screen != "opening" or not is_instance_valid(opening_overlay):
 		return
 	var beat: Dictionary = opening_sequence.beats[opening_index]
+	if is_instance_valid(world.i01_props) and (opening_sequence.id != I01Film.VID_B or opening_index > 0):
+		world.i01_props.settle_film_pour()
 	if bool(beat.get("await_choice", false)) and not _film_choice_open(beat) and opening_index < opening_sequence.beats.size() - 1:
 		# Resumed after the choice was committed: never offer or commit it twice.
 		opening_index += 1
@@ -1098,6 +1110,8 @@ func _opening_process(delta: float) -> void:
 		return
 	var duration := maxf(0.1, maxf(float(beat.duration), opening_voice_duration))
 	opening_elapsed = minf(duration, opening_elapsed + maxf(0.0, delta))
+	if opening_sequence.id == I01Film.VID_B and opening_index == 0 and is_instance_valid(world.i01_props):
+		world.i01_props.sample_film_pour(opening_elapsed)
 	var cut := _beat_cut(beat, opening_elapsed / duration)
 	if str(cut.shot_id) != opening_director.shot_id or str(cut.actor_id) != opening_director.mission_actor_id:
 		# A cut inside the line (reaction shot): same clock, new composition.
@@ -1320,6 +1334,8 @@ func _opening_finish() -> void:
 
 
 func _release_opening() -> void:
+	if not opening_sequence.is_empty() and is_instance_valid(world.i01_props):
+		world.i01_props.settle_film_pour()
 	_stop_opening_voice()
 	if is_instance_valid(opening_director):
 		opening_director.finish()
