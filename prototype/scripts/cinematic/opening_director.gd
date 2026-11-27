@@ -418,7 +418,7 @@ func _i01_framing(id: String) -> Array:
 			# later silent insert and reduced-motion mode keep the authored still.
 			var props := _world.get_node_or_null("I01FamilyProps")
 			if not reduced_motion and is_instance_valid(props) and props.has_method("cinematic_pour_focus"):
-				var focus: Vector3 = props.cinematic_pour_focus()
+				var focus: Vector3 = props.call("cinematic_pour_focus")
 				if focus.is_finite():
 					return [focus + Vector3(-0.82, 0.39, 1.15), focus + Vector3(-0.74, 0.34, 1.05),
 						focus, focus, 33.0, 30.5]

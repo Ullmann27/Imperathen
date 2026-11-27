@@ -325,7 +325,7 @@ func _test_hud_and_props() -> void:
 		check(props._water[owner].visible,"Filled water remains visible in "+owner)
 
 
-func _check_live_pour_focus(props: Node3D, owner: String) -> void:
+func _check_live_pour_focus(props, owner: String) -> void:
 	var cup: Node3D = props.cup_node(owner)
 	var expected := cup.to_global(Vector3(.033 if owner == "player" else 0.0, .147, 0)).lerp(
 		props.jug_node().to_global(props.JUG_MOUTH), 0.5)
