@@ -19,8 +19,12 @@ def completion(text,finish="stop"):
 
 class DeepSeekTests(unittest.TestCase):
     def setUp(self):
-        self.task=json.loads((d.ROOT/"deepseek_task.json").read_text())
-        self.register=json.loads((d.ROOT/"team_work_register.json").read_text())
+        self.task={"schema":1,"id":"D001","phase":"probe_then_review","revision":"a"*40,
+                   "task":"Review one real source","files":["prototype/scripts/ui/regional_map.gd"],
+                   "images":[],"max_tokens":8192}
+        self.register={"schema":1,"version":1,"tasks":[{"id":"D001","owner":"DeepSeek",
+             "status":"reserved","revision":"a"*40,"run_id":None,"scope":self.task["files"],
+             "access":"read","note":"Independent offline fixture; no real invocation"}]}
     def test_pinned_scope(self):
         d.validate_task(self.task,self.register)
         bad=dict(self.task,files=["prototype/scripts/main.gd"])

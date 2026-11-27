@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 4,
+  "version": 5,
   "tasks": [
     {
       "id": "K101",
@@ -80,15 +80,15 @@
     {
       "id": "D001",
       "owner": "DeepSeek",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
-      "run_id": null,
+      "run_id": "46018153691",
       "scope": [
         "prototype/scripts/ui/regional_map.gd",
         "prototype/tests/regional_map_test.gd"
       ],
       "access": "read",
-      "note": "New independent regional map review. First authenticated DeepSeek access probe must pass; no code execution or automatic retry."
+      "note": "Actual GitHub workflow created at 645a268854ce66ee3bd2872fbb3f29b8238828f3. Preflight in progress at verification; live API access not yet proven."
     }
   ]
 }
