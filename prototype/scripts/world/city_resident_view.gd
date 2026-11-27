@@ -189,7 +189,8 @@ func _materialize(person: int, resident: Dictionary, point: Vector3) -> bool:
 	figure.rotation.y = life.slot_facing(resident.at, int(resident.slot))
 	actor.add_child(figure)
 	var appearance := "civilian_woman" if resident.female else ("elder" if life.age(resident) >= 62 else "civilian_man")
-	figure.configure_resident(resident.origin, life.age(resident), appearance, int(resident.look), camera, Population.resident_id(person))
+	figure.configure_resident(resident.origin, life.age(resident), appearance, int(resident.look), camera, Population.resident_id(person), str(resident.role), int(resident.tier))
+	actor.set_meta("profession",str(resident.role))
 	actors[person] = actor
 	return true
 

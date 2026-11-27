@@ -96,6 +96,8 @@ var appearance_id := ""
 var appearance_variation := 0
 ## Catalog identity only for named Italian adult residents; no new save fields.
 var resident_id := ""
+var _city_role := ""
+var _city_wealth := -1
 var look: Dictionary = {}
 var _resident_tempo := 1.0
 var _loaned_gear := false
@@ -207,7 +209,7 @@ func youth_path(level: int) -> String:
 	return String(MESHY_YOUTH_OUTFITS[youth_outfit].path) % level
 
 
-func configure_resident(origin: String, years: int, new_appearance: String, variation: int = 0, camera: Camera3D = null, actor_uid: String = "") -> void:
+func configure_resident(origin: String, years: int, new_appearance: String, variation: int = 0, camera: Camera3D = null, actor_uid: String = "", city_role: String = "", city_wealth: int = -1) -> void:
 	# Resident population builders already know the complete identity. Configure
 	# it atomically so they never load an unused generic body or a near LOD first.
 	var selected := new_appearance if new_appearance in APPEARANCES else ""
@@ -221,7 +223,7 @@ func configure_resident(origin: String, years: int, new_appearance: String, vari
 	# Do not carry the old person's Meshy body into a new resident identity.
 	if assigned_asset.is_empty() and named_id == resident_id and face_seed == seed_value and not MeshyCharacters.is_owner_civilian(meshy_asset_id):
 		assigned_asset = meshy_asset_id
-	var changed := face_seed != seed_value or role != "resident" or home != origin or age != years or appearance_id != selected or appearance_variation != selected_variation or resident_id != named_id or meshy_asset_id != assigned_asset
+	var changed := face_seed != seed_value or role != "resident" or home != origin or age != years or appearance_id != selected or appearance_variation != selected_variation or resident_id != named_id or meshy_asset_id != assigned_asset or _city_role != city_role or _city_wealth != city_wealth
 	if role != "resident":
 		clear_gaze_target()
 	role = "resident"
@@ -235,13 +237,18 @@ func configure_resident(origin: String, years: int, new_appearance: String, vari
 	resident_id = named_id
 	meshy_asset_id = assigned_asset
 	look = {} if resident_id.is_empty() else ResidentIdentity.look(resident_id, appearance_id, appearance_variation, age)
+	_city_role = city_role
+	_city_wealth = city_wealth
+	if resident_id.is_empty() and not city_role.is_empty() and actor_uid.begins_with("c") and actor_uid.substr(1).is_valid_int():
+		look = ResidentIdentity.city_look(actor_uid,appearance_id,variation,age,city_role,city_wealth)
 	# A catalog entry may not replace the live roster anatomy or equipment.
 	if str(look.get("kind", "")) != appearance_id:
 		look = {}
 	_resident_tempo = 1.0
 	if not look.is_empty():
-		identity = "resident_" + resident_id
-		var stable := float(absi(resident_id.hash()) % 100003) / 100003.0
+		var stable_id := str(look.get("id",resident_id))
+		identity = "resident_" + stable_id
+		var stable := float(absi(stable_id.hash()) % 100003) / 100003.0
 		_resident_tempo = 0.92 + 0.16 * fposmod(stable * 7.31, 1.0)
 		if not body and clip == "idle" and not _posed:
 			phase = stable
@@ -496,7 +503,7 @@ func _style(shape: MeshInstance3D) -> void:
 		elif active_model_path.begins_with("res://assets/characters/frontier_") and source.resource_name in ["FrontierCloth", "HeroHair", "FrontierGreyHair"]:
 			var key := "%d/frontier/%d" % [source.get_instance_id(), appearance_variation]
 			if not look.is_empty():
-				key += "/" + resident_id
+				key += "/" + str(look.get("id",resident_id))
 			var mat: StandardMaterial3D
 			if materials.has(key):
 				mat = (materials[key] as WeakRef).get_ref() as StandardMaterial3D

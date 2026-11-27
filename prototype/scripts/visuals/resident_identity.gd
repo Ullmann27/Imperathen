@@ -344,8 +344,31 @@ static func _named(id: String) -> Dictionary:
 
 ## Generic villagers: a stable, varied identity from (appearance, variation).
 ## Fill strength is higher than for named people, so 18 variants never repeat.
-static func _generic(appearance: String, variation: int, years: int) -> Dictionary:
-	var key := "%s/%d" % [appearance, posmod(variation, 18)]
+## City residents use their full persistent population key, not 18 recycled
+## faces. Their profession/wealth alters clothing only, never saved economics.
+static func city_look(uid: String, appearance: String, variation: int, years: int, job: String, wealth: int) -> Dictionary:
+	if years < 18 or appearance not in KINDS:
+		return {}
+	var result := _generic(appearance,variation,years,"city:"+uid)
+	var rng := _rng("city:"+uid+"/clothing")
+	var palette := ["undyed","oatmeal","natural_grey","natural_brown","walnut"]
+	if job in ["vendor","craft"]:
+		palette = ["ochre","olive","faded_woad","faded_madder","natural_brown"]
+	elif wealth >= 2:
+		palette = ["woad","green","madder_brown","walnut","ochre"]
+	elif job == "guard":
+		palette = ["natural_grey","walnut","madder_brown"]
+	result.wear.tunic = _colour(str(palette[rng.randi_range(0,palette.size()-1)]),DYES)
+	result.role = job
+	result["city"] = true
+	result.height = rng.randf_range(0.95,1.05)
+	if appearance == "civilian_woman" and years >= 55:
+		result.hair.grey = clampf((float(years)-45.0)/43.0,0.08,0.7)
+	return result
+
+
+static func _generic(appearance: String, variation: int, years: int, stable_key: String = "") -> Dictionary:
+	var key := stable_key if not stable_key.is_empty() else "%s/%d" % [appearance, posmod(variation, 18)]
 	var rng := _rng(key)
 	var woman := appearance == "civilian_woman"
 	var elder := appearance == "elder"
