@@ -69,7 +69,8 @@ jobs:
           set -euo pipefail
           if [[ -z "${UNITY_SERVICE_ACCOUNT_ID:-}" && -z "${UNITY_SERVICE_ACCOUNT_SECRET:-}" ]]; then
             echo "UNITY_SERVICE_ACCOUNT_NOT_YET_CONFIGURED" >> unity-cli-evidence/checks.txt
-            exit 0
+            echo "Unity CI credentials are missing from repository Actions secrets" >&2
+            exit 1
           fi
           if [[ -z "${UNITY_SERVICE_ACCOUNT_ID:-}" || -z "${UNITY_SERVICE_ACCOUNT_SECRET:-}" ]]; then
             echo "UNITY_SERVICE_ACCOUNT_INCOMPLETE" >> unity-cli-evidence/checks.txt
