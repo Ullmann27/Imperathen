@@ -60,6 +60,25 @@ jobs:
           echo "NO_UNITY_PROJECT_OR_IMPERATHEN_GAME_FILE_MODIFIED" >> unity-cli-evidence/checks.txt
           echo "NO_CLOUD_AI_GENERATION_REQUESTED" >> unity-cli-evidence/checks.txt
           cat unity-cli-evidence/checks.txt
+      - name: Validate optional scoped Unity service account, without disclosing tokens
+        shell: bash
+        env:
+          UNITY_SERVICE_ACCOUNT_ID: ${{ secrets.IMPERATHEN_UNITY_SA_ID }}
+          UNITY_SERVICE_ACCOUNT_SECRET: ${{ secrets.IMPERATHEN_UNITY_SA_SECRET }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${UNITY_SERVICE_ACCOUNT_ID:-}" || -z "${UNITY_SERVICE_ACCOUNT_SECRET:-}" ]]; then
+            echo "UNITY_SERVICE_ACCOUNT_NOT_YET_CONFIGURED" >> unity-cli-evidence/checks.txt
+            exit 0
+          fi
+          export PATH="$HOME/.local/bin:$PATH"
+          if unity auth status > "$RUNNER_TEMP/unity-account-status-private.txt" 2>&1; then
+            echo "UNITY_SERVICE_ACCOUNT_AUTHENTICATED" >> unity-cli-evidence/checks.txt
+          else
+            echo "UNITY_SERVICE_ACCOUNT_AUTH_FAILED" >> unity-cli-evidence/checks.txt
+            exit 1
+          fi
+          # Never publish authenticated account information, access tokens or environment secrets.
       - name: Keep only sanitized CLI evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
