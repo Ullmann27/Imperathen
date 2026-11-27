@@ -153,6 +153,8 @@ func set_active(value: bool) -> void:
 		for record: Dictionary in citizens:
 			var character := record.customer as CharacterBody3D
 			character.velocity = Vector3.ZERO
+			(record.vendor_figure as Node3D).clear_gaze_target()
+			(record.visitor_figure as Node3D).clear_gaze_target()
 			(record.vendor_figure as Node3D).set_conversation_focus(false)
 			(record.visitor_figure as Node3D).set_conversation_focus(false)
 			(record.visitor_figure as Node3D).drive(0)
@@ -208,6 +210,12 @@ func _physics_process(delta: float) -> void:
 			_turn_towards(visitor_figure,character.position,vendor.position,delta)
 			_turn_towards(vendor_figure,vendor.position,character.position,delta)
 		if meets != bool(record.talking):
+			if meets:
+				visitor_figure.set_gaze_target(vendor_figure)
+				vendor_figure.set_gaze_target(visitor_figure)
+			else:
+				visitor_figure.clear_gaze_target()
+				vendor_figure.clear_gaze_target()
 			visitor_figure.set_conversation_focus(meets)
 			vendor_figure.set_conversation_focus(meets)
 			record.talking = meets

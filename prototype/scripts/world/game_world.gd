@@ -28,6 +28,7 @@ var _political_survey_pending := false
 var _political_survey_at := Vector2.ZERO
 var _political_survey_range := 1.6
 var _village_focus := ""
+var _gaze_dialog_actor: Node3D
 var _dodge_remaining := 0.0
 var _dodge_direction := Vector3.ZERO
 const PatrolPeople = preload("res://scripts/domain/person_registry.gd")
@@ -271,6 +272,8 @@ func set_mode(mode: String) -> void:
 	if mode not in ["person", "city", "map"]:
 		return
 	_mode = mode
+	if is_instance_valid(_figure):
+		_figure.set_ambient_gaze(_active and mode == "person")
 	if mode != "person":
 		action_requested.emit("combat_interrupt", {})
 		_actions.reset()
@@ -316,6 +319,8 @@ func set_active(active: bool) -> void:
 		village_life_world.set_active(active)
 	if active:
 		clear_frontier_focus()
+	if is_instance_valid(_figure):
+		_figure.set_ambient_gaze(active and _mode == "person")
 	if not active:
 		_story_companions.pause()
 		action_requested.emit("combat_interrupt", {})
@@ -405,11 +410,15 @@ func focus_frontier_npc(id: String) -> bool:
 	_frontier_camera_direction = direction.normalized() if direction.length() > .2 else Vector3.BACK
 	_frontier_focus = id
 	population.focus(id,at+_frontier_camera_direction*3)
+	var actor: Node3D = population.actors.get(id)
+	if is_instance_valid(actor):
+		_set_dialog_gaze(actor.get_node_or_null("Figure") as Node3D)
 	_camera.fov = 44.0
 	return true
 
 
 func clear_frontier_focus() -> void:
+	_set_dialog_gaze(null)
 	if is_instance_valid(_companion):
 		_companion.get_node("Figure").set_conversation_focus(false)
 	_frontier_focus = ""
@@ -646,10 +655,30 @@ func cue_village_defense(action: String) -> void:
 func focus_village_npc(id: String) -> void:
 	_village_focus = id
 	village_life_world.focus(id, get_player_position())
+	var actor: Node3D = village_life_world.actors.get(id)
+	_set_dialog_gaze(actor.get_node_or_null("Figure") as Node3D if is_instance_valid(actor) else null)
 	var direction: Vector3 = get_player_position() - village_life_world.actor_position(id)
 	direction.y = 0
 	_frontier_camera_direction = direction.normalized() if direction.length() > .1 else Vector3.BACK
 	_camera_initialized = false
+
+
+func _set_dialog_gaze(target: Node3D) -> void:
+	if is_instance_valid(_gaze_dialog_actor) and _gaze_dialog_actor != target:
+		_gaze_dialog_actor.clear_gaze_target()
+	_gaze_dialog_actor = target
+	if not is_instance_valid(_figure):
+		return
+	if is_instance_valid(target):
+		_figure.set_gaze_target(target, true)
+		target.set_gaze_target(_figure)
+	else:
+		_figure.clear_gaze_target()
+
+
+func focus_companion_gaze() -> void:
+	if is_instance_valid(_companion) and _companion.is_visible_in_tree():
+		_set_dialog_gaze(_companion.get_node_or_null("Figure") as Node3D)
 
 
 func _reset_touch_input() -> void:

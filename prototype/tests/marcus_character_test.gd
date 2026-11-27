@@ -85,5 +85,7 @@ func _run() -> void:
 	_check(not Person.MarcusModel.owns(friend.active_model_path),"Other cultures keep their own companion")
 	world.free()
 	await process_frame
+	await preload("res://tests/character_head_focus_checks.gd").run(self, _check)
+	await process_frame
 	print("MARCUS_CHARACTER_PASS" if failures == 0 else "MARCUS_CHARACTER_FAIL"," ",checks," checks, ",failures," failed")
 	quit(0 if failures == 0 else 1)

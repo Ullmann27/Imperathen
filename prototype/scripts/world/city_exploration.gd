@@ -954,6 +954,7 @@ func _open_market(inventory: bool) -> void:
 	_look.reset()
 	player.velocity = Vector3.ZERO
 	figure.drive(0)
+	figure.set_ambient_gaze(false)
 	crowd.set_paused(true)
 	if resident_view:
 		resident_view.process_mode = Node.PROCESS_MODE_DISABLED
@@ -965,6 +966,7 @@ func _open_market(inventory: bool) -> void:
 	_hud.hide()
 
 func _close_market() -> void:
+	figure.set_ambient_gaze(not paused)
 	_hud.show()
 	var display := get_node_or_null("/root/RuntimeDisplay")
 	if is_instance_valid(display):
@@ -1033,6 +1035,7 @@ func set_paused(value: bool) -> void:
 		if not value:
 			return
 	paused = value
+	figure.set_ambient_gaze(not paused)
 	var quality_monitor := get_node_or_null("/root/RuntimeDisplay")
 	if is_instance_valid(quality_monitor):
 		quality_monitor.set_sustained_paused(paused)
