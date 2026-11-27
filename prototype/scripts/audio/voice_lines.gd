@@ -63,10 +63,32 @@ static func stream_for(line: Dictionary) -> AudioStream:
 	return load(path) as AudioStream if ResourceLoader.exists(path) else null
 
 
-## Viseme track: {"fps":.., "visemes":[...], "keys":[[t, viseme_index, weight], ...]}.
+## Actual forced-alignment format: segments [start, end, viseme index].
 static func viseme_track(line: Dictionary) -> Dictionary:
 	var path := "res://assets/audio/voice/" + str(line.get("visemes", ""))
 	if not FileAccess.file_exists(path):
 		return {}
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
-	return parsed if typeof(parsed) == TYPE_DICTIONARY else {}
+	if not parsed is Dictionary or parsed.get("schema_version", 0) != 1:
+		return {}
+	for key: String in ["line_id", "speaker_id", "text_key"]:
+		if parsed.get(key) != line.get(key):
+			return {}
+	var segments: Variant = parsed.get("segments", [])
+	var names: Variant = parsed.get("visemes", [])
+	var duration: float = float(parsed.get("duration_s",0.0))
+	if not segments is Array or segments.is_empty() or not names is Array or names.size() != 15 or not is_finite(duration) or duration <= 0.0:
+		return {}
+	var last := -1.0
+	for segment: Variant in segments:
+		if not segment is Array or segment.size() != 3:
+			return {}
+		if not (segment[0] is float or segment[0] is int) or not (segment[1] is float or segment[1] is int) or not (segment[2] is float or segment[2] is int):
+			return {}
+		var start := float(segment[0])
+		var end := float(segment[1])
+		var index := float(segment[2])
+		if not is_finite(start) or not is_finite(end) or not is_finite(index) or start < 0.0 or start < last or end < start or end > duration + 0.061 or index != floor(index) or index < 0.0 or index >= float(names.size()):
+			return {}
+		last = start
+	return parsed

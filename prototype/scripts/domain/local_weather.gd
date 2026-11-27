@@ -37,15 +37,23 @@ static func sample(clock: Variant, origin: String, legacy_season: int = 0) -> Di
 	var block := second / BLOCK_SECONDS
 	var current := kind_for(day,block,origin)
 	var previous := kind_for(day,block-1,origin)
-	var earlier := kind_for(day,block-2,origin)
 	var blend := smoothstep(0.0,float(TRANSITION_SECONDS),float(second % BLOCK_SECONDS))
-	# Dampness survives a shower and dries slowly over the next weather block.
-	var before_wet := maxf(float(WET[previous]),float(WET[earlier])*0.28)
-	var after_wet := maxf(float(WET[current]),float(WET[previous])*lerpf(0.65,0.12,float(second % BLOCK_SECONDS)/BLOCK_SECONDS))
+	# The end of each block is exactly the start of the next. Wetting is
+	# faster than drying; two previous blocks retain residual dampness.
+	var before_wet := settled_wetness(day,block-1,origin)
+	var after_wet := settled_wetness(day,block,origin)
+	var wet_mix := smoothstep(0.0,float(TRANSITION_SECONDS if after_wet>=before_wet else BLOCK_SECONDS),float(second%BLOCK_SECONDS))
 	return {"from":previous,"to":current,"mix":blend,
 		"rain":lerpf(float(RAIN[previous]),float(RAIN[current]),blend),
 		"wind":lerpf(float(WIND[previous]),float(WIND[current]),blend),
-		"wetness":lerpf(before_wet,after_wet,blend),"kind":current if blend>=0.5 else previous}
+		"wetness":lerpf(before_wet,after_wet,wet_mix),"kind":current if blend>=0.5 else previous}
+
+static func settled_wetness(day: int, block: int, origin: String) -> float:
+	return maxf(float(WET[kind_for(day,block,origin)]),maxf(float(WET[kind_for(day,block-1,origin)])*0.18,float(WET[kind_for(day,block-2,origin)])*0.04))
 
 static func for_state(data: Dictionary) -> Dictionary:
-	return sample(data.get("calendar",{}).get("clock"),str(data.get("origin_id","italia")),int(data.get("strategy",{}).get("turn",0)))
+	var clock: Variant = data.get("calendar",{}).get("clock")
+	if Calendar.validate_clock(clock):
+		@warning_ignore("integer_division")
+		clock = Calendar.new_clock(int(clock.jdn),int(clock.second)/300*300)
+	return sample(clock,str(data.get("origin_id","italia")),int(data.get("strategy",{}).get("turn",0)))

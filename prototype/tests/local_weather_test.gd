@@ -25,10 +25,10 @@ func _run()->void:
 			seen[a.kind]=true
 		for seconds in [0,21600,43200,64800]:
 			var now:=Calendar.new_clock(day,seconds)
-			var last:=Calendar.advance_clock(now,-1)
+			var last:=Calendar.new_clock(day-1,86399) if seconds==0 else Calendar.new_clock(day,seconds-1)
 			var a:=Weather.sample(last,"italia")
 			var b:=Weather.sample(now,"italia")
-			check(absf(float(a.rain)-float(b.rain))<0.001 and absf(float(a.wind)-float(b.wind))<0.001,"Weather transition continuous at block boundary")
+			check(absf(float(a.rain)-float(b.rain))<0.001 and absf(float(a.wind)-float(b.wind))<0.001 and absf(float(a.wetness)-float(b.wetness))<0.001,"Weather transition continuous at block boundary")
 	check(seen.size()==5,"All five fictional weather regimes occur")
 	check(Weather.sample(null,"italia",2).kind=="rain","Clockless legacy autumn preserved")
 	var fire:=Fires.new()

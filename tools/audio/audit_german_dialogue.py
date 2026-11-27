@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 from collections import Counter
+from voice_contract import track_errors
 
 def digest(data):
     return hashlib.sha256(data).hexdigest()
@@ -52,8 +53,7 @@ def main():
             if not any(reason.startswith("visemes") for reason in reasons):
                 try:
                     track = json.loads((args.audio / row["visemes"]).read_text(encoding="utf-8"))
-                    if track.get("speaker_id") != line["speaker_id"] or track.get("text_key") != actual_key or not track.get("keys"):
-                        reasons.append("viseme_identity_mismatch")
+                    reasons.extend(track_errors(track, row))
                 except (OSError, ValueError):
                     reasons.append("viseme_invalid")
         if reasons:

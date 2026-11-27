@@ -73,6 +73,23 @@ def main():
                 raise ValueError("Refusing to replace different runtime derivative")
         for name,data in payload:
             (DEST/name).write_bytes(data)
+    # The runtime catalogue is generated only after the actual four GLBs
+    # passed their checks. Never advertise missing assets in source control.
+    catalog_path = ROOT / "prototype/assets/world/city_catalog.json"
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    family = {"id": "meshy/characters/" + cfg["asset"],
+              "name": {"sextus": "Sextus – Schmied", "vibius": "Vibius – Dorfbewohner"}[args.family],
+              "category": "models",
+              "tiers": [{"level": i, "path": "res://assets/meshy/characters/" + name} for i, name in enumerate(names)]}
+    existing = [x for x in catalog["families"] if x["id"] == family["id"]]
+    if existing and (len(existing) != 1 or existing[0]["tiers"] != family["tiers"]):
+        raise ValueError("Conflicting city catalogue family")
+    if not existing:
+        catalog["families"].append(family)
+    catalog["families"].sort(key=lambda x: (x["category"], x["id"]))
+    catalog["family_count"] = len(catalog["families"])
+    catalog["binary_count"] = sum(len(x["tiers"]) for x in catalog["families"])
+    catalog_path.write_text(json.dumps(catalog, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
     args.report.parent.mkdir(parents=True,exist_ok=True)
     args.report.write_text(json.dumps({"status":"STAGED_VERIFIED_QA_CANDIDATE","asset":cfg["asset"],"story_id":cfg["story_id"],"files":expected},indent=2)+"\n")
     print("OWNER_"+args.family.upper()+"_RUNTIME_STAGED lods=4 clips=11")

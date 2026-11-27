@@ -8,6 +8,7 @@ ASSETS=ROOT/"prototype/assets"
 OUTPUT=ASSETS/"world/city_catalog.json"
 TIER=re.compile(r"_(?P<tier>[0-3]|near|mid|far|lod[0-3])$")
 LABELS={"frontier_hut":"Grenzhütte","atrium_house":"Römisches Atriumhaus","frontier_house":"Wohnhaus","village_well":"Dorfbrunnen","workshop":"Werkstatt","training_dummy":"Übungspfahl","timber_billet":"Holzbündel","storehouse":"Speicher","market":"Marktstand","palisade_silhouette":"Palisadenreihe","palisade_bay":"Palisadensegment","oak":"Eiche","olive":"Olivenbaum","pine":"Kiefer","wood_longhouse":"Langhaus","wa_store":"Wa-Speicher","wa_house":"Wa-Haus","han_house":"Han-Haus","farmer":"Feldarbeiter","wa_farmer":"Wa-Feldarbeiter","han_farmer":"Han-Feldarbeiter","gladius":"Gladius","scutum":"Scutum","hero_quality":"Bisherige Hauptfigur","hero_meshy_italia":"Meshy-Jugendlicher","frontier_archer":"Bogenschütze","frontier_civilian_man":"Dorfbewohner","frontier_civilian_woman":"Dorfbewohnerin","frontier_elder":"Ältester","frontier_legionary":"Legionär","frontier_officer":"Offizier","frontier_spearman":"Speerträger","villager":"Frühe Dorffigur","unit_roman_signifer":"Römischer Signifer","unit_germanic_axe_fighter":"Germanischer Axtkämpfer","gear_germanic_round_shield":"Rundschild","gear_roman_signum":"Signum","weap_germanic_hand_axe":"Handaxt","heavy":"Schwerer Soldat","officer":"Offizier","spear":"Speerträger","archer":"Bogenschütze"}
+LABELS.update({"unit_legacy_blacksmith":"Sextus – Schmied","unit_legacy_tunic_villager":"Vibius – Dorfbewohner"})
 def collect():
     families={}
     for path in sorted(ASSETS.rglob("*.glb")):

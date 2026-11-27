@@ -13,6 +13,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from voice_contract import track_errors
 
 ROOT = Path(__file__).resolve().parents[2]
 AUDIO = ROOT / "prototype/assets/audio/voice"
@@ -59,6 +60,8 @@ def canonical_lines(band):
                 entries.append((mission_id + "." + item["id"] + ".result", "chronik", item["result"]))
         for line_id, item in mission.get("slice", {}).get("lines", {}).items():
             entries.append((line_id, item["speaker_id"], item["text"]))
+        for label, text in mission.get("slice", {}).get("contact_lines", {}).items():
+            entries.append((mission_id + ".contact." + label, label, text))
         for line_id, label, text in entries:
             sid = speaker(label)
             k = text_key(text)
@@ -83,6 +86,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--speaker", required=True)
     ap.add_argument("--band", default="band1", choices=["band1"])
+    ap.add_argument("--authored", type=Path, help="Exact Godot runtime dialogue export")
     ap.add_argument("--work", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--attempts", type=int, default=8)
@@ -116,7 +120,16 @@ def main():
     wanted = []
     report = {"speaker": a.speaker, "band": a.band, "already_recorded": 0,
               "requested": [], "accepted": [], "rejected": [], "status": "candidate_only"}
-    for line in canonical_lines(a.band):
+    source_lines = load(a.authored)["lines"] if a.authored else canonical_lines(a.band)
+    seen = set()
+    for source in source_lines:
+        line = {**source, "kind": "story"}
+        if line["text_key"] != text_key(line["text"]):
+            raise ValueError("Runtime export text hash mismatch: " + line["line_id"])
+        identity = (line["speaker_id"], line["text_key"])
+        if identity in seen:
+            continue
+        seen.add(identity)
         if line["speaker_id"] != a.speaker:
             continue
         key = (line["speaker_id"], line["text_key"])
@@ -125,8 +138,12 @@ def main():
             if len(rows) != 1 or rows[0]["text"] != line["text"]:
                 raise ValueError("Ambiguous existing recording " + line["line_id"])
             verify(rows[0], "file", "sha256", AUDIO)
-            verify(rows[0], "visemes", "visemes_sha256", AUDIO)
-            report["already_recorded"] += 1
+            track = load(verify(rows[0], "visemes", "visemes_sha256", AUDIO))
+            errors = track_errors(track, rows[0])
+            if errors:
+                report["rejected"].append({"line_id": rows[0]["line_id"], "reason": ",".join(errors)})
+            else:
+                report["already_recorded"] += 1
             continue
         lid = line["line_id"]
         if lid in used_ids:
@@ -141,6 +158,8 @@ def main():
     if not wanted:
         save(out / "manifest.fragment.json", {"language": "de", "lines": []})
         print("NO_MISSING_GERMAN_LINES", a.speaker)
+        if report["rejected"]:
+            raise SystemExit(1)
         return
 
     candidates = [row for row in manifest["lines"] if row["speaker_id"] == a.speaker
@@ -209,8 +228,9 @@ def main():
             audio = verify(row, "file", "sha256", stage)
             track_path = verify(row, "visemes", "visemes_sha256", stage)
             track = load(track_path)
-            if track.get("speaker_id") != a.speaker or track.get("text_key") != request["text_key"] or not track.get("keys"):
-                raise ValueError("Viseme does not belong to this speaker and text")
+            errors = track_errors(track, row)
+            if errors:
+                raise ValueError("Invalid forced alignment: " + ",".join(errors))
             for field, src in (("file", audio), ("visemes", track_path)):
                 dest = out / row[field]
                 if dest.exists() or (AUDIO / row[field]).exists():
