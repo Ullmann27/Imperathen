@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 116,
+  "version": 120,
   "tasks": [
     {
       "id": "K101",
@@ -560,6 +560,57 @@
       ],
       "access": "edit",
       "note": "Roadmap phase 01 only: existing full regression 46038086118/job 140638526143 had 2/760 downward rays hit other/missing body and 11/225 horizontal faults, while walk and terrain height passed. Preserve all original assertions, add actual collider path/position/shape and expected mesh coordinates for failures. Isolated focused Godot diagnostic; no preview push or duplicate Nemotron request while APK #221 runs. New isolated branch fix/aeterna-backdrop-ray-provenance-20261127, actual head bba33d9f45d43d02ca70c39304a6e848fafcac98; workflow 46055508471 in_progress, actual engine baseline (no private model staging) and unchanged checks. N27 is separately registered as read-only, no duplicate API call. No result or repair claimed."
+    },
+    {
+      "id": "PARALLEL-NIGHT-EVIDENCE",
+      "scope": [
+        "prototype/tests/render_bench_views_test.gd",
+        ".github/workflows/aeterna-parallel-stability.yml",
+        "docs/44_integration/AETERNA_PARALLEL_STABILITY_20261127.md"
+      ],
+      "note": "Roadmap 01.3. Old run 46038086118: night_torch 8/86 failures after genuine managed door/route lights. Keep existing light counts, shadow checks, all limits and gameplay unchanged; add profile-bound evidence and real compatibility framebuffers. Do not edit active CAMPAIGN-CONTINUITY route_fire_lights.gd or loosen review ceilings.",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "access": "edit"
+    },
+    {
+      "id": "PARALLEL-WEATHER-FIXTURE",
+      "scope": [
+        "art/village/verify.gd"
+      ],
+      "note": "Roadmap 01.2. Old run 46038086118: autumn mud and drizzle fixture fails. Actual scenery uses continuous weather state and physically grounded rain rather than season alone. Preserve mesh, PBR, density and doorway tests; supply explicit dry/rain states, camera and real ground rays. Candidate fixture only, no claim of runtime repair.",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "access": "edit"
+    },
+    {
+      "id": "PARALLEL-FORMATION-EVIDENCE",
+      "scope": [
+        "prototype/tests/formation_agents_test.gd"
+      ],
+      "note": "Roadmap 01.4. Old full regression 46038086118: 60/180 foot jump, phase and position discontinuities, wheel issue. Preserve every original numerical limit and rule/identity test. Add worst measured switch provenance; run both original check groups in independent CI. No active runtime edit; N28 is separate read-only model task.",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "access": "edit"
+    },
+    {
+      "id": "PARALLEL-ATELIER-RUNTIME",
+      "scope": [
+        "prototype/tests/resident_catalog_bridge_test.gd",
+        "prototype/tests/soldier_visual_test.gd"
+      ],
+      "note": "Roadmap 01.1/01.4 and PR #180 read-through. Check exact original frontier civilian woman and legionary GLB references actually selected by existing runtime actors. Preserve original tests and animations. Hash source files; report catalog and equipment gates. No generation or replacement, no private assets or other projects.",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "access": "edit"
     }
   ]
 }
