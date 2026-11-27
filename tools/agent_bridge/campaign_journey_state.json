@@ -20,8 +20,21 @@
       },
       "findings": "Unabhängige Sichtprüfung V1: drei konkurrierende rote Hauptaktionen, obwohl Neues Leben der Kampagnenstart ist. Zwei Explorationsaktionen sekundär gestalten, Zugriff und Speicherverhalten erhalten. Eigener, nicht von Kimi erzeugter Kandidat PR #171, 4f109b9853f7fa1213ed2ed548d421dca3da39d4; identische Spiel- und Testdateien im V2-Review-Commit. Hintergrund weiterhin zu dunkel; kein Fold7-Nachweis.",
       "patch_revision": "8807c03666683d564659f6f92dcd49b33a3dee99",
-      "reason": "K101 Live-Run 46013490508: socket_timeout nach 300.4 s ohne HTTP-Status, UUID oder Modellantwort; Provider-Ausführungszustand unbekannt. Kein blinder Retry. Transport-PR #172 offline grün, Live-Beweis offen. Unabhängiger V2-Run 46015164122 läuft; danach realen A/B-Vergleich dokumentieren, keine nächste Etappe ohne erfolgreiche MAX-Antwort und Engine-/Sichtprüfung.",
-      "resume_phase": "render"
+      "reason": "K102 46016053212/job 140563627074 HTTP 504 after 62.2s, no accepted UUID/full MAX response; do not retry blindly. Both actual 1280x720 V1/V2 menu PNGs independently decoded and SHA256 verified against receipts (V1 8390daf…, V2 b9b3df1…), visually compared at identical layout. V2 has precisely one red primary Neues Leben; city exploration and Colosseum visibly secondary, text/layout intact. Remaining background very dark, vegetation/architecture indistinct, banner silhouette and torch light remain stylized. V2 technical menu improvement confirmed; RQG visual/device acceptance not granted. Both source/test blobs match #171, review publication and f1f3fb96 combined candidate. No chronological advancement or new Kimi POST until live MAX access repaired.",
+      "resume_phase": "compare",
+      "v2": {
+        "source_revision": "8807c03666683d564659f6f92dcd49b33a3dee99",
+        "published_revision": "b3f28fa11ed9de4ed03eb8495680d28ea55ba407",
+        "run_id": "46015164122",
+        "engine_pass": true,
+        "images": [
+          {
+            "path": "art/review/campaign-start/menu.png",
+            "sha256": "b9b3df173e85fda116e8bc3336b7006ddfb937d4da2a5c18fc9508b06a95b9c5",
+            "bytes": 410125
+          }
+        ]
+      }
     }
   },
   "serial": 203
