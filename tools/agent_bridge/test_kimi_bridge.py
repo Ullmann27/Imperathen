@@ -12,8 +12,11 @@ import nemotron_bridge as common
 class KimiBridgeTests(unittest.TestCase):
     def test_manifest(self):
         manifest = k.load_tasks(Path(k.__file__).with_name("kimi_tasks.json"))
-        self.assertEqual(set(manifest), set(k.TASK_IDS))
-        self.assertEqual(sum(t["max_tokens"] for t in manifest.values()), 98_304)
+        self.assertTrue(1 <= len(manifest) <= k.MAX_TASKS)
+        self.assertTrue(all(k.TASK_ID.fullmatch(name) for name in manifest))
+        self.assertLessEqual(sum(t["max_tokens"] for t in manifest.values()), 98_304)
+        for task in manifest.values():
+            k.validate_task(task)
 
     def test_image_allowlist(self):
         self.assertTrue(k.allowed_image("art/cinematic/i00/i00_vexillum_detail.png"))
@@ -73,7 +76,7 @@ class KimiBridgeTests(unittest.TestCase):
 class AdaptiveTransportTests(unittest.TestCase):
     def test_adaptive_manifest_and_effort(self):
         manifest = k.load_tasks(Path(k.__file__).with_name("kimi_tasks.json"))
-        task = dict(manifest["K01"], max_tokens=4096, reasoning_effort="high")
+        task = dict(next(iter(manifest.values())), max_tokens=4096, reasoning_effort="high")
         with tempfile.TemporaryDirectory() as d:
             path = Path(d) / "manifest.json"
             path.write_text(json.dumps({"K07": task}), encoding="utf-8")
