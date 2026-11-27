@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 158,
+  "version": 159,
   "tasks": [
     {
       "id": "K101",
@@ -720,7 +720,7 @@
     {
       "id": "VALLEY-MUSTER-IDENTITY",
       "owner": "Nemotron coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "a80af59fd222619f5bdd911f16e27130b820e7d6",
       "run_id": "46065570928",
       "scope": [
@@ -728,7 +728,7 @@
         ".github/workflows/aeterna-valley-muster-identity.yml"
       ],
       "access": "edit",
-      "note": "Roadmap 01: N28 truncated (46055347080), old full regression failed authored Germanic swordsman assertion. Independent focused actual engine reproduction with identity, LOD and real scene provenance; retain original assertion and all budgets, no automatic model retry. No edits to formation runtime or concurrent visual tasks. Exact candidate a80af59f on fix/aeterna-valley-muster-identity-20261127, focused run 46065570928 observed in_progress. 46 lines added to test; original combat-camera assertion unchanged. Fresh production camera focused on enemy independently validates actual Germanic near/mid rig, per-UID family, scene path, LOD, frustum, pool deferrals at both contexts. No runtime changes; result pending."
+      "note": "Roadmap 01: N28 truncated (46055347080), old full regression failed authored Germanic swordsman assertion. Independent focused actual engine reproduction with identity, LOD and real scene provenance; retain original assertion and all budgets, no automatic model retry. No edits to formation runtime or concurrent visual tasks. Exact candidate a80af59f on fix/aeterna-valley-muster-identity-20261127, focused run 46065570928 observed in_progress. 46 lines added to test; original combat-camera assertion unchanged. Fresh production camera focused on enemy independently validates actual Germanic near/mid rig, per-UID family, scene path, LOD, frustum, pool deferrals at both contexts. No runtime changes; result pending. Actual 46065570928 failure, 49/50. Fresh enemy view: 12 authentic forest_swordsman rigs. Combat camera: 11 visible living enemy agents at 14.1–16m, all detail 2 far instances; 25 pool deferrals. Original assertion remains red. No runtime fix yet."
     },
     {
       "id": "VIS-I00-FRAMING-V2",
@@ -779,6 +779,20 @@
       "access": "edit",
       "status": "submitted",
       "run_id": "46065957068"
+    },
+    {
+      "id": "VALLEY-MUSTER-RIG-FAIRNESS",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "a80af59fd222619f5bdd911f16e27130b820e7d6",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/tactics/valley_scene.gd",
+        "prototype/tests/valley_muster_test.gd",
+        ".github/workflows/aeterna-valley-muster-identity.yml"
+      ],
+      "note": "Independent follow-up to 49/50 diagnostic. Reserve valley_scene runtime + existing muster regression on same isolated branch. Investigate deterministic bounded rig materialization: prioritize a visible eligible agent from each otherwise unrepresented side then camera distance. Preserve max 3 new rigs per ordinary sync, total profile budgets, action holds, authoritative identity, and original failing assertion. Existing formation test scope remains separate. No preview modification until actual successful related tests and current blob comparison."
     }
   ]
 }
