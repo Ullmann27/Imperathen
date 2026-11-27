@@ -54,8 +54,16 @@ func _run() -> void:
 	for banner in stage._standards:
 		_check(banner.cloth.mesh is ArrayMesh and banner.cloth.mesh.surface_get_array_len(0) > 500, "Cloth has a tessellated deformation surface")
 		_check(banner.cloth.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_ON, "The cloth participates in lighting and shadows")
-		if OS.get_environment("IMPERATHEN_REQUIRE_I00_VEXILLUM") == "1":
-			_check(banner.imported and banner.textile.get_shader_parameter("use_atlas") == true, "Actual Blender GLB and textile atlas are bound")
+		if OS.get_environment("IMPERATHEN_REQUIRE_I00_VEXILLUM") == "1" or FileAccess.file_exists(Vexillum.ASSET) or ResourceLoader.exists(Vexillum.ASSET, "PackedScene"):
+			_check(banner.imported and banner.textile.get_shader_parameter("use_atlas") == true, "Installed/required Blender GLB must bind its real textile atlas")
+			_check(Vexillum.has_original_textile(banner.cloth), "Installed cloth has a deformable UV mesh and genuine textile material")
+	# The procedural mesh is intentionally available for missing assets, but
+	# cannot be counted as an original Blender export.
+	var invalid := MeshInstance3D.new()
+	invalid.mesh = Vexillum._cloth_mesh()
+	_check(not Vexillum.has_original_textile(invalid), "Geometry without a baked textile cannot masquerade as an imported original")
+	invalid.free()
+	_check(not Vexillum.has_original_textile(null), "Missing cloth is rejected without a runtime error")
 	var front = stage._standards[0]
 	_check(front.global_position.is_equal_approx(stage.anchor("i00_standard")), "Opening shot is anchored to the real standard")
 	var rest := Vector3(0,Vexillum.TOP,Vexillum.FRONT)
