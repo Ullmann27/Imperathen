@@ -67,18 +67,56 @@ jobs:
           UNITY_SERVICE_ACCOUNT_SECRET: ${{ secrets.IMPERATHEN_UNITY_SA_SECRET }}
         run: |
           set -euo pipefail
-          if [[ -z "${UNITY_SERVICE_ACCOUNT_ID:-}" || -z "${UNITY_SERVICE_ACCOUNT_SECRET:-}" ]]; then
+          if [[ -z "${UNITY_SERVICE_ACCOUNT_ID:-}" && -z "${UNITY_SERVICE_ACCOUNT_SECRET:-}" ]]; then
             echo "UNITY_SERVICE_ACCOUNT_NOT_YET_CONFIGURED" >> unity-cli-evidence/checks.txt
             exit 0
           fi
+          if [[ -z "${UNITY_SERVICE_ACCOUNT_ID:-}" || -z "${UNITY_SERVICE_ACCOUNT_SECRET:-}" ]]; then
+            echo "UNITY_SERVICE_ACCOUNT_INCOMPLETE" >> unity-cli-evidence/checks.txt
+            exit 1
+          fi
           export PATH="$HOME/.local/bin:$PATH"
-          if unity auth status > "$RUNNER_TEMP/unity-account-status-private.txt" 2>&1; then
+          # Unity CLI automatically uses these two environment variables for
+          # service-account authentication; never print token-bearing output.
+          if unity auth status --format json > "$RUNNER_TEMP/unity-account-status-private.json" 2>&1; then
             echo "UNITY_SERVICE_ACCOUNT_AUTHENTICATED" >> unity-cli-evidence/checks.txt
           else
             echo "UNITY_SERVICE_ACCOUNT_AUTH_FAILED" >> unity-cli-evidence/checks.txt
             exit 1
           fi
-          # Never publish authenticated account information, access tokens or environment secrets.
+          # Current Unity CLI 1.0 uses the bare plural group, not the removed
+          # 'unity cloud project list' subcommand (October 2026 change).
+          if unity cloud projects --format json > "$RUNNER_TEMP/unity-cloud-projects-private.json" 2>&1; then
+            echo "UNITY_CLOUD_PROJECT_QUERY_SUCCEEDED" >> unity-cli-evidence/checks.txt
+          else
+            echo "UNITY_CLOUD_PROJECT_QUERY_FAILED" >> unity-cli-evidence/checks.txt
+            exit 1
+          fi
+          python3 - "$RUNNER_TEMP/unity-cloud-projects-private.json" <<'PY'
+          import json, pathlib, sys
+          report = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+          try:
+              root = json.loads(report)
+          except json.JSONDecodeError:
+              raise SystemExit("Unity Cloud did not return valid JSON")
+          if root.get("success") is not True:
+              raise SystemExit("Unity Cloud returned an unsuccessful query")
+          def named(obj):
+              if isinstance(obj, dict):
+                  for key in ("name", "projectName", "displayName"):
+                      if str(obj.get(key, "")).casefold() == "imperathen":
+                          return True
+                  return any(named(value) for value in obj.values())
+              if isinstance(obj, list):
+                  return any(named(value) for value in obj)
+              return False
+          if not named(root.get("data")):
+              raise SystemExit("Expected Unity Cloud project Imperathen was not accessible")
+          with open("unity-cli-evidence/checks.txt", "a", encoding="utf-8") as file:
+              file.write("UNITY_CLOUD_IMPERATHEN_PROJECT_VISIBLE\n")
+          PY
+          # The raw response and authentication details remain in runner temp,
+          # are never printed and are never uploaded as an artifact.
       - name: Keep only sanitized CLI evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
