@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 2,
+  "version": 4,
   "tasks": [
     {
       "id": "K101",
@@ -18,14 +18,14 @@
     {
       "id": "K102",
       "owner": "Kimi",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "4f109b9853f7fa1213ed2ed548d421dca3da39d4",
       "run_id": "46016053212",
       "scope": [
         "prototype/tests/roman_menu_test.gd"
       ],
       "access": "read",
-      "note": "33 offline tests passed; MAX JSON live job 140563627074 submitted and in progress at verification. Provider completion unconfirmed."
+      "note": "Run 46016053212/job 140563627074: HTTP 504 after 62.2s, no complete answer or accepted UUID. Provider outcome unknown; do not blindly retry."
     },
     {
       "id": "MENU-V2",
@@ -76,6 +76,19 @@
       ],
       "access": "read",
       "note": "Complete answer; independent validation required."
+    },
+    {
+      "id": "D001",
+      "owner": "DeepSeek",
+      "status": "reserved",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/ui/regional_map.gd",
+        "prototype/tests/regional_map_test.gd"
+      ],
+      "access": "read",
+      "note": "New independent regional map review. First authenticated DeepSeek access probe must pass; no code execution or automatic retry."
     }
   ]
 }

@@ -5,7 +5,7 @@ from pathlib import Path, PurePosixPath
 import re
 import sys
 
-OWNERS = {"Kimi","Nemotron","Coordinator","A1","A2","A3","B1","B2","B3","C1","C2","C3"}
+OWNERS = {"Kimi","Nemotron","DeepSeek","Coordinator","A1","A2","A3","B1","B2","B3","C1","C2","C3"}
 STATES = {"queued","reserved","submitted","review_pending","blocked","done"}
 ACTIVE = {"reserved","submitted","review_pending"}
 SHA = re.compile(r"[0-9a-f]{40}")
@@ -44,7 +44,8 @@ def validate(data):
     for i,a in enumerate(edits):
         for b in edits[i+1:]:
             require(not any(overlap(x,y) for x in a["scope"] for y in b["scope"]), "Overlapping active edit leases")
-    require(sum(t["owner"]=="Kimi" and t["status"] in ("reserved","submitted") for t in tasks)<=1,"Only one active Kimi submission")
+    for owner in ("Kimi","DeepSeek"):
+        require(sum(t["owner"]==owner and t["status"] in ("reserved","submitted") for t in tasks)<=1,"Only one active "+owner+" submission")
     return data
 
 def update(data,event):

@@ -1,0 +1,43 @@
+name: NVIDIA DeepSeek independent engineering
+on:
+  push:
+    branches: ['feat/kimi-3d-special-operations-20261127']
+    paths:
+      - 'tools/agent_bridge/deepseek_task.json'
+      - '.github/workflows/deepseek-engineering.yml'
+permissions:
+  contents: read
+concurrency:
+  group: imperathen-deepseek-engineering
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest discover -s tools/agent_bridge -p 'test_deepseek_bridge.py' -v
+      - run: python3 tools/agent_bridge/deepseek_bridge.py --validate-only --output artifacts/deepseek
+  consult:
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify authorized NVIDIA access and produce unexecuted patch
+        timeout-minutes: 22
+        env:
+          NVIDIA_API_KEY: ${{ secrets.IMPERATHEN_ROME_NVIDIA || secrets.IMPERATHEN_NVIDIA || secrets.NVIDIA_API_KEY }}
+        run: python3 tools/agent_bridge/deepseek_bridge.py --output artifacts/deepseek
+      - name: Archive receipts and candidate (no execution or write credentials)
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: deepseek-engineering-${{ github.run_id }}
+          path: artifacts/deepseek/
+          if-no-files-found: warn
+          retention-days: 14
