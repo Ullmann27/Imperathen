@@ -1,0 +1,141 @@
+name: Aeterna original well candidate - headless gates
+on:
+  push:
+    branches: ['fix/aeterna-well-candidate-gates-20261127']
+    paths:
+      - 'prototype/tests/i01_well_asset_contract_test.gd'
+      - '.github/workflows/aeterna-well-candidate-gates.yml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: aeterna-well-candidate-gates
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_ISOLATED_TEST: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Recover actual previously generated Blender artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: aeterna-well-evidence-45989884335
+          run-id: 45989884335
+          github-token: ${{ github.token }}
+          path: recovered-well
+      - name: Validate producer revision, bytes and asset contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/well-candidate
+          git rev-parse HEAD > artifacts/well-candidate/source-commit.txt
+          test "$(cat recovered-well/source-commit.txt)" = "e1a374f6b40ea16801ea2dc616266eba24c314d1"
+          python3 - <<'PY'
+          import hashlib, json, pathlib
+          p = pathlib.Path('recovered-well/generated')
+          m = json.loads((p/'village_well.json').read_text())
+          glb = p/'village_well.glb'
+          assert hashlib.sha256(glb.read_bytes()).hexdigest() == m['sha256']
+          assert glb.stat().st_size == m['bytes']
+          before = json.loads(pathlib.Path('art/visual_benchmark/assets/architecture/village_well.json').read_text())
+          assert before['triangles'] == m['triangles']
+          assert m['mesh_batches'] > before['mesh_batches']
+          assert (p/'village_well.blend').stat().st_size > 1024
+          PY
+          python3 tools/art/validate_interactive_well.py recovered-well/generated/village_well.glb > artifacts/well-candidate/well-validation.json
+          cp recovered-well/generated/village_well.glb prototype/assets/architecture/village_well.glb
+          cp recovered-well/generated/village_well.{glb,blend,json} art/visual_benchmark/assets/architecture/
+          python3 tools/art/validate_visual_assets.py --output artifacts/well-candidate/static-assets.json
+      - name: Install official Godot and verify checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Run real imported model and complete I-01 without rasterizer
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$GITHUB_WORKSPACE/artifacts/well-candidate"
+          export XDG_DATA_HOME="$RUNNER_TEMP/well-candidate-import/data"
+          export XDG_CONFIG_HOME="$RUNNER_TEMP/well-candidate-import/config"
+          export XDG_CACHE_HOME="$RUNNER_TEMP/well-candidate-import/cache"
+          mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME"
+          timeout --kill-after=10s 300s "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee "$out/import.log"
+          run_check() {
+            local name="$1" script="$2" marker="$3"
+            local state
+            state="$(mktemp -d "$RUNNER_TEMP/well-candidate.XXXXXX")"
+            mkdir -p "$state"/{data,config,cache}
+            XDG_DATA_HOME="$state/data" XDG_CONFIG_HOME="$state/config" XDG_CACHE_HOME="$state/cache" timeout --kill-after=10s 240s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script "$script" 2>&1 | tee "$out/$name.log"
+            grep -Fq "$marker" "$out/$name.log"
+          }
+          run_check asset res://tests/i01_well_asset_contract_test.gd I01_WELL_ASSET_PASS
+          run_check flow res://tests/i01_flow_test.gd I01_FLOW_PASS
+      - name: Preserve source-bound candidate evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: well-headless-candidate-${{ github.run_id }}
+          path: artifacts/well-candidate/
+          if-no-files-found: warn
+          retention-days: 30
+  stage-candidate:
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/fix/aeterna-well-candidate-gates-20261127'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@v4
+        with:
+          name: aeterna-well-evidence-45989884335
+          run-id: 45989884335
+          github-token: ${{ github.token }}
+          path: recovered-well
+      - uses: actions/download-artifact@v4
+        with:
+          name: well-headless-candidate-${{ github.run_id }}
+          path: candidate-evidence
+      - name: Stage original assets only as an unapproved candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(cat recovered-well/source-commit.txt)" = "e1a374f6b40ea16801ea2dc616266eba24c314d1"
+          test "$(cat candidate-evidence/source-commit.txt)" = "$GITHUB_SHA"
+          test "$(git ls-remote origin "$GITHUB_REF" | cut -f1)" = "$GITHUB_SHA"
+          grep -Fq I01_WELL_ASSET_PASS candidate-evidence/asset.log
+          grep -Fq I01_FLOW_PASS candidate-evidence/flow.log
+          python3 - <<'PY'
+          import hashlib, json, pathlib
+          p = pathlib.Path('recovered-well/generated')
+          digest = hashlib.sha256((p/'village_well.glb').read_bytes()).hexdigest()
+          assert digest == json.loads((p/'village_well.json').read_text())['sha256']
+          assert digest == json.loads(pathlib.Path('candidate-evidence/well-validation.json').read_text())['sha256']
+          PY
+          cp recovered-well/generated/village_well.{glb,blend,json} art/visual_benchmark/assets/architecture/
+          cp recovered-well/generated/village_well.glb prototype/assets/architecture/village_well.glb
+          python3 tools/art/validate_interactive_well.py prototype/assets/architecture/village_well.glb
+          git add art/visual_benchmark/assets/architecture/village_well.{glb,blend,json} prototype/assets/architecture/village_well.glb
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m "Stage headless-tested original well candidate; visual release gate still pending (CI $GITHUB_RUN_ID)"
+          git push origin HEAD:"$GITHUB_REF"
