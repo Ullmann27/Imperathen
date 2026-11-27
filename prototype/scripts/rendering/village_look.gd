@@ -4,6 +4,7 @@ extends Node3D
 ## lines, navigation, simulation or saved state, in any quality profile.
 
 const SafeVegetation := preload("res://scripts/vegetation/vegetation_safe.gd")
+const RouteFires := preload("res://scripts/rendering/route_fire_lights.gd")
 const PROFILE_DATA = preload("res://assets/quality_profiles.json")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Surfaces = preload("res://scripts/rendering/village_surfaces.gd")
@@ -64,6 +65,7 @@ var _fires: Array[Dictionary] = []
 var _clock := 0.0
 var _fire_budget := 3
 var _flames: MultiMeshInstance3D
+var _route_fires: RouteFires
 
 
 ## Typed copy of look_values.json: "#rrggbb" strings become Colors, the named
@@ -134,6 +136,10 @@ func setup(world: Node3D, target: Environment, sky: ShaderMaterial) -> Direction
 	add_child(_shafts)
 	_build_window_glow()
 	_build_village_fires()
+	_route_fires = RouteFires.new()
+	_route_fires.name = "ValdoraRouteFires"
+	add_child(_route_fires)
+	_route_fires.configure(RouteFires.village_candidates(), profile)
 	apply_season_light(season, sun, environment, sky_material)
 	return sun
 
@@ -207,6 +213,10 @@ static func apply_season_light(index: int, light: DirectionalLight3D, env: Envir
 	light.rotation_degrees = Vector3(preset.sun_angle.x, preset.sun_angle.y, 0)
 	light.light_color = preset.sun
 	light.light_energy = preset.sun_energy
+	if env.has_meta("day_ambient_source"):
+		env.ambient_light_source = int(env.get_meta("day_ambient_source"))
+		env.ambient_light_color = env.get_meta("day_ambient_color")
+		env.ambient_light_sky_contribution = float(env.get_meta("day_ambient_sky"))
 	env.ambient_light_energy = preset.ambient
 	env.fog_density = preset.fog
 	env.fog_height_density = preset.fog_height
@@ -261,7 +271,16 @@ static func apply_solar_time(hours: float, season_index: int, light: Directional
 		elevation = (day - 1.0) * (path.y - path.x) * -15.0
 	var azimuth := lerpf(-105.0, 105.0, clampf(day, 0.0, 1.0))
 	var low := 1.0 - smoothstep(2.0, 24.0, elevation)
-	var darkness := smoothstep(1.0, -7.0, elevation)
+	var darkness := 1.0 - smoothstep(-7.0, 1.0, elevation)
+	if not env.has_meta("day_ambient_source"):
+		env.set_meta("day_ambient_source", int(env.ambient_light_source))
+		env.set_meta("day_ambient_color", env.ambient_light_color)
+		env.set_meta("day_ambient_sky", env.ambient_light_sky_contribution)
+	# Keep a restrained cool reflected-light floor in Compatibility. Very
+	# dark night-sky radiance alone made silhouettes disappear on Android.
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR if darkness > 0.04 else int(env.get_meta("day_ambient_source"))
+	env.ambient_light_color = (env.get_meta("day_ambient_color") as Color).lerp(Color("8095bd"), darkness)
+	env.ambient_light_sky_contribution = lerpf(float(env.get_meta("day_ambient_sky")), 0.22, darkness)
 	var warm: Color = (VALUES.daylight.dawn_sun as Color).lerp(VALUES.daylight.low_sun, smoothstep(1.0, 12.0, elevation)).lerp(preset.sun, smoothstep(12.0, 40.0, elevation))
 	if elevation > 0.0:
 		light.rotation_degrees = Vector3(-maxf(elevation, 1.5), -azimuth, 0)
@@ -273,6 +292,7 @@ static func apply_solar_time(hours: float, season_index: int, light: Directional
 		light.light_color = MOON.color
 		light.light_energy = MOON.energy * darkness
 	env.ambient_light_energy = float(preset.ambient) * lerpf(1.0, float(NIGHT_SKY.ambient_scale), darkness) * lerpf(1.0, .75, low * (1.0 - darkness))
+	env.ambient_light_energy = maxf(env.ambient_light_energy, 0.15 * darkness)
 	var exposure := float(preset.exposure) * lerpf(1.0, float(NIGHT_SKY.exposure_scale), darkness) * lerpf(1.0, 1.12, low * (1.0 - darkness))
 	env.set_meta("look_exposure", exposure)
 	env.tonemap_exposure = exposure
@@ -331,6 +351,8 @@ func _update_window_glow() -> void:
 	var lit := _torches_lit()
 	_flames.visible = lit > 0.0
 	_flames.material_override.set_shader_parameter("lit", lit)
+	if is_instance_valid(_route_fires):
+		_route_fires.set_darkness(night)
 
 
 ## 0 by day, 1 once dusk has fallen: door torches burn from dusk to dawn.
@@ -489,6 +511,8 @@ func apply_quality(next_profile: String) -> void:
 	environment.fog_aerial_perspective = float(look.get("aerial_perspective", .62))
 	environment.ssao_enabled = bool(look.get("ssao", false))
 	_fire_budget = int(look.get("fire_lights", 3))
+	if is_instance_valid(_route_fires):
+		_route_fires.set_quality(profile)
 	_bounce_allowed = bool(look.get("interior_bounce", true))
 	_shafts_allowed = bool(look.get("light_shafts", false))
 	Surfaces.set_profile(profile)
@@ -559,8 +583,10 @@ func _apply_interior(value: float) -> void:
 	# Without the interior lights (low profile) rooms only take half of the warm
 	# ambient shift and no exposure change, so they stay readable.
 	var amount := interior if _bounce_allowed else interior * .5
-	environment.ambient_light_color = interior_ambient if _bounce_allowed else interior_ambient * 2.2
-	environment.ambient_light_sky_contribution = lerpf(1.0, interior_sky_share, amount)
+	var day_colour := interior_ambient if _bounce_allowed else interior_ambient * 2.2
+	var outside_night := Color("8095bd").lerp(interior_ambient, amount)
+	environment.ambient_light_color = day_colour.lerp(outside_night, night)
+	environment.ambient_light_sky_contribution = lerpf(lerpf(1.0, 0.22, night), interior_sky_share, amount)
 	environment.tonemap_exposure = float(environment.get_meta("look_exposure", 1.0)) * lerpf(1.0, interior_exposure, interior if _bounce_allowed else 0.0)
 	_bounce.visible = _bounce_allowed and interior > .01
 	# By night the threshold bounce becomes the hearth and the window only

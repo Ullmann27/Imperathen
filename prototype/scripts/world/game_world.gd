@@ -4,6 +4,7 @@ extends Node3D
 signal action_requested(action: String, payload: Dictionary)
 
 const Art = preload("res://scripts/world/village_art.gd")
+const MeshyWorldProps := preload("res://scripts/visuals/meshy_world_props.gd")
 const Grove = preload("res://scripts/visuals/grove.gd")
 const Origins = preload("res://scripts/strategy/origins.gd")
 const VillageLifeWorld = preload("res://scripts/world/village_life_world.gd")
@@ -1047,6 +1048,10 @@ func _sync_resources() -> void:
 				log_view.position = Vector3(-0.35 + index % 2 * 0.55, 0.22 + index / 2 * 0.32, 0)
 				stock.add_child(log_view)
 				log_view.name = "Log%d" % index
+			var firewood := MeshyWorldProps.instantiate("resource_firewood", 1)
+			if firewood != null:
+				firewood.name = "MeshyFirewood"
+				stock.add_child(firewood)
 			var stock_label := Art.label(stock, "", Vector3(0, 1.55, 0), Color(0.94, 0.84, 0.59), 36)
 			stock_label.name = "StockLabel"
 			_resource_views[identity] = stock
@@ -1055,9 +1060,13 @@ func _sync_resources() -> void:
 		var remaining := int(item.get("amount", 0))
 		var label_view: Label3D = visual.get_node("StockLabel")
 		label_view.text = "Holzvorrat · E\n%d Holz" % remaining if remaining > 0 else "Holzvorrat erschöpft"
+		var pile := visual.get_node_or_null("MeshyFirewood") as Node3D
+		if pile != null:
+			pile.visible = remaining > 0
+			pile.scale = Vector3(1.0, lerpf(0.45,1.0,clampf(float(remaining)/16.0,0.0,1.0)), 1.0)
 		for index in range(4):
 			var log_node: Node3D = visual.get_node("Log%d" % index)
-			log_node.visible = remaining > index * 4
+			log_node.visible = remaining > index * 4 and pile == null
 	for identity: Variant in _resource_views.keys():
 		if not seen.has(identity):
 			_resource_views[identity].queue_free()

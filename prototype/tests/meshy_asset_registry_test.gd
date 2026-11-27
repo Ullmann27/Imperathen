@@ -69,5 +69,15 @@ func run() -> void:
 	check(str(heavy.get("shield", "")) == "gear_roman_cavalry_oval_shield", "heavy cavalry shield remains modular")
 	check(Loadouts.resource_asset("wood") == "resource_firewood", "wood economy key resolves to the firewood visual")
 	check(Loadouts.resource_asset("iron_ore") == "resource_iron_ore", "iron economy key resolves to the ore visual")
+	var catalog: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://assets/world/city_catalog.json"))
+	var families := {}
+	for family: Dictionary in catalog.get("families", []):
+		families[str(family.id)] = family
+	for group: String in ["equipment", "props", "characters", "mounts"]:
+		var folder := "res://assets/meshy/" + group
+		for filename: String in ResourceLoader.list_directory(folder):
+			if filename.ends_with("_0.glb"):
+				var family_id := "meshy/" + group + "/" + filename.trim_suffix("_0.glb")
+				check(families.has(family_id), "Existing Meshy derivative is reachable in model library: " + family_id)
 	print("MESHY_ASSET_REGISTRY ", checks, " checks, ", failed, " failed")
 	quit(1 if failed else 0)

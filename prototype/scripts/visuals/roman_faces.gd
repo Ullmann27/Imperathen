@@ -1,6 +1,8 @@
 extends RefCounted
 ## Close-up shape controls baked on the existing frontier models in Blender.
 ## Each mesh stays shared. Only instance weights change, once per materialization.
+const ResidentLook := preload("res://scripts/visuals/resident_look.gd")
+const PARENTS := ["julia", "silvanus"]
 const FEATURES := [&"CastJaw",&"CastBridge",&"CastCheeks",&"CastHair"]
 
 # The original photographic atlas and its roughness/normal maps stay attached.
@@ -9,6 +11,18 @@ const COMPLEXIONS := [Color(1.00,.99,.97),Color(.96,.92,.89),Color(.91,.86,.80),
 
 
 static func apply(model: Node3D, seed_value: int, look: Dictionary = {}) -> void:
+	var parent := str(look.get("id", "")) in PARENTS
+	# Only activate the complete identity layer on a real exported identity
+	# model. Legacy rigs have neither these geometry controls nor these pieces.
+	if parent:
+		var identity_piece := "IdentityHairBound" if look.get("kind") == "civilian_woman" else "IdentityBeard"
+		if model.find_child(identity_piece, true, false) is MeshInstance3D:
+			var tier := 0
+			var source_path := model.scene_file_path.get_file().get_basename()
+			if source_path.get_slice_count("_") > 1:
+				tier = clampi(int(source_path.get_slice("_", source_path.get_slice_count("_") - 1)), 0, 3)
+			ResidentLook.apply(model, look, tier)
+			return
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
 	var traits := PackedFloat32Array()
@@ -32,7 +46,11 @@ static func apply(model: Node3D, seed_value: int, look: Dictionary = {}) -> void
 		if part.name == &"HeroBody" and part.mesh.get_surface_count() > 0:
 			var surface := part.mesh.surface_get_material(0) as StandardMaterial3D
 			if part.find_blend_shape_by_name(&"CastJaw") >= 0 or (not look.is_empty() and surface != null and surface.resource_name == "FrontierSkin"):
-				_apply_skin(part, skin_tint)
+				var finish: ShaderMaterial = ResidentLook.parent_skin(look, surface) if parent else null
+				if finish:
+					part.material_override = finish
+				else:
+					_apply_skin(part, skin_tint)
 		for index in FEATURES.size():
 			var slot := part.find_blend_shape_by_name(FEATURES[index])
 			if slot >= 0:

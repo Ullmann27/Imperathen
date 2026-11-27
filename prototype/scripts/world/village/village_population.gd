@@ -5,6 +5,7 @@ const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Person = preload("res://scripts/visuals/village_person.gd")
 const Art = preload("res://scripts/world/village_art.gd")
 const Behavior = preload("res://scripts/domain/npc_behavior.gd")
+const Activities := preload("res://scripts/visuals/resident_activity.gd")
 const LocalNavigation = preload("res://scripts/world/village/village_local_navigation.gd")
 const SOCIAL_DISTANCE := 1.3
 const SOCIAL_RANGE := 5.0
@@ -128,6 +129,8 @@ func set_active(enabled: bool) -> void:
 	if not active:
 		for actor: Node3D in actors.values():
 			actor.get_node("Figure").drive(0.0)
+			actor.get_node("Figure").clear_gaze_target()
+			actor.get_node("Figure").set_resident_prop("")
 			actor.get_node("Nameplate").hide()
 
 func advance_to(time: float, force := false) -> void:
@@ -184,6 +187,8 @@ func advance_to(time: float, force := false) -> void:
 			actor.rotation.y = rotate_toward(actor.rotation.y,atan2(-travelled.x,-travelled.z),minf(elapsed,.1)*3.5)
 		var figure: Node3D = actor.get_node("Figure")
 		figure.drive(actual_speed)
+		figure.set_resident_prop("")
+		figure.clear_gaze_target()
 		if pose.activity == "work" and actual_speed < .05:
 			figure.keep_working()
 		actor.set_meta("activity","march" if actual_speed > .05 else pose.activity)
@@ -210,7 +215,7 @@ func _advance_behavior(elapsed: float) -> void:
 		var social_arrived := false
 		if activity in ["work","weather_pause"]:
 			goal = 0.0
-		elif activity in ["socialize","explore"]:
+		elif activity in ["socialize","explore","errand"]:
 			goal = total
 			var peer: String = intent.partner
 			if activity == "socialize" and not peer.is_empty():
@@ -244,7 +249,7 @@ func _advance_behavior(elapsed: float) -> void:
 		var motion := Vector3.ZERO
 		# After a social detour, safely rejoin the original corridor before
 		# resuming work, exploration or patrol. Never snap to the route.
-		if local_mode.is_empty() and total > .01 and activity in ["work","weather_pause","explore","socialize","patrol","flee"]:
+		if local_mode.is_empty() and total > .01 and activity in ["work","weather_pause","explore","socialize","patrol","flee","errand"]:
 			var rejoin := to_global(_route_point(route,distance))
 			var cached: Dictionary = _local_paths.get(id,{})
 			if cached.get("mode","") == "rejoin":
@@ -268,7 +273,7 @@ func _advance_behavior(elapsed: float) -> void:
 				# authored corridor or through a wall.
 				if (actor.position+motion-_route_point(route,distance)).length() > .72:
 					motion = Vector3.ZERO
-		elif activity not in ["rest","greet","space","alert","assist","absent"] and total > .01:
+		elif activity not in ["rest","meal","greet","space","alert","assist","absent"] and total > .01:
 			_local_paths.erase(id)
 			motion = (target-actor.position).limit_length(speed*elapsed)
 			motion.y = 0.0
@@ -294,6 +299,17 @@ func _advance_behavior(elapsed: float) -> void:
 		_route_distances[id] = _route_projection(route,actor.position)
 		var figure: Node3D = actor.get_node("Figure")
 		figure.drive(actual_speed)
+		figure.set_resident_prop(Activities.village_prop(activity))
+		# Only physically present, mutually interested neighbors receive a
+		# persistent gaze target. The legacy routine above has no intent.
+		var social_peer: Node3D
+		if activity == "socialize" and social_arrived and actual_speed < .05:
+			var peer_id := str(intent.get("partner",""))
+			var peer_actor: Node3D = actors.get(peer_id)
+			var other: Dictionary = _behavior_state.village.behavior.people.get(peer_id,{})
+			if is_instance_valid(peer_actor) and other.get("activity","") == "socialize" and other.get("partner","") == id:
+				social_peer = peer_actor.get_node_or_null("Figure") as Node3D
+		figure.set_gaze_target(social_peer)
 		if actual_speed > .05:
 			actor.rotation.y = rotate_toward(actor.rotation.y,atan2(-travelled.x,-travelled.z),minf(elapsed,.1)*3.5)
 		elif activity in ["greet","space","socialize","alert","assist"]:

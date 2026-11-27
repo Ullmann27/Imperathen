@@ -4,6 +4,7 @@ extends Node3D
 const Life = preload("res://scripts/domain/city_life.gd")
 const Population = preload("res://scripts/domain/city_population.gd")
 const Figure = preload("res://scripts/visuals/village_person.gd")
+const Activities := preload("res://scripts/visuals/resident_activity.gd")
 const LIMITS := {"low": 3, "balanced": 6, "high": 9, "very_high": 12}
 const ENTER_RANGE := 48.0
 const LEAVE_RANGE := 58.0
@@ -16,6 +17,7 @@ var camera: Camera3D
 var profile := "balanced"
 var actors := {}
 var _cursor := 0
+var _social_clock := 0.0
 var _capsule := CapsuleShape3D.new()
 
 func setup(source: Life, player: CharacterBody3D, view: Camera3D, quality: String) -> void:
@@ -28,6 +30,8 @@ func setup(source: Life, player: CharacterBody3D, view: Camera3D, quality: Strin
 
 func _physics_process(delta: float) -> void:
 	if life == null or not is_instance_valid(observer):
+		return
+	if delta <= 0.0:
 		return
 	var now := int(life.state.t)
 	for person: int in actors.keys():
@@ -49,9 +53,16 @@ func _physics_process(delta: float) -> void:
 		actor.move_and_slide()
 		var movement := Vector2(actor.position.x - before.x, actor.position.z - before.z)
 		var figure: Figure = actor.get_node("Figure")
-		figure.drive(movement.length() / delta)
+		var actual_speed := movement.length() / delta
+		figure.drive(actual_speed)
+		actor.set_meta("actual_speed",actual_speed)
 		if movement.length_squared() > 0.000001:
 			figure.rotation.y = rotate_toward(figure.rotation.y, atan2(-movement.x, -movement.y), delta * 4.5)
+	_social_clock += delta
+	var refresh_contact := _social_clock >= 0.20
+	if refresh_contact:
+		_social_clock = 0.0
+	_update_visible_activities(now,delta,refresh_contact)
 	# Bound the search independently of total city size and spread model
 	# instantiation across physics frames.
 	var count: int = life.state.residents.size()
@@ -86,6 +97,57 @@ func _physics_process(delta: float) -> void:
 			if replace >= 0:
 				_retire(replace)
 			break
+
+func _update_visible_activities(now: int, delta: float, refresh_contact: bool) -> void:
+	# Only the bounded pool of actual streamed residents is considered.
+	# A buyer can address a vendor even though the vendor's domain with
+	# field is not reciprocal; never invent a partner from proximity alone.
+	var requests := {}
+	for person: int in actors:
+		var resident: Dictionary = life.state.residents[person]
+		var peer := Activities.partner_id(resident,now)
+		if peer >= 0 and actors.has(peer):
+			requests[person] = peer
+			if not requests.has(peer):
+				requests[peer] = person
+	for person: int in actors:
+		var resident: Dictionary = life.state.residents[person]
+		var actor: CharacterBody3D = actors[person]
+		var figure: Figure = actor.get_node("Figure")
+		var moving := float(actor.get_meta("actual_speed",0.0)) > 0.06 or life.is_walking(person,now)
+		figure.set_resident_prop(Activities.city_prop(resident,now))
+		var other := int(requests.get(person,-1))
+		var partner: Figure
+		if not moving and other >= 0 and actors.has(other):
+			var other_body: CharacterBody3D = actors[other]
+			if float(other_body.get_meta("actual_speed",0.0)) <= 0.06 and not life.is_walking(other,now) and actor.global_position.distance_to(other_body.global_position) <= 2.8:
+				var other_figure := other_body.get_node("Figure") as Figure
+				var start := figure.gaze_anchor()
+				var finish := other_figure.gaze_anchor()
+				if start.is_finite() and finish.is_finite():
+					if refresh_contact or int(actor.get_meta("contact_peer",-1)) != other:
+						var ray := PhysicsRayQueryParameters3D.create(start,finish,1,[actor.get_rid(),other_body.get_rid()])
+						actor.set_meta("contact_clear",get_world_3d().direct_space_state.intersect_ray(ray).is_empty())
+						actor.set_meta("contact_peer",other)
+					if bool(actor.get_meta("contact_clear",false)):
+						partner = other_figure
+		if moving or other < 0 or not actors.has(other):
+			actor.set_meta("contact_peer",-1)
+		figure.set_gaze_target(partner)
+		var talking := is_instance_valid(partner) and Activities.speaker(person,other,now) == person
+		if bool(actor.get_meta("activity_speaking",false)) and not talking:
+			figure.set_conversation_focus(false)
+		actor.set_meta("activity_speaking",talking)
+		if is_instance_valid(partner):
+			var offset := partner.global_position - figure.global_position
+			if Vector2(offset.x,offset.z).length() > .12:
+				figure.rotation.y = rotate_toward(figure.rotation.y,atan2(-offset.x,-offset.z),delta*2.8)
+			if talking:
+				figure.keep_talking()
+		elif not moving and Activities.standing_work(resident,now):
+			figure.keep_working()
+		actor.set_meta("visible_activity","walking" if moving else str(resident.act))
+
 
 func _target(person: int, now: int) -> Vector3:
 	if not life.is_walking(person, now):

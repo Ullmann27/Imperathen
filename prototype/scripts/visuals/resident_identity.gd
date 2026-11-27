@@ -88,16 +88,18 @@ const PEOPLE := {
 		"wear": {"tunic": "oatmeal", "belt": "leather", "IdentityApron": "leather", "IdentityVeil": "faded_madder"},
 		"veil_long": 0.0},
 	"julia": {"kind": "civilian_woman", "role": "Mutter des Jungen (Bäuerin)", "eyes": "hazel", "look_age": 36, "height": 0.97,
-		"face": {"ID_NoseLength": -0.4, "ID_NoseWidth": -0.2, "ID_Lips": 0.55, "ID_Cheeks": 0.35, "ID_Brow": -0.8,
-			"ID_Chin": -0.25, "ID_JawWidth": -0.35, "ID_Cheekbones": 0.45},
-		"build": {"ID_Heavy": 0.0, "ID_Shoulders": -0.45},
-		"skin": {"tone": "olive", "sun": 0.4, "flush": 0.35}, "hair": {"style": "bound", "color": "dark_brown", "grey": 0.03},
-		"wear": {"tunic": "woad", "belt": "dark_leather", "IdentityMantle": "faded_madder", "IdentityEarrings": "bronze"}},
+		"face": {"ID_NoseLength": -0.45, "ID_NoseWidth": -0.35, "ID_NoseBridge": -0.35, "ID_Lips": 0.35, "ID_Cheeks": 0.45, "ID_Brow": -0.85,
+			"ID_Chin": -0.6, "ID_JawWidth": -0.75, "ID_Cheekbones": 0.35, "ID_FaceLength": -0.4, "ID_EyeDepth": 0.15},
+		"build": {"ID_Heavy": 0.05, "ID_Shoulders": -0.75},
+		"face_age": 0.40, "skin": {"tone": "olive", "sun": 0.4, "flush": 0.35, "age": 0.48, "brow": 0.35, "stubble": 0.0},
+		"hair": {"style": "bound", "color": "dark_brown", "grey": 0.06, "keys": {"HAIR_Volume": -0.2}},
+		"wear": {"tunic": "woad", "belt": "dark_leather", "IdentityMantle": "faded_madder", "IdentityEarrings": "bronze"}, "hem": 0.25},
 	"silvanus": {"kind": "civilian_man", "role": "Vater des Jungen (Lastenträger)", "look_age": 40, "height": 1.03,
-		"face": {"ID_JawWidth": 0.7, "ID_Chin": 0.5, "ID_NoseBridge": 0.7, "ID_NoseLength": 0.3, "ID_Brow": 0.5, "ID_Cheeks": -0.3},
-		"build": {"ID_Heavy": 0.15, "ID_Shoulders": 0.9},
-		"skin": {"tone": "olive", "sun": 0.7, "flush": 0.25}, "hair": {"style": "short", "color": "dark_brown", "grey": 0.08},
-		"beard": {"color": "dark_brown", "full": 0.2, "grey": 0.12},
+		"face": {"ID_JawWidth": 0.85, "ID_Chin": 0.45, "ID_NoseBridge": 0.65, "ID_NoseLength": 0.35, "ID_Brow": 0.6, "ID_Cheeks": -0.4, "ID_EyeDepth": 0.4, "ID_FaceLength": 0.4},
+		"build": {"ID_Heavy": 0.25, "ID_Shoulders": 0.9},
+		"face_age": 0.52, "skin": {"tone": "olive", "sun": 0.75, "flush": 0.25, "age": 0.60, "stubble": 0.65},
+		"hair": {"style": "short", "color": "dark_brown", "grey": 0.16, "keys": {"HAIR_Short": 0.65, "HAIR_Recede": 0.25}},
+		"beard": {"color": "dark_brown", "full": 0.45, "grey": 0.18},
 		"wear": {"tunic": "walnut", "belt": "dark_leather"}},
 	"valeria": {"kind": "civilian_woman", "role": "Wächterin", "eyes": "grey_blue", "look_age": 29, "height": 1.03,
 		"face": {"ID_Brow": 0.3, "ID_Cheekbones": 0.6, "ID_Chin": 0.5, "ID_NoseBridge": 0.3, "ID_Lips": -0.3},
@@ -296,7 +298,7 @@ static func _finish(id: String, kind: String, entry: Dictionary) -> Dictionary:
 	var age_weight := clampf((float(years) - 28.0) / 34.0, 0.0, 1.0)
 	var result := {"id": id, "kind": kind, "role": str(entry.get("role", "")), "look_age": years,
 		"height": float(entry.get("height", 1.0)), "face": _face(id, entry.get("face", {}), 0.35)}
-	result.face["ID_Age"] = age_weight
+	result.face["ID_Age"] = clampf(float(entry.get("face_age", age_weight)), 0.0, 1.0)
 	var build: Dictionary = entry.get("build", {})
 	result["build"] = {"ID_Heavy": float(build.get("ID_Heavy", 0.0)), "ID_Shoulders": float(build.get("ID_Shoulders", 0.0))}
 	var skin: Dictionary = entry.get("skin", {})
@@ -304,7 +306,7 @@ static func _finish(id: String, kind: String, entry: Dictionary) -> Dictionary:
 	var beard: Dictionary = entry.get("beard", {})
 	var hair_colour := _colour(str(hair.get("color", "dark_brown")), HAIR)
 	result["skin"] = {"tone": TONES.get(str(skin.get("tone", "light")), Color.WHITE), "sun": float(skin.get("sun", 0.4)),
-		"flush": float(skin.get("flush", 0.3)), "age": age_weight, "stubble": float(skin.get("stubble", 0.0)),
+		"flush": float(skin.get("flush", 0.3)), "age": clampf(float(skin.get("age", age_weight)), 0.0, 1.0), "stubble": float(skin.get("stubble", 0.0)),
 		"scalp": float(skin.get("scalp", 0.0)), "brow": float(skin.get("brow", 0.55 if kind != "civilian_woman" else 0.4)),
 		"brow_color": hair_colour.darkened(0.25), "stubble_color": hair_colour.darkened(0.35)}
 	if not beard.is_empty():

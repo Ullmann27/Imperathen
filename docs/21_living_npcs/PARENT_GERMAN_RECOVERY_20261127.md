@@ -1,0 +1,8 @@
+# Julia, Silvanus and German dialogue recovery
+Baseline PR #153: 7d2792e26a59e5f1403ec8f4e19436956b4bbec6.
+The current frontier adult models derive from the same young hero anatomy; the existing resident bridge only applies four Cast morphs and colours. This is insufficient for recognizably mature, distinct parents. The old base renders are under art/frontier_people/runtime_review; they are not current named-parent captures.
+- Retain authored ages (36/40), character IDs, original rigs and story; adjust Julia's jaw, brow, face length and shoulders, Silvanus's mature face and grooming.
+- Enable the existing age/crease skin material for both real legacy parent models. If and only if an identity export actually supplies its dedicated pieces, apply the existing full identity controls. No generated GLB is committed by this source change.
+- Read-only CI renders baseline/current and a disposable rebuild of the female/male Blender sources through the production Godot actors, including live Valdora and studio close/full/talk/walk. The rebuild is an unaccepted candidate, not a release asset. Inspect geometry, hair, hands, clothing, movement, and texture before replacing anything.
+- German dialogue: exact text AND speaker lookup; inventory all installed indexed mission bands and alternate slice lines. The coverage audit reports missing/wrong recordings, checksum, existing transcription and viseme errors without pretending absent recordings are present.
+- Compile fix for resident_activity_test committed separately. Combat, formation, companion contact, render-light accounting and complete Fold7 acceptance remain open. No merge or release approved.

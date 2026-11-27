@@ -2,8 +2,8 @@
   "format": "imperathen-city-catalog",
   "version": 1,
   "source": "Existing runtime GLBs; one station per model family.",
-  "family_count": 44,
-  "binary_count": 97,
+  "family_count": 59,
+  "binary_count": 140,
   "families": [
     {
       "id": "architecture/atrium_house",
@@ -698,6 +698,283 @@
         {
           "level": 3,
           "path": "res://assets/landscape/pine_far.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/equipment/gear_roman_cavalry_lance",
+      "name": "Roman cavalry lance",
+      "category": "equipment",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/equipment/gear_roman_cavalry_lance_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/equipment/gear_roman_cavalry_lance_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/equipment/gear_roman_cavalry_lance_2.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/equipment/gear_roman_cavalry_oval_shield",
+      "name": "Roman cavalry oval shield",
+      "category": "equipment",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/equipment/gear_roman_cavalry_oval_shield_0.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/equipment/gear_roman_scutum",
+      "name": "Roman legionary scutum",
+      "category": "equipment",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/equipment/gear_roman_scutum_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/equipment/gear_roman_scutum_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/equipment/gear_roman_scutum_2.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/equipment/gear_sling",
+      "name": "Ancient leather sling",
+      "category": "equipment",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/equipment/gear_sling_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/equipment/gear_sling_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/equipment/gear_sling_2.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/equipment/weap_germanic_spear",
+      "name": "Germanic spear",
+      "category": "equipment",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/equipment/weap_germanic_spear_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/equipment/weap_germanic_spear_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/equipment/weap_germanic_spear_2.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/equipment/weap_roman_gladius_pompeii",
+      "name": "Roman gladius Pompeii",
+      "category": "equipment",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/equipment/weap_roman_gladius_pompeii_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/equipment/weap_roman_gladius_pompeii_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/equipment/weap_roman_gladius_pompeii_2.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/equipment/weap_roman_pilum",
+      "name": "Roman pilum",
+      "category": "equipment",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/equipment/weap_roman_pilum_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/equipment/weap_roman_pilum_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/equipment/weap_roman_pilum_2.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/equipment/weap_roman_pugio",
+      "name": "Roman pugio",
+      "category": "equipment",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/equipment/weap_roman_pugio_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/equipment/weap_roman_pugio_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/equipment/weap_roman_pugio_2.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/equipment/weap_roman_spatha",
+      "name": "Roman cavalry spatha",
+      "category": "equipment",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/equipment/weap_roman_spatha_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/equipment/weap_roman_spatha_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/equipment/weap_roman_spatha_2.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/mounts/mount_legacy_bay_horse",
+      "name": "Braunes Pferd · Meshy Original",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/mounts/mount_legacy_bay_horse_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/mounts/mount_legacy_bay_horse_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/mounts/mount_legacy_bay_horse_2.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/props/resource_clay",
+      "name": "Clay deposit",
+      "category": "nature",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/props/resource_clay_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/props/resource_clay_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/props/resource_clay_2.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/props/resource_copper_ore",
+      "name": "Copper ore outcrop",
+      "category": "nature",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/props/resource_copper_ore_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/props/resource_copper_ore_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/props/resource_copper_ore_2.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/props/resource_firewood",
+      "name": "Firewood and timber pile",
+      "category": "nature",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/props/resource_firewood_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/props/resource_firewood_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/props/resource_firewood_2.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/props/resource_iron_ore",
+      "name": "Iron ore outcrop",
+      "category": "nature",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/props/resource_iron_ore_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/props/resource_iron_ore_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/props/resource_iron_ore_2.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/props/resource_limestone",
+      "name": "Limestone outcrop",
+      "category": "nature",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/props/resource_limestone_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/props/resource_limestone_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/props/resource_limestone_2.glb"
         }
       ]
     }

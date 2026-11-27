@@ -54,6 +54,11 @@ jobs:
           if [[ ! -x "$ANDROID_HOME/build-tools/35.0.1/apksigner" || ! -f "$ANDROID_HOME/platforms/android-35/android.jar" ]]; then
             "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'build-tools;35.0.1' 'platforms;android-35'
           fi
+      - name: Recover existing Meshy assets for the review catalog (read only)
+        env:
+          MESHY_API_KEY: ${{ secrets.IMPERATHEN_MESHY_API_KEY || secrets.MESHY_API_KEY }}
+        run: |
+          python3 tools/art/recover_meshy_sources.py --report artifacts/qa/meshy-recovery.json
       - name: Produce actual original city and separate physical collision GLBs
         shell: bash
         run: |
@@ -142,7 +147,7 @@ jobs:
         run: |
           set -euo pipefail
           IMPERATHEN_FULL_ASSET_ACCEPTANCE=1 python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going \
-            --only import vegetation vegetation_safe valdora_house_family village_landscape opening_flow opening_voice i01_flow roman_menu city_trade city_market_bridge city_inventory_ui \
+            --only import route_fire resident_activity meshy_registry vegetation vegetation_safe valdora_house_family village_landscape opening_flow opening_voice i01_flow roman_menu city_trade city_market_bridge city_inventory_ui \
               city_support city_viva_props city_exploration_detail npc_physical_conversation city_watch i03_flow \
               touch_controls fold7_graphics_policy main_scene \
               combat_actions melee_tracks melee_core melee_visual_contact melee_feedback melee_camera melee_weapons \

@@ -11,8 +11,8 @@ const SocialMemory = preload("res://scripts/domain/npc_social_memory.gd")
 const VERSION := 1
 const STEP := 0.5
 const PLAYER_CENTER_HEIGHT := 0.9
-const ACTIVITIES := ["work", "patrol", "explore", "socialize", "rest", "weather_pause", "greet", "yield", "space", "flee", "alert", "assist", "absent"]
-const REASONS := ["daily_work", "watch", "curiosity", "company", "shared_interest", "familiar_neighbor", "tired", "injured", "rain", "familiar_face", "friendly", "distrust", "personal_space", "danger", "alarm", "help_injured", "unavailable"]
+const ACTIVITIES := ["work", "patrol", "explore", "socialize", "rest", "meal", "errand", "weather_pause", "greet", "yield", "space", "flee", "alert", "assist", "absent"]
+const REASONS := ["daily_work", "watch", "curiosity", "company", "shared_interest", "familiar_neighbor", "tired", "injured", "rain", "familiar_face", "friendly", "distrust", "personal_space", "danger", "alarm", "help_injured", "unavailable", "midday_break", "household_errand", "evening_rest"]
 const INTEREST_LABELS := {
 	"craft":"Handwerk und gute Werkzeuge", "trade":"Handel und verlässliche Kunden",
 	"community":"Nachbarn und Neuigkeiten", "family":"Familie und Haushalt",
@@ -22,7 +22,7 @@ const INTEREST_LABELS := {
 const ACTIVITY_LABELS := {
 	"work":"Arbeitet", "patrol":"Hält auf dem Weg Wache",
 	"explore":"Sieht sich in der Nachbarschaft um", "socialize":"Sucht Gesellschaft",
-	"rest":"Legt eine Pause ein", "weather_pause":"Unterbricht die Arbeit im Regen",
+	"rest":"Legt eine Pause ein", "meal":"Hält eine Mahlzeitpause", "errand":"Erledigt Besorgungen mit einem Korb", "weather_pause":"Unterbricht die Arbeit im Regen",
 	"greet":"Wendet sich dir zu", "yield":"Macht auf dem Weg Platz",
 	"space":"Bittet um mehr Abstand", "flee":"Weicht der Gefahr aus",
 	"alert":"Beobachtet die Gefahr", "assist":"Hält Hilfe für Verletzte bereit",
@@ -35,6 +35,9 @@ const EXPLANATIONS := {
 	"familiar_neighbor":"Gemeinsame Gespräche machen diesen Nachbarn vertraut.",
 	"injured":"Die Verletzung lässt gerade keine Arbeit zu.", "rain":"Die nasse Witterung unterbricht die Tätigkeit draußen.",
 	"familiar_face":"Eure bisherigen Begegnungen bleiben in Erinnerung.", "friendly":"Deine Nähe bietet Gelegenheit für einen kurzen Gruß.",
+	"midday_break":"Zur Mittagszeit ist eine kurze Essenspause vorgesehen.",
+	"household_errand":"Nach der Arbeit stehen persönliche Besorgungen an.",
+	"evening_rest":"Die Arbeit lässt nach und die Bewohner ruhen sich aus.",
 	"distrust":"Eure bisherigen Begegnungen verlangen Vorsicht.", "personal_space":"Du stehst sehr nahe im persönlichen Bereich.",
 	"danger":"Ein lebender Angreifer ist in der Nähe.", "alarm":"Der Alarm verlangt Aufmerksamkeit.",
 	"help_injured":"Beim Überfall werden Verletzte versorgt.", "unavailable":"Tod oder Truppendienst nimmt diese Person aus dem zivilen Alltag."
@@ -203,10 +206,10 @@ static func _decide_all(data: Dictionary, delta: float, sight_check: Callable = 
 			_choose(person,"absent","unavailable",now)
 			continue
 		var old_activity: String = person.activity
-		if old_activity in ["work","patrol","explore"]:
+		if old_activity in ["work","patrol","explore","errand"]:
 			person.fatigue = minf(100.0,float(person.fatigue)+delta*(0.10 if old_activity == "work" else 0.075))
 		else:
-			person.fatigue = maxf(0.0,float(person.fatigue)-delta*(0.75 if old_activity == "rest" else 0.08))
+			person.fatigue = maxf(0.0,float(person.fatigue)-delta*(0.75 if old_activity in ["rest","meal"] else 0.08))
 		person.social_need = clampf(float(person.social_need)+delta*(-0.9 if old_activity in ["socialize","greet"] and _has_company(id,perceived,previous,player_at,available,sight_check,visibility_cache,float(player_ground[1])) else 0.075),0.0,100.0)
 		person.stress = maxf(0.0,float(person.stress)-delta*0.45)
 		var at := Vector2(float(perceived.position[0]),float(perceived.position[2]))
@@ -258,6 +261,18 @@ static func _decide_all(data: Dictionary, delta: float, sight_check: Callable = 
 			"socialize":float(person.social_need)*0.82+float(traits.sociability)*16.0+(8.0 if not partner.is_empty() else 0.0),
 			"rest":float(person.fatigue)*1.05+8.0,
 			"explore":24.0+float(traits.curiosity)*25.0-float(person.fatigue)*0.2}
+		# Keep fixed story actors and emergency decisions on their existing
+		# contract. Only ambient mobile residents receive daily-life choices.
+		var daily := daily_window(data,id) if catalog[id].ambient and traits.mobile and not guard_duty else ""
+		if daily == "meal":
+			scores["meal"] = 94.0 + float(person.fatigue)*0.12
+		elif daily == "errand":
+			scores["errand"] = 65.0 + float(traits.curiosity)*18.0
+			scores.work -= 12.0
+		elif daily == "evening":
+			scores.work -= 35.0
+			scores.rest += 42.0
+			scores.socialize += 22.0
 		if guard_duty:
 			scores.work += 18.0
 		if not catalog[id].ambient and str(actual.get("assignment","idle")) != "idle":
@@ -271,7 +286,7 @@ static func _decide_all(data: Dictionary, delta: float, sight_check: Callable = 
 		# A small hysteresis prevents work/rest oscillation near equal utilities.
 		if scores.has(old_activity) and float(scores[selected]) < float(scores[old_activity])+7.0 and now-float(person.since) < 20.0:
 			selected = old_activity
-		var reason: String = {"work":"daily_work","socialize":"company","rest":"tired","explore":"curiosity"}[selected]
+		var reason: String = {"work":"daily_work","socialize":"company","rest":"evening_rest" if daily == "evening" else "tired","explore":"curiosity","meal":"midday_break","errand":"household_errand"}[selected]
 		if selected == "work" and guard_duty:
 			selected = "patrol"
 			reason = "watch"
@@ -282,6 +297,23 @@ static func _decide_all(data: Dictionary, delta: float, sight_check: Callable = 
 			elif not partner.is_empty() and profile(partner).interest == traits.interest:
 				reason = "shared_interest"
 		_choose(person,selected,reason,now)
+
+
+## Deterministic per-resident timing spread on the authoritative calendar.
+## No calendar means the previous needs-only behavior (legacy save).
+static func daily_window(data: Dictionary, id: String) -> String:
+	var clock: Variant = data.get("calendar",{}).get("clock",{})
+	if not clock is Dictionary or not clock.has("second"):
+		return ""
+	var hour := float(clock.second)/3600.0
+	var stagger := float(_seed(id)%45)/60.0
+	if hour >= 11.5+stagger and hour < 12.25+stagger:
+		return "meal"
+	if hour >= 15.5+stagger and hour < 16.75+stagger:
+		return "errand"
+	if hour >= 18.0+stagger or hour < 5.0:
+		return "evening"
+	return ""
 
 
 static func _nearby_partner(id: String, person: Dictionary, traits: Dictionary, people: Dictionary, social: Dictionary = {}, available: Dictionary = {}, sight_check: Callable = Callable(), visibility_cache: Variant = null) -> String:

@@ -11,6 +11,7 @@ const CityCharacterFinish := preload("res://scripts/rendering/city_character_det
 const CityMarketSignage := preload("res://scripts/world/city_market_signage.gd")
 const CityMarketBridge := preload("res://scripts/world/city_market_bridge.gd")
 const Daylight := preload("res://scripts/rendering/village_look.gd")
+const RouteFires := preload("res://scripts/rendering/route_fire_lights.gd")
 const BakeryDisplay := preload("res://scripts/world/city_bakery_display.gd")
 const ResidentView := preload("res://scripts/world/city_resident_view.gd")
 const CityLifeSession := preload("res://scripts/world/city_life_session.gd")
@@ -61,6 +62,9 @@ var _bakery_business := -1
 var street_watch: WatchPatrol
 var _visit_elapsed := 0.0
 var _market_sun: DirectionalLight3D
+var _route_fires: RouteFires
+var _free_solar_hour := 12.0
+var _day_button: Button
 var _solar_minute := -1
 var _wait_button: Button
 # Only explicit, non-persistent QA callers may attach the new city economy.
@@ -131,6 +135,11 @@ func _ready() -> void:
 		quarter.install(profile, _add_static_colliders)
 	_build_player()
 	_build_camera()
+	if city_available:
+		_route_fires = RouteFires.new()
+		_route_fires.name = "CityRouteFires"
+		add_child(_route_fires)
+		_route_fires.configure(RouteFires.city_candidates(), profile)
 	add_child(training)
 	if campaign == null:
 		_build_ambient_people()
@@ -454,6 +463,13 @@ func _read_catalog() -> void:
 	for value: Variant in data.get("families",[]):
 		if value is Dictionary and value.get("tiers") is Array and not value.tiers.is_empty():
 			catalog.append(value)
+	var recovery_path := "res://assets/meshy/recovery_catalog.json"
+	if FileAccess.file_exists(recovery_path):
+		var recovered: Variant = JSON.parse_string(FileAccess.get_file_as_string(recovery_path))
+		if recovered is Dictionary and recovered.get("format","") == "imperathen-meshy-recovery-catalog":
+			for row: Variant in recovered.get("families",[]):
+				if row is Dictionary and row.get("rig_status","") == "review_only_not_an_npc" and row.get("tiers") is Array and not row.tiers.is_empty() and not _catalog_path(row).is_empty():
+					catalog.append(row)
 	var label := Label3D.new()
 	label.text = "MODELLSAMMLUNG\n%d vorhandene Modellfamilien" % catalog.size()
 	label.font_size = 50
@@ -536,6 +552,8 @@ func _add_catalog_model(index: int,packed: PackedScene) -> void:
 	label.text = str(catalog[index].name)
 	if str(catalog[index].get("scale_status",""))=="unverified_source_units":
 		label.text += "\nMaßstab ungeprüft"
+	if catalog[index].get("rig_status","") == "review_only_not_an_npc":
+		label.text += "\nOriginalmodell · noch kein NPC"
 	label.font_size = 34
 	label.pixel_size = 0.008
 	label.position = Vector3(0,maxf(2,bounds.size.y+model.position.y+0.4),0)
@@ -576,6 +594,8 @@ func _build_ui() -> void:
 		_toolbar.add_child(_button("Stadt",func(): teleport(State.SPAWN)))
 		_toolbar.add_child(_button("Modelle",func(): teleport(CATALOG_ORIGIN+Vector3(0,0.92,12))))
 		_toolbar.add_child(_button("Übung",func(): teleport(Vector3(0,0.92,-5.8))))
+		_day_button = _button("Zeit: 12 Uhr", _advance_free_light)
+
 	else:
 		_toolbar.add_child(_button("Zurück ins Dorf", _request_leave))
 		_wait_button = _button("1 Std. warten", _wait_at_market)
@@ -621,6 +641,7 @@ func _build_ui() -> void:
 	column.add_child(description)
 	column.add_child(_button("Weiter erkunden",func(): set_paused(false)))
 	if campaign == null:
+		column.add_child(_day_button)
 		if is_instance_valid(get_node_or_null("FlavianAmphitheatre")):
 			var monument_button := _button("Zum Kolosseum", func():
 				if go_to_colosseum():
@@ -836,10 +857,28 @@ func _update_market_daylight() -> void:
 	if minute == _solar_minute:
 		return
 	_solar_minute = minute
-	Daylight.apply_solar_time(float(clock.second) / 3600.0, Calendar.season_index(clock.jdn),
-		_market_sun, camera.environment, null)
+	set_solar_hour(float(clock.second) / 3600.0, Calendar.season_index(clock.jdn))
 	_safe.get_node("Heading").text = "STADTMARKT · %s · %02d:%02d" % [
 		Calendar.format_date(clock.jdn), floori(float(clock.second) / 3600.0), minute % 60]
+
+
+## Free-city QA uses the same solar path as the authoritative campaign.
+## This changes presentation only, never the campaign clock.
+func set_solar_hour(hours: float, season: int = 0) -> void:
+	var darkness := Daylight.apply_solar_time(fposmod(hours, 24.0), clampi(season,0,3),
+		_market_sun, camera.environment, null)
+	if is_instance_valid(_route_fires):
+		_route_fires.set_darkness(darkness)
+
+func _advance_free_light() -> void:
+	if campaign != null:
+		return
+	_free_solar_hour = fposmod(_free_solar_hour + 3.0, 24.0)
+	set_solar_hour(_free_solar_hour, Calendar.season_index(world_jdn))
+	if is_instance_valid(_day_button):
+		_day_button.text = "Zeit: %02d Uhr" % int(_free_solar_hour)
+	if paused:
+		set_paused(false)
 
 
 func _place_camera(delta: float) -> void:

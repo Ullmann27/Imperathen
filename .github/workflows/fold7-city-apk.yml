@@ -62,6 +62,11 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y --no-install-recommends blender python3-numpy python3-scipy python3-pil ffmpeg
           blender -b --python-expr "import numpy; print('BLENDER_NUMPY_OK',numpy.__version__)"
+      - name: Recover existing Meshy assets for the review catalog (read only)
+        env:
+          MESHY_API_KEY: ${{ secrets.IMPERATHEN_MESHY_API_KEY || secrets.MESHY_API_KEY }}
+        run: |
+          python3 tools/art/recover_meshy_sources.py --report artifacts/city/meshy-recovery.json
       - name: Build original city, forum geometry and grounded NPC layout
         shell: bash
         run: |

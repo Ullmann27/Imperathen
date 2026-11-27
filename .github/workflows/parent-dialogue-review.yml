@@ -1,0 +1,128 @@
+name: Parent anatomy and German dialogue evidence
+on:
+  pull_request:
+    paths:
+      - 'prototype/scripts/visuals/resident_identity.gd'
+      - 'prototype/scripts/visuals/resident_look.gd'
+      - 'prototype/scripts/visuals/roman_faces.gd'
+      - 'prototype/scripts/audio/**'
+      - 'prototype/assets/audio/voice/**'
+      - 'prototype/assets/story/missions/**'
+      - 'prototype/tests/parent_visual_contract_test.gd'
+      - 'prototype/tests/resident_live_review.gd'
+      - 'prototype/tests/tools/export_dialogue_lines.gd'
+      - 'art/village_characters/build_resident_identity.py'
+      - 'tools/audio/audit_german_dialogue.py'
+      - '.github/workflows/parent-dialogue-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: parent-dialogue-review-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  render:
+    name: Actual parent render (${{ matrix.variant }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [baseline, current, rebuilt]
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ matrix.variant == 'baseline' && '7d2792e26a59e5f1403ec8f4e19436956b4bbec6' || github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Install renderer and verify Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends xvfb xauth libgl1-mesa-dri blender python3-numpy python3-scipy
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Rebuild real identity geometry in disposable candidate checkout
+        if: matrix.variant == 'rebuilt'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/parent
+          blender --version | tee artifacts/parent/blender-version.txt
+          blender -b -t 2 --python-exit-code 1 -P art/village_characters/build_resident_identity.py -- --kinds civilian_man civilian_woman 2>&1 | tee artifacts/parent/blender.log
+          cp art/village_characters/resident_identity_report.json artifacts/parent/
+      - name: Import actual models and capture both parents
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$GITHUB_WORKSPACE/artifacts/parent"
+          mkdir -p "$out"/{studio,live} "$RUNNER_TEMP/parent-state"/{data,config,cache}
+          export XDG_DATA_HOME="$RUNNER_TEMP/parent-state/data"
+          export XDG_CONFIG_HOME="$RUNNER_TEMP/parent-state/config"
+          export XDG_CACHE_HOME="$RUNNER_TEMP/parent-state/cache"
+          git rev-parse HEAD > "$out/commit.txt"
+          "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee "$out/import.log"
+          status=0
+          for profile in high very_high; do
+            timeout --kill-after=10s 180s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --resolution 1280x720 --fixed-fps 60 --script res://tests/resident_identity_review.gd -- "$out/studio" "$profile" close,talk,full,walk julia,silvanus 2>&1 | tee "$out/studio-$profile.log" || status=1
+          done
+          timeout --kill-after=10s 240s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --resolution 1280x720 --fixed-fps 60 --script res://tests/resident_live_review.gd -- "$out/live" high,very_high julia,silvanus 2>&1 | tee "$out/live.log" || status=1
+          python3 - "$out" <<'PY'
+          import json, pathlib, sys
+          root = pathlib.Path(sys.argv[1])
+          for file in root.glob("studio/*.json"):
+              data = json.loads(file.read_text())
+              assert not data["errors"] and len(data["captures"]) == 8, file
+              for entry in data["captures"]:
+                  assert (file.parent / entry["file"]).stat().st_size > 0
+          assert len(list(root.glob("studio/*.json"))) == 2
+          file = root / "live/live-review.json"
+          data = json.loads(file.read_text())
+          assert not data["errors"] and len(data["captures"]) == 4
+          for entry in data["captures"]:
+              assert (file.parent / entry["file"]).stat().st_size > 0
+          PY
+          exit "$status"
+      - name: Verify applied parent anatomy and material
+        if: matrix.variant != 'baseline'
+        shell: bash
+        run: |
+          set -euo pipefail
+          export IMPERATHEN_REQUIRE_PARENT_MORPHS="${{ matrix.variant == 'rebuilt' && '1' || '0' }}"
+          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/parent_visual_contract_test.gd 2>&1 | tee artifacts/parent/parent-contract.log
+          grep -Fq PARENT_VISUAL_CONTRACT_PASS artifacts/parent/parent-contract.log
+      - name: Export exact German coverage
+        if: matrix.variant == 'current'
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$GODOT_BIN" --headless --path prototype --script res://tests/tools/export_dialogue_lines.gd -- "$GITHUB_WORKSPACE/artifacts/parent/authored-dialogue.json"
+          python3 tools/audio/audit_german_dialogue.py artifacts/parent/authored-dialogue.json --report artifacts/parent/german-dialogue-coverage.json
+      - name: Preserve regenerated models for review, never auto-install
+        if: matrix.variant == 'rebuilt'
+        shell: bash
+        run: |
+          mkdir -p artifacts/parent/generated
+          cp prototype/assets/characters/frontier_civilian_{man,woman}_*.glb artifacts/parent/generated/
+      - name: Upload actual framebuffers and reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: parent-review-${{ matrix.variant }}-${{ github.run_id }}
+          path: artifacts/parent/
+          retention-days: 30
+          if-no-files-found: error

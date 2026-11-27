@@ -8,6 +8,8 @@ const Person = preload("res://scripts/visuals/village_person.gd")
 const Art = preload("res://scripts/world/village_art.gd")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Behavior = preload("res://scripts/domain/npc_behavior.gd")
+const Activities := preload("res://scripts/visuals/resident_activity.gd")
+const WorkplaceStock := preload("res://scripts/visuals/workplace_stock.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Strike = preload("res://scripts/domain/raider_strike.gd")
 const COUNCIL := "res://assets/politics/council/valdora_council.glb"
@@ -211,6 +213,10 @@ func _update_attention(delta: float) -> void:
 	for id: String in actors:
 		var actor: Node3D = actors[id]
 		if not actor.visible or actor.get_meta("companion_controlled",false):
+			var inactive_figure := actor.get_node_or_null("Figure")
+			if is_instance_valid(inactive_figure):
+				inactive_figure.clear_gaze_target()
+				inactive_figure.set_resident_prop("")
 			_set_social_pose(actor,false)
 			continue
 		var intent := Behavior.view(state,id)
@@ -220,6 +226,19 @@ func _update_attention(delta: float) -> void:
 		var activity: String = str(intent.activity)
 		var contact := _physical_social_contact(id,actor,intent,player)
 		_set_social_pose(actor,not contact.is_empty())
+		var figure := actor.get_node_or_null("Figure") as Node3D
+		if is_instance_valid(figure):
+			var partner: Node3D
+			if not contact.is_empty():
+				var peer_id := str(intent.get("partner", ""))
+				if peer_id == "player" and parent != null:
+					partner = parent.get_node_or_null("Player/Figure") as Node3D
+				else:
+					var body := _physical_partner(peer_id)
+					if is_instance_valid(body):
+						partner = body.get_node_or_null("Figure") as Node3D
+			figure.set_gaze_target(partner)
+			figure.set_resident_prop(Activities.village_prop(activity))
 		var target := player
 		if activity in ["greet","socialize"]:
 			# A social decision is not a conversation until the two *visible*
@@ -330,6 +349,7 @@ func _set_social_pose(actor: Node3D, allowed: bool) -> void:
 	else:
 		# Stop a social pose if the conversation partner moved, turned a
 		# corner, died or became hidden. Animation does not play through walls.
+		figure.clear_gaze_target()
 		figure.reset_motion()
 
 
@@ -374,6 +394,9 @@ func sync_state(data: Dictionary, profile: String) -> void:
 		item.damaged.visible = int(place.condition) < 100
 		item.repaired.visible = int(place.condition) == 100
 		item.label.modulate = Color("d8e2a8") if place.working else Color("e1c493")
+		WorkplaceStock.sync(item.get("stock_piles",[]),str(place.id),economy.get("stocks",{}))
+		item.node.set_meta("production_active",bool(place.working))
+		item.node.set_meta("production_cycle",float(place.cycle_progress))
 	_sync_raiders()
 
 
@@ -481,11 +504,12 @@ func _create_workplace(id: String, at: Vector2) -> void:
 	broken.rotation.z = -.28
 	# The workplace apron is flush with the path, including its collision.
 	Art.box(node, Vector3(4.5,.12,2.9), Vector3(0,-.06,0), _stone, true)
-	if id == "woodcamp":
+	var stock_piles := WorkplaceStock.build(node,id)
+	if id == "woodcamp" and stock_piles.is_empty():
 		for index in 6:
 			var log := Art.cylinder(node, .17, 2.5, Vector3(-1.2 + (index % 3) * .4, .3 + (index / 3) * .3, .5), _wood)
 			log.rotation.z = PI / 2
-	elif id == "quarry":
+	elif id == "quarry" and stock_piles.is_empty():
 		for index in 5:
 			Art.box(node, Vector3(.7,.5,.8), Vector3(-1.5 + (index % 3), .3, -.6 + (index / 3)), _stone)
 	elif id == "trade":
@@ -496,7 +520,7 @@ func _create_workplace(id: String, at: Vector2) -> void:
 		Art.box(repaired, Vector3(2.0,.14,1.0), Vector3(0,1.45,0), _wood)
 	var label := Art.label(node, Economy.WORKPLACES[id].name, Vector3(0,3.35,0), Color("e6d4aa"), 27)
 	label.visibility_range_end = 20
-	workplaces[id] = {"node":node, "label":label, "damaged":damaged, "repaired":repaired}
+	workplaces[id] = {"node":node, "label":label, "damaged":damaged, "repaired":repaired, "stock_piles":stock_piles}
 
 
 func _sync_actor(id: String, caption: String, profession: String, person: Dictionary) -> void:
@@ -699,6 +723,8 @@ func set_active(value: bool) -> void:
 	for actor: Node3D in actors.values():
 		if not active:
 			_set_social_pose(actor,false)
+			actor.get_node("Figure").clear_gaze_target()
+			actor.get_node("Figure").set_resident_prop("")
 			actor.get_node("Figure").drive(0.0)
 	if not active:
 		for actor: Node3D in raiders.values():

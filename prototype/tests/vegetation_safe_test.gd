@@ -248,6 +248,31 @@ func _run() -> void:
 	game.world.prepare_cinematic_camera()
 	await _shot("game-well")
 	var camera := game.world.get_node("WorldCamera") as Camera3D
+	if graphical:
+		# The actual playable village, same camera/geometry for day and night.
+		for frame in 3:
+			await physics_frame
+		var fire = game.world.look._route_fires
+		_check(is_instance_valid(fire) and not fire.sites.is_empty(),"Real village contains grounded roadside fire sites")
+		if is_instance_valid(fire) and not fire.sites.is_empty():
+			var nearest: Vector3 = fire.sites[0]
+			for site: Vector3 in fire.sites:
+				if site.distance_squared_to(Vector3(0,0,-10)) < nearest.distance_squared_to(Vector3(0,0,-10)):
+					nearest = site
+			camera.global_position = nearest + Vector3(-2.1,1.8,5.5)
+			camera.look_at(nearest + Vector3(0,0.9,-4))
+			var old_hour: float = game.world.look.time_of_day
+			game.world.look.set_time_of_day(13.0)
+			await _shot("game-lane-day")
+			game.world.look.set_time_of_day(22.5)
+			fire._process(0.25)
+			var burning := 0
+			for light: OmniLight3D in fire._pool:
+				if light.visible and light.light_energy > 0.0:
+					burning += 1
+			_check(burning > 0 and burning <= 4,"Real roadside flames illuminate the night within mobile light budget")
+			await _shot("game-lane-night")
+			game.world.look.set_time_of_day(old_hour)
 	camera.global_position = Vector3(-12,1.7,50)
 	camera.look_at(Vector3(-16,.5,80))
 	var counts := []

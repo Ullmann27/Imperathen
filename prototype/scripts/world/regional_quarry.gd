@@ -3,6 +3,7 @@ extends RefCounted
 ## waypoint stays clear on the natural ground in front of the excavation.
 
 const Footpath = preload("res://scripts/world/regional_footpath.gd")
+const MeshyWorldProps = preload("res://scripts/visuals/meshy_world_props.gd")
 const SITE_NAME := "OldQuarry"
 const COLLISION_NAME := "QuarryStructures"
 const VISUAL_PATH := "res://assets/world/road_landmarks/old_quarry.glb"
@@ -32,6 +33,14 @@ static func add_site(sector: Node3D, sector_size: float, surface_height: Callabl
 	var front := approach_direction()
 	site.rotation.y = atan2(-front.y, front.x)
 	site.add_child(visual_scene.instantiate())
+	# The original quarry remains the worksite; the exact Meshy limestone
+	# formation becomes visible at its side, with no new resource credit.
+	var limestone := MeshyWorldProps.instantiate("resource_limestone", 1)
+	if limestone != null:
+		limestone.name = "MeshyLimestone"
+		limestone.position = Vector3(0,0,2.6)
+		limestone.scale = Vector3.ONE * 0.72
+		site.add_child(limestone)
 	sector.add_child(site)
 
 

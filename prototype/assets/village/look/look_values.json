@@ -2,67 +2,382 @@
   "schema_version": 1,
   "about": "Valdora look values read by scripts/rendering/village_look.gd and tests/village_look_review.gd. Shared with the render-profile study: renderer and engine switches stay in quality_profiles.json, colours and energies live here. Colours are sRGB hex; angles in degrees; sun_angle is [pitch, yaw] of the DirectionalLight (yaw -38 puts the sun in the south-west, -Z is north).",
   "renderer_verified": "gl_compatibility 4.7.2: ACES/AgX/Filmic, exposure, adjustments, glow, sky/BG ambient, exponential/depth/height/aerial fog and the directional soft-shadow filter change pixels; SSAO, shadow_blur, light_angular_distance (PCSS), fog_sun_scatter and volumetric fog do not.",
-  "tonemap": {"mode": "aces", "white": 6.0},
-  "fog": {"aerial_perspective": 0.5, "sky_affect": 0.08, "sun_scatter": 0.18, "height": 1.2},
-  "glow": {"intensity": 0.55, "strength": 0.9, "bloom": 0.035, "hdr_threshold": 1.05},
-  "grade": {"about": "Optional 17^3 split-tone LUT applied after tonemapping (Environment.adjustment_color_correction): offsets added to shadows (weight (1-luma)^2) and highlights (weight luma^2).",
-    "split_tone": false, "shadows": [-0.012, 0.002, 0.022], "highlights": [0.022, 0.008, -0.02]},
-  "ssao": {"about": "Used where quality_profiles.json look.ssao is true.", "radius": 1.2, "intensity": 2.2, "power": 1.6, "detail": 0.5, "light_affect": 0.15},
+  "tonemap": {
+    "mode": "aces",
+    "white": 6
+  },
+  "fog": {
+    "aerial_perspective": 0.5,
+    "sky_affect": 0.08,
+    "sun_scatter": 0.18,
+    "height": 1.2
+  },
+  "glow": {
+    "intensity": 0.55,
+    "strength": 0.9,
+    "bloom": 0.035,
+    "hdr_threshold": 1.05
+  },
+  "grade": {
+    "about": "Optional 17^3 split-tone LUT applied after tonemapping (Environment.adjustment_color_correction): offsets added to shadows (weight (1-luma)^2) and highlights (weight luma^2).",
+    "split_tone": false,
+    "shadows": [
+      -0.012,
+      0.002,
+      0.022
+    ],
+    "highlights": [
+      0.022,
+      0.008,
+      -0.02
+    ]
+  },
+  "ssao": {
+    "about": "Used where quality_profiles.json look.ssao is true.",
+    "radius": 1.2,
+    "intensity": 2.2,
+    "power": 1.6,
+    "detail": 0.5,
+    "light_affect": 0.15
+  },
   "seasons": [
-    {"name": "spring", "sun_angle": [-29, -38], "sun": "#ffdcb0", "sun_energy": 2.0, "ambient": 0.52, "exposure": 0.88,
-     "fog": 0.0019, "fog_height": 0.006, "zenith": "#3a73ab", "horizon": "#a9c2cc", "clouds": "#f3ebdc", "haze": "#ffcf96",
-     "ground": "#4d4f33", "coverage": 0.43},
-    {"name": "summer", "sun_angle": [-34, -31], "sun": "#ffd6a0", "sun_energy": 2.2, "ambient": 0.48, "exposure": 0.86,
-     "fog": 0.0023, "fog_height": 0.008, "zenith": "#467eae", "horizon": "#bccad0", "clouds": "#f4e6cf", "haze": "#ffc584",
-     "ground": "#5a5232", "coverage": 0.30},
-    {"name": "autumn", "sun_angle": [-24, -47], "sun": "#f2ddc4", "sun_energy": 1.25, "ambient": 0.66, "exposure": 0.95,
-     "fog": 0.0048, "fog_height": 0.02, "zenith": "#66808f", "horizon": "#a9b2b1", "clouds": "#c3c9c4", "haze": "#e6cfae",
-     "ground": "#443f30", "coverage": 0.86},
-    {"name": "winter", "sun_angle": [-19, -39], "sun": "#f6e6d2", "sun_energy": 1.45, "ambient": 0.62, "exposure": 0.92,
-     "fog": 0.0036, "fog_height": 0.015, "zenith": "#5f84a0", "horizon": "#b4c5cd", "clouds": "#dde2df", "haze": "#f2d6b4",
-     "ground": "#56585a", "coverage": 0.61}
+    {
+      "name": "spring",
+      "sun_angle": [
+        -29,
+        -38
+      ],
+      "sun": "#ffdcb0",
+      "sun_energy": 2,
+      "ambient": 0.52,
+      "exposure": 0.88,
+      "fog": 0.0019,
+      "fog_height": 0.006,
+      "zenith": "#3a73ab",
+      "horizon": "#a9c2cc",
+      "clouds": "#f3ebdc",
+      "haze": "#ffcf96",
+      "ground": "#4d4f33",
+      "coverage": 0.43
+    },
+    {
+      "name": "summer",
+      "sun_angle": [
+        -34,
+        -31
+      ],
+      "sun": "#ffd6a0",
+      "sun_energy": 2.2,
+      "ambient": 0.48,
+      "exposure": 0.86,
+      "fog": 0.0023,
+      "fog_height": 0.008,
+      "zenith": "#467eae",
+      "horizon": "#bccad0",
+      "clouds": "#f4e6cf",
+      "haze": "#ffc584",
+      "ground": "#5a5232",
+      "coverage": 0.3
+    },
+    {
+      "name": "autumn",
+      "sun_angle": [
+        -24,
+        -47
+      ],
+      "sun": "#f2ddc4",
+      "sun_energy": 1.25,
+      "ambient": 0.66,
+      "exposure": 0.95,
+      "fog": 0.0048,
+      "fog_height": 0.02,
+      "zenith": "#66808f",
+      "horizon": "#a9b2b1",
+      "clouds": "#c3c9c4",
+      "haze": "#e6cfae",
+      "ground": "#443f30",
+      "coverage": 0.86
+    },
+    {
+      "name": "winter",
+      "sun_angle": [
+        -19,
+        -39
+      ],
+      "sun": "#f6e6d2",
+      "sun_energy": 1.45,
+      "ambient": 0.62,
+      "exposure": 0.92,
+      "fog": 0.0036,
+      "fog_height": 0.015,
+      "zenith": "#5f84a0",
+      "horizon": "#b4c5cd",
+      "clouds": "#dde2df",
+      "haze": "#f2d6b4",
+      "ground": "#56585a",
+      "coverage": 0.61
+    }
   ],
   "daylight": {
     "about": "Per season [sunrise, sunset, noon elevation] in local solar hours/degrees for about 45.6 N.",
-    "path": [[6.3, 18.5, 50.0], [5.3, 19.6, 64.0], [6.6, 17.4, 36.0], [7.6, 16.4, 22.0]],
-    "twilight_zenith": "#2c4775", "twilight_horizon": "#e8a070", "twilight_haze": "#ff8c4a", "twilight_clouds": "#f2b48a",
-    "dawn_sun": "#ff8a46", "low_sun": "#ffc58e"
+    "path": [
+      [
+        6.3,
+        18.5,
+        50
+      ],
+      [
+        5.3,
+        19.6,
+        64
+      ],
+      [
+        6.6,
+        17.4,
+        36
+      ],
+      [
+        7.6,
+        16.4,
+        22
+      ]
+    ],
+    "twilight_zenith": "#2c4775",
+    "twilight_horizon": "#e8a070",
+    "twilight_haze": "#ff8c4a",
+    "twilight_clouds": "#f2b48a",
+    "dawn_sun": "#ff8a46",
+    "low_sun": "#ffc58e"
   },
-  "night": {"zenith": "#070d1a", "horizon": "#1a2638", "clouds": "#262d3a", "haze": "#3d4a66", "ground": "#0e1014",
-    "moon": "#9fb4e6", "moon_energy": 0.14, "moon_angle": [-48, 150], "ambient_scale": 0.22, "exposure_scale": 1.7},
+  "night": {
+    "zenith": "#101a30",
+    "horizon": "#293c56",
+    "clouds": "#262d3a",
+    "haze": "#3d4a66",
+    "ground": "#171b22",
+    "moon": "#9fb4e6",
+    "moon_energy": 0.16,
+    "moon_angle": [
+      -48,
+      150
+    ],
+    "ambient_scale": 0.28,
+    "exposure_scale": 1.85
+  },
   "weather": {
-    "clear": {"coverage": -1.0, "sun": 1.0, "ambient": 1.0, "fog": 1.0, "height": 1.0, "grey": 0.0},
-    "overcast": {"coverage": 0.9, "sun": 0.35, "ambient": 1.25, "fog": 1.8, "height": 1.4, "grey": 0.45},
-    "rain": {"coverage": 1.0, "sun": 0.18, "ambient": 1.12, "fog": 2.6, "height": 2.2, "grey": 0.6},
-    "mist": {"coverage": 0.7, "sun": 0.55, "ambient": 1.15, "fog": 4.0, "height": 3.5, "grey": 0.3}
+    "clear": {
+      "coverage": -1,
+      "sun": 1,
+      "ambient": 1,
+      "fog": 1,
+      "height": 1,
+      "grey": 0
+    },
+    "overcast": {
+      "coverage": 0.9,
+      "sun": 0.35,
+      "ambient": 1.25,
+      "fog": 1.8,
+      "height": 1.4,
+      "grey": 0.45
+    },
+    "rain": {
+      "coverage": 1,
+      "sun": 0.18,
+      "ambient": 1.12,
+      "fog": 2.6,
+      "height": 2.2,
+      "grey": 0.6
+    },
+    "mist": {
+      "coverage": 0.7,
+      "sun": 0.55,
+      "ambient": 1.15,
+      "fog": 4,
+      "height": 3.5,
+      "grey": 0.3
+    }
   },
-  "weather_grey": {"day": "#9aa3a6", "night": "#1c222b"},
+  "weather_grey": {
+    "day": "#9aa3a6",
+    "night": "#1c222b"
+  },
   "fire": {
     "about": "colour, energy, range in metres, flicker depth",
-    "candle": ["#ffb066", 0.55, 2.6, 0.10], "torch": ["#ff9a48", 1.6, 7.0, 0.16], "hearth": ["#ff8a3c", 2.2, 5.0, 0.20]
+    "candle": [
+      "#ffb066",
+      0.55,
+      2.6,
+      0.1
+    ],
+    "torch": [
+      "#ff9a48",
+      1.6,
+      7,
+      0.16
+    ],
+    "hearth": [
+      "#ff8a3c",
+      2.2,
+      5,
+      0.2
+    ]
   },
   "village_fires": {
     "about": "Fire sources placed in Valdora. forge: the smith's hearth (world metres), glows all day at day_share of its energy. sconces: a torch in an iron bracket at the front corner of the listed homes, above the stone quoins and clear of door and shutters (house-local metres, outer wall face z 2.5), lit from dusk (night above lit_from) to dawn. Lights are unshadowed; quality_profiles.json look.fire_lights caps how many of the nearest burn as real lights (flames always show), and they fade out between fade_start and fade_end metres from the camera.",
-    "forge": {"at": [34.15, 1.15, -29.0], "kind": "hearth", "day_share": 0.55},
-    "sconce_local": [2.84, 1.98, 2.5], "sconce_light_offset": [0.0, 0.32, 0.22], "flame_size": [0.17, 0.30],
-    "sconce_homes": ["baker_home", "south_baker_home", "south_weaver_home", "carpenter_home", "weaver_home", "charcoal_home", "elder_home", "scribe_home", "farmer_home", "grain_home", "cooper_home", "guard_home", "smith_home", "cloth_home", "wagon_home"],
-    "lit_from": 0.18, "fade_start": 34.0, "fade_end": 46.0
+    "forge": {
+      "at": [
+        34.15,
+        1.15,
+        -29
+      ],
+      "kind": "hearth",
+      "day_share": 0.55
+    },
+    "sconce_local": [
+      2.84,
+      1.98,
+      2.5
+    ],
+    "sconce_light_offset": [
+      0,
+      0.32,
+      0.22
+    ],
+    "flame_size": [
+      0.17,
+      0.3
+    ],
+    "sconce_homes": [
+      "baker_home",
+      "south_baker_home",
+      "south_weaver_home",
+      "carpenter_home",
+      "weaver_home",
+      "charcoal_home",
+      "elder_home",
+      "scribe_home",
+      "farmer_home",
+      "grain_home",
+      "cooper_home",
+      "guard_home",
+      "smith_home",
+      "cloth_home",
+      "wagon_home"
+    ],
+    "lit_from": 0.18,
+    "fade_start": 34,
+    "fade_end": 46
   },
   "interior": {
     "about": "frontier_house.glb local metres: rear window x -0.35..0.55, y 1.8..2.4 (inner face z -2.17); door and two windows face +z (inner face z 2.17).",
-    "ambient": "#4a433b", "sky_share": 0.28, "exposure": 1.3,
-    "bounce_colour": "#ffc995", "bounce_energy": 2.4, "bounce_range": 3.8, "bounce_local": [0.0, 0.55, 1.55],
-    "window_colour": "#c9dcff", "window_energy": 3.0, "window_range": 3.8, "window_local": [0.1, 2.25, -1.55], "window_pitch": -60.0, "window_angle": 64.0,
-    "openings": [[-0.65, 0.55, 0.45, 2.55], [-2.3, -1.4, 1.65, 2.4], [1.3, 2.2, 1.65, 2.4]],
-    "sunbeam_strength": 0.16, "window_glow_strength": 0.85
+    "ambient": "#4a433b",
+    "sky_share": 0.28,
+    "exposure": 1.3,
+    "bounce_colour": "#ffc995",
+    "bounce_energy": 2.4,
+    "bounce_range": 3.8,
+    "bounce_local": [
+      0,
+      0.55,
+      1.55
+    ],
+    "window_colour": "#c9dcff",
+    "window_energy": 3,
+    "window_range": 3.8,
+    "window_local": [
+      0.1,
+      2.25,
+      -1.55
+    ],
+    "window_pitch": -60,
+    "window_angle": 64,
+    "openings": [
+      [
+        -0.65,
+        0.55,
+        0.45,
+        2.55
+      ],
+      [
+        -2.3,
+        -1.4,
+        1.65,
+        2.4
+      ],
+      [
+        1.3,
+        2.2,
+        1.65,
+        2.4
+      ]
+    ],
+    "sunbeam_strength": 0.16,
+    "window_glow_strength": 0.85
   },
   "cameras": {
     "about": "Fixed look-development shots (tests/village_look_review.gd). start: the game camera right after a new life (I-01 family house, player (-12, 1.29, 11.7)); conversation: a resident (julia first), player 1.35 m away on open floor, camera 1.15 m behind and 0.52 m beside the player at 1.62 m, FOV 44.",
-    "resolutions": [[1280, 720], [1384, 1536]],
-    "profiles": ["balanced", "very_high"],
-    "start_camera_reference": {"origin": [-10.86016, 2.121331, 12.94984], "back": [0.554924, 0.071524, 0.82882], "fov": 54},
-    "path": {"player": [0.9, 0.0, 12.5], "yaw": 0.0, "pitch": 0.24},
-    "overview": {"eye": [31.0, 17.5, 33.0], "target": [-4.0, 1.0, -9.0], "fov": 54},
-    "conversation": {"partners": ["julia", "silvanus", "sextus", "cassia"], "distance": 1.35, "camera_back": 1.15, "camera_side": 0.52, "camera_height": 1.62, "fov": 44}
+    "resolutions": [
+      [
+        1280,
+        720
+      ],
+      [
+        1384,
+        1536
+      ]
+    ],
+    "profiles": [
+      "balanced",
+      "very_high"
+    ],
+    "start_camera_reference": {
+      "origin": [
+        -10.86016,
+        2.121331,
+        12.94984
+      ],
+      "back": [
+        0.554924,
+        0.071524,
+        0.82882
+      ],
+      "fov": 54
+    },
+    "path": {
+      "player": [
+        0.9,
+        0,
+        12.5
+      ],
+      "yaw": 0,
+      "pitch": 0.24
+    },
+    "overview": {
+      "eye": [
+        31,
+        17.5,
+        33
+      ],
+      "target": [
+        -4,
+        1,
+        -9
+      ],
+      "fov": 54
+    },
+    "conversation": {
+      "partners": [
+        "julia",
+        "silvanus",
+        "sextus",
+        "cassia"
+      ],
+      "distance": 1.35,
+      "camera_back": 1.15,
+      "camera_side": 0.52,
+      "camera_height": 1.62,
+      "fov": 44
+    }
   }
 }
