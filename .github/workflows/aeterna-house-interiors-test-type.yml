@@ -1,7 +1,7 @@
 name: Aeterna furnished interiors and forge regression
 on:
   push:
-    branches: ['fix/aeterna-house-interiors-test-type-20261127']
+    branches: ['fix/aeterna-house-interiors-test-type-20261127', 'fix/aeterna-house-window-hit-provenance-20261127']
 permissions:
   contents: read
 jobs:
@@ -43,7 +43,7 @@ jobs:
             local name="$1" marker="$2" state
             state="$(mktemp -d "$RUNNER_TEMP/house-interiors.XXXXXX")"
             mkdir -p "$state"/{data,config,cache}
-            XDG_DATA_HOME="$state/data" XDG_CONFIG_HOME="$state/config" XDG_CACHE_HOME="$state/cache" timeout --kill-after=10s 300s "$GODOT_BIN" --headless --path prototype --script "res://tests/$name.gd" 2>&1 | tee "$out/$name.log"
+            XDG_DATA_HOME="$state/data" XDG_CONFIG_HOME="$state/config" XDG_CACHE_HOME="$state/cache" timeout --kill-after=10s 300s "$GODOT_BIN" --headless --path prototype --script "res://tests/$name.gd" -- "$out/$name.json" 2>&1 | tee "$out/$name.log"
             grep -Fq "$marker" "$out/$name.log"
             grep -Eq 'HOUSE_INTERIORS_RESULT checks=[1-9][0-9]* failures=0' "$out/$name.log"
             if grep -Eq 'SCRIPT ERROR:|^ERROR:' "$out/$name.log"; then exit 1; fi
