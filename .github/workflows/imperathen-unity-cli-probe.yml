@@ -1,0 +1,70 @@
+name: IMPERATHEN Unity CLI connectivity (isolated and read-only)
+on:
+  push:
+    branches:
+      - integration/unity-cli-exploration-20261127
+    paths:
+      - .github/workflows/imperathen-unity-cli-probe.yml
+      - docs/00_governance/UNITY_CLI_ROUTE_20261127.md
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: imperathen-unity-cli-exploration
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      CI: "true"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Fetch official Unity CLI installer; record provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p unity-cli-evidence
+          curl --fail --silent --show-error --location --retry 2 --connect-timeout 20 --max-time 120 \
+            https://public-cdn.cloud.unity3d.com/hub/prod/cli/install.sh \
+            --output "$RUNNER_TEMP/unity-cli-install.sh"
+          test -s "$RUNNER_TEMP/unity-cli-install.sh"
+          sha256sum "$RUNNER_TEMP/unity-cli-install.sh" > unity-cli-evidence/installer-sha256.txt
+          bash -n "$RUNNER_TEMP/unity-cli-install.sh"
+      - name: Install official Unity CLI without signing in or installing an Editor
+        shell: bash
+        run: |
+          set -euo pipefail
+          UNITY_CLI_CHANNEL=beta bash "$RUNNER_TEMP/unity-cli-install.sh"
+          export PATH="$HOME/.local/bin:$PATH"
+          test -x "$HOME/.local/bin/unity"
+          unity --version | tee unity-cli-evidence/version.txt
+          unity --help > unity-cli-evidence/cli-help.txt
+          echo "UNITY_CLI_BINARY_INSTALLED" >> unity-cli-evidence/checks.txt
+      - name: Check tooling readiness without credentials, projects, paid AI calls or uploads
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="$HOME/.local/bin:$PATH"
+          unity auth status > "$RUNNER_TEMP/unity-auth-status.txt" 2>&1 && auth=0 || auth=$?
+          unity editors -i > "$RUNNER_TEMP/unity-editors.txt" 2>&1 && editor=0 || editor=$?
+          printf 'auth_status_exit_code=%s\neditor_list_exit_code=%s\n' "$auth" "$editor" >> unity-cli-evidence/checks.txt
+          if test "$auth" -ne 0; then echo "UNITY_ACCOUNT_NOT_AUTHENTICATED_IN_CI" >> unity-cli-evidence/checks.txt; fi
+          echo "NO_UNITY_EDITOR_INSTALLED_BY_THIS_JOB" >> unity-cli-evidence/checks.txt
+          echo "NO_UNITY_LICENSE_ACCESSED_OR_MODIFIED" >> unity-cli-evidence/checks.txt
+          echo "NO_UNITY_PROJECT_OR_IMPERATHEN_GAME_FILE_MODIFIED" >> unity-cli-evidence/checks.txt
+          echo "NO_CLOUD_AI_GENERATION_REQUESTED" >> unity-cli-evidence/checks.txt
+          cat unity-cli-evidence/checks.txt
+      - name: Keep only sanitized CLI evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-unity-cli-probe-${{ github.run_id }}
+          path: unity-cli-evidence/
+          if-no-files-found: warn
+          retention-days: 7
