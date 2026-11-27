@@ -17,6 +17,7 @@ extends RefCounted
 ## `_pay`; goods only through `_goods`. `audit()` proves both conserve.
 
 const Calendar = preload("res://scripts/domain/world_calendar.gd")
+const LocalWeather := preload("res://scripts/domain/local_weather.gd")
 const Anchors = preload("res://scripts/domain/city_anchors.gd")
 const Streets = preload("res://scripts/domain/city_streets.gd")
 const Population = preload("res://scripts/domain/city_population.gd")
@@ -36,9 +37,8 @@ const WORK_ROLES := ["vendor", "craft"]
 const EARNER_ROLES := ["vendor", "craft", "guard", "porter", "labourer", "patron"]
 const OUTDOOR_LEISURE := ["gossip", "play", "stroll", "beg", "water"]
 const TILL_FLOAT := 400
-const WEATHER := ["clear", "cloudy", "rain"]
-## Chance of rain per three-hour slot by season (spring, summer, autumn, winter), percent.
-const RAIN_CHANCE := [14, 5, 16, 20]
+const WEATHER := ["clear", "cloudy", "rain", "mist", "storm"]
+const WEATHER_SAMPLE_SECONDS := 300
 
 var state: Dictionary = {}
 var index: Dictionary = {}
@@ -139,6 +139,9 @@ func load_state(saved: Variant) -> bool:
 			error = "Die Wohnung eines Haushalts fehlt."
 			return false
 	_rebuild_runtime()
+	# Old saves may still have a three-hour weather appointment. Bring only
+	# that future appointment forward; never alter residents or booked trade.
+	state.sys.weather = mini(int(state.sys.weather), (int(state.t)/WEATHER_SAMPLE_SECONDS+1)*WEATHER_SAMPLE_SECONDS)
 	_push(int(state.sys.day) * KEY + SYS_DAY)
 	_push(int(state.sys.weather) * KEY + SYS_WEATHER)
 	for person in state.residents.size():
@@ -751,7 +754,7 @@ func _decide(person: int, resident: Dictionary, t: int) -> void:
 		if not _go(person, resident, t, "sleep", home, sleep):
 			_wait(person, resident, t, 300)
 		return
-	var raining: bool = state.weather == "rain"
+	var raining: bool = state.weather in ["rain","storm"]
 	var household: Dictionary = state.households[int(resident.hh)]
 	var has_food := int(household.pantry.staple) + int(household.pantry.side) > 0
 	# Real hunger overrides duty: go home and eat when there is food.
@@ -1411,7 +1414,7 @@ func _topic(person: int, resident: Dictionary, other: int, partner: Dictionary, 
 		return "news"
 	if not known:
 		return "introduction"
-	if state.weather == "rain" and roll < 40:
+	if state.weather in ["rain","storm"] and roll < 40:
 		return "weather"
 	if int(resident.job) >= 0 and int(resident.job) == int(partner.job):
 		return "work"
@@ -1550,15 +1553,13 @@ func _nearest_anchor_to(point: Vector3, kinds: Array) -> String:
 # --- weather -----------------------------------------------------------------------
 
 func _weather_tick(t: int) -> void:
-	state.sys.weather = t + 3 * 3600
+	state.sys.weather = (t/WEATHER_SAMPLE_SECONDS+1)*WEATHER_SAMPLE_SECONDS
 	_push(int(state.sys.weather) * KEY + SYS_WEATHER)
 	if state.weather_forced:
 		return
 	var jdn := int(state.origin_jdn) + t / DAY
-	var season := Calendar.season_index(jdn)
-	var roll := Population.mix(int(state.seed), t / (3 * 3600), 131) % 100
-	var kind := "rain" if roll < int(RAIN_CHANCE[season]) else ("cloudy" if roll < int(RAIN_CHANCE[season]) + 30 else "clear")
-	_set_weather(kind, t)
+	var sample_second := (posmod(t,DAY)/WEATHER_SAMPLE_SECONDS)*WEATHER_SAMPLE_SECONDS
+	_set_weather(LocalWeather.city_kind(Calendar.new_clock(jdn,sample_second)),t)
 
 
 ## An external weather system may take over; pass forced = false to return
@@ -1574,7 +1575,7 @@ func _set_weather(kind: String, t: int) -> void:
 		return
 	state.weather = kind
 	var sheltering := 0
-	if kind == "rain":
+	if kind in ["rain","storm"]:
 		for person in state.residents.size():
 			var resident: Dictionary = state.residents[person]
 			if resident.act in OUTDOOR_LEISURE and int(resident.arr) <= t and not Anchors.has_tag(index.anchors[resident.at], "shelter"):

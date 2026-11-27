@@ -476,17 +476,36 @@ func set_conditions(hours: float, sample: Dictionary) -> void:
 	apply_season(season)
 
 
+static func weather_values(sample: Dictionary, kind: String = "clear") -> Dictionary:
+	if sample.is_empty():
+		return WEATHER.get(kind,WEATHER.clear).duplicate()
+	var a: Dictionary = WEATHER.get(str(sample.get("from","clear")),WEATHER.clear)
+	var b: Dictionary = WEATHER.get(str(sample.get("to","clear")),WEATHER.clear)
+	var amount := clampf(float(sample.get("mix",1.0)),0.0,1.0)
+	var values := {}
+	for key: String in ["coverage","sun","ambient","fog","height","grey"]:
+		values[key] = lerpf(float(a[key]),float(b[key]),amount)
+	return values
+
+
+## Apply once after the solar baseline; no accumulation between updates.
+static func apply_city_weather(light: DirectionalLight3D, env: Environment, darkness: float, sample: Dictionary) -> void:
+	var w := weather_values(sample)
+	light.light_energy *= float(w.sun)
+	env.ambient_light_energy = maxf(env.ambient_light_energy*float(w.ambient),.15*darkness)
+	env.fog_density *= float(w.fog)
+	var grey: Color = (VALUES.weather_grey.day as Color).lerp(VALUES.weather_grey.night,darkness)
+	env.fog_light_color = env.fog_light_color.lerp(grey,float(w.grey))
+	if env.sky != null and env.sky.sky_material is ProceduralSkyMaterial:
+		var sky := env.sky.sky_material as ProceduralSkyMaterial
+		sky.sky_top_color = sky.sky_top_color.lerp(grey,float(w.grey))
+		sky.sky_horizon_color = sky.sky_horizon_color.lerp(grey,float(w.grey))
+
+
 func _apply_weather() -> void:
-	var w: Dictionary = WEATHER.get(weather,WEATHER.clear)
-	if not _weather_sample.is_empty():
-		var a: Dictionary = WEATHER.get(str(_weather_sample.get("from","clear")),WEATHER.clear)
-		var b: Dictionary = WEATHER.get(str(_weather_sample.get("to","clear")),WEATHER.clear)
-		var amount := clampf(float(_weather_sample.get("mix",1.0)),0.0,1.0)
-		w = {}
-		for key: String in ["coverage","sun","ambient","fog","height","grey"]:
-			w[key] = lerpf(float(a[key]),float(b[key]),amount)
-	elif weather == "clear":
+	if _weather_sample.is_empty() and weather=="clear":
 		return
+	var w := weather_values(_weather_sample,weather)
 	sun.light_energy *= float(w.sun)
 	environment.ambient_light_energy *= float(w.ambient)
 	# Bad weather must not remove the night visibility floor.

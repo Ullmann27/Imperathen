@@ -1,0 +1,25 @@
+# Open world: real routes, daylight and combat presentation
+
+## Verified starting implementation
+32,000 x 32,000 m planning extent; 250 m sectors; 16,384 sector addresses. Only existing Valdora, Weidenhof and quarry are marked live in the new map. The actual bent track is drawn from Footpath.WAYPOINTS rather than the planning graph's straight links. Other places are marked planned and cannot issue a live route. This is original prototype geography, not archaeological coordinates.
+
+New regular 58 BC game starts at 09:00 in the authoritative calendar with the existing clear first-morning weather. Legacy careers and existing saves are not rewritten. City life had an unrelated 3-hour random weather model: it now reads LocalWeather at aligned 5-minute intervals, preserving manual weather overrides and old city enum values. City lighting also reads the shared weather. City precipitation, wet materials and rain shelter physics still require their own visual acceptance.
+
+## Reference research (27 November 2026)
+- Rockstar official GTA VI map: https://www.rockstargames.com/VI/media/artwork-wallpapers ; GTA Vice City map analysis https://gtadex.net/gta-map-sizes (coordinate extent, not an official playable area).
+- Ghost Recon Wildlands: https://www.ubisoft.com/en-us/games/tom-clancys-ghost-recon-wildlands ; publisher's road-network description https://store.steampowered.com/news/posts/?appids=460930&enddate=1484317005 ; 21 provinces, 11 biomes and resident schedules https://www.gamespot.com/articles/see-ghost-recon-wildlands-massive-open-world-map/1100-6446161/
+- Assassin's Creed Valhalla: https://www.ubisoft.com/en-us/game/assassins-creed/valhalla ; reference for settlement progression, regions and careers.
+- RDR2 ecology: https://www.rockstargames.com/newswire/article/51974aa3a8k847/Wildlife-in-Red-Dead-Redemption-2 ; observed ambient events https://blog.playstation.com/?p=204745
+- Ryse: timing, combo progression, conditional executions https://www.crytek.com/news/crytek-announces-new-multiplayer-mode-and-reveals-a-deeper-look-at-the-combat-system-in--ryse-son-of-rome ; smooth camera control return https://gamesbeat.com/crytek-stayed-true-to-the-vision-of-hair-trigger-combat-in-ryse-son-of-rome-interview/
+- Sniper Elite 3: configurable X-ray camera https://store.steampowered.com/app/238090/Sniper_Elite_3/
+- Historical data: https://itiner-e.org/about (CC BY 4.0); https://www.nature.com/articles/s41597-025-06140-z ; https://pleiades.stoa.org/. Roman roads dataset covers the empire at its later extent, not a verified 58 BC network. Import only dated or separately verified roads; track uncertainty. Valdora remains fictional.
+
+## Production sequence
+1. Physical regional map and route hierarchy: local streets, regional traversable network, strategic atlas. Touch-pan, zoom, actual player marker; no invented access or teleport on selection. Future terrain/road layer should include actual city footprint and graph.
+2. Replace current separate-scene market access with a road that reaches a physically authored Aquileia-region gate; prefetch city chunks and use shared coordinates or a matched portal crossing. Road/fast travel must preserve time, possessions, health, companions, return location and era. Current market connection is a scene change at Weidenhof; it is not seamless and not a verified historical city.
+3. Ambient road simulation from saved identities: carts with load/destination, travelers with needs, trade deliveries, animal herds, weather and guard patrols. Encounters must leave real economic/social consequences; don't clone random people to refill a road. NPC combat, capture, carrying incapacitated characters, crime witnesses and surrender need authoritative world state, rig and collision support, not just cosmetic animation.
+4. Adult combat: use confirmed weapon contact, armor, stamina, enemy posture and timing to decide a finisher. Give surrender/nonlethal options; cinematic takedown cannot create a second damage event. Optional camera effects (including stylized X-ray) use adult characters only, settings for frequency and intensity, collision-safe shot and exact control return. No rig deformation or body dismemberment is currently certified. Never introduce this as a reward for attacks on children or by the playable child.
+5. Actual engine captures at opening 09:00, afternoon, dusk, storm and night; compare environment density, cloth, face, hand contact, camera visibility, frame time and temperatures. Art references are not engine evidence. Do not publish new APK until quality gates pass.
+
+## Sizes
+Competitor km² figures depend on land vs water, bounding box, game-unit conversion and unavailable official scale. GTA VI's official map is available, but no official numeric area was verified. Vice City community extent ~9–11 km² (different definitions), Wildlands map has 21 provinces, Valhalla has distinct regions. Our 1,024 km² design envelope is not an achievement of shipped populated content and must never be marketed as such.

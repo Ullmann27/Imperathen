@@ -482,6 +482,10 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 		"mode_person": _set_mode("person")
 		"mode_city": _set_mode("city")
 		"mode_map": _set_mode("map")
+		"map_route":
+			if screen=="playing" and mode=="map":
+				world.select_route(str(payload.get("id","mission")))
+				_set_mode("person")
 		"quality_changed":
 			var selected_profile: String = str(payload.get("profile", "balanced"))
 			world.set_quality(selected_profile)

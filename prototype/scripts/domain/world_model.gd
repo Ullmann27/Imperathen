@@ -162,7 +162,7 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 	# legacy careers, which keep their own timeline (D-044).
 	data.population.total = _reserve_size(data)
 	data.population.workers = data.population.total
-	WorldClock.start(data)
+	WorldClock.start(data, regular_start)
 	changed.emit()
 
 
