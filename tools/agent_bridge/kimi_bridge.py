@@ -26,6 +26,7 @@ STATUS_URL = "https://integrate.api.nvidia.com/v1/status/"
 REQUEST_ID = re.compile(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
 KIMI_DEADLINE = 1200
 POLL_INTERVAL = 15
+JSON_POLL_SECONDS = 60
 MAX_POLLS = 24
 MAX_TASKS = 6
 MAX_IMAGE = 2_200_000
@@ -185,6 +186,11 @@ def call_response(payload, key, opener, deadline, decode):
     """One POST, then bounded GET status polls only for an accepted invocation."""
     headers = {"Authorization": "Bearer " + key, "Content-Type": "application/json",
                "Accept": "text/event-stream" if payload.get("stream") else "application/json"}
+    # NVIDIA's documented server-side wait hint: ask for a pending response
+    # before the 300s client socket limit. Support on this model is not yet
+    # live-proven; ignored hints still fail closed, never resubmit a POST.
+    if not payload.get("stream"):
+        headers["NVCF-POLL-SECONDS"] = str(JSON_POLL_SECONDS)
     request = Request(common.ENDPOINT, data=json.dumps(payload).encode("utf-8"),
                       method="POST", headers=headers)
     ident = None
@@ -258,6 +264,26 @@ def failure_kind(exc):
     return "io_error"
 
 
+def write_failure_receipt(output, task_id, task, stage, kind, elapsed):
+    # All fields are fixed categories or validated manifest metadata. Never
+    # persist an exception string, response body, headers, prompt or key.
+    receipt = {"task": task_id if TASK_ID.fullmatch(task_id) else "invalid",
+               "requested_model": MODEL, "status": "failed", "complete": False,
+               "stage": stage, "error_kind": kind, "elapsed_seconds": round(elapsed, 1),
+               "invocation_state": ("outcome_unknown" if stage == "inference" else
+                                    "response_received" if stage == "archive" else "not_submitted"),
+               "automatic_post_retry": False}
+    if task is not None:
+        receipt.update(source_revision=task["revision"], max_tokens=task["max_tokens"],
+                       reasoning_effort=task.get("reasoning_effort", "max"),
+                       response_mode=task.get("response_mode", "stream"))
+    run_id = os.environ.get("GITHUB_RUN_ID", "")
+    if re.fullmatch(r"[0-9]{1,24}", run_id):
+        receipt["workflow_run_id"] = run_id
+    output.mkdir(parents=True, exist_ok=True)
+    (output / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--task", required=True)
@@ -270,6 +296,7 @@ def main():
         return 2
     started = time.monotonic()
     stage = "manifest"
+    task = None
     try:
         task = load_tasks(args.manifest)[args.task]
         effort = task.get("reasoning_effort", "max")
@@ -300,9 +327,15 @@ def main():
         print("KIMI_RECEIPT " + json.dumps({"task": args.task, "status": receipt["status"], "source_revision": task["revision"]}))
         return 0 if meta["complete"] else 3
     except HTTPError as exc:
-        print(f"KIMI_ERROR stage={stage} kind=http_{exc.code} elapsed={time.monotonic()-started:.1f}s", file=sys.stderr)
+        kind = f"http_{exc.code}"
     except (common.BridgeError, URLError, TimeoutError, OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
-        print(f"KIMI_ERROR stage={stage} kind={failure_kind(exc)} elapsed={time.monotonic()-started:.1f}s", file=sys.stderr)
+        kind = failure_kind(exc)
+    elapsed = time.monotonic() - started
+    print(f"KIMI_ERROR stage={stage} kind={kind} elapsed={elapsed:.1f}s", file=sys.stderr)
+    try:
+        write_failure_receipt(args.output, args.task, task, stage, kind, elapsed)
+    except OSError:
+        print("KIMI_ERROR stage=archive kind=failure_receipt_io", file=sys.stderr)
     return 1
 
 
