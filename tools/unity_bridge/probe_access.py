@@ -81,6 +81,13 @@ def probe(unity: str, org_candidate: str) -> dict[str, Any]:
         ]
     for name, args in commands.items():
         report["probes"][name] = _run_read_only(unity, args, env)
+    # Official Unity CLI option: compare the brokered sign-in against a direct
+    # service-account environment token path, without changing credentials.
+    without_broker = dict(env)
+    without_broker["UNITY_NO_AUTH_BROKER"] = "1"
+    for name in ("cloud_orgs", "cloud_projects_default", "cloud_projects_org_candidate"):
+        if name in commands:
+            report["probes"][name + "_direct_auth"] = _run_read_only(unity, commands[name], without_broker)
     found = any(x.get("imperathen_visible") is True for x in report["probes"].values())
     report["status"] = "IMPERATHEN_VISIBLE" if found else "PROJECT_ACCESS_NOT_PROVEN"
     return report
