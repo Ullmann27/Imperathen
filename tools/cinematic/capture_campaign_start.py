@@ -60,7 +60,7 @@ def main():
                GODOT_SILENCE_ROOT_WARNING="1")
     stages = []
     with tempfile.TemporaryDirectory(prefix="imperathen-journey-") as work:
-        for name in ("import", "menu", "playthrough"):
+        for name in ("import", "menu_contract", "menu", "playthrough"):
             local_env = dict(env)
             for key, leaf in (("XDG_DATA_HOME", "data"), ("XDG_CONFIG_HOME", "config"),
                               ("XDG_CACHE_HOME", "cache")):
@@ -72,6 +72,10 @@ def main():
                 stages.append(stage(name, cmd, 600, out, local_env))
                 if not stages[-1]["passed"]:
                     break
+            elif name == "menu_contract":
+                cmd = [godot, "--headless", "--path", "prototype",
+                       "--script", "res://tests/roman_menu_test.gd"]
+                stages.append(stage(name, cmd, 180, out, local_env, "ROMAN_MENU_PASS"))
             else:
                 cmd = ["xvfb-run", "-a", "-s", "-screen 0 1280x720x24", godot,
                        "--path", "prototype", "--audio-driver", "Dummy",
@@ -90,7 +94,7 @@ def main():
               "renderer": "gl_compatibility / Linux software", "physical_device_pass": False,
               "visual_acceptance": False, "stages": stages, "images": images,
               "missing_or_invalid_images": missing,
-              "engine_pass": len(stages) == 3 and all(s["passed"] for s in stages) and not missing}
+              "engine_pass": len(stages) == 4 and all(s["passed"] for s in stages) and not missing}
     (out / "campaign-start-receipt.json").write_text(json.dumps(report, indent=2) + "\n")
     print("CAMPAIGN_START_RECEIPT", json.dumps(report), flush=True)
     return 0 if report["engine_pass"] else 1
