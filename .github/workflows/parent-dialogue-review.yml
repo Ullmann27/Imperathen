@@ -81,7 +81,11 @@ jobs:
           for profile in high very_high; do
             timeout --kill-after=10s 180s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --resolution 1280x720 --fixed-fps 60 --script res://tests/resident_identity_review.gd -- "$out/studio" "$profile" close,talk,full,walk julia,silvanus 2>&1 | tee "$out/studio-$profile.log" || status=1
           done
-          timeout --kill-after=10s 240s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --resolution 1280x720 --fixed-fps 60 --script res://tests/resident_live_review.gd -- "$out/live" high,very_high julia,silvanus 2>&1 | tee "$out/live.log" || status=1
+          # The historical baseline uses the old, substantially slower software
+          # rendering path. Preserve exactly the same scenes and capture checks.
+          live_timeout=240s
+          if [[ "${{ matrix.variant }}" == "baseline" ]]; then live_timeout=720s; fi
+          timeout --kill-after=10s "$live_timeout" xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --resolution 1280x720 --fixed-fps 60 --script res://tests/resident_live_review.gd -- "$out/live" high,very_high julia,silvanus 2>&1 | tee "$out/live.log" || { status=1; echo "::error::Live capture did not finish within its budget or exited with an error"; }
           python3 - "$out" <<'PY'
           import json, pathlib, sys
           root = pathlib.Path(sys.argv[1])
