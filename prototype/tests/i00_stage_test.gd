@@ -3,6 +3,8 @@ extends SceneTree
 
 const Stage = preload("res://scripts/cinematic/i00_stage.gd")
 const Vexillum = preload("res://scripts/cinematic/i00_vexillum.gd")
+const Camp = preload("res://scripts/cinematic/i00_camp_scenery.gd")
+const Terrain = preload("res://scripts/world/regional_terrain.gd")
 
 var checks := 0
 var failures: Array[String] = []
@@ -22,6 +24,30 @@ func _run() -> void:
 	var camp := stage.get_node_or_null("CampScenery") as Node3D
 	_check(camp != null and int(camp.get_meta("tent_count", 0)) == 6, "Six authored campaign tents replace the six red boxes")
 	var mud := camp.get_node_or_null("MudSurface") as MeshInstance3D
+	# Actual generated geometry, not only a stage-height metadata flag.
+	var min_clearance := INF
+	var buried_at_old_height := 0
+	if mud != null and mud.mesh is ArrayMesh:
+		var verts: PackedVector3Array = mud.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+		for vertex: Vector3 in verts:
+			var world := mud.to_global(vertex)
+			var ground := Terrain.surface_height(Vector2(world.x, world.z))
+			min_clearance = minf(min_clearance, world.y - ground)
+			if world.y - stage.position.y + Stage.OFFSET.y < ground:
+				buried_at_old_height += 1
+	_check(buried_at_old_height > 0, "Negative control: former y=0 terrain would cover the camp mesh")
+	_check(is_finite(min_clearance) and min_clearance >= Camp.TERRAIN_CLEARANCE - 0.01, "Every actual mud vertex clears the regional surface")
+	_check(is_equal_approx(stage.position.x, Stage.OFFSET.x) and is_equal_approx(stage.position.z, Stage.OFFSET.z), "Only the presentation elevation changes")
+	var apron := camp.get_node_or_null("TerrainApron") as MeshInstance3D
+	_check(apron != null and apron.mesh is ArrayMesh and apron.mesh.surface_get_array_len(0) == 6 * Camp.APRON_RINGS * (2 * Camp.GRID_X + 2 * Camp.GRID_Z), "One bounded sloped terrain transition mesh")
+	if apron != null and apron.mesh is ArrayMesh:
+		var apron_min := INF
+		var verts: PackedVector3Array = apron.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+		for vertex: Vector3 in verts:
+			var world := apron.to_global(vertex)
+			apron_min = minf(apron_min, world.y - Terrain.surface_height(Vector2(world.x, world.z)))
+		_check(is_finite(apron_min) and apron_min >= 0.025, "Apron vertices follow the streamed surface without being buried")
+	print("I00_TERRAIN_CLEARANCE ", JSON.stringify({"stage_y":stage.position.y,"min_mud_clearance_m":min_clearance,"old_buried_vertices":buried_at_old_height}))
 	var puddles := camp.get_node_or_null("RainPuddles") as MeshInstance3D
 	_check(mud != null and mud.mesh is ArrayMesh and mud.mesh.surface_get_array_len(0) > 10000, "Textured-by-vertex muddy platform is actual geometry")
 	_check(puddles != null and int(puddles.get_meta("puddle_count", 0)) == 12 and puddles.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF, "Rain puddles are one bounded shadow-free scenery batch")

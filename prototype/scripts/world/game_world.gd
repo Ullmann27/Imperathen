@@ -69,6 +69,9 @@ const PLAYER_BRAKING := 8.0
 const START_YAW := 0.62
 const START_PITCH := 0.18
 const PERSON_ZOOM_MIN := 1.25
+# A provisional presentation floor for normal obstructed shoulder views.
+# Explicit close zoom/steep camera requests, dialogue and impact shots are separate.
+const PERSON_CAMERA_MIN_CLEARANCE := 1.05
 const PERSON_ZOOM_MAX := 12.0
 const INTERACTION_RADIUS := 3.0
 const TRAINING_LOCATION := Vector3(0, 0, -7)
@@ -1443,6 +1446,7 @@ func _update_camera(delta: float) -> void:
 	var target: Vector3
 	var desired: Vector3
 	var collision_anchor := Vector3.INF
+	var normal_shoulder := false
 	if not _village_focus.is_empty() and village_life_world != null and village_life_world.actors.has(_village_focus):
 		var actor: Vector3 = village_life_world.actor_position(_village_focus)
 		var right := Vector3.UP.cross(_frontier_camera_direction)
@@ -1457,6 +1461,7 @@ func _update_camera(delta: float) -> void:
 		desired = actor+Vector3.UP*1.60+_frontier_camera_direction*3.0
 		collision_anchor = head
 	elif _mode == "person":
+		normal_shoulder = true
 		target = _player.global_position + Vector3(0, 0.40, 0)
 		collision_anchor = target
 		var offset := Vector3(0.36, sin(_camera_pitch) * _person_zoom + 0.22, cos(_camera_pitch) * _person_zoom)
@@ -1464,6 +1469,7 @@ func _update_camera(delta: float) -> void:
 		# Look beyond the shoulder so the horizon and the path remain visible.
 		target += Vector3(0.36, 0.05, -3.6).rotated(Vector3.UP, _camera_yaw)
 		if _active and _impact_remaining>0.0 and _movement_axis().length_squared()<.01:
+			normal_shoulder = false
 			var weight := ImpactCamera.weight(_impact_remaining)
 			var opponent := Vector3(_impact_target.x,_player.global_position.y+.18,_impact_target.y)
 			var axis := opponent-collision_anchor
@@ -1490,8 +1496,12 @@ func _update_camera(delta: float) -> void:
 		_camera.size = 100.0
 	if collision_anchor.is_finite() and is_inside_tree():
 		var previous := _camera.global_position if _camera_initialized else Vector3.INF
+		var minimum := 0.0
+		if normal_shoulder:
+			var requested := Vector2(desired.x-collision_anchor.x,desired.z-collision_anchor.z).length()
+			minimum = minf(PERSON_CAMERA_MIN_CLEARANCE,requested*0.85)
 		var placement: Vector3 = _camera_obstruction.place(get_world_3d().direct_space_state,
-			collision_anchor,desired,previous,1.0-exp(-maxf(delta,0.0)*12.0),[_player.get_rid()])
+			collision_anchor,desired,previous,1.0-exp(-maxf(delta,0.0)*12.0),[_player.get_rid()],minimum)
 		if not placement.is_finite():
 			# A sealed volume has no verified local view. Never assign INF or
 			# show clipped geometry; keep UI and camera ownership unchanged.

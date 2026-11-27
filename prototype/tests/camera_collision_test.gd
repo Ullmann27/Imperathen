@@ -47,6 +47,8 @@ func _run() -> void:
 	_setup_review_geometry()
 	await physics_frame
 	await _test_shoulder_wall()
+	await _test_close_wall_spacing()
+	await _test_cramped_room_spacing()
 	await _test_near_plane_corner()
 	await _test_smoothed_position()
 	await _test_dialogue_wall()
@@ -150,6 +152,46 @@ func _test_shoulder_wall() -> void:
 	world._update_camera(0.0)
 	_check(world._camera.position.z < 1.6-0.06-BODY_RADIUS,"Shoulder camera retracts its entire collision volume before a wall")
 	_check(_camera_free() and _line_free(_anchor(),world._camera.global_position),"Retracted camera stays free with a clear route to the player")
+
+
+func _horizontal_spacing(point: Vector3) -> float:
+	var delta := point - _anchor()
+	return Vector2(delta.x,delta.z).length()
+
+
+func _test_close_wall_spacing() -> void:
+	_reset_camera()
+	_wall(Vector3(0,2,0.65),Vector3(1.40,4,0.12))
+	await physics_frame
+	var space: PhysicsDirectSpaceState3D = world.get_world_3d().direct_space_state
+	var excluded: Array[RID] = [world._player.get_rid()]
+	var former: Vector3 = world._camera_obstruction.place(space,_anchor(),_desired(),Vector3.INF,0.0,excluded)
+	_check(_horizontal_spacing(former) < 0.65 and _position_free(former), "Negative control: direct boom can be collision-free but almost inside the player")
+	world._camera_obstruction.reset()
+	world._update_camera(0.0)
+	var alternate: Vector3 = world._camera.global_position
+	_check(_horizontal_spacing(alternate) >= WorldScene.PERSON_CAMERA_MIN_CLEARANCE, "A nearby rear wall selects a sufficiently spaced shoulder")
+	_check(_camera_free() and _line_free(_anchor(),alternate), "Alternative shoulder obeys the original camera-volume and sightline checks")
+	for i in range(10):
+		world._update_camera(1.0/60.0)
+	_check(_horizontal_spacing(world._camera.global_position) >= WorldScene.PERSON_CAMERA_MIN_CLEARANCE and _camera_free(), "Shoulder spacing remains stable while the wall stays present")
+	await _capture_review("close-wall-alternate","Nahe Rueckwand: alternativer Schulterblick")
+	_clear_walls()
+	await physics_frame
+	for i in range(60):
+		world._update_camera(1.0/60.0)
+	_check(world._camera.global_position.distance_to(_desired()) < 0.001, "Removing the wall restores the requested camera without sticking")
+
+
+func _test_cramped_room_spacing() -> void:
+	_reset_camera()
+	for sign_value: float in [-1.0,1.0]:
+		_wall(Vector3(sign_value*0.65,2,0),Vector3(0.12,4,1.5))
+		_wall(Vector3(0,2,sign_value*0.65),Vector3(1.5,4,0.12))
+	await physics_frame
+	world._update_camera(0.0)
+	_check(_horizontal_spacing(world._camera.global_position) < WorldScene.PERSON_CAMERA_MIN_CLEARANCE, "Tight-room negative control: no valid spaced shoulder exists")
+	_check(world._camera_initialized and _camera_free() and _line_free(_anchor(),world._camera.global_position), "No alternative never forces a camera through the wall")
 
 
 func _test_near_plane_corner() -> void:

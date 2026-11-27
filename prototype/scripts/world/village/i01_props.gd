@@ -328,8 +328,9 @@ func _set_water_level(owner: String, amount: float) -> void:
 
 
 func _carry_transform() -> Transform3D:
-	if not _family_carry:
-		return _hand_transform(_left_bone,_left_rest,JUG_HAND,1.0)
+	# All carry states use the measured handle, including the later father
+	# delivery, legacy saves and supervised gate watch. Only the family
+	# sequence owns the additional two-hand IK/pour choreography.
 	var wrist := _skeleton.to_global(_skeleton.get_bone_global_pose(_left_bone).origin)
 	var basis := _skeleton.global_basis.orthonormalized()
 	# The mesh handle is +X; rotate it to the left side of the actual rig.

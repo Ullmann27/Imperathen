@@ -1,0 +1,135 @@
+name: AETERNA I00 terrain and cinematic coverage
+on:
+  push:
+    branches: ['fix/aeterna-i00-terrain-clearance-20261127']
+permissions:
+  contents: read
+concurrency:
+  group: aeterna-i00-terrain-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  terrain:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_REQUIRE_I00_VEXILLUM: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install checksum-verified Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 --connect-timeout 15 --max-time 120 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 --connect-timeout 15 --max-time 300 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Test actual generated camp geometry
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/i00-terrain
+          git rev-parse HEAD > artifacts/i00-terrain/source.txt
+          timeout --kill-after=10s 420s "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee artifacts/i00-terrain/import.log
+          timeout --kill-after=10s 180s "$GODOT_BIN" --headless --path prototype --script res://tests/i00_stage_test.gd 2>&1 | tee artifacts/i00-terrain/terrain.log
+          grep -Fq I00_STAGE_PASS artifacts/i00-terrain/terrain.log
+          if grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/i00-terrain/terrain.log; then exit 1; fi
+      - name: Preserve geometry evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: i00-terrain-contract-${{ github.run_id }}
+          path: artifacts/i00-terrain/
+          if-no-files-found: warn
+          retention-days: 30
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install verified Godot and graphical runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends xvfb xauth libgl1-mesa-dri
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 --connect-timeout 15 --max-time 120 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 --connect-timeout 15 --max-time 300 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Actual New Life prologue at both aspect ratios
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$GITHUB_WORKSPACE/artifacts/i00-capture"
+          mkdir -p "$out"
+          git rev-parse HEAD > "$out/source.txt"
+          timeout --kill-after=10s 420s "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee "$out/import.log"
+          status=0
+          for size in 1280x720 1180x1312; do
+            mkdir -p "$out/$size" "$RUNNER_TEMP/i00-$size"/{data,config,cache}
+            export XDG_DATA_HOME="$RUNNER_TEMP/i00-$size/data"
+            export XDG_CONFIG_HOME="$RUNNER_TEMP/i00-$size/config"
+            export XDG_CACHE_HOME="$RUNNER_TEMP/i00-$size/cache"
+            if ! timeout --kill-after=10s 780s xvfb-run -a -s "-screen 0 ${size}x24" "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --fixed-fps 60 --script res://tests/i00_terrain_capture_test.gd -- --size="$size" --capture-dir="$out/$size" 2>&1 | tee "$out/$size/run.log"; then
+              status=1
+            fi
+            if grep -Eq 'SCRIPT ERROR:|^ERROR:' "$out/$size/run.log"; then status=1; fi
+            if ! grep -Fq I00_TERRAIN_CAPTURE_RESULT "$out/$size/run.log"; then status=1; fi
+          done
+          find "$out" -type f -name '*.png' -print0 | sort -z | xargs -0 -r sha256sum > "$out/FRAME_SHA256.txt"
+          if ! python3 - "$out" <<'PY'
+          import json, pathlib, struct, sys
+          root = pathlib.Path(sys.argv[1])
+          for width, height in ((1280,720),(1180,1312)):
+              name = f"{width}x{height}"
+              folder = root / name
+              report = json.loads((folder / f"i00-report-{name}.json").read_text())
+              assert report["size"] == [width,height] and report["quality"] == "high"
+              assert len(report["samples"]) == 15
+              assert len({(s["shot"],s["fraction"]) for s in report["samples"]}) == 15
+              for sample in report["samples"]:
+                  p = folder / sample["file"]
+                  with p.open("rb") as stream:
+                      header = stream.read(24)
+                  assert header[:8] == b"\x89PNG\r\n\x1a\n" and header[12:16] == b"IHDR"
+                  assert struct.unpack(">II", header[16:24]) == (width,height)
+              assert not report["failures"], report["failures"]
+              assert not report["coverage_failures"], report["coverage_failures"]
+          PY
+          then status=1; fi
+          printf '%s\n' 'Engine framebuffers and point projection only; independent visual and physical device review pending.' > "$out/REVIEW_PENDING.txt"
+          exit "$status"
+      - name: Preserve all successful or failed real render evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: i00-capture-both-aspects-${{ github.run_id }}
+          path: artifacts/i00-capture/
+          if-no-files-found: warn
+          retention-days: 30

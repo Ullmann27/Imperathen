@@ -1,0 +1,79 @@
+name: AETERNA rain surface – physics and real renderer
+on:
+  push:
+    branches: ['fix/aeterna-rain-surface-contract-20261127']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install checksum-verified Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot" artifacts/rain-surface
+          git rev-parse HEAD > artifacts/rain-surface/source.txt
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Existing geometry weather and physics contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --only import village_scenery village_look --report artifacts/rain-surface/headless
+          grep -F 'AETERNA_RAIN_SURFACE' artifacts/rain-surface/headless/village_scenery.log
+      - name: Independently verify submitted MultiMesh transforms on Compatibility
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -x "$GODOT_BIN"
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends xvfb xauth libgl1-mesa-dri
+          state="$(mktemp -d "$RUNNER_TEMP/rain-render.XXXXXX")"
+          mkdir -p "$state"/{data,config,cache} "$PWD/artifacts/rain-surface/frames"
+          export XDG_DATA_HOME="$state/data" XDG_CONFIG_HOME="$state/config" XDG_CACHE_HOME="$state/cache"
+          export LIBGL_ALWAYS_SOFTWARE=1 IMPERATHEN_RAIN_CAPTURE_DIR="$PWD/artifacts/rain-surface/frames"
+          # The prior headless check may fail before import; never assume its cache exists.
+          timeout --kill-after=10s 420s "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee artifacts/rain-surface/compatibility-import.log
+          if grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/rain-surface/compatibility-import.log; then exit 1; fi
+          timeout --kill-after=10s 420s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --resolution 1280x720 --rendering-method gl_compatibility --rendering-driver opengl3 --script "$GITHUB_WORKSPACE/art/village/verify.gd" 2>&1 | tee artifacts/rain-surface/compatibility.log
+          grep -Fq 'VILLAGE_SCENERY errors []' artifacts/rain-surface/compatibility.log
+          test "$(grep -c '^AETERNA_RAIN_SURFACE ' artifacts/rain-surface/compatibility.log)" -eq 4
+          if grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/rain-surface/compatibility.log; then exit 1; fi
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, struct
+          root = pathlib.Path("artifacts/rain-surface/frames")
+          frames = []
+          for profile in ("low","balanced","high","very_high"):
+              data = (root / f"{profile}.png").read_bytes()
+              assert data[:8] == b"\x89PNG\r\n\x1a\n" and data[12:16] == b"IHDR"
+              width, height = struct.unpack(">II", data[16:24])
+              assert width > 0 and height > 0
+              frames.append({"profile": profile, "width": width, "height": height, "sha256": hashlib.sha256(data).hexdigest()})
+          (root / "receipt.json").write_text(json.dumps({"source_commit":os.environ["GITHUB_SHA"],"run_id":os.environ["GITHUB_RUN_ID"],"frames":frames,"device_acceptance":False},indent=2)+"\n")
+          PY
+      - name: Preserve physics and renderer proof
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: aeterna-rain-surface-${{ github.run_id }}
+          path: artifacts/rain-surface/
+          if-no-files-found: warn
+          retention-days: 30

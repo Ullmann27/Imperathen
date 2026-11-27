@@ -12,6 +12,9 @@ const POT := Vector3(-1.32, 0.0, 0.36)
 const SMALL_MEASURE := Vector3(-0.72, 0.0, 0.42)
 const LARGE_MEASURE := Vector3(-0.50, 0.0, 0.42)
 const TALLY := Vector3(-0.24, 0.011, 0.47)
+# Same water_pitcher.glb and measured handle contact as I01FamilyProps.
+const JUG_GRIP := Vector3(0.168, 0.28, 0.0)
+const PALM_OFFSET := Vector3(0.0, 0.0, 0.035)
 
 var _built := false
 var _coins: Node3D
@@ -22,7 +25,6 @@ var _jug: Node3D
 var _carrier: Node3D
 var _skeleton: Skeleton3D
 var _left_bone := -1
-var _left_rest := Basis.IDENTITY
 var _figure_body: Node3D
 var _carrying := false
 var _stall: Node3D
@@ -31,7 +33,11 @@ var _stall: Node3D
 func _init() -> void:
 	name = "I03MarketProps"
 	process_priority = 10
+	# The carrier root also moves in the physics phase, before idle animation.
+	# Reconcile the world-space prop after the default-priority player motion.
+	process_physics_priority = 10
 	set_process(false)
+	set_physics_process(false)
 
 
 ## Cinematic anchors in this node's space (the world root).
@@ -127,6 +133,7 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 	if not enabled:
 		_carrying = false
 		set_process(false)
+		set_physics_process(false)
 		if is_instance_valid(_jug):
 			_jug.hide()
 		return
@@ -145,6 +152,7 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 	_notch.visible = salt == "debt" and open
 	_carrying = state.village.childhood.get("carried", []).has("stall_water")
 	set_process(_carrying)
+	set_physics_process(_carrying)
 	if _carrying:
 		_ensure_hand()
 		_place_in_hand()
@@ -169,6 +177,14 @@ func jug_in_hand() -> bool:
 
 
 func _process(_delta: float) -> void:
+	_sync_held_jug()
+
+
+func _physics_process(_delta: float) -> void:
+	_sync_held_jug()
+
+
+func _sync_held_jug() -> void:
 	_ensure_hand()
 	_place_in_hand()
 
@@ -178,8 +194,13 @@ func _place_in_hand() -> void:
 	if not _carrying or not is_instance_valid(_skeleton) or _left_bone < 0:
 		_jug.hide()
 		return
-	var pose := _skeleton.global_transform*_skeleton.get_bone_global_pose(_left_bone)
-	_jug.global_transform = Transform3D((pose.basis*_left_rest).orthonormalized(),pose*(_left_rest*Vector3(0,-.34,.06)))
+	# Carry the pitcher upright with the actual handle at the palm, rather
+	# than placing its origin beneath the wrist (which can put fingers in the rim).
+	var wrist := _skeleton.to_global(_skeleton.get_bone_global_pose(_left_bone).origin)
+	var basis := _skeleton.global_basis.orthonormalized()
+	if _skeleton.get_bone_global_rest(_left_bone).origin.x < 0.0:
+		basis *= Basis(Vector3.UP, PI)
+	_jug.global_transform = Transform3D(basis, wrist + basis * PALM_OFFSET - basis * JUG_GRIP)
 	_jug.show()
 
 
@@ -201,7 +222,6 @@ func _ensure_hand() -> void:
 	_skeleton = skeletons[0] as Skeleton3D
 	_left_bone = _skeleton.find_bone("Hand_L")
 	if _left_bone >= 0:
-		_left_rest = _skeleton.get_bone_global_rest(_left_bone).basis.inverse()
 		_skeleton.skeleton_updated.connect(_place_in_hand)
 
 
