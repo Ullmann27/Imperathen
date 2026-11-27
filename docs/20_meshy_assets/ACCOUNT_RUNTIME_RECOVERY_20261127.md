@@ -1,0 +1,5 @@
+# Meshy account → runtime recovery
+
+Live paginated Meshy inventory: 131 account tasks; 71 exact project task IDs matched the existing verified inventory. Other projects and unclassified IDs excluded. Preview/refine pairs are not duplicate live assets. The integrated Git tree contains 20 Meshy derivative families (57 GLBs). All of them now have a model-library station, and existing actual firewood and limestone are attached to gameplay stock/quarry presentation. The 5 blocked canonical humanoids still need source-specific reconstruction and retargeting, rather than arbitrary assignment of a 15-joint rig to fused riders or fixed equipment. No signed source URL, new paid generation, or claim of physical device testing.
+
+Night: actual pooled OmniLights plus batched metal braziers/flames on grounded village/city routes; compatible rendering, no collider mutation. Shared solar clock keeps a limited cool ambient floor. Free city can advance the visual hour via pause menu without editing campaign time. Dedicated runtime regression added.

@@ -184,6 +184,12 @@ func advance_to(time: float, force := false) -> void:
 			actor.rotation.y = rotate_toward(actor.rotation.y,atan2(-travelled.x,-travelled.z),minf(elapsed,.1)*3.5)
 		var figure: Node3D = actor.get_node("Figure")
 		figure.drive(actual_speed)
+		var social_peer: Node3D
+		if activity == "socialize" and social_arrived and actual_speed < .05:
+			var peer_actor: Node3D = actors.get(str(intent.get("partner","")))
+			if is_instance_valid(peer_actor):
+				social_peer = peer_actor.get_node_or_null("Figure") as Node3D
+		figure.set_gaze_target(social_peer)
 		if pose.activity == "work" and actual_speed < .05:
 			figure.keep_working()
 		actor.set_meta("activity","march" if actual_speed > .05 else pose.activity)

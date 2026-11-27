@@ -220,6 +220,18 @@ func _update_attention(delta: float) -> void:
 		var activity: String = str(intent.activity)
 		var contact := _physical_social_contact(id,actor,intent,player)
 		_set_social_pose(actor,not contact.is_empty())
+		var figure := actor.get_node_or_null("Figure") as Node3D
+		if is_instance_valid(figure):
+			var partner: Node3D
+			if not contact.is_empty():
+				var peer_id := str(intent.get("partner", ""))
+				if peer_id == "player" and parent != null:
+					partner = parent.get_node_or_null("Player/Figure") as Node3D
+				else:
+					var body := _physical_partner(peer_id)
+					if is_instance_valid(body):
+						partner = body.get_node_or_null("Figure") as Node3D
+			figure.set_gaze_target(partner)
 		var target := player
 		if activity in ["greet","socialize"]:
 			# A social decision is not a conversation until the two *visible*
@@ -330,6 +342,7 @@ func _set_social_pose(actor: Node3D, allowed: bool) -> void:
 	else:
 		# Stop a social pose if the conversation partner moved, turned a
 		# corner, died or became hidden. Animation does not play through walls.
+		figure.clear_gaze_target()
 		figure.reset_motion()
 
 
