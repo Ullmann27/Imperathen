@@ -1,0 +1,51 @@
+name: Kimi 3D specialist engineering
+on:
+  push:
+    branches: ['feat/kimi-3d-special-operations-20261127']
+    paths:
+      - 'tools/agent_bridge/kimi_bridge.py'
+      - 'tools/agent_bridge/kimi_tasks.json'
+      - 'tools/agent_bridge/test_kimi_bridge.py'
+      - '.github/workflows/kimi-3d-specialist.yml'
+permissions:
+  contents: read
+concurrency:
+  group: imperathen-kimi-3d-specialist
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify request boundaries and API contract offline
+        run: python3 -m unittest discover -s tools/agent_bridge -p 'test_kimi_bridge.py' -v
+  consult:
+    needs: verify
+    name: Kimi / ${{ matrix.task }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        task: [K01, K02, K03, K04, K05, K06]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Request one concrete 3D engineering patch from Kimi
+        env:
+          NVIDIA_KIMI_API_KEY: ${{ secrets.NVIDIA_KIMI_API_KEY }}
+          KIMI_TASK: ${{ matrix.task }}
+        run: python3 tools/agent_bridge/kimi_bridge.py --task "$KIMI_TASK" --output artifacts/kimi
+      - name: Archive unexecuted patch proposal and provenance
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: kimi-${{ matrix.task }}-${{ github.run_id }}
+          path: artifacts/kimi/
+          if-no-files-found: warn
+          retention-days: 14
