@@ -1,0 +1,106 @@
+{
+  "K01": {
+    "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
+    "task": "CHARACTER & GEAR. Analysiere Legionär und Kind anatomisch, Proportionen, PBR, Normalen, Gesichtsdetails, Silhouette, Rüstungsaufbau und Materialtrennung. Liefere einen konkreten Blender-Python- oder Godot-Patch für den größten verifizierbaren Qualitätsgewinn; respektiere Meshy-Originale, Skinning, Gewichtung, Bones, UVs und Kind als eigenständige Anatomie. Liefere genau eine priorisierte, vollständig umsetzbare Änderung mit konkretem Unified Diff gegen die gepinnte Revision (a/b-Pfade), neuen oder erweiterten Tests, exakten Blender/Godot-Abnahmekriterien, Vorher/Nachher-Kamerapositionen und Grenzen. Keine erfundenen Testresultate, Assets oder APIs. Bestehende Spielregeln, Save-Verträge, Grafikprofile und öffentliche Schnittstellen erhalten. Originale Assets, keine kopierten Spielmodelle. Die Bilder sind vorhandene Referenz-/Review-Captures und können älter sein als der Code; trenne sichtbare Befunde von Hypothesen. Keine Änderungen an CI, Secrets oder Agentenbrücke.",
+    "files": [
+      "tools/art/build_characters.py",
+      "tools/art/build_meshy_gear.py",
+      "tools/art/inspect_meshy_glb.py",
+      "prototype/scripts/visuals/gear_visuals.gd",
+      "prototype/scripts/rendering/city_character_detail.gd",
+      "prototype/tests/gear_visual_test.gd",
+      "prototype/tests/hero_face_test.gd"
+    ],
+    "images": [
+      "art/frontier_people/runtime_review/legionary-face.png",
+      "art/hero_quality/review/hero_child_full.png"
+    ],
+    "max_tokens": 16384
+  },
+  "K02": {
+    "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
+    "task": "CITY ARCHITECTURE. Verbessere römische Stadt- und Innenraumgeometrie: Wandstärke, Dach, Holz/Stein, Maßstäbe, Fassaden, Öffnungen und benutzbare Innenräume. Erhalte Kollisionen, Wege, Markt- und Interaktionsverträge. Liefere einen vollständigen Blender-Python- oder Godot-Patch für ein konkretes modulares Bauwerk, mit UV/PBR/LOD-Konzept und reproduzierbarem Export. Liefere genau eine priorisierte, vollständig umsetzbare Änderung mit konkretem Unified Diff gegen die gepinnte Revision (a/b-Pfade), neuen oder erweiterten Tests, exakten Blender/Godot-Abnahmekriterien, Vorher/Nachher-Kamerapositionen und Grenzen. Keine erfundenen Testresultate, Assets oder APIs. Bestehende Spielregeln, Save-Verträge, Grafikprofile und öffentliche Schnittstellen erhalten. Originale Assets, keine kopierten Spielmodelle. Die Bilder sind vorhandene Referenz-/Review-Captures und können älter sein als der Code; trenne sichtbare Befunde von Hypothesen. Keine Änderungen an CI, Secrets oder Agentenbrücke.",
+    "files": [
+      "tools/art/build_architecture.py",
+      "tools/art/common.py",
+      "prototype/scripts/world/village/house_interiors.gd",
+      "prototype/scripts/rendering/city_architecture_detail.gd",
+      "prototype/scripts/rendering/city_exploration_detail_adapter.gd",
+      "prototype/tests/house_interiors_test.gd"
+    ],
+    "images": [
+      "art/architecture/review/strasse_after.png",
+      "art/world_expansion/architecture/taberna_review.png"
+    ],
+    "max_tokens": 16384
+  },
+  "K03": {
+    "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
+    "task": "LANDSCAPE. Analysiere Landschaft, Terrain-Geometrie, Texturübergänge, Höhenrelief, Distanzsilhouette, natürliche Vegetationsverteilung und sichtbare Wiederholungsmuster. Liefere einen konkreten GDScript/Shader-Patch, der die größte tatsächliche sichtbare Schwäche behebt, ohne Streaming-, Navigations- oder Kollisionsautorität zu verändern. Liefere genau eine priorisierte, vollständig umsetzbare Änderung mit konkretem Unified Diff gegen die gepinnte Revision (a/b-Pfade), neuen oder erweiterten Tests, exakten Blender/Godot-Abnahmekriterien, Vorher/Nachher-Kamerapositionen und Grenzen. Keine erfundenen Testresultate, Assets oder APIs. Bestehende Spielregeln, Save-Verträge, Grafikprofile und öffentliche Schnittstellen erhalten. Originale Assets, keine kopierten Spielmodelle. Die Bilder sind vorhandene Referenz-/Review-Captures und können älter sein als der Code; trenne sichtbare Befunde von Hypothesen. Keine Änderungen an CI, Secrets oder Agentenbrücke.",
+    "files": [
+      "prototype/scripts/world/regional_terrain.gd",
+      "prototype/scripts/world/land/land_surface.gd",
+      "prototype/scripts/world/land/terrain.gdshader",
+      "prototype/scripts/world/land/far_relief.gd",
+      "prototype/scripts/rendering/village_look.gd",
+      "prototype/tests/regional_terrain_test.gd"
+    ],
+    "images": [
+      "art/visual_benchmark/evidence/engine_high_view0_morning.png",
+      "art/world_expansion/vegetation/review/vegetation_overview.png"
+    ],
+    "max_tokens": 16384
+  },
+  "K04": {
+    "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
+    "task": "MOTION. Untersuche Lauf-/Gehbewegungen, Fußgleiten, Schwerpunkt, IK, Schrittwechsel, Beschleunigung, Arme und Mimik aus Code und vorhandenen Einzelbildern. Keine Bewegung aus einem Standbild behaupten. Liefere eine konkrete Patch-Korrektur plus quantitative Animationsmessung (Bodenkontakt, Fußdrift, Kontinuität) und Szenario für wiederholbare Godot-Tests; erhalte vorhandene Rigs und Gameplay-Autorität. Liefere genau eine priorisierte, vollständig umsetzbare Änderung mit konkretem Unified Diff gegen die gepinnte Revision (a/b-Pfade), neuen oder erweiterten Tests, exakten Blender/Godot-Abnahmekriterien, Vorher/Nachher-Kamerapositionen und Grenzen. Keine erfundenen Testresultate, Assets oder APIs. Bestehende Spielregeln, Save-Verträge, Grafikprofile und öffentliche Schnittstellen erhalten. Originale Assets, keine kopierten Spielmodelle. Die Bilder sind vorhandene Referenz-/Review-Captures und können älter sein als der Code; trenne sichtbare Befunde von Hypothesen. Keine Änderungen an CI, Secrets oder Agentenbrücke.",
+    "files": [
+      "prototype/scripts/visuals/character_motion.gd",
+      "prototype/scripts/visuals/natural_motion.gd",
+      "prototype/scripts/visuals/facial_motion.gd",
+      "prototype/scripts/formation/troop_motion.gd",
+      "prototype/tests/locomotion_regression_test.gd",
+      "prototype/tests/motion_quality_measurement.gd"
+    ],
+    "images": [
+      "art/frontier_people/runtime_review/legionary-march.png",
+      "art/hero_quality/review/hero_run.png"
+    ],
+    "max_tokens": 16384
+  },
+  "K05": {
+    "revision": "75585794decd7bd2ea0bfbe9b50294d505b41150",
+    "task": "CINEMATIC I-00. Analysiere die tatsächlich generierte Vexillum-Standarte, Stoff, Wind, Befestigung, Beleuchtung und filmische Kamera. Liefere den höchstwertigen konkreten Patch für den Blender-Generator, Stoffshader oder Kamera, mit reproduzierbarer Original-GLB-/Render-Produktion. Keine Änderung der Story, Formation oder Szenenautorität. Beachte: PR 167 arbeitet parallel an camp scenery; vermeide konkurrierende Änderungen an i00_stage.gd, beschränke dich möglichst auf Vexillum-Generator, Shader oder isolierten Kamerapfad. Liefere genau eine priorisierte, vollständig umsetzbare Änderung mit konkretem Unified Diff gegen die gepinnte Revision (a/b-Pfade), neuen oder erweiterten Tests, exakten Blender/Godot-Abnahmekriterien, Vorher/Nachher-Kamerapositionen und Grenzen. Keine erfundenen Testresultate, Assets oder APIs. Bestehende Spielregeln, Save-Verträge, Grafikprofile und öffentliche Schnittstellen erhalten. Originale Assets, keine kopierten Spielmodelle. Die Bilder sind vorhandene Referenz-/Review-Captures und können älter sein als der Code; trenne sichtbare Befunde von Hypothesen. Keine Änderungen an CI, Secrets oder Agentenbrücke.",
+    "files": [
+      "tools/art/build_i00_vexillum.py",
+      "prototype/scripts/cinematic/i00_vexillum.gd",
+      "prototype/scripts/cinematic/i00_vexillum.gdshader",
+      "prototype/scripts/cinematic/i00_stage.gd",
+      "prototype/scripts/cinematic/opening_director.gd",
+      "prototype/tests/i00_stage_test.gd"
+    ],
+    "images": [
+      "art/cinematic/i00/i00_vexillum_detail.png",
+      "art/cinematic/i00/i00_vexillum_textile.png"
+    ],
+    "max_tokens": 16384
+  },
+  "K06": {
+    "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
+    "task": "FOLD7 RENDER. Untersuche Renderqualität und Performance-Verträge: Shaderkosten, Auflösung, LOD, Instancing, Frame-Pacing, thermische Grenzen, CPU/GPU-Korrelation. Liefere einen konkreten messbaren Patch gegen eine belegte Schwäche ohne Absenkung der ausgewählten Grafikqualität als pauschale Lösung. Vergleiche die vorhandenen Profil-Captures qualitativ; keine FPS oder Gerätemessungen aus Bildern behaupten. Liefere genau eine priorisierte, vollständig umsetzbare Änderung mit konkretem Unified Diff gegen die gepinnte Revision (a/b-Pfade), neuen oder erweiterten Tests, exakten Blender/Godot-Abnahmekriterien, Vorher/Nachher-Kamerapositionen und Grenzen. Keine erfundenen Testresultate, Assets oder APIs. Bestehende Spielregeln, Save-Verträge, Grafikprofile und öffentliche Schnittstellen erhalten. Originale Assets, keine kopierten Spielmodelle. Die Bilder sind vorhandene Referenz-/Review-Captures und können älter sein als der Code; trenne sichtbare Befunde von Hypothesen. Keine Änderungen an CI, Secrets oder Agentenbrücke.",
+    "files": [
+      "prototype/scripts/rendering/fold7_quality_policy.gd",
+      "prototype/scripts/rendering/render_profile.gd",
+      "prototype/scripts/ui/runtime_display.gd",
+      "tools/render/compare_renderers.py",
+      "tools/render/fold7_render_bench.py",
+      "prototype/tests/fold7_graphics_policy_test.gd",
+      "prototype/tests/runtime_display_lifecycle_test.gd"
+    ],
+    "images": [
+      "art/visual_benchmark/evidence/engine_high_view0_morning.png",
+      "art/visual_benchmark/evidence/engine_balanced_view0_morning.png"
+    ],
+    "max_tokens": 16384
+  }
+}
