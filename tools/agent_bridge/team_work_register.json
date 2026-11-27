@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 66,
+  "version": 69,
   "tasks": [
     {
       "id": "K101",
@@ -326,7 +326,7 @@
     {
       "id": "FORMATION-ORDER-CONTINUITY",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "6fce2e98f61958afea69359bcd587d462bb9b04e",
       "run_id": "46025109203",
       "scope": [
@@ -336,14 +336,14 @@
         "prototype/tests/formation_slot_authority_test.gd"
       ],
       "access": "edit",
-      "note": "PR #175 candidate 553ceab39d7d9a4a9936f24c69ac4672a789edce, base verified N20 6fce2e9. Actual source repair: stable authoritative UID order on ordinary movement and minor wheels, rematch deliberate form/deploy or >75-degree discrete change, bounded pair matching; presentation validates unique slots and records actual assignment. New real rules/agents test; original battle and 60/180-person motion gates unchanged. CI in_progress. Preserve all candidate refs; no merge or release until results. N21 zero-time present hypothesis not applied."
+      "note": "Run 46025109203 completed failure on 553ceab: new slot-authority 13/13, battle rules 144/144, battle commands 411/412 (new front-gap closing failure), formation 60 82/87 and 180 18/22. Previous 60 had 7 failures, now 5; rank ownership and recorded matching improved, global wheel counter and strict LOD position/phase/foot gates remain red. Do not merge. Child branch repairs casualty rank fill without changing existing branch or other running tests."
     },
     {
       "id": "MEASURED-COMBAT-TARGETS",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "6fce2e98f61958afea69359bcd587d462bb9b04e",
-      "run_id": null,
+      "run_id": "46025782969",
       "scope": [
         "prototype/scripts/world/player_action_world.gd",
         "prototype/tests/action_adapter_test.gd",
@@ -351,7 +351,21 @@
         "prototype/tests/gear_market_test.gd"
       ],
       "access": "edit",
-      "note": "Independent repair while #175 tests run: actual player attack selection should prefer a living currently reachable unobstructed target using measured sweeps; preserve ordinary broad aim fallback and final authoritative collision. Fix proven stale 1m legacy village raid and adult gear fixtures against measured tracks; keep actual contact/physics/authority checks and new negative controls. No production reach, damage or gate changes. Do not edit active formation/campaign branches."
+      "note": "PR #176 candidate 2e761e5, real input-only swept-target preference, actual physics wall regression, measured legacy village and gear training fixtures. CI in_progress. Preserve actual damage authority and all gates. No integration until tests."
+    },
+    {
+      "id": "FORMATION-CASUALTY-GAPS",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "553ceab39d7d9a4a9936f24c69ac4672a789edce",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/battle/battle_model.gd",
+        "prototype/tests/battle_command_test.gd",
+        "prototype/tests/formation_slot_authority_test.gd"
+      ],
+      "access": "edit",
+      "note": "Independent child of tested #175; preserve ordinary rank ownership but assign actual vacant slots after casualties using prior ranks, nearest appropriate living soldier and stable same-rank preference. No position teleport, saved schema or movement limit changes. Original 8-step closing gate remains unchanged; add controlled actual casualty and UID regression, rerun battle and formation tests."
     }
   ]
 }
