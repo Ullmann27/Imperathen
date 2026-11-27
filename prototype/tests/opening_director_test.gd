@@ -107,6 +107,28 @@ func _run() -> void:
 	director.sample("player", 1.0)
 	_check(director.camera.global_transform.is_equal_approx(gameplay.global_transform) and is_equal_approx(director.camera.fov, gameplay.fov), "Final pose exactly matches the gameplay camera")
 	_check(actor.transform == actor_before and gameplay.transform == gameplay_before, "Neither player nor original camera is moved")
+	# The generated camera grammar must preserve screen direction in a real
+	# two-person layout and when either parent is the active speaker.
+	stage.cast["player"] = actor
+	stage.cast["silvanus"] = speaking
+	for speaker_id: String in ["julia", "silvanus"]:
+		director.mission_actor_id = speaker_id
+		var axis := speaking.global_position - actor.global_position
+		axis.y = 0.0
+		var normal := Vector3.UP.cross(axis.normalized())
+		var centre := actor.global_position.lerp(speaking.global_position, 0.5)
+		var close: Array = director._duo_framing("duo_close")
+		var reverse: Array = director._duo_framing("duo_react")
+		var adult: Array = director._i01_framing("i01_close_speaker")
+		var child: Array = director._i01_framing("i01_react_boy")
+		for sample_index: int in [0, 1]:
+			_check((Vector3(close[sample_index]) - centre).dot(normal) * (Vector3(reverse[sample_index]) - centre).dot(normal) > 0.0,
+				"Dialogue reverse shot preserves the 180-degree axis: " + speaker_id)
+			_check((Vector3(adult[sample_index]) - centre).dot(normal) * (Vector3(child[sample_index]) - centre).dot(normal) > 0.0,
+				"Family reaction preserves the adult's side of the dialogue axis: " + speaker_id)
+	stage.cast.erase("player")
+	stage.cast.erase("silvanus")
+	director.mission_actor_id = ""
 	director.prepare_cinematic_cast("i01_close_speaker", "julia")
 	_check(speaking.pinned, "Story actor uses close detail before voice binding")
 	director.play("well", 10.0, true)

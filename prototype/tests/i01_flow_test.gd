@@ -305,17 +305,35 @@ func _test_hud_and_props() -> void:
 	game._opening_process(1.55)
 	check(props._water.julia.visible and not props._water.silvanus.visible and not props._water.player.visible,"Only first cup is filling")
 	check(props._water_motion.stream.any(func(item: MeshInstance3D)->bool: return item.visible),"The water stream is actual visible geometry")
+	var first_focus: Vector3 = props.cinematic_pour_focus()
+	check(first_focus.is_finite(), "First pour has a live world-space camera focus")
+	_check_live_pour_focus(props, "julia")
 	await capture("film-first-cup-pour")
 	game._opening_process(1.75)
 	check(props._water.julia.visible and props._water.silvanus.visible and not props._water.player.visible,"Second cup starts after first, not before")
+	_check_live_pour_focus(props, "silvanus")
+	check(props.cinematic_pour_focus().distance_to(first_focus) > 0.2, "Insert follows the physical receiver instead of a fixed tabletop point")
 	await capture("film-second-cup-pour")
 	game._opening_process(1.75)
 	check(props._water.player.visible,"Third cup is now filling")
+	_check_live_pour_focus(props, "player")
 	await capture("film-third-cup-pour")
 	game._opening_process(1.60)
 	check(not props.jug_animating() and carried_jug.global_position.distance_to(props.world_point(props.JUG_TABLE)) < .025,"The same jug settles at the real table")
+	check(not props.cinematic_pour_focus().is_finite(), "Finished pour releases the dynamic camera focus")
 	for owner: String in I01.CUPS:
 		check(props._water[owner].visible,"Filled water remains visible in "+owner)
+
+
+func _check_live_pour_focus(props: Node3D, owner: String) -> void:
+	var cup: Node3D = props.cup_node(owner)
+	var expected := cup.to_global(Vector3(.033 if owner == "player" else 0.0, .147, 0)).lerp(
+		props.jug_node().to_global(props.JUG_MOUTH), 0.5)
+	var focus: Vector3 = props.cinematic_pour_focus()
+	check(focus.is_equal_approx(expected), "Camera focus matches real water endpoints: " + owner)
+	var camera: Camera3D = game.opening_director.camera
+	var direction := (focus - camera.global_position).normalized()
+	check((-camera.global_basis.z).normalized().dot(direction) > 0.98, "Camera looks at the live pour: " + owner)
 
 
 ## D-052 film dialogue: several shot sizes, reaction shots inside a line,

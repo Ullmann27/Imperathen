@@ -414,7 +414,14 @@ func _i01_framing(id: String) -> Array:
 			return [table + Vector3(2.85, 1.10, 2.55), table + Vector3(2.55, 0.95, 2.30),
 				table + Vector3(0.0, -0.10, 0.0), table + Vector3(-0.15, -0.05, 0.0), 58.0, 54.0]
 		"i01_cups_insert":
-			# Insert: the crooked cup in front, Silvanus' cup behind it.
+			# The first breakfast beat uses the live pouring endpoints. The
+			# later silent insert and reduced-motion mode keep the authored still.
+			var props := _world.get_node_or_null("I01FamilyProps")
+			if not reduced_motion and is_instance_valid(props) and props.has_method("cinematic_pour_focus"):
+				var focus: Vector3 = props.cinematic_pour_focus()
+				if focus.is_finite():
+					return [focus + Vector3(-0.82, 0.39, 1.15), focus + Vector3(-0.74, 0.34, 1.05),
+						focus, focus, 33.0, 30.5]
 			return [table + Vector3(-0.62, 0.30, 0.86), table + Vector3(-0.50, 0.26, 0.74),
 				table + Vector3(0.32, 0.07, 0.30), table + Vector3(0.30, 0.07, 0.34), 33.0, 30.5]
 		"i01_close_speaker", "i01_react_julia":
@@ -432,12 +439,14 @@ func _i01_framing(id: String) -> Array:
 		"i01_react_boy":
 			# Reaction close on the listening boy from the adult's side.
 			var listening := _mission_figure("player")
-			var adult := _mission_figure(mission_actor_id if mission_actor_id in ["julia", "silvanus"] else "silvanus")
+			var adult_id := mission_actor_id if mission_actor_id in ["julia", "silvanus"] else "silvanus"
+			var adult := _mission_figure(adult_id)
 			var boy_face := (listening.global_position if is_instance_valid(listening) else _anchor("i01_player_table") + Vector3.UP * 0.9) + Vector3.UP * 0.36
 			var away := (adult.global_position if is_instance_valid(adult) else _anchor("i01_silvanus") + Vector3.UP * 0.9) - boy_face
 			away.y = 0.0
 			away = away.normalized() if away.length() > 0.1 else Vector3.FORWARD
-			var off := Vector3.UP.cross(away).normalized() * -0.30
+			# Preserve the adult close-up's side of the boy/adult axis.
+			var off := Vector3.UP.cross(away).normalized() * (0.30 if adult_id == "julia" else -0.30)
 			return [boy_face + away * 1.10 + off + Vector3.UP * 0.06, boy_face + away * 1.00 + off * 0.9 + Vector3.UP * 0.05,
 				boy_face, boy_face + Vector3.UP * 0.01, 36.0, 34.0]
 		"i01_two_shot":
@@ -497,7 +506,9 @@ func _duo_framing(id: String) -> Array:
 			return [speaker_face - axis * 1.40 + side * 0.36 + Vector3.UP * 0.03, speaker_face - axis * 1.20 + side * 0.30 + Vector3.UP * 0.02,
 				speaker_face, speaker_face + Vector3.UP * 0.015, 35.0, 32.0]
 		"duo_react":
-			return [boy_face + axis * 1.12 - side * 0.30 + Vector3.UP * 0.06, boy_face + axis * 1.02 - side * 0.27 + Vector3.UP * 0.05,
+			# Shot/reverse-shot: stay on the same side of the dialogue axis
+			# as duo_close, duo_wide and duo_ots to preserve screen direction.
+			return [boy_face + axis * 1.12 + side * 0.30 + Vector3.UP * 0.06, boy_face + axis * 1.02 + side * 0.27 + Vector3.UP * 0.05,
 				boy_face, boy_face + Vector3.UP * 0.01, 36.0, 34.0]
 		"duo_ots":
 			var shoulder := boy_at + Vector3.UP * 0.32
