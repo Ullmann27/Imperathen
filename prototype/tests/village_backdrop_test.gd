@@ -195,6 +195,24 @@ func _test_closed_rim(ridge: MeshInstance3D) -> void:
 	_check(span.position.x < -200 and span.end.x > 200 and span.position.y < -145 and span.end.y > -72, "The rim runs round the back, both ends and the foot")
 
 
+## Evidence only: do not skip collision bodies or alter tolerances.
+func _ray_fault(kind: String, start: Vector3, finish: Vector3, hit: Dictionary, expected: Vector3) -> void:
+	var collider: Object = hit.get("collider")
+	var actual: Vector3 = hit.get("position", Vector3.INF)
+	print("BACKDROP_RAY_FAULT ", JSON.stringify({
+		"kind": kind, "start": str(start), "end": str(finish),
+		"expected": str(expected), "actual": str(actual),
+		"collider": str((collider as Node).get_path()) if collider is Node else str(collider),
+		"is_hill": collider == hill_body,
+		"shape": int(hit.get("shape", -1)), "face": int(hit.get("face_index", -1)),
+		"normal": str(hit.get("normal", Vector3.ZERO)),
+		"expected_hill": str(hills.height(expected.x, expected.z)) if expected.is_finite() else "none",
+		"expected_ground": str(ground.height(expected.x, expected.z)) if expected.is_finite() else "none",
+		"actual_hill": str(hills.height(actual.x, actual.z)) if actual.is_finite() else "none",
+		"actual_ground": str(ground.height(actual.x, actual.z)) if actual.is_finite() else "none",
+	}))
+
+
 func _test_physics_surface() -> void:
 	var worst := 0.0
 	var probes := 0
@@ -209,7 +227,10 @@ func _test_physics_surface() -> void:
 			probes += 1
 			if hit.is_empty() or hit.collider != hill_body:
 				wrong += 1
+				_ray_fault("down_other", query.from, query.to, hit, Vector3(xi, visible, zi))
 				continue
+			if absf(hit.position.y - visible) > .02:
+				_ray_fault("down_height", query.from, query.to, hit, Vector3(xi, visible, zi))
 			worst = maxf(worst, absf(hit.position.y - visible))
 	print("VILLAGE_BACKDROP downward_rays=%d not_hill=%d max_difference_m=%.6f" % [probes, wrong, worst])
 	_check(probes > 500 and wrong == 0 and worst <= .02, "Downward rays meet the hill collision at the visible surface")
@@ -265,13 +286,20 @@ func _sight_line(start: Vector3, finish: Vector3) -> String:
 			shared = absf(hill - base) < .001
 			break
 	if crossing < 0.0:
+		if not hit.is_empty():
+			_ray_fault("horizontal_unexpected", start, finish, hit, Vector3.INF)
 		return "clear" if hit.is_empty() else "fault"
 	if hit.is_empty() or start.lerp(finish, crossing).distance_to(hit.position) > (finish - start).length() / 800.0 + .05:
+		_ray_fault("horizontal_surface", start, finish, hit, start.lerp(finish, crossing))
 		return "fault"
 	if shared:
 		return "blocked" if hit.collider == hill_body else "terrain"
 	if on_hill:
+		if hit.collider != hill_body:
+			_ray_fault("horizontal_expected_hill", start, finish, hit, start.lerp(finish, crossing))
 		return "blocked" if hit.collider == hill_body else "fault"
+	if hit.collider == hill_body:
+		_ray_fault("horizontal_expected_terrain", start, finish, hit, start.lerp(finish, crossing))
 	return "terrain" if hit.collider != hill_body else "fault"
 
 
