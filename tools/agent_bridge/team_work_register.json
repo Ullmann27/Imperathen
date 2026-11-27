@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 145,
+  "version": 146,
   "tasks": [
     {
       "id": "K101",
@@ -715,6 +715,19 @@
       ],
       "access": "edit",
       "note": "M10/M11: source review finds cap position snapping without corresponding binding update in build_youth_civil_outfit.py. Hypothesis only. Read-only actual original staged civilian LOD audit and separate candidate cap-weight correction limited to exactly coincident unambiguous original hand-cut seams. No body/geometry/motion/texture/identity modifications; numerical before/after, negative controls and real Godot evidence. No private GLB publication or production-builder modifications until measured evidence."
+    },
+    {
+      "id": "VALLEY-MUSTER-IDENTITY",
+      "owner": "Nemotron coordinator",
+      "status": "reserved",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/valley_muster_test.gd",
+        ".github/workflows/aeterna-valley-muster-identity.yml"
+      ],
+      "access": "edit",
+      "note": "Roadmap 01: N28 truncated (46055347080), old full regression failed authored Germanic swordsman assertion. Independent focused actual engine reproduction with identity, LOD and real scene provenance; retain original assertion and all budgets, no automatic model retry. No edits to formation runtime or concurrent visual tasks."
     }
   ]
 }
