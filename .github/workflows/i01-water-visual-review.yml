@@ -58,13 +58,22 @@ jobs:
           "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee "$out/import.log"
           timeout --kill-after=10s 120s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --resolution 1280x720 --script res://tests/regional_map_test.gd -- "$out" 2>&1 | tee "$out/map.log"
           grep -Fq REGIONAL_MAP_PASS "$out/map.log"
-          timeout --kill-after=15s 1500s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --fixed-fps 60 --script res://tests/i01_flow_test.gd -- --capture-dir="$out" --size=1280x720 2>&1 | tee "$out/flow.log"
+          timeout --kill-after=15s 1500s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --fixed-fps 60 --script res://tests/i01_flow_test.gd -- --capture-dir="$out" --size=1280x720 --capture-on-demand 2>&1 | tee "$out/flow.log"
           grep -Fq I01_FLOW_PASS "$out/flow.log"
           python3 - "$out" <<'PY'
-          import json, pathlib, sys
+          import json, pathlib, struct, sys
           out = pathlib.Path(sys.argv[1])
           report = json.loads((out / "i01-flow-report.json").read_text())
           assert not report["failures"], report["failures"]
+          assert report["capture_mode"] == "on_demand", report["capture_mode"]
+          assert report["size"] == [1280, 720] and report["renderer"] == "gl_compatibility"
+          for capture in report["captures"]:
+              p = out / capture["file"]
+              with p.open("rb") as stream:
+                  header = stream.read(24)
+              assert header[:8] == b"\x89PNG\r\n\x1a\n" and header[12:16] == b"IHDR", p
+              assert struct.unpack(">II", header[16:24]) == (1280, 720), p
+              assert [capture["width"], capture["height"]] == [1280, 720], p
           for name in ("empty-jug", "well-rope-lift", "well-bucket-pour", "film-first-cup-pour", "film-second-cup-pour", "film-third-cup-pour"):
               files = list(out.glob("*" + name + "*.png"))
               assert files and all(p.stat().st_size > 1024 for p in files), name

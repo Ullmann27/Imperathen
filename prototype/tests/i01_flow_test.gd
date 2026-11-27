@@ -7,6 +7,9 @@ extends SceneTree
 ## events), I-01 "Film abgebrochen", "Save am Tisch" (world props), "NPC beim
 ## Brunnen abwesend" (hidden Marcus), child HUD per HB S. 13/44, VID-C.
 ## Optional: -- --capture-dir=<dir> saves engine frames (needs a display).
+## --capture-on-demand rasterizes only at the same authored capture points;
+## simulation and fixed-fps process steps remain unchanged. Continuous mode
+## stays the default for visual playback and frame-pacing investigation.
 
 const Entry = preload("res://main.tscn")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
@@ -19,6 +22,8 @@ var game
 var checks := 0
 var failures: Array[String] = []
 var capture_dir := ""
+var capture_on_demand := false
+var original_render_loop := true
 var captures: Array = []
 var timing := {}
 var size := Vector2i(1280, 720)
@@ -32,9 +37,15 @@ func _initialize() -> void:
 	for arg: String in OS.get_cmdline_user_args():
 		if arg.begins_with("--capture-dir="):
 			capture_dir = arg.trim_prefix("--capture-dir=")
+		elif arg == "--capture-on-demand":
+			capture_on_demand = true
 		elif arg.begins_with("--size="):
 			var parts := arg.trim_prefix("--size=").split("x")
 			size = Vector2i(int(parts[0]), int(parts[1]))
+	if capture_on_demand and (capture_dir.is_empty() or DisplayServer.get_name() == "headless"):
+		printerr("I01 capture-on-demand requires a real display and capture directory.")
+		quit(2)
+		return
 	_run.call_deferred()
 
 
@@ -115,17 +126,29 @@ func _run() -> void:
 	game.set_physics_process(false)
 	game.ui._touch_enabled = true
 	game.ui._finish_intro()
+	original_render_loop = RenderingServer.render_loop_enabled
+	if capture_on_demand:
+		RenderingServer.render_loop_enabled = false
+	print("I01_PHASE voice_catalog")
 	_check_i01_voice_catalog()
+	print("I01_PHASE vid_a_normal")
 	await _test_vid_a_normal()
+	print("I01_PHASE hud_and_props")
 	await _test_hud_and_props()
+	print("I01_PHASE vid_b_interrupted")
 	await _test_vid_b_interrupted()
+	print("I01_PHASE marcus_and_vid_c")
 	await _test_marcus_and_vid_c()
+	print("I01_PHASE vid_a_skip_and_resume")
 	await _test_vid_a_skip_and_resume()
+	print("I01_PHASE film_aborted_equivalence")
 	await _test_film_aborted_equivalence()
+	RenderingServer.render_loop_enabled = original_render_loop
 	if not capture_dir.is_empty():
 		var file := FileAccess.open(capture_dir.path_join("i01-flow-report.json"), FileAccess.WRITE)
 		file.store_string(JSON.stringify({"checks":checks, "failures":failures, "captures":captures, "timing_film_seconds":timing,
 			"size":[size.x, size.y], "renderer":RenderingServer.get_current_rendering_method(),
+			"capture_mode":"on_demand" if capture_on_demand else "continuous",
 			"note":"Engine frames from the production Main; travel between authored points is fixture placement, not a timed walk."}, "\t"))
 		file.close()
 	game.queue_free()
@@ -649,14 +672,22 @@ func _all_text(node: Node) -> String:
 func capture(id: String) -> void:
 	if capture_dir.is_empty() or DisplayServer.get_name() == "headless":
 		return
+	# The original three warm-up frames and post-draw barrier are retained.
+	# Only the unobserved frames between captures omit rasterization.
+	if capture_on_demand:
+		RenderingServer.render_loop_enabled = true
 	for i in 3:
 		await process_frame
 	await RenderingServer.frame_post_draw
 	var image := root.get_texture().get_image()
+	if capture_on_demand:
+		RenderingServer.render_loop_enabled = false
 	if image == null or image.is_empty():
 		check(false, "Real rendered image for " + id)
 		return
+	check(image.get_width() == size.x and image.get_height() == size.y, "Full-size rendered image for " + id)
 	DirAccess.make_dir_recursive_absolute(capture_dir)
 	var name := "%dx%d-%s" % [size.x, size.y, id]
 	check(image.save_png(capture_dir.path_join(name + ".png")) == OK, "Saved " + name)
 	captures.append({"id":id, "file":name + ".png", "width":image.get_width(), "height":image.get_height(), "label":"engine render (gl_compatibility, software rasterizer)"})
+	print("I01_CAPTURE ", id, " ", image.get_width(), "x", image.get_height())
