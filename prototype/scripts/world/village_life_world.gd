@@ -9,6 +9,7 @@ const Art = preload("res://scripts/world/village_art.gd")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Behavior = preload("res://scripts/domain/npc_behavior.gd")
 const Activities := preload("res://scripts/visuals/resident_activity.gd")
+const WorkplaceStock := preload("res://scripts/visuals/workplace_stock.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Strike = preload("res://scripts/domain/raider_strike.gd")
 const COUNCIL := "res://assets/politics/council/valdora_council.glb"
@@ -393,6 +394,9 @@ func sync_state(data: Dictionary, profile: String) -> void:
 		item.damaged.visible = int(place.condition) < 100
 		item.repaired.visible = int(place.condition) == 100
 		item.label.modulate = Color("d8e2a8") if place.working else Color("e1c493")
+		WorkplaceStock.sync(item.get("stock_piles",[]),str(place.id),economy.get("stocks",{}))
+		item.node.set_meta("production_active",bool(place.working))
+		item.node.set_meta("production_cycle",float(place.cycle_progress))
 	_sync_raiders()
 
 
@@ -500,11 +504,12 @@ func _create_workplace(id: String, at: Vector2) -> void:
 	broken.rotation.z = -.28
 	# The workplace apron is flush with the path, including its collision.
 	Art.box(node, Vector3(4.5,.12,2.9), Vector3(0,-.06,0), _stone, true)
-	if id == "woodcamp":
+	var stock_piles := WorkplaceStock.build(node,id)
+	if id == "woodcamp" and stock_piles.is_empty():
 		for index in 6:
 			var log := Art.cylinder(node, .17, 2.5, Vector3(-1.2 + (index % 3) * .4, .3 + (index / 3) * .3, .5), _wood)
 			log.rotation.z = PI / 2
-	elif id == "quarry":
+	elif id == "quarry" and stock_piles.is_empty():
 		for index in 5:
 			Art.box(node, Vector3(.7,.5,.8), Vector3(-1.5 + (index % 3), .3, -.6 + (index / 3)), _stone)
 	elif id == "trade":
@@ -515,7 +520,7 @@ func _create_workplace(id: String, at: Vector2) -> void:
 		Art.box(repaired, Vector3(2.0,.14,1.0), Vector3(0,1.45,0), _wood)
 	var label := Art.label(node, Economy.WORKPLACES[id].name, Vector3(0,3.35,0), Color("e6d4aa"), 27)
 	label.visibility_range_end = 20
-	workplaces[id] = {"node":node, "label":label, "damaged":damaged, "repaired":repaired}
+	workplaces[id] = {"node":node, "label":label, "damaged":damaged, "repaired":repaired, "stock_piles":stock_piles}
 
 
 func _sync_actor(id: String, caption: String, profession: String, person: Dictionary) -> void:
@@ -718,6 +723,8 @@ func set_active(value: bool) -> void:
 	for actor: Node3D in actors.values():
 		if not active:
 			_set_social_pose(actor,false)
+			actor.get_node("Figure").clear_gaze_target()
+			actor.get_node("Figure").set_resident_prop("")
 			actor.get_node("Figure").drive(0.0)
 	if not active:
 		for actor: Node3D in raiders.values():

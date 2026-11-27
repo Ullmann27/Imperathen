@@ -9,6 +9,10 @@ on:
       - 'prototype/scripts/world/village_life_world.gd'
       - 'prototype/scripts/visuals/meshy_*.gd'
       - 'prototype/scripts/visuals/village_person.gd'
+      - 'prototype/scripts/visuals/resident_activity.gd'
+      - 'prototype/scripts/visuals/workplace_stock.gd'
+      - 'prototype/scripts/world/city_resident_view.gd'
+      - 'prototype/tests/resident_activity_test.gd'
       - 'prototype/assets/meshy/characters/**'
       - 'prototype/assets/meshy/equipment/**'
       - 'prototype/tests/npc_behavior*_test.gd'
@@ -91,6 +95,8 @@ jobs:
               timeout --kill-after=10s 180s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script "res://tests/$script.gd" 2>&1 | tee "$log"
             grep -Fq "$marker" "$log"
           }
+          run_check resident_activity_test 'RESIDENT_ACTIVITY_PASS'
+          run_check route_fire_test 'ROUTE_FIRE_PASS'
           run_check npc_behavior_test 'checks passed'
           run_check npc_behavior_world_test 'checks passed'
           run_check npc_behavior_ui_test 'NPC_BEHAVIOR_UI_PASS'

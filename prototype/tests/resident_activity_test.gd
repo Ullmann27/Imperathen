@@ -2,6 +2,8 @@ extends SceneTree
 const Activity := preload("res://scripts/visuals/resident_activity.gd")
 const Person := preload("res://scripts/visuals/village_person.gd")
 const Behavior := preload("res://scripts/domain/npc_behavior.gd")
+const Model := preload("res://scripts/domain/world_model.gd")
+const Stock := preload("res://scripts/visuals/workplace_stock.gd")
 var failed := 0
 func _initialize() -> void:
 	_run.call_deferred()
@@ -25,9 +27,33 @@ func _run() -> void:
 	check(Activity.speaker(3,5,0)!=Activity.speaker(3,5,5) and Activity.speaker(3,5,0)==Activity.speaker(5,3,0),"Consistent alternating speakers")
 	check(Activity.standing_work({"act":"work","arr":10,"until":40},12),"Work intent uses actual workplace animation")
 	check(not Activity.standing_work({"act":"work","arr":10,"until":40},5),"No work animation while commuting")
-	check(Behavior.daily_window({"calendar":{"clock":{"second":12*3600+14*60}}},"flavia") in ["meal",""],"Staggered lunchtime is bounded")
+	check(Behavior.daily_window({"calendar":{"clock":{"second":12*3600+14*60+30}}},"flavia")=="meal","Staggered lunchtime overlaps at midday")
 	check(Behavior.daily_window({"calendar":{"clock":{"second":20*3600}}},"flavia")=="evening","Evening follows world clock")
 	check(Behavior.daily_window({},"flavia")=="","Legacy saves retain behavior")
+	var model := Model.new()
+	model.new_game("italia",true,true)
+	var data := model.data
+	data.calendar.clock.second = 12*3600+14*60+30
+	data.village.behavior.people.flavia.next_decision = 0.0
+	data.village.behavior.people.flavia.observed = false
+	data.village.behavior.people.flavia.fatigue = 12.0
+	data.village.behavior.people.flavia.social_need = 10.0
+	var ledger := data.resources.duplicate(true)
+	Behavior._decide_all(data,0.0)
+	check(Behavior.view(data,"flavia").activity=="meal","Actual resident decision chooses midday break")
+	check(Behavior.view(data,"lucius").activity!="meal","Guard retains duty")
+	check(data.resources==ledger,"Daytime choice cannot create goods")
+	check(Behavior.validate(data).is_empty(),"New decision remains compatible with the saved state contract")
+	check(Stock.pile_count(0,240)==0 and Stock.pile_count(120,240)==2 and Stock.pile_count(240,240)==3,"Stock visibility follows depletion")
+	var workplace := Node3D.new()
+	root.add_child(workplace)
+	var piles := Stock.build(workplace,"woodcamp")
+	check(piles.size()==3,"Three real imported Meshy wood piles")
+	Stock.sync(piles,"woodcamp",{"forest":0})
+	check(piles.all(func(item: Node3D)->bool: return not item.visible),"Depleted stock disappears")
+	Stock.sync(piles,"woodcamp",{"forest":240})
+	check(piles.all(func(item: Node3D)->bool: return item.visible),"Replenished stock appears")
+	workplace.free()
 	var actor := Person.new()
 	root.add_child(actor)
 	actor.configure_resident("italia",35,"civilian_man",3,null,"test-resident")

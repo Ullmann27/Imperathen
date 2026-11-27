@@ -17,6 +17,7 @@ var camera: Camera3D
 var profile := "balanced"
 var actors := {}
 var _cursor := 0
+var _social_clock := 0.0
 var _capsule := CapsuleShape3D.new()
 
 func setup(source: Life, player: CharacterBody3D, view: Camera3D, quality: String) -> void:
@@ -57,7 +58,11 @@ func _physics_process(delta: float) -> void:
 		actor.set_meta("actual_speed",actual_speed)
 		if movement.length_squared() > 0.000001:
 			figure.rotation.y = rotate_toward(figure.rotation.y, atan2(-movement.x, -movement.y), delta * 4.5)
-	_update_visible_activities(now,delta)
+	_social_clock += delta
+	var refresh_contact := _social_clock >= 0.20
+	if refresh_contact:
+		_social_clock = 0.0
+	_update_visible_activities(now,delta,refresh_contact)
 	# Bound the search independently of total city size and spread model
 	# instantiation across physics frames.
 	var count: int = life.state.residents.size()
@@ -93,7 +98,7 @@ func _physics_process(delta: float) -> void:
 				_retire(replace)
 			break
 
-func _update_visible_activities(now: int, delta: float) -> void:
+func _update_visible_activities(now: int, delta: float, refresh_contact: bool) -> void:
 	# Only the bounded pool of actual streamed residents is considered.
 	# A buyer can address a vendor even though the vendor's domain with
 	# field is not reciprocal; never invent a partner from proximity alone.
@@ -120,9 +125,14 @@ func _update_visible_activities(now: int, delta: float) -> void:
 				var start := figure.gaze_anchor()
 				var finish := other_figure.gaze_anchor()
 				if start.is_finite() and finish.is_finite():
-					var ray := PhysicsRayQueryParameters3D.create(start,finish,1,[actor.get_rid(),other_body.get_rid()])
-					if get_world_3d().direct_space_state.intersect_ray(ray).is_empty():
+					if refresh_contact or int(actor.get_meta("contact_peer",-1)) != other:
+						var ray := PhysicsRayQueryParameters3D.create(start,finish,1,[actor.get_rid(),other_body.get_rid()])
+						actor.set_meta("contact_clear",get_world_3d().direct_space_state.intersect_ray(ray).is_empty())
+						actor.set_meta("contact_peer",other)
+					if bool(actor.get_meta("contact_clear",false)):
 						partner = other_figure
+		if moving or other < 0 or not actors.has(other):
+			actor.set_meta("contact_peer",-1)
 		figure.set_gaze_target(partner)
 		var talking := is_instance_valid(partner) and Activities.speaker(person,other,now) == person
 		if bool(actor.get_meta("activity_speaking",false)) and not talking:
