@@ -87,7 +87,60 @@ func _audio_onset(stream: AudioStream) -> Dictionary:
 	return {"onset": onset, "end": (last * hop + win) / rate}
 
 
+## Reject wrong phoneme-index order, invalid timing and duplicate catalogue
+## identities before the runtime can send them to the facial animation.
+func _check_voice_contract() -> void:
+	var known := VoiceLines.find_line_id("I-00.i00_caesar")
+	var track := VoiceLines.viseme_track(known)
+	_check(not known.is_empty() and not track.is_empty(), "Known shipped Caesar recording has valid contract")
+	if known.is_empty() or track.is_empty():
+		return
+	var swapped := track.duplicate(true)
+	var first: Variant = swapped.visemes[0]
+	swapped.visemes[0] = swapped.visemes[1]
+	swapped.visemes[1] = first
+	_check(not VoiceLines.validate_viseme_track(swapped, known), "Reordered viseme indices cannot drive incorrect mouths")
+	var wrong_duration := track.duplicate(true)
+	wrong_duration.duration_s = float(known.duration_s) + 0.5
+	_check(not VoiceLines.validate_viseme_track(wrong_duration, known), "Track duration must match the recording metadata")
+	var wrong_onset := track.duplicate(true)
+	wrong_onset.first_phoneme_s = float(track.audio_onset_s) + 0.1
+	_check(not VoiceLines.validate_viseme_track(wrong_onset, known), "Audio and phoneme onset must agree")
+	var negative_onset := track.duplicate(true)
+	negative_onset.audio_onset_s = -0.1
+	negative_onset.first_phoneme_s = -0.1
+	_check(not VoiceLines.validate_viseme_track(negative_onset, known), "Negative onset cannot be accepted")
+	var wrong_type := track.duplicate(true)
+	wrong_type.duration_s = "invalid"
+	_check(not VoiceLines.validate_viseme_track(wrong_type, known), "Malformed duration is rejected without conversion")
+	var wrong_index := track.duplicate(true)
+	wrong_index.segments[0][2] = 15
+	_check(not VoiceLines.validate_viseme_track(wrong_index, known), "Out-of-range mouth index is rejected")
+	var wrong_speaker := track.duplicate(true)
+	wrong_speaker.speaker_id = "julia"
+	_check(not VoiceLines.validate_viseme_track(wrong_speaker, known), "Wrong speaker track is rejected")
+	var same_key := known.duplicate(true)
+	same_key.line_id = "duplicate-story-entry"
+	var duplicated := VoiceLines.index_lines([known, same_key])
+	_check(duplicated.by_key[known.text_key][known.speaker_id].is_empty(), "Two recordings for the same speaker and subtitle are ambiguous")
+	var duplicate_id := VoiceLines.index_lines([known, known.duplicate(true)])
+	_check(duplicate_id.by_id[known.line_id].is_empty(), "Duplicate line IDs cannot overwrite each other")
+	var another_speaker := known.duplicate(true)
+	another_speaker.line_id = "other-speaker"
+	another_speaker.speaker_id = "julia"
+	var distinct := VoiceLines.index_lines([known, another_speaker])
+	_check(distinct.by_key[known.text_key].size() == 2 and not distinct.by_key[known.text_key]["julia"].is_empty(), "Same words spoken by different characters stay distinct")
+	var stale := known.duplicate(true)
+	stale.text = "Changed dialogue."
+	_check(VoiceLines.index_lines([stale]).by_id.is_empty(), "A stale text hash cannot index a changed dialogue line")
+	_check(VoiceLines.stream_for({"file": "../voice/lines/I-00.i00_caesar.ogg"}) == null, "Audio path cannot escape its catalogue")
+	_check(VoiceLines.viseme_track({"visemes": "../voice/visemes/I-00.i00_caesar.json"}).is_empty(), "Viseme path cannot escape its catalogue")
+	for row: Dictionary in VoiceLines.all_lines():
+		_check(not VoiceLines.viseme_track(row).is_empty(), "Shipped viseme contract: " + str(row.line_id))
+
+
 func _run() -> void:
+	_check_voice_contract()
 	# The current film includes alternate family reactions and topic branches,
 	# not only the default VID-A path. Every authored spoken line must have
 	# its own exact text, correct speaker, imported audio and matching track.

@@ -121,20 +121,29 @@ func _update_visible_activities(now: int, delta: float, refresh_contact: bool) -
 	# A buyer can address a vendor even though the vendor's domain with
 	# field is not reciprocal; never invent a partner from proximity alone.
 	var requests := {}
+	var buyers := {}
 	for person: int in actors:
 		var resident: Dictionary = life.state.residents[person]
 		var peer := Activities.partner_id(resident,now)
-		if peer >= 0 and actors.has(peer):
-			requests[person] = peer
-			if not requests.has(peer):
-				requests[peer] = person
+		if peer < 0 or peer == person or not actors.has(peer):
+			continue
+		var actor: CharacterBody3D = actors[person]
+		var other_body: CharacterBody3D = actors[peer]
+		if life.is_walking(person,now) or life.is_walking(peer,now) or float(actor.get_meta("actual_speed",0.0)) > 0.06 or float(other_body.get_meta("actual_speed",0.0)) > 0.06:
+			continue
+		if actor.global_position.distance_to(other_body.global_position) > 2.8 or not actor.is_visible_in_tree() or not other_body.is_visible_in_tree():
+			continue
+		requests[person] = peer
+		if resident.get("act","") == "shop" and int(resident.get("step",0)) == 2:
+			buyers[person] = true
+	var pairs := Activities.conversation_pairs(requests,buyers)
 	for person: int in actors:
 		var resident: Dictionary = life.state.residents[person]
 		var actor: CharacterBody3D = actors[person]
 		var figure: Figure = actor.get_node("Figure")
 		var moving := float(actor.get_meta("actual_speed",0.0)) > 0.06 or life.is_walking(person,now)
 		figure.set_resident_prop(Activities.city_prop(resident,now))
-		var other := int(requests.get(person,-1))
+		var other := int(pairs.get(person,-1))
 		var partner: Figure
 		if not moving and other >= 0 and actors.has(other):
 			var other_body: CharacterBody3D = actors[other]
@@ -144,8 +153,11 @@ func _update_visible_activities(now: int, delta: float, refresh_contact: bool) -
 				var finish := other_figure.gaze_anchor()
 				if start.is_finite() and finish.is_finite():
 					if refresh_contact or int(actor.get_meta("contact_peer",-1)) != other:
-						var ray := PhysicsRayQueryParameters3D.create(start,finish,1,[actor.get_rid(),other_body.get_rid()])
-						actor.set_meta("contact_clear",get_world_3d().direct_space_state.intersect_ray(ray).is_empty())
+						var exclusions: Array[RID] = [actor.get_rid(),other_body.get_rid()]
+						var ray := PhysicsRayQueryParameters3D.create(start,finish,1,exclusions)
+						var torso_ray := PhysicsRayQueryParameters3D.create(actor.global_position + Vector3.UP * 0.85,other_body.global_position + Vector3.UP * 0.85,1,exclusions)
+						var space := get_world_3d().direct_space_state
+						actor.set_meta("contact_clear",space.intersect_ray(ray).is_empty() and space.intersect_ray(torso_ray).is_empty())
 						actor.set_meta("contact_peer",other)
 					if bool(actor.get_meta("contact_clear",false)):
 						partner = other_figure
