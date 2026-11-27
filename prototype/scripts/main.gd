@@ -1064,14 +1064,14 @@ func _opening_present() -> void:
 	_update_opening_voice(beat)
 	opening_director.mission_actor_id = str(cut.actor_id)
 	opening_director.focus_key = str(beat.get("anchor", ""))
-	opening_director.speaking = _film_actor_speaks(beat,str(cut.actor_id))
-	opening_director.play(str(cut.shot_id), maxf(0.1, maxf(float(beat.duration), opening_voice_duration) * float(cut.span)), bool(ui.opening_preferences().reduce_motion))
+	opening_director.begin_beat(_film_line_actor(beat))
+	opening_director.play(str(cut.shot_id), maxf(0.1, maxf(float(beat.duration), opening_voice_duration) * float(cut.span)), bool(ui.opening_preferences().reduce_motion), 0.0)
 	# One clock drives subtitle timing and camera travel. Reading mode can hold
 	# the finished composition without skipping a sentence or simulating time.
 	opening_director.set_process(false)
 	opening_director.set_paused(opening_paused)
 	if bool(beat.get("final", false)):
-		opening_director.sample(str(cut.shot_id), 1.0)
+		opening_director.sample(str(cut.shot_id), 1.0, opening_elapsed)
 		opening_overlay.set_progress(1.0)
 	else:
 		opening_overlay.set_progress(0.0)
@@ -1126,11 +1126,12 @@ func _opening_process(delta: float) -> void:
 	if str(cut.shot_id) != opening_director.shot_id or str(cut.actor_id) != opening_director.mission_actor_id:
 		# A cut inside the line (reaction shot): same clock, new composition.
 		opening_director.mission_actor_id = str(cut.actor_id)
-		opening_director.speaking = _film_actor_speaks(beat,str(cut.actor_id))
-		opening_director.play(str(cut.shot_id), maxf(0.1, duration * float(cut.span)), bool(ui.opening_preferences().reduce_motion))
-		opening_director.set_process(false)
+		# Sample the correct shot fraction and absolute line time immediately;
+		# do not introduce a transient zero-phase pose at the cut.
+		opening_director.play(str(cut.shot_id), maxf(0.1, duration * float(cut.span)), bool(ui.opening_preferences().reduce_motion), opening_elapsed, float(cut.local))
 		opening_director.set_paused(opening_paused)
-	opening_director.sample(str(cut.shot_id), float(cut.local))
+	else:
+		opening_director.sample(str(cut.shot_id), float(cut.local), opening_elapsed)
 	opening_overlay.set_progress(opening_elapsed / duration)
 	# AwaitChoice holds only this scene (HB S. 29); the composition stays.
 	# Silent pauses carry no sentence, so reading mode does not hold them.
@@ -1142,13 +1143,16 @@ func _opening_process(delta: float) -> void:
 ## ([{at, shot_id, actor_id}], ascending "at" in 0..1) to change the shot size
 ## or show a reaction while the same line continues. Returns the shot, the
 ## actor it frames, the cut's share of the beat and the time inside the cut.
-func _film_actor_speaks(beat: Dictionary, actor_id: String) -> bool:
+func _film_line_actor(beat: Dictionary) -> String:
 	if bool(beat.get("silent",false)) or bool(beat.get("final",false)) or bool(beat.get("await_choice",false)):
-		return false
+		return ""
 	var speaker := VoiceLines.speaker_id(str(beat.get("speaker_id",beat.get("speaker",""))))
-	if speaker in ["","narrator","player"]:
-		return false
-	return actor_id.is_empty() or VoiceLines.speaker_id(actor_id) == speaker
+	return "" if speaker in ["","narrator","player"] else speaker
+
+
+func _film_actor_speaks(beat: Dictionary, actor_id: String) -> bool:
+	var speaker := _film_line_actor(beat)
+	return not speaker.is_empty() and (actor_id.is_empty() or VoiceLines.speaker_id(actor_id) == speaker)
 
 
 func _beat_cut(beat: Dictionary, fraction: float) -> Dictionary:

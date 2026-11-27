@@ -24,6 +24,8 @@ const JUG_SUPPORT := Vector3(-.085,.055,0)
 const JUG_MOUTH := Vector3(0,.389,0)
 const WELL_DURATION := 6.6
 const POUR_DURATION := 6.6
+const POUR_START := 0.45
+const POUR_CUP_SPAN := 1.75
 const HAND_CUPS := {"julia":Vector3(0.0, -0.02, 0.05), "silvanus":Vector3(0.0, 0.10, 0.05), "player":Vector3(0.0, 0.22, 0.05)}
 
 var _cups: Dictionary = {}
@@ -75,6 +77,26 @@ func sample_film_pour(seconds: float) -> void:
 	if _film_pour and _jug_action == "i01_pour":
 		_jug_clock = clampf(seconds,0.0,_jug_duration)
 		_sample_water_action()
+
+## World-space centre of the physical pour, shared with the film camera.
+## Presentation only; use the same timeline and actual imported props.
+func cinematic_pour_focus() -> Vector3:
+	if not _film_pour or _jug_action != "i01_pour" or not is_instance_valid(_jug):
+		return Vector3.INF
+	var index := clampi(floori((_jug_clock - POUR_START) / POUR_CUP_SPAN), 0, I01.CUPS.size() - 1)
+	var owner: String = I01.CUPS[index]
+	var cup: Node3D = _cups.get(owner)
+	if not is_instance_valid(cup):
+		return Vector3.INF
+	var mouth := _cup_mouth(owner)
+	# Blend between actual receivers while the jug travels to the next cup.
+	# During the active stream both endpoints are the same as the water FX.
+	if index > 0:
+		var local := clampf((_jug_clock - POUR_START - float(index) * POUR_CUP_SPAN) / POUR_CUP_SPAN, 0.0, 1.0)
+		mouth = _cup_mouth(I01.CUPS[index - 1]).lerp(mouth, smoothstep(0.0, 0.25, local))
+	var lip := _jug.to_global(JUG_MOUTH)
+	return mouth.lerp(lip, 0.5) if mouth.is_finite() and lip.is_finite() else Vector3.INF
+
 
 func settle_film_pour() -> void:
 	if _film_pour and _jug_action == "i01_pour":
@@ -408,8 +430,8 @@ func _pour_pose(owner: String, tilt: float) -> Transform3D:
 
 func _sample_pour(seconds: float) -> void:
 	_water_motion.clear_stream()
-	var start := .45
-	var span := 1.75
+	var start := POUR_START
+	var span := POUR_CUP_SPAN
 	for i in I01.CUPS.size():
 		var owner: String = I01.CUPS[i]
 		var local := clampf((seconds-start-float(i)*span)/span,0,1)

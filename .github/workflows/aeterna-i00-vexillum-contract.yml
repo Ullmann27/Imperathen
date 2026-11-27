@@ -1,0 +1,51 @@
+name: I-00 original textile import contract
+on:
+  push:
+    branches: ['fix/aeterna-vexillum-import-contract-20261127']
+permissions:
+  contents: read
+concurrency:
+  group: aeterna-vexillum-import-contract
+  cancel-in-progress: false
+jobs:
+  verify-camp:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      IMPERATHEN_REQUIRE_I00_VEXILLUM: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install official Godot and verify its checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Verify installed original textile and cinematic director
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --only import i00_stage opening_director --report artifacts/i00-camp/engine
+          grep -Fq I00_STAGE_PASS artifacts/i00-camp/engine/i00_stage.log
+      - name: Keep engine evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: i00-camp-engine-${{ github.run_id }}
+          path: artifacts/i00-camp/
+          if-no-files-found: warn
+          retention-days: 30

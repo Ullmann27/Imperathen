@@ -1,0 +1,5 @@
+# Integrated weather and predictive terrain support
+Source base a201e5b49f151c8d1c55b1ca7290c81c5f84f17e.
+PR #163 exact tested revision b730eca31eb7423fa3066e00939f986d193ff352: run 45999590328 / job 140507522011 CITY_LIFE_PASS checks=119, LOCAL_WEATHER_PASS checks=4403 failures=0.
+PR #164 exact tested revision 3d2fb971a19699bac11aca4d6bfb183ee9894346: run 45999603112 / job 140507566092 import, world_stream_plan and regional_terrain passed; route replay reports failures=[], 9 sector crossings in each run, 0 ungrounded frames in each run, 1780.78 m walked (1239.33 simulated s) and 1780.58 m with faster capsule (617.35 simulated s). Faster capsule is a reference test, NOT implemented mounted gameplay.
+The complete blob comparison against the same parent found zero overlapping changes. The two exact passing trees are integrated here; combined regression still required. PR #165 acting clock is independent and pending CI, not included. Candidate ARM64 gate 45997789228 failed on the existing companion planted-foot limit; no release or device approval claimed.

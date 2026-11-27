@@ -105,11 +105,18 @@ func _seed_measurements(display: Node) -> void:
 	display._sample_frames = 45
 	display._previous_frame_usec = 1234
 	display._recent_times.assign([16.0, 17.0])
+	display._cpu_times.assign([4.0])
+	display._gpu_times.assign([6.0])
+	display._governor_frame_times.assign([16.0,17.0])
+	display._governor_gpu_times.assign([6.0])
+	display._governor_elapsed_ms = 33.0
 
 
 func _check_clean_window(display: Node, label: String) -> void:
 	_check(display._sample_frames == 0 and display._previous_frame_usec == 0 and display._recent_times.is_empty() and display._sample_start > 1,
 		"Fresh timing window after " + label)
+	_check(display._cpu_times.is_empty() and display._gpu_times.is_empty() and display._governor_frame_times.is_empty() and display._governor_gpu_times.is_empty() and display._governor_elapsed_ms == 0.0,
+		"All timing observations invalidated after " + label)
 
 
 func _check(condition: bool, label: String) -> void:

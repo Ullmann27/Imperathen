@@ -63,6 +63,11 @@ var focus_key := ""
 ## False during silent pause and reaction beats (set by the film owner).
 var speaking := true
 var _speaker_posed := false
+# Main owns the absolute beat clock and the identity of the spoken line.
+# Standalone playback/review retains its original shot-clock contract.
+var _beat_owned := false
+var _line_actor_id := ""
+var _acting_seconds := 0.0
 var _interior_film := false
 
 
@@ -86,35 +91,49 @@ func setup(world: Node3D) -> bool:
 	return true
 
 
-func play(next_shot: String, seconds: float, reduce_motion := false) -> bool:
-	if next_shot not in SHOT_IDS or not is_finite(seconds) or not is_instance_valid(_world) or not is_instance_valid(_game_camera):
+func play(next_shot: String, seconds: float, reduce_motion := false, beat_seconds: float = -1.0, shot_fraction: float = 0.0) -> bool:
+	if next_shot not in SHOT_IDS or not is_finite(seconds) or not is_finite(beat_seconds) or not is_finite(shot_fraction) or not is_instance_valid(_world) or not is_instance_valid(_game_camera):
 		return false
 	_begin()
 	_change_speaker(next_shot)
 	shot_id = next_shot
 	duration = maxf(0.1, seconds)
-	elapsed = 0.0
+	elapsed = clampf(shot_fraction, 0.0, 1.0) * duration
 	reduced_motion = reduce_motion
 	paused = false
 	_completed = false
-	_apply_sample(0.0)
-	set_process(true)
+	_acting_seconds = beat_seconds if beat_seconds >= 0.0 else elapsed
+	_apply_sample(elapsed / duration)
+	# Main drives beat-owned shots explicitly, including the first frame
+	# of a reaction cut. Standalone playback still owns its own process.
+	set_process(beat_seconds < 0.0)
 	shot_started.emit(shot_id)
 	return true
 
 
+## Establish the line identity separately from the actor framed by the camera.
+## The following cuts can change framing without resetting the same speaker.
+func begin_beat(actor_id: String) -> void:
+	_beat_owned = true
+	_line_actor_id = actor_id
+	speaking = not actor_id.is_empty()
+
+
 func set_paused(value: bool) -> void:
 	paused = value
+	if is_instance_valid(_i00_stage):
+		_i00_stage.call("set_presentation_paused",value)
 
 
-func sample(next_shot: String, normalized_time: float) -> Dictionary:
+func sample(next_shot: String, normalized_time: float, beat_seconds: float = -1.0) -> Dictionary:
 	# Deterministic sampling uses the same shot code as playback, for render review.
-	if next_shot not in SHOT_IDS or not is_finite(normalized_time) or not is_instance_valid(_game_camera):
+	if next_shot not in SHOT_IDS or not is_finite(normalized_time) or not is_finite(beat_seconds) or not is_instance_valid(_game_camera):
 		return {}
 	_begin()
 	_change_speaker(next_shot)
 	shot_id = next_shot
 	elapsed = clampf(normalized_time, 0.0, 1.0) * duration
+	_acting_seconds = beat_seconds if beat_seconds >= 0.0 else elapsed
 	_apply_sample(clampf(normalized_time, 0.0, 1.0))
 	return snapshot()
 
@@ -125,7 +144,7 @@ func snapshot() -> Dictionary:
 	return {"shot_id": shot_id, "time": elapsed, "duration": duration,
 		"position": camera.global_position, "transform": camera.global_transform,
 		"fov": camera.fov, "active": active, "paused": paused,
-		"reduced_motion": reduced_motion}
+		"reduced_motion": reduced_motion, "acting_seconds": _acting_seconds}
 
 
 func finish() -> void:
@@ -134,6 +153,9 @@ func finish() -> void:
 		return
 	active = false
 	_release_speaker()
+	_beat_owned = false
+	_line_actor_id = ""
+	_acting_seconds = 0.0
 	_release_cinematic_cast()
 	_interior_film = false
 	_apply_grade(0.0)
@@ -184,6 +206,7 @@ func _process(delta: float) -> void:
 	if not active or paused or _completed:
 		return
 	elapsed = minf(duration, elapsed + maxf(0.0, delta))
+	_acting_seconds = elapsed
 	_apply_sample(elapsed / duration)
 	if elapsed >= duration:
 		_completed = true
@@ -197,6 +220,7 @@ func _ensure_i00_stage() -> Node3D:
 		add_child(_i00_stage)
 		_i00_stage.call("ensure_built")
 	_i00_stage.visible = true
+	_i00_stage.call("set_presentation_paused",paused)
 	return _i00_stage
 
 
@@ -236,18 +260,19 @@ func _apply_sample(normalized_time: float) -> void:
 	match shot_id:
 		"aquileia_detail":
 			var anchor := _anchor("i00_standard")
-			start = anchor + Vector3(0.85, 1.35, 1.55)
-			end = anchor + Vector3(0.48, 1.15, 1.0)
-			target_start = anchor + Vector3(0.0, 2.0, 0.0)
-			target_end = anchor + Vector3(0.0, 1.75, -0.1)
-			fov_start = 42.0
-			fov_end = 38.0
+			# Compose around the real fabric, then pull back to reveal the ranks.
+			start = anchor+Vector3(.32,2.53,1.50)
+			end = anchor+Vector3(1.25,2.26,3.60)
+			target_start = anchor+Vector3(0,2.48,.13)
+			target_end = anchor+Vector3(0,2.05,-2.0)
+			fov_start = 41.0
+			fov_end = 49.0
 		"legions_rain":
 			var anchor := _anchor("i00_legions")
-			start = anchor + Vector3(17.0, 8.4, 18.0)
-			end = anchor + Vector3(12.0, 6.2, 13.5)
-			target_start = anchor + Vector3(0.0, 1.2, -5.5)
-			target_end = anchor + Vector3(0.0, 1.0, -8.0)
+			start = anchor+Vector3(12.5,5.9,15.0)
+			end = anchor+Vector3(7.5,3.5,10.6)
+			target_start = anchor+Vector3(-3.2,1.35,-1.7)
+			target_end = anchor+Vector3(-2.2,1.45,.8)
 			fov_start = 57.0
 			fov_end = 51.0
 		"caesar_orders":
@@ -385,7 +410,7 @@ func _apply_sample(normalized_time: float) -> void:
 	_apply_grade(1.0 - eased if shot_id == "player" else 1.0)
 	if is_instance_valid(_speaker):
 		if speaking:
-			_speaker.sample_pose("talk", fposmod(elapsed / 1.7, 1.0))
+			_speaker.sample_pose("talk", fposmod(_acting_seconds / 1.7, 1.0))
 			_speaker_posed = true
 		elif _speaker_posed:
 			# A silent pause or reaction: nobody mouths a line.
@@ -414,7 +439,14 @@ func _i01_framing(id: String) -> Array:
 			return [table + Vector3(2.85, 1.10, 2.55), table + Vector3(2.55, 0.95, 2.30),
 				table + Vector3(0.0, -0.10, 0.0), table + Vector3(-0.15, -0.05, 0.0), 58.0, 54.0]
 		"i01_cups_insert":
-			# Insert: the crooked cup in front, Silvanus' cup behind it.
+			# The first breakfast beat uses the live pouring endpoints. The
+			# later silent insert and reduced-motion mode keep the authored still.
+			var props := _world.get_node_or_null("I01FamilyProps")
+			if not reduced_motion and is_instance_valid(props) and props.has_method("cinematic_pour_focus"):
+				var focus: Vector3 = props.call("cinematic_pour_focus")
+				if focus.is_finite():
+					return [focus + Vector3(-0.82, 0.39, 1.15), focus + Vector3(-0.74, 0.34, 1.05),
+						focus, focus, 33.0, 30.5]
 			return [table + Vector3(-0.62, 0.30, 0.86), table + Vector3(-0.50, 0.26, 0.74),
 				table + Vector3(0.32, 0.07, 0.30), table + Vector3(0.30, 0.07, 0.34), 33.0, 30.5]
 		"i01_close_speaker", "i01_react_julia":
@@ -432,12 +464,14 @@ func _i01_framing(id: String) -> Array:
 		"i01_react_boy":
 			# Reaction close on the listening boy from the adult's side.
 			var listening := _mission_figure("player")
-			var adult := _mission_figure(mission_actor_id if mission_actor_id in ["julia", "silvanus"] else "silvanus")
+			var adult_id := mission_actor_id if mission_actor_id in ["julia", "silvanus"] else "silvanus"
+			var adult := _mission_figure(adult_id)
 			var boy_face := (listening.global_position if is_instance_valid(listening) else _anchor("i01_player_table") + Vector3.UP * 0.9) + Vector3.UP * 0.36
 			var away := (adult.global_position if is_instance_valid(adult) else _anchor("i01_silvanus") + Vector3.UP * 0.9) - boy_face
 			away.y = 0.0
 			away = away.normalized() if away.length() > 0.1 else Vector3.FORWARD
-			var off := Vector3.UP.cross(away).normalized() * -0.30
+			# Preserve the adult close-up's side of the boy/adult axis.
+			var off := Vector3.UP.cross(away).normalized() * (0.30 if adult_id == "julia" else -0.30)
 			return [boy_face + away * 1.10 + off + Vector3.UP * 0.06, boy_face + away * 1.00 + off * 0.9 + Vector3.UP * 0.05,
 				boy_face, boy_face + Vector3.UP * 0.01, 36.0, 34.0]
 		"i01_two_shot":
@@ -497,7 +531,9 @@ func _duo_framing(id: String) -> Array:
 			return [speaker_face - axis * 1.40 + side * 0.36 + Vector3.UP * 0.03, speaker_face - axis * 1.20 + side * 0.30 + Vector3.UP * 0.02,
 				speaker_face, speaker_face + Vector3.UP * 0.015, 35.0, 32.0]
 		"duo_react":
-			return [boy_face + axis * 1.12 - side * 0.30 + Vector3.UP * 0.06, boy_face + axis * 1.02 - side * 0.27 + Vector3.UP * 0.05,
+			# Shot/reverse-shot: stay on the same side of the dialogue axis
+			# as duo_close, duo_wide and duo_ots to preserve screen direction.
+			return [boy_face + axis * 1.12 + side * 0.30 + Vector3.UP * 0.06, boy_face + axis * 1.02 + side * 0.27 + Vector3.UP * 0.05,
 				boy_face, boy_face + Vector3.UP * 0.01, 36.0, 34.0]
 		"duo_ots":
 			var shoulder := boy_at + Vector3.UP * 0.32
@@ -524,8 +560,8 @@ func _mission_figure(actor_id: String) -> Node3D:
 	return null
 
 
-func _face_mission_pair() -> void:
-	var npc := _mission_figure(mission_actor_id)
+func _face_mission_pair(actor_id: String) -> void:
+	var npc := _mission_figure(actor_id)
 	var player := _mission_figure("player")
 	if not is_instance_valid(npc) or not is_instance_valid(player) or npc == player:
 		return
@@ -569,6 +605,21 @@ func _release_cinematic_cast() -> void:
 
 func _change_speaker(next_shot: String) -> void:
 	prepare_cinematic_cast(next_shot, mission_actor_id)
+	if _beat_owned and (next_shot in I01_SHOTS or next_shot in DUO_SHOTS or next_shot in ["mission_dialogue", "mission_reaction"]):
+		# Camera actor and actual speaker can be different (Cassia's line
+		# with a cut to Marcus). Keep the line actor's real rig and gaze.
+		var pair_actor := _line_actor_id if not _line_actor_id.is_empty() else mission_actor_id
+		prepare_cinematic_cast(next_shot, pair_actor)
+		var line_figure := _mission_figure(_line_actor_id)
+		if is_instance_valid(line_figure) and (not line_figure.has_method("sample_pose") or not line_figure.has_method("reset_motion")):
+			line_figure = null
+		if _speaker == line_figure and _speaker_actor == pair_actor:
+			return
+		_release_speaker()
+		_speaker_actor = pair_actor
+		_face_mission_pair(pair_actor)
+		_speaker = line_figure
+		return
 	if next_shot == shot_id and _speaker_actor == mission_actor_id and (is_instance_valid(_speaker) or next_shot in ["mission_dialogue","mission_reaction"]):
 		return
 	_release_speaker()
@@ -581,12 +632,12 @@ func _change_speaker(next_shot: String) -> void:
 	elif next_shot in I01_SHOTS or next_shot in DUO_SHOTS:
 		# The named speaker of an I-01 shot uses the existing talk pose and
 		# turns toward the boy (restored when the film releases the figures).
-		_face_mission_pair()
+		_face_mission_pair(mission_actor_id)
 		var speaking := _mission_figure(mission_actor_id)
 		if is_instance_valid(speaking) and speaking.has_method("sample_pose") and speaking.has_method("reset_motion"):
 			_speaker = speaking
 	elif next_shot in ["mission_dialogue","mission_reaction"]:
-		_face_mission_pair()
+		_face_mission_pair(mission_actor_id)
 		if next_shot == "mission_dialogue":
 			var figure := _mission_figure(mission_actor_id)
 			if is_instance_valid(figure) and figure.has_method("sample_pose") and figure.has_method("reset_motion"):
@@ -601,6 +652,8 @@ func _release_speaker() -> void:
 	if is_instance_valid(_speaker):
 		_speaker.reset_motion()
 	_speaker = null
+	_speaker_posed = false
+	_speaker_actor = ""
 	for entry: Dictionary in _mission_rotations:
 		if is_instance_valid(entry.node):
 			if entry.node.has_method("clear_gaze_target"):

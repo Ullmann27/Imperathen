@@ -1578,11 +1578,21 @@ func _set_weather(kind: String, t: int) -> void:
 	if kind in ["rain","storm"]:
 		for person in state.residents.size():
 			var resident: Dictionary = state.residents[person]
-			if resident.act in OUTDOOR_LEISURE and int(resident.arr) <= t and not Anchors.has_tag(index.anchors[resident.at], "shelter"):
-				# They notice the rain a little apart from each other.
-				resident.until = t + 5 + person % 40
-				_schedule(person, int(resident.until))
-				sheltering += 1
+			if resident.act not in OUTDOOR_LEISURE or Anchors.has_tag(index.anchors[resident.at], "shelter"):
+				continue
+			# Preserve the reserved destination, travel interpolation and
+			# arrival wake. Once there, the resident can choose shelter using
+			# the normal decision system. Never extend an already short stay.
+			var arrival := int(resident.arr)
+			var deadline: int = arrival + 1 if arrival > t else t + 5 + int(person) % 40
+			if int(resident.until) <= deadline:
+				continue
+			resident.until = deadline
+			# An earlier arrival/decision must still execute. Do not book a
+			# duplicate wake at the same instant or move the heap backwards.
+			if arrival <= t and int(resident.wake) > deadline:
+				_schedule(person, deadline)
+			sheltering += 1
 	_event(t, "weather", {"weather": kind, "sheltering": sheltering})
 
 

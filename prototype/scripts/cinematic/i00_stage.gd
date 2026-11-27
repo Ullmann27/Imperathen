@@ -1,5 +1,5 @@
 extends Node3D
-## Lightweight cinematic scaffold for I-00 "Drei Legionen im Regen".
+## Original cinematic staging for I-00 "Drei Legionen im Regen".
 ##
 ## This is deliberately presentation-only. Caesar/Labienus use replaceable
 ## placeholder character visuals until historically reviewed hero assets exist.
@@ -8,10 +8,13 @@ extends Node3D
 const Person = preload("res://scripts/visuals/village_person.gd")
 const Ranks = preload("res://scripts/visuals/far_ranks.gd")
 const Art = preload("res://scripts/world/village_art.gd")
+const Vexillum := preload("res://scripts/cinematic/i00_vexillum.gd")
+const CampScenery := preload("res://scripts/cinematic/i00_camp_scenery.gd")
+const MESHY_SIGNIFER := "unit_roman_signifer"
 
 const OFFSET := Vector3(180.0, 0.0, 160.0)
 const ANCHORS := {
-	"i00_standard": Vector3(-7.5, 0.0, -1.0),
+	"i00_standard": Vector3(-9.0, 0.0, -3.0),
 	"i00_legions": Vector3(0.0, 0.0, -11.0),
 	"i00_caesar": Vector3(-2.4, 0.0, 2.2),
 	"i00_labienus": Vector3(2.4, 0.0, 2.0),
@@ -21,12 +24,15 @@ const ANCHORS := {
 var _built := false
 var _speakers: Dictionary = {}
 var _iron: StandardMaterial3D
-var _cloth: StandardMaterial3D
 var _shield: StandardMaterial3D
-var _mud: StandardMaterial3D
 var _wood: StandardMaterial3D
 var _legions: Node3D
 var _legion_clock := 0.0
+var _wind_clock := 0.0
+var _pose_tick := 0.0
+var _presentation_paused := false
+var _standards: Array[Node3D] = []
+var _foreground: Array[Node3D] = []
 
 
 func ensure_built() -> void:
@@ -36,10 +42,8 @@ func ensure_built() -> void:
 	position = OFFSET
 	_iron = Art.material(Color("5e625f"), 0.62)
 	_iron.metallic = 0.42
-	_cloth = Art.material(Color("7b4037"), 0.92)
 	_shield = Art.material(Color("6d3029"), 0.70)
 	_shield.metallic = 0.10
-	_mud = Art.material(Color("37342e"), 0.82)
 	_wood = Art.material(Color("554638"), 0.94)
 	_build_ground()
 	_build_legions()
@@ -65,31 +69,25 @@ func speaker(id: String) -> Node3D:
 
 
 func _build_ground() -> void:
-	Art.box(self, Vector3(52.0, 0.18, 62.0), Vector3(0.0, -0.10, -8.0), _mud)
-	for z in [-28.0, -20.0, -12.0, -4.0, 8.0]:
-		Art.box(self, Vector3(6.0, 0.025, 0.20), Vector3(0.0, 0.01, z), _wood)
-	for x in [-18.0, 18.0]:
-		for z in [-18.0, -7.0, 4.0]:
-			var tent := Node3D.new()
-			tent.position = Vector3(x, 0.0, z)
-			add_child(tent)
-			Art.box(tent, Vector3(3.8, 1.4, 2.8), Vector3(0, 0.7, 0), _cloth)
+	CampScenery.build(self)
 	for x in [-9.0, 0.0, 9.0]:
 		_standard(Vector3(x, 0.0, -3.0))
 
 
 func _standard(at: Vector3) -> void:
-	var node := Node3D.new()
+	var node := Vexillum.new()
+	node.name = "CommandVexillum_%d" % _standards.size()
 	node.position = at
 	add_child(node)
-	Art.cylinder(node, 0.045, 3.2, Vector3(0, 1.6, 0), _wood)
-	var flag := Art.box(node, Vector3(0.9, 0.55, 0.035), Vector3(0.48, 2.55, 0), _cloth)
-	flag.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var bronze := Art.material(Color("89744d"), .52, false)
+	bronze.metallic = .62
+	node.build(_wood, bronze, float(_standards.size())*1.37)
+	_standards.append(node)
 
 
 func _build_legions() -> void:
-	# Three presentation-only formations share the actual low-detail soldier
-	# mesh and phase-driven idle. No static capsules stand in for living people.
+	# Nine detailed front-row rigs REPLACE nine former far silhouettes.
+	# The remaining 45 share the existing animated formation batch.
 	_legions = Ranks.new()
 	_legions.name = "LegionBlocks"
 	add_child(_legions)
@@ -100,18 +98,59 @@ func _build_legions() -> void:
 		for row in 6:
 			for column in 3:
 				var at := Vector3(center_x+float(column-1)*.92,0,-8.0-float(row)*1.28)
-				transforms.append(Transform3D(Basis.IDENTITY,at))
-				var phase := fposmod(float(transforms.size())*.381966,1.0)
-				phases.append(Ranks.gait_data("idle",phase,phase+1.0))
+				var slot: int = block*18+row*3+column
+				var phase := fposmod(float(slot+1)*.381966,1.0)
+				if row == 0:
+					_foreground_soldier(at, slot, block == 0 and column == 1, phase)
+				else:
+					transforms.append(Transform3D(Basis.IDENTITY,at))
+					phases.append(Ranks.gait_data("idle",phase,phase+1.0))
 	_legions.sync({"spear":transforms},{"spear":phases})
 	_legions.set_step_fraction(0.0)
 
 
+func _foreground_soldier(at: Vector3, slot: int, signifer: bool, phase: float) -> void:
+	var figure := Person.new()
+	figure.name = "FrontRank_%02d" % slot
+	figure.position = at+Vector3.UP*.90
+	figure.rotation.y = PI
+	figure.detail = 0
+	figure.set_cinematic_detail(true)
+	add_child(figure)
+	figure.configure_resident("italia", 29+slot%13, "legionary", slot+31)
+	if signifer:
+		figure.configure_meshy(MESHY_SIGNIFER)
+	figure.set_meta("i00_slot",slot)
+	figure.set_meta("i00_phase",phase)
+	figure.set_meta("i00_source",figure.active_model_path)
+	figure.set_process(false)
+	figure.set_physics_process(false)
+	figure.sample_pose("idle",phase)
+	_foreground.append(figure)
+
+
+func set_presentation_paused(value: bool) -> void:
+	if _presentation_paused == value:
+		return
+	_presentation_paused = value
+	var rain := get_node_or_null("Rain") as GPUParticles3D
+	if rain:
+		rain.speed_scale = 0.0 if value else 1.0
+
+
 func _process(delta: float) -> void:
-	if not _built or not is_visible_in_tree() or delta <= 0.0:
+	if not _built or not is_visible_in_tree() or _presentation_paused or not is_finite(delta) or delta <= 0.0:
 		return
 	_legion_clock = fposmod(_legion_clock+delta,2.0)
+	_wind_clock = fposmod(_wind_clock+delta,40.0)
 	_legions.set_step_fraction(_legion_clock/2.0)
+	for standard: Node3D in _standards:
+		standard.call("sample_wind",_wind_clock)
+	_pose_tick += delta
+	if _pose_tick >= 1.0/30.0:
+		_pose_tick = fposmod(_pose_tick,1.0/30.0)
+		for figure: Node3D in _foreground:
+			figure.call("sample_pose","idle",fposmod(_legion_clock/2.0+float(figure.get_meta("i00_phase")),1.0))
 
 
 func _build_commanders() -> void:
@@ -128,6 +167,8 @@ func _commander(label: String, at: Vector3, appearance: String, variation: int) 
 	var figure := Person.new()
 	figure.name = "Figure"
 	figure.position.y = 0.90
+	figure.detail = 0
+	figure.set_cinematic_detail(true)
 	root.add_child(figure)
 	figure.configure_resident("italia", 42, appearance, variation, null)
 	return figure

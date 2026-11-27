@@ -305,17 +305,35 @@ func _test_hud_and_props() -> void:
 	game._opening_process(1.55)
 	check(props._water.julia.visible and not props._water.silvanus.visible and not props._water.player.visible,"Only first cup is filling")
 	check(props._water_motion.stream.any(func(item: MeshInstance3D)->bool: return item.visible),"The water stream is actual visible geometry")
+	var first_focus: Vector3 = props.cinematic_pour_focus()
+	check(first_focus.is_finite(), "First pour has a live world-space camera focus")
+	_check_live_pour_focus(props, "julia")
 	await capture("film-first-cup-pour")
 	game._opening_process(1.75)
 	check(props._water.julia.visible and props._water.silvanus.visible and not props._water.player.visible,"Second cup starts after first, not before")
+	_check_live_pour_focus(props, "silvanus")
+	check(props.cinematic_pour_focus().distance_to(first_focus) > 0.2, "Insert follows the physical receiver instead of a fixed tabletop point")
 	await capture("film-second-cup-pour")
 	game._opening_process(1.75)
 	check(props._water.player.visible,"Third cup is now filling")
+	_check_live_pour_focus(props, "player")
 	await capture("film-third-cup-pour")
 	game._opening_process(1.60)
 	check(not props.jug_animating() and carried_jug.global_position.distance_to(props.world_point(props.JUG_TABLE)) < .025,"The same jug settles at the real table")
+	check(not props.cinematic_pour_focus().is_finite(), "Finished pour releases the dynamic camera focus")
 	for owner: String in I01.CUPS:
 		check(props._water[owner].visible,"Filled water remains visible in "+owner)
+
+
+func _check_live_pour_focus(props, owner: String) -> void:
+	var cup: Node3D = props.cup_node(owner)
+	var expected := cup.to_global(Vector3(.033 if owner == "player" else 0.0, .147, 0)).lerp(
+		props.jug_node().to_global(props.JUG_MOUTH), 0.5)
+	var focus: Vector3 = props.cinematic_pour_focus()
+	check(focus.is_equal_approx(expected), "Camera focus matches real water endpoints: " + owner)
+	var camera: Camera3D = game.opening_director.camera
+	var direction := (focus - camera.global_position).normalized()
+	check((-camera.global_basis.z).normalized().dot(direction) > 0.98, "Camera looks at the live pour: " + owner)
 
 
 ## D-052 film dialogue: several shot sizes, reaction shots inside a line,
@@ -369,6 +387,26 @@ func _check_vid_b_direction() -> void:
 	# Restore the running beat exactly.
 	director.mission_actor_id = str(_beat().get("actor_id", ""))
 	director.sample(str(_beat().shot_id), 0.0)
+	# Drive the actual production Main through one continuous spoken beat,
+	# including both reaction cuts. Restore the original beat afterwards.
+	var original_index: int = game.opening_index
+	game.opening_index = ids.find("I01_B_SEXTUS")
+	game._opening_present()
+	var father: Node3D = game.world.get_cinematic_figure("silvanus")
+	var total: float = maxf(float(_beat().duration), game.opening_voice_duration)
+	var current_face: Node = game.opening_voice.face
+	var line_id := str(game.opening_voice.current.get("line_id",""))
+	game._opening_process(total * 0.45)
+	var before_cut: float = game.opening_elapsed
+	var first_phase: float = father.get("phase")
+	game._opening_process(total * 0.02)
+	check(director.shot_id == "i01_react_boy" and director._speaker == father, "Production reaction cut retains the original speaking figure")
+	check(is_equal_approx(float(father.get("phase")), fposmod(float(game.opening_elapsed) / 1.7, 1.0)) and is_equal_approx(first_phase, fposmod(before_cut / 1.7, 1.0)), "Body animation phase follows absolute beat seconds on both sides of the cut")
+	check(game.opening_voice.face == current_face and str(game.opening_voice.current.get("line_id","")) == line_id, "Camera cut does not rebind the voice or viseme track")
+	game._opening_process(total * 0.25)
+	check(director.shot_id == "i01_close_speaker" and director._speaker == father and is_equal_approx(float(father.get("phase")), fposmod(float(game.opening_elapsed) / 1.7, 1.0)), "Returning to the speaker retains continuous beat timing")
+	game.opening_index = original_index
+	game._opening_present()
 
 
 func _test_vid_b_interrupted() -> void:

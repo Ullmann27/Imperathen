@@ -13,6 +13,9 @@ const UNLOAD_BUDGET := 8
 ## A walking capsule can overlap an edge before its center changes sector.
 ## Keep the adjacent ground ready within one meter, including low quality.
 const SUPPORT_MARGIN_M := 1.0
+const PREFETCH_SECONDS := 1.5
+const MAX_PREFETCH_DISTANCE_M := 12.0
+const PREFETCH_MIN_SPEED_M_S := 0.25
 const MAX_RESIDENT_SECTORS := 145
 const LandSurface = preload("res://scripts/world/land/land_surface.gd")
 const AuthoredGround = preload("res://scripts/world/village/brook.gd")
@@ -35,6 +38,8 @@ var _last_support_key := ""
 var _pending: Array = []
 var _retiring: Array[String] = []
 var _support_ids: Array[String] = []
+var _prefetch_ids: Array[String] = []
+var _demand_ids: Dictionary = {}
 var _collision_targets: Dictionary = {}
 var _collision_order: Array[String] = []
 var ground_material: ShaderMaterial
@@ -51,7 +56,7 @@ func _ready() -> void:
 	ground_material = LandSurface.make_terrain()
 
 
-func follow(position: Vector3, quality: String) -> void:
+func follow(position: Vector3, quality: String, velocity: Vector3 = Vector3.ZERO) -> void:
 	var cell: Vector2i = Plan.sector_for_position(position)
 	if not Plan.sector_valid(cell):
 		return
@@ -61,29 +66,31 @@ func follow(position: Vector3, quality: String) -> void:
 	var profile := quality if Plan.PROFILES.has(quality) else "balanced"
 	var key := Plan.sector_id(cell)
 	var next_support := _support_sectors(position, cell)
-	var support_key := ",".join(next_support)
 	var demand_changed := key != _last_cell or profile != _last_quality
 	if demand_changed:
 		_last_cell = key
 		_last_quality = profile
 		demand = Plan.plan(position, profile)
-		var wanted: Dictionary = {}
+		_demand_ids.clear()
 		_pending.clear()
 		_retiring.clear()
 		for entry: Dictionary in demand.get("sectors", []):
-			wanted[entry.id] = true
+			_demand_ids[entry.id] = true
 			if not sectors.has(entry.id):
 				_pending.append(entry)
 		for id: String in sectors.keys():
-			if not wanted.has(id):
+			if not _demand_ids.has(id):
 				_retiring.append(id)
 		_retiring.sort_custom(func(a: String, b: String) -> bool:
 			var distance_a: float = sectors[a].position.distance_squared_to(position)
 			var distance_b: float = sectors[b].position.distance_squared_to(position)
 			return distance_a > distance_b if distance_a != distance_b else a < b)
+	var next_prefetch := _predictive_support(position, velocity, next_support)
+	var support_key := ",".join(next_support) + "|" + ",".join(next_prefetch)
 	if demand_changed or support_key != _last_support_key:
 		_last_support_key = support_key
 		_support_ids = next_support
+		_prefetch_ids = next_prefetch
 		_refresh_collision_targets()
 		_prioritize_support_meshes()
 	# Retire old geometry incrementally. During a profile reduction the report
@@ -131,10 +138,37 @@ func _support_sectors(position: Vector3, cell: Vector2i) -> Array[String]:
 	return result
 
 
+## Conservative swept horizontal footprint of the next short travel interval.
+## The maximum sweep is much smaller than one cell; at most four cells can
+## intersect it. Only already planned cells may be promoted, never synthesized.
+func _predictive_support(position: Vector3, velocity: Vector3, immediate: Array[String]) -> Array[String]:
+	var result: Array[String] = []
+	if not velocity.is_finite():
+		return result
+	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
+	var speed := horizontal.length()
+	if not is_finite(speed) or speed < PREFETCH_MIN_SPEED_M_S:
+		return result
+	var travel := horizontal.normalized() * minf(MAX_PREFETCH_DISTANCE_M, speed * PREFETCH_SECONDS)
+	var ahead := position + travel
+	if not ahead.is_finite():
+		return result
+	var lo: Vector2i = Plan.sector_for_position(Vector3(minf(position.x, ahead.x) - SUPPORT_MARGIN_M, position.y, minf(position.z, ahead.z) - SUPPORT_MARGIN_M))
+	var hi: Vector2i = Plan.sector_for_position(Vector3(maxf(position.x, ahead.x) + SUPPORT_MARGIN_M, position.y, maxf(position.z, ahead.z) + SUPPORT_MARGIN_M))
+	if not Plan.sector_valid(lo) or not Plan.sector_valid(hi):
+		return result
+	for z in range(lo.y, hi.y + 1):
+		for x in range(lo.x, hi.x + 1):
+			var id: String = Plan.sector_id(Vector2i(x, z))
+			if _demand_ids.has(id) and not immediate.has(id):
+				result.append(id)
+	return result
+
+
 func _refresh_collision_targets() -> void:
 	_collision_targets.clear()
 	_collision_order.clear()
-	for id: String in _support_ids:
+	for id: String in _support_ids + _prefetch_ids:
 		_collision_targets[id] = true
 		_collision_order.append(id)
 	for entry: Dictionary in demand.get("sectors", []):
@@ -149,14 +183,19 @@ func _refresh_collision_targets() -> void:
 
 
 func _prioritize_support_meshes() -> void:
-	var ordered: Array = []
-	for id: String in _support_ids:
-		for entry: Dictionary in _pending:
-			if str(entry.id) == id:
-				ordered.append(entry)
+	var by_id: Dictionary = {}
 	for entry: Dictionary in _pending:
-		if not _support_ids.has(str(entry.id)):
-			ordered.append(entry)
+		by_id[entry.id] = entry
+	var ordered: Array = []
+	for id: String in _support_ids + _prefetch_ids:
+		if by_id.has(id):
+			ordered.append(by_id[id])
+			by_id.erase(id)
+	# Restore the canonical demand order after a turn; an obsolete prediction
+	# must not keep priority. Never add anything outside the original queue.
+	for entry: Dictionary in demand.get("sectors", []):
+		if by_id.has(entry.id):
+			ordered.append(by_id[entry.id])
 	_pending = ordered
 
 
@@ -277,7 +316,7 @@ func report() -> Dictionary:
 		"retiring_sectors":_retiring.size(), "pending_collisions":pending_collisions,
 		"pending_work":_pending.size() + _retiring.size() + pending_collisions,
 		"collision_sectors":collisions, "collision_limit":_collision_targets.size(),
-		"support_sectors":_support_ids.size(), "triangles":loaded_triangles,
+		"support_sectors":_support_ids.size(), "prefetch_sectors":_prefetch_ids.size(), "triangles":loaded_triangles,
 		"active_limit":demand.get("active_limit", 0), "resident_limit":MAX_RESIDENT_SECTORS,
 		"last_mesh_builds":_last_mesh_builds, "last_collider_builds":_last_collider_builds,
 		"last_unloads":_last_unloads, "quality":_last_quality,
