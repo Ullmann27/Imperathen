@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 14,
+  "version": 18,
   "tasks": [
     {
       "id": "K101",
@@ -93,7 +93,7 @@
     {
       "id": "G001",
       "owner": "Gemini",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
       "run_id": "46019720312",
       "scope": [
@@ -101,12 +101,12 @@
         "prototype/tests/opening_director_test.gd"
       ],
       "access": "read",
-      "note": "GitHub workflow 46019720312, job 140576304218, offline checks passed; provider access/response not yet verified."
+      "note": "Verified run 46019720312, job 140576304218: required authorized API key missing; no provider request submitted. Keep assignment for a new dispatch after key setup."
     },
     {
       "id": "E001",
       "owner": "ERNIE",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
       "run_id": "46019720312",
       "scope": [
@@ -114,12 +114,12 @@
         "prototype/tests/npc_behavior_test.gd"
       ],
       "access": "read",
-      "note": "GitHub workflow 46019720312, job 140576304213, offline checks passed; provider access/response not yet verified."
+      "note": "Verified run 46019720312, job 140576304213: required authorized API key missing; no provider request submitted. Keep assignment for a new dispatch after key setup."
     },
     {
       "id": "V001",
       "owner": "SuperVL",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
       "run_id": "46019720312",
       "scope": [
@@ -127,19 +127,19 @@
         "prototype/scripts/world/village/house_interiors.gd"
       ],
       "access": "read",
-      "note": "GitHub workflow 46019720312, job 140576304093, offline checks passed; provider access/response not yet verified."
+      "note": "Verified run 46019720312, job 140576304093: required authorized API key missing; no provider request submitted. Keep assignment for a new dispatch after key setup."
     },
     {
       "id": "O001",
       "owner": "GPTOSS",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
       "run_id": "46019720312",
       "scope": [
         "prototype/tests/companion_turn_motion_test.gd"
       ],
       "access": "read",
-      "note": "GitHub workflow 46019720312, job 140576304279, offline checks passed; provider access/response not yet verified."
+      "note": "Verified run 46019720312, job 140576304279: required authorized API key missing; no provider request submitted. Keep assignment for a new dispatch after key setup."
     }
   ]
 }
