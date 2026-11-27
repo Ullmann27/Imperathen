@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 134,
+  "version": 135,
   "tasks": [
     {
       "id": "K101",
@@ -640,6 +640,20 @@
       ],
       "access": "edit",
       "note": "PR #187 head c9fe2960008cf52787fa51c4afe09c4528d236b1. Actual focused push workflow 46062934470/job 140721300780 observed in_progress; live I03 flow, 6 contact/upright checks before/after LOD, Compatibility screenshot and SHA256 receipt. No measured contact, finger or visual/device acceptance yet. Own coordinator patch; no Kimi/Nemotron output."
+    },
+    {
+      "id": "VIS-FAMILY-JUG-GRIP",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/world/village/i01_props.gd",
+        "prototype/tests/i01_flow_test.gd",
+        ".github/workflows/aeterna-family-jug-regression.yml"
+      ],
+      "access": "edit",
+      "note": "VIS-002: I01 _carry_transform uses obsolete origin offset when _family_carry false (later father delivery/legacy/gate carry). Existing regression asserts incorrect origin offset. Use existing measured GLB handle target for all carry states, retain family IK/pour/state semantics. Test empty, full and father handoff, same object identity across model switches. Independent of active market I03 PR #187. No finger/visual/device acceptance before real captures and review."
     }
   ]
 }
