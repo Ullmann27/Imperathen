@@ -1,7 +1,7 @@
 name: AETERNA market pitcher contact regression
 on:
   push:
-    branches: ['fix/aeterna-market-jug-grip-20261127']
+    branches: ['fix/aeterna-market-jug-grip-20261127', 'fix/aeterna-market-jug-physics-sync-20261127']
 permissions:
   contents: read
 concurrency:
@@ -50,7 +50,7 @@ jobs:
           set -euo pipefail
           sudo apt-get update -q
           sudo apt-get install -y --no-install-recommends xvfb xauth libgl1-mesa-dri
-          timeout --kill-after=10s 900s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --rendering-method gl_compatibility --audio-driver Dummy --fixed-fps 60 --script res://tests/i03_flow_test.gd -- --capture-dir="$PWD/artifacts/market-jug/frames" --size=1280x720 2>&1 | tee artifacts/market-jug/render.log
+          timeout --kill-after=10s 900s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --rendering-method gl_compatibility --audio-driver Dummy --fixed-fps 60 --script res://tests/i03_flow_test.gd -- --capture-dir="$PWD/artifacts/market-jug/frames" --size=1280x720 --capture-on-demand 2>&1 | tee artifacts/market-jug/render.log
           grep -Fq I03_FLOW_PASS artifacts/market-jug/render.log
           test -s artifacts/market-jug/frames/1280x720-i03-well-jug.png
           sha256sum artifacts/market-jug/frames/*.png > artifacts/market-jug/FRAME_SHA256.txt

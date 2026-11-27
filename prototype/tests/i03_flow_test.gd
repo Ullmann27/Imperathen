@@ -17,6 +17,8 @@ var game
 var checks := 0
 var failures: Array[String] = []
 var capture_dir := ""
+var capture_on_demand := false
+var original_render_loop := true
 var captures: Array = []
 var size := Vector2i(1280, 720)
 
@@ -29,9 +31,15 @@ func _initialize() -> void:
 	for arg: String in OS.get_cmdline_user_args():
 		if arg.begins_with("--capture-dir="):
 			capture_dir = arg.trim_prefix("--capture-dir=")
+		elif arg == "--capture-on-demand":
+			capture_on_demand = true
 		elif arg.begins_with("--size="):
 			var parts := arg.trim_prefix("--size=").split("x")
 			size = Vector2i(int(parts[0]), int(parts[1]))
+	if capture_on_demand and (capture_dir.is_empty() or DisplayServer.get_name() == "headless"):
+		printerr("I03 capture-on-demand requires a real display and capture directory.")
+		quit(2)
+		return
 	_run.call_deferred()
 
 
@@ -198,6 +206,9 @@ func _run() -> void:
 	game.set_physics_process(false)
 	game.ui._touch_enabled = true
 	game.ui._finish_intro()
+	original_render_loop = RenderingServer.render_loop_enabled
+	if capture_on_demand:
+		RenderingServer.render_loop_enabled = false
 	# Preserve all I-03 assertions on a valid setup. On setup failure the
 	# test exits nonzero rather than reporting unrelated cascade failures.
 	if await _to_lane():
@@ -206,10 +217,12 @@ func _run() -> void:
 		await _test_stall()
 		await _test_vid_b_and_service()
 		await _test_farewell()
+	RenderingServer.render_loop_enabled = original_render_loop
 	if not capture_dir.is_empty():
 		var file := FileAccess.open(capture_dir.path_join("i03-flow-report-%dx%d.json" % [size.x, size.y]), FileAccess.WRITE)
 		file.store_string(JSON.stringify({"checks":checks, "failures":failures, "captures":captures, "size":[size.x, size.y],
 			"renderer":RenderingServer.get_current_rendering_method(),
+			"capture_mode":"on_demand" if capture_on_demand else "continuous",
 			"note":"Engine frames from the production Main; travel to authored places is fixture placement, Marcus walks with the world director."}, "\t"))
 		file.close()
 	game.queue_free()
@@ -347,6 +360,13 @@ func _test_vid_b_and_service() -> void:
 	await frames(4)
 	check(_sp().i03_task == "service_bring" and props.jug_in_hand(), "The filled jug is really in the boy's hand")
 	_check_market_grip(props, "Before LOD switch")
+	check(props.is_physics_processing(), "Carried pitcher reconciles after player physics")
+	# process_frame fires before idle processing. Keep the original assertion
+	# and inspect consecutive completed physics steps, not an explicit snap.
+	for frame_index in range(4):
+		await physics_frame
+		await process_frame
+		_check_market_grip(props, "Consecutive physics frame %d" % frame_index)
 	var carried: Node3D = props._jug
 	var actor = game.world._figure
 	actor._reload((actor.detail+1)%4)
@@ -359,6 +379,7 @@ func _test_vid_b_and_service() -> void:
 	var bring: Dictionary = game._command("village_childhood_action", {"action_id":"i03_service_bring"})
 	await frames(4)
 	check(bool(bring.get("ok", false)) and not props.jug_in_hand() and not props.coins_visible() and props.pot_fill() == "large", "After the service the jug is gone, Cassia has the coins, the pot holds the large measure")
+	check(not props.is_physics_processing() and not props.is_processing(), "Released pitcher no longer schedules pose synchronization")
 	var again: Dictionary = game._command("village_childhood_action", {"action_id":"i03_service_bring"})
 	check(not again.get("ok", false) and str(again.get("message", "")).contains("bereits"), "Gegenstand bereits bezahlt: " + str(again.get("message", "")))
 	await capture("stall-paid")
@@ -423,17 +444,24 @@ func _test_farewell() -> void:
 func capture(id: String) -> void:
 	if capture_dir.is_empty() or DisplayServer.get_name() == "headless":
 		return
+	# Keep the original three warm-up frames and real post-draw capture.
+	# Only unobserved frames omit rasterization, as in the I01 harness.
+	if capture_on_demand:
+		RenderingServer.render_loop_enabled = true
 	for i in 3:
 		await process_frame
 	await RenderingServer.frame_post_draw
 	var image := root.get_texture().get_image()
+	if capture_on_demand:
+		RenderingServer.render_loop_enabled = false
 	if image == null or image.is_empty():
 		check(false, "Real rendered image for " + id)
 		return
+	check(image.get_width() == size.x and image.get_height() == size.y, "Full-size rendered image for " + id)
 	DirAccess.make_dir_recursive_absolute(capture_dir)
 	var name := "%dx%d-i03-%s" % [size.x, size.y, id]
 	check(image.save_png(capture_dir.path_join(name + ".png")) == OK, "Saved " + name)
 	var cam: Camera3D = root.get_camera_3d()
-	captures.append({"id":id, "file":name + ".png", "screen":game.screen, "sequence":str(game.opening_sequence.get("id", "")) if game.screen == "opening" else "",
+	captures.append({"id":id, "file":name + ".png", "width":image.get_width(), "height":image.get_height(), "screen":game.screen, "sequence":str(game.opening_sequence.get("id", "")) if game.screen == "opening" else "",
 		"beat":str(_beat().get("id", "")), "shot_id":str(game.opening_director.shot_id) if game.screen == "opening" else "play",
 		"camera":[cam.global_position.x, cam.global_position.y, cam.global_position.z] if cam else [], "fov":cam.fov if cam else 0.0})
