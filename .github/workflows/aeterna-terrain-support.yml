@@ -35,7 +35,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --only world_stream_plan regional_terrain --report artifacts/terrain-support
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --only import world_stream_plan regional_terrain --report artifacts/terrain-support
       - name: Replay the actual long-distance footpath with movement prediction
         shell: bash
         run: |
