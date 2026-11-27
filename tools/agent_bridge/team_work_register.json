@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 64,
+  "version": 65,
   "tasks": [
     {
       "id": "K101",
@@ -326,9 +326,9 @@
     {
       "id": "FORMATION-ORDER-CONTINUITY",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "6fce2e98f61958afea69359bcd587d462bb9b04e",
-      "run_id": null,
+      "run_id": "46025109203",
       "scope": [
         "prototype/scripts/battle/battle_model.gd",
         "prototype/scripts/formation/formation_agents.gd",
@@ -336,7 +336,7 @@
         "prototype/tests/formation_slot_authority_test.gd"
       ],
       "access": "edit",
-      "note": "Independent formation integration after N20 focused success. Existing BattleModel _align_members greedily reassigns every living soldier each tick; presentation then changes roster slot owners on ordinary wheeling, and _match authoritative-slot branch omits actual last_match record. Preserve rank owners during ordinary movement; rematch only explicit layout/deployment or large discrete front change. Validate unique authority, real orders, deterministic save and existing motion gates without changing tolerances. No simultaneous N21 patch or change to shared candidate."
+      "note": "PR #175 candidate 553ceab39d7d9a4a9936f24c69ac4672a789edce, base verified N20 6fce2e9. Actual source repair: stable authoritative UID order on ordinary movement and minor wheels, rematch deliberate form/deploy or >75-degree discrete change, bounded pair matching; presentation validates unique slots and records actual assignment. New real rules/agents test; original battle and 60/180-person motion gates unchanged. CI in_progress. Preserve all candidate refs; no merge or release until results. N21 zero-time present hypothesis not applied."
     }
   ]
 }
