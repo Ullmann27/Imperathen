@@ -1,0 +1,32 @@
+name: Child and teen anatomy art candidates
+on:
+  pull_request:
+    paths:
+      - 'tools/characters/build_hero.py'
+      - 'art/hero_quality/source/**'
+      - '.github/workflows/child-anatomy-candidates.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        kind: [boy_child, girl_child, boy_teen, girl_teen]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install 'bpy==4.5.3'
+      - name: Construct and render independent anatomy, rig, outfit and LODs
+        run: python tools/characters/build_hero.py -- --child-candidate "${{ matrix.kind }}" --candidate-dir "artifacts/children/${{ matrix.kind }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: child-art-${{ matrix.kind }}
+          path: artifacts/children/
+          if-no-files-found: warn

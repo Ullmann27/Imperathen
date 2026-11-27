@@ -21,7 +21,12 @@
       "git_blob_sha": "07b1f5526a3139dbd528efe07452d0a454106d0d",
       "bytes": 400125,
       "upstream_path": "makehuman/data/targets/macrodetails/caucasian-male-old.target"
+    },
+    "caucasian-female-child.target": {
+      "git_blob_sha": "ff74bbad4e2b3cfb68faff34f25b06d6017202a1",
+      "bytes": 446405,
+      "upstream_path": "makehuman/data/targets/macrodetails/caucasian-female-child.target"
     }
   },
-  "usage": "Adult-only separate source candidates. Child/player geometry, source hero.blend and release GLBs are not replaced."
+  "usage": "Independent adult and child art candidates only. Existing player geometry, source hero.blend and release GLBs are not replaced."
 }
