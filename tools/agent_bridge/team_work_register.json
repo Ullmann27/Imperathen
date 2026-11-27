@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 155,
+  "version": 158,
   "tasks": [
     {
       "id": "K101",
@@ -745,11 +745,11 @@
         ".github/workflows/aeterna-i00-terrain-clearance.yml",
         "docs/44_integration/AETERNA_VISUAL_30_MILESTONES_20261127.md"
       ],
-      "note": "Combine exact verified #186 eye-framing files with #190 terrain and correct both Legion wide shots; retain 30-frame two-aspect capture and require all three rank groups each sampled wide frame. Prior 30 images independently reviewed; no claim of realism. Update existing #190 only.",
+      "note": "PR #190 head ce523afa28bd165699ab8f6b93d4348bb94227f8; terrain and 30 actual two-aspect captures running; strict all-three-block criterion in every wide sample. Prior 30 captures independently reviewed, departure and lighting defects documented; no visual acceptance.",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
-      "run_id": null
+      "status": "submitted",
+      "run_id": "46065939951"
     },
     {
       "id": "VIS-MARKET-JUG-CAPTURE",
@@ -759,11 +759,11 @@
         "prototype/tests/i03_flow_test.gd",
         ".github/workflows/aeterna-market-jug-regression.yml"
       ],
-      "note": "Preserve 88/88 and 5mm test; fix graphical timeout using already-proven I01 on-demand rendering. Update #189 only, retain genuine framebuffer and all simulation checks.",
+      "note": "PR #189 head 9f8504f5eb03188e64175f5e88d2c9eeb7a302fb; 88/88 prior headless, render timed out; on-demand capture now retains the original warmups, real frame, size checks and simulation. Actual job running; no capture acceptance.",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
-      "run_id": null
+      "status": "submitted",
+      "run_id": "46066036841"
     },
     {
       "id": "VIS-INDOOR-TYPED-FIXTURE",
@@ -774,11 +774,11 @@
         "prototype/tests/camera_collision_test.gd",
         ".github/workflows/aeterna-indoor-camera-spacing.yml"
       ],
-      "note": "Fix measured typed Array[RID] test invocation, preserve all original collision and shoulder-spacing assertions. Update #191 only.",
+      "note": "PR #191 head 9d795174e8f71508d14c7bf58bcf3db889edbde6; exact measured typed Array[RID] test failure corrected; actual regression running, no pass claim.",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
-      "run_id": null
+      "status": "submitted",
+      "run_id": "46065957068"
     }
   ]
 }
