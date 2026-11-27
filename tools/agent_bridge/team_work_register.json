@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 18,
+  "version": 36,
   "tasks": [
     {
       "id": "K101",
@@ -43,14 +43,14 @@
     {
       "id": "N17",
       "owner": "Nemotron",
-      "status": "review_pending",
+      "status": "done",
       "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
       "run_id": "46008020658",
       "scope": [
         "prototype/scripts/rendering/route_fire_lights.gd"
       ],
       "access": "read",
-      "note": "Complete answer; independent validation required."
+      "note": "Complete model answer independently reviewed; score-only sort rejected to preserve closest-player guarantee. Separate N17-FIX tracks actual code and focused CI 46019923875; no integration claim."
     },
     {
       "id": "N18",
@@ -67,7 +67,7 @@
     {
       "id": "N19",
       "owner": "Nemotron",
-      "status": "review_pending",
+      "status": "done",
       "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
       "run_id": "46008020658",
       "scope": [
@@ -75,7 +75,7 @@
         "prototype/scripts/world/mount_controller.gd"
       ],
       "access": "read",
-      "note": "Complete answer; independent validation required."
+      "note": "Complete answer independently reviewed. Unsafe dismount and unintegrated serialization rejected; actual rider/gaze ownership and rollback implementation tracked as N19-FIX in CI 46020024550."
     },
     {
       "id": "D001",
@@ -140,6 +140,116 @@
       ],
       "access": "read",
       "note": "Verified run 46019720312, job 140576304279: required authorized API key missing; no provider request submitted. Keep assignment for a new dispatch after key setup."
+    },
+    {
+      "id": "N17-FIX",
+      "owner": "Coordinator",
+      "revision": "4e963457ea0d441702755d5d27b10b327d27870b",
+      "run_id": "46019923875",
+      "scope": [
+        "prototype/scripts/rendering/route_fire_lights.gd",
+        "prototype/tests/route_fire_test.gd"
+      ],
+      "access": "edit",
+      "note": "Independent implementation of N17 lifecycle repair, actual focused CI. Preserve nearest-player guarantee and four-light cap. Actual run state: completed / failure. No automatic integration.",
+      "status": "submitted"
+    },
+    {
+      "id": "N19-FIX",
+      "owner": "Coordinator",
+      "revision": "9bf365aa62f8abadd42003a30e16f5d99d8c8a17",
+      "run_id": "46020024550",
+      "scope": [
+        "prototype/scripts/world/mounted_rider_pose.gd",
+        "prototype/scripts/world/mount_controller.gd",
+        "prototype/tests/mount_controller_test.gd"
+      ],
+      "access": "edit",
+      "note": "Independent implementation of N19 gaze/pose ownership and boarding rollback, real fixture CI. Actual run state: in_progress. No automatic integration.",
+      "status": "submitted"
+    },
+    {
+      "id": "MAP-SCALE",
+      "owner": "Coordinator",
+      "revision": "ef965a4ea4a993a1413b0dd6a862fec54b6d78aa",
+      "run_id": "46020155432",
+      "scope": [
+        "prototype/scripts/ui/regional_map.gd",
+        "prototype/tests/regional_map_test.gd"
+      ],
+      "access": "edit",
+      "note": "Independent local repair of confirmed unsupported %g map scale runtime error. Real all-five-level viewport CI; D001 provider remains blocked. Actual run state: in_progress. No automatic integration.",
+      "status": "submitted"
+    },
+    {
+      "id": "I00-INTEGRATE",
+      "owner": "Coordinator",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": "46008231545",
+      "scope": [
+        "prototype/scripts/cinematic/i00_stage.gd",
+        "prototype/scripts/cinematic/i00_vexillum.gd",
+        "prototype/scripts/cinematic/i00_camp_scenery.gd",
+        "prototype/scripts/cinematic/opening_director.gd",
+        "prototype/tests/i00_stage_test.gd",
+        "prototype/assets/cinematic/i00_vexillum.glb",
+        "art/cinematic/i00/"
+      ],
+      "access": "read",
+      "note": "Candidate #162 fast-forwarded from db4d663 to exact 9fa7b14 after verified original Blender render run 46003302682, strict import 46008231545 and story 46008252851 (I00 82, opening director 357 checks). Blob comparison: six original asset files byte-identical to 7558579; full failed-test names identical to baseline. Candidate only, visual device acceptance and release gates still open.",
+      "status": "done"
+    },
+    {
+      "id": "N20",
+      "owner": "Nemotron",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": "46020399670",
+      "scope": [
+        "prototype/tests/adult_path_test.gd",
+        "prototype/tests/combat_actions_test.gd",
+        "prototype/scripts/domain/combat_actions.gd",
+        "prototype/scripts/domain/melee/melee_tracks.gd",
+        "prototype/scripts/domain/melee/melee_geometry.gd",
+        "prototype/scripts/domain/melee/melee_track_data.gd"
+      ],
+      "access": "read",
+      "note": "Actual bounded batch in_progress at d1d9aea. Independent engineering only; no response yet, no edit permission or merge.",
+      "status": "submitted"
+    },
+    {
+      "id": "N21",
+      "owner": "Nemotron",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": "46020399670",
+      "scope": [
+        "prototype/scripts/formation/formation_agents.gd",
+        "prototype/scripts/formation/formation_levels.gd",
+        "prototype/scripts/formation/troop_motion.gd",
+        "prototype/scripts/battle/formation_slots.gd",
+        "prototype/scripts/tactics/valley_scene.gd",
+        "prototype/tests/formation_agents_test.gd",
+        "prototype/tests/formation_motion_measurement.gd"
+      ],
+      "access": "read",
+      "note": "Actual bounded batch in_progress at d1d9aea. Independent engineering only; no response yet, no edit permission or merge.",
+      "status": "submitted"
+    },
+    {
+      "id": "N22",
+      "owner": "Nemotron",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": "46020399670",
+      "scope": [
+        "prototype/scripts/rendering/render_bench.gd",
+        "prototype/tests/render_bench_views_test.gd",
+        "prototype/scripts/rendering/village_look.gd",
+        "prototype/scripts/rendering/route_fire_lights.gd",
+        "prototype/assets/quality_profiles.json",
+        "prototype/tests/village_look_test.gd"
+      ],
+      "access": "read",
+      "note": "Actual bounded batch in_progress at d1d9aea. Independent engineering only; no response yet, no edit permission or merge.",
+      "status": "submitted"
     }
   ]
 }
