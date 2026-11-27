@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 176,
+  "version": 177,
   "tasks": [
     {
       "id": "K101",
@@ -839,16 +839,16 @@
       "id": "N29",
       "owner": "Nemotron",
       "access": "read",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "6d1aad82174764751cb2e2d3c0f610804518d512",
-      "run_id": null,
+      "run_id": "46075607650",
       "scope": [
         "prototype/scripts/tactics/valley_scene.gd",
         "prototype/scripts/visuals/valley_rider.gd",
         "prototype/scripts/world/mounted_rider_pose.gd",
         "prototype/tests/valley_muster_test.gd"
       ],
-      "note": "New independently evidenced scope: actual 46066402676/job 140732645272, valley 52/53, mounted socket test fails after Germanic rig fairness candidate. Distinguish missing first UID, quota/LOD eligibility, available pose, stale bone attachment and transform residual; not a repeat of N28 Germanic identity or N19 player mount. One bounded read-only request, 8192 maximum completion tokens, concise minimal diff or diagnostic; no automatic retry. Prior N27/N28 ended truncated, not quota denial; actual remaining provider credit not exposed. No model patch may execute automatically."
+      "note": "New independently evidenced scope: actual 46066402676/job 140732645272, valley 52/53, mounted socket test fails after Germanic rig fairness candidate. Distinguish missing first UID, quota/LOD eligibility, available pose, stale bone attachment and transform residual; not a repeat of N28 Germanic identity or N19 player mount. One bounded read-only request, 8192 maximum completion tokens, concise minimal diff or diagnostic; no automatic retry. Prior N27/N28 ended truncated, not quota denial; actual remaining provider credit not exposed. No model patch may execute automatically. Actual bridge HEAD 9af16fdaa275072b8593e69ca71ee4df19957578 and run 46075607650 observed in_progress; no provider result yet."
     }
   ]
 }
