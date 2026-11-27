@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 85,
+  "version": 86,
   "tasks": [
     {
       "id": "K101",
@@ -441,6 +441,18 @@
       ],
       "access": "read",
       "note": "New prepared MENU V3 single MAX task, no K102 repeat. Official https://build.nvidia.com/moonshotai/kimi-k3_1-pro/build explicitly says no programmatic API access despite Free Endpoint label; K102 HTTP 504, no accepted UUID. Offline manifest tools/agent_bridge/kimi_prepared_k103.json, NOT active push-trigger manifest. Submit only after confirmed eligible live access; do not activate paid provider or advance Journey."
+    },
+    {
+      "id": "I01-RENDER-CHECKPOINT",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "2e761e544022d03b0a813ee7cbc0c3f095ce7329",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/i01_flow_test.gd"
+      ],
+      "access": "edit",
+      "note": "Independent I-01 software-render evidence timeout 46020295748/job 140577885552 (1500s after continued). Scoped opt-in checkpoint rasterization on isolated branch and matching CI invocation, preserve every simulation step, all existing asserts, required real 1280x720 captures, no FPS/temporal or physical claim; continuous mode remains available. Map formatting already corrected on campaign head."
     }
   ]
 }
