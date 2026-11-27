@@ -1,0 +1,98 @@
+{
+  "status": "rendered_and_reopened",
+  "project": "IMPERATHEN",
+  "job_id": "imperathen-character-atelier-20261127-01",
+  "source_revision": "2e761e544022d03b0a813ee7cbc0c3f095ce7329",
+  "checkout": "acd0574efcefb756e030cdda7a69896d8ac33860",
+  "blender": "4.3.2",
+  "visual_acceptance": false,
+  "physical_device_test": false,
+  "assets": [
+    {
+      "id": "roman-adult",
+      "label": "Römischer Bürger – erwachsen",
+      "source_path": "prototype/assets/characters/frontier_civilian_man_0.glb",
+      "source_git_blob": "24c40a142414ddbef03c8da1edeb9cdc7917f635",
+      "source_sha256": "6e5c1f3372741fb1613ba5a484e1c014a04b1726a33df61f2dd8bce8b84b29f2",
+      "armatures": 1,
+      "actions": [
+        "attack_FrontierRig",
+        "block_FrontierRig",
+        "death_FrontierRig",
+        "gather_FrontierRig",
+        "hit_FrontierRig",
+        "idle_FrontierRig",
+        "march_FrontierRig",
+        "run_FrontierRig",
+        "talk_FrontierRig",
+        "train_FrontierRig",
+        "work_FrontierRig"
+      ],
+      "files": {
+        "Ganzfigur.png": {
+          "bytes": 423514,
+          "sha256": "94a0517757e1b5cf25a875fdb0500913184967b2b4871eac7abc9dca7ac3da7a"
+        },
+        "Gesicht.png": {
+          "bytes": 413989,
+          "sha256": "09a0da46c99a02e611ad9d86b95b53fa86c6b5de40c1ef4e648b0bda197bc89d"
+        },
+        "Rueckansicht.png": {
+          "bytes": 425528,
+          "sha256": "9a40e9fe2d6d82c13c0b7ce81d667866dec51facf41ebdebfc9a3fa87d4eca61"
+        },
+        "Figur.blend": {
+          "bytes": 5193220,
+          "sha256": "2114c71f55f48ef39495e15fb7230036027a3099fb823dc437ac330c929c60dc"
+        },
+        "Original.glb": {
+          "bytes": 5234416,
+          "sha256": "6e5c1f3372741fb1613ba5a484e1c014a04b1726a33df61f2dd8bce8b84b29f2"
+        }
+      }
+    },
+    {
+      "id": "roman-elder",
+      "label": "Römischer Bürger – älter",
+      "source_path": "prototype/assets/characters/frontier_elder_0.glb",
+      "source_git_blob": "b704a4035698d4405b200733bbf817b3f1b1dcde",
+      "source_sha256": "50fdd03555d834a9aab45d98730c8451ef4d6cf722e4f71d484b0c67a0edb8a4",
+      "armatures": 1,
+      "actions": [
+        "attack_FrontierRig",
+        "block_FrontierRig",
+        "death_FrontierRig",
+        "gather_FrontierRig",
+        "hit_FrontierRig",
+        "idle_FrontierRig",
+        "march_FrontierRig",
+        "run_FrontierRig",
+        "talk_FrontierRig",
+        "train_FrontierRig",
+        "work_FrontierRig"
+      ],
+      "files": {
+        "Ganzfigur.png": {
+          "bytes": 423162,
+          "sha256": "f71985992f0406d498d1ca5d5111755cbe96758ea84ce0495d7d089bf52c0280"
+        },
+        "Gesicht.png": {
+          "bytes": 414523,
+          "sha256": "39e03742a2f3eb7c924cc0054c8bffdcec80ed4e69d6b91ebf1bfd03376d603e"
+        },
+        "Rueckansicht.png": {
+          "bytes": 424225,
+          "sha256": "bf24b3a8b8c961948c165905ec60a51069fd4c7596606282c21003e16b6f7d0a"
+        },
+        "Figur.blend": {
+          "bytes": 4656547,
+          "sha256": "590e6ba8ff7cba493b3fb84dd5f1c1da74dc8f1bf161a9f1a80f19bf729a1f68"
+        },
+        "Original.glb": {
+          "bytes": 4680492,
+          "sha256": "50fdd03555d834a9aab45d98730c8451ef4d6cf722e4f71d484b0c67a0edb8a4"
+        }
+      }
+    }
+  ]
+}
