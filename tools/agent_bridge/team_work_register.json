@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 106,
+  "version": 107,
   "tasks": [
     {
       "id": "K101",
@@ -503,6 +503,20 @@
       ],
       "access": "edit",
       "note": "Exact tested house test blob 2824ce83 copied onto fde8360 with existing game/guard work preserved; isolated branch fix/aeterna-house-campaign-reconciliation-20261127. Workflow only adds isolated trigger. No integration before focused combined test. Actual focused CI observed in_progress at ff781d0. Completed success: actual Godot HOUSE_INTERIORS_RESULT checks=8037 failures=0, HOUSE_INTERIORS_PASS. Baseline campaign run 46047114032 also green (menu 298, mount 34, I04 271, I03 109; route/map pass). Compared campaign fde8360 -> ff781d0: ahead 1, behind 0, only house test, docs and isolated workflow; test blob 2824ce83 matches tested #183. Fast-forwarded campaign via expected-head lease to exact ff781d0 and verified identical. No runtime geometry change, combined post-update CI and physical/visual acceptance remain separate."
+    },
+    {
+      "id": "PREVIEW-MARCUS-TURN",
+      "owner": "Coordinator",
+      "status": "review_pending",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": "46052536805",
+      "scope": [
+        "prototype/scripts/story/companion_follow.gd",
+        "prototype/tests/companion_turn_motion_test.gd",
+        ".github/workflows/aeterna-preview-companion-turn.yml"
+      ],
+      "access": "edit",
+      "note": "Preview APK #219 actual run 46049893315, job 140678327076, fails strict companion turn at 60 Hz sign -1 (65/66; 15 mm gate unchanged). Isolated candidate on fix/aeterna-preview-companion-turn-20261127: squared heading alignment eases lateral travel while retaining full requested speed and angular/acceleration limits. Six added physical assertions and compact per-case diagnostics. Focused actual Marcus build/Godot regression run 46052536805 observed in_progress. Hypothesis, not verified correction. No integration until successful relevant tests and current preview HEAD/blob comparison. Do not edit overlapping scopes or repeat full APK unchanged; preview branch only, no main/release."
     }
   ]
 }
