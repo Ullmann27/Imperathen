@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 147,
+  "version": 155,
   "tasks": [
     {
       "id": "K101",
@@ -616,7 +616,7 @@
     {
       "id": "VIS-CAMERA-EYE-REGRESSION",
       "owner": "Coordinator",
-      "status": "review_pending",
+      "status": "blocked",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
       "run_id": "46061403644",
       "scope": [
@@ -626,7 +626,7 @@
         ".github/workflows/aeterna-visual-camera-regression.yml"
       ],
       "access": "edit",
-      "note": "PR #186 head f0925a30c99b6e17bfdcfc9cd870290e4e81c96f; verified actual Godot CI 46061403644/job 140716288121 success, OPENING_DIRECTOR_TEST 368 checks []; story contract 46061403624 success. Broader ARM64 and city image checks still in_progress. Camera eye target only, no occlusion, RQG visual/device pending."
+      "note": "Engine camera test 368/368 retained. Separate candidate #186 blocked for visual/combined integration; successor copies exact camera changes into #190 and re-tests. No accepted visual/device status."
     },
     {
       "id": "VIS-MARKET-JUG-GRIP",
@@ -659,7 +659,7 @@
     {
       "id": "VIS-MARKET-JUG-PHYSICS-SYNC",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "c9fe2960008cf52787fa51c4afe09c4528d236b1",
       "run_id": "46063582273",
       "scope": [
@@ -668,12 +668,12 @@
         ".github/workflows/aeterna-market-jug-regression.yml"
       ],
       "access": "edit",
-      "note": "PR #189 head 39e1a6ab124ecaedc4f0f1eccaad15613a4409b6, focused push workflow 46063582273/job 140723419374 observed in_progress. Story 46063600171 and NPC 46063600239 passed separately; no confirmation of 5mm grip or actual render yet."
+      "note": "Run 46063582273: I03_FLOW_PASS 88/88, render timeout exit 124. Existing 5mm and consecutive-frame checks preserved; follow-up adopts proven I01 on-demand rendering, no visual acceptance."
     },
     {
       "id": "VIS-I00-TERRAIN-CLEARANCE",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
       "run_id": "46064658673",
       "scope": [
@@ -685,12 +685,12 @@
         "docs/44_integration/AETERNA_VISUAL_30_MILESTONES_20261127.md"
       ],
       "access": "edit",
-      "note": "PR #190 head 9d3a08cc63758f4f6d8064c4c7347cc3aaaf4c81: six commits, terrain-aligned stage, apron, mesh-vertex negative control, actual five-shot dual-aspect 30-frame capture test and 30-milestone ledger. Focused push run 46064658673 terrain job 140726953601, capture 140726954021 both observed in_progress. Source-calculated rank centre 5.031m and max enclosing grid 5.862m; not engine measurements yet. No visual/device acceptance."
+      "note": "Run 46064658673: terrain 87/87; real capture 30 images with 140 checks, portrait last departure projected [0,0,0]. Artifact 15231060416 SHA256 23c90195ba17a11434369546536490ec1fd1925f1c80d89d3a045211b2c7c70c; independent contact sheet shows soldiers now present, overbright edges, plain camp and departure loss. Follow-up fixes framing, not full realism."
     },
     {
       "id": "VIS-INDOOR-CAMERA-SPACING",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
       "run_id": "46065039724",
       "scope": [
@@ -700,14 +700,14 @@
         ".github/workflows/aeterna-indoor-camera-spacing.yml"
       ],
       "access": "edit",
-      "note": "PR #191 exact 6d593cbbd2fc94247f6751a4f0b8f2a1a1005e04, four commits; actual focused push 46065039724/job 140728194211 in_progress. Seven new physics assertions. 1.05m provisional horizontal normal shoulder spacing, capped to 85% of requested distance, bounded alternate sweeps retain all previous collision safety. Actual I01 source image still visual failure. No acceptance. Separate from #186/#190. M03 I00 terrain job 140726953601 independently verified 87/87, stage y=5.981636, min mud clearance 0.332749m, old buried vertices 16128; capture job 140726954021 still running."
+      "note": "Run 46065039724: actual script error at test line 167: argument 6 untyped Array rather than Array[RID]. Success marker was rejected by log gate. Follow-up uses typed array, no runtime gate changes."
     },
     {
       "id": "VIS-YOUTH-CAP-BINDING",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
-      "run_id": null,
+      "run_id": "46065635264",
       "scope": [
         "tools/art/youth_cap_binding.py",
         "tools/art/test_youth_cap_binding.py",
@@ -715,7 +715,7 @@
         "docs/44_integration/YOUTH_CAP_BINDING_20261127.md"
       ],
       "access": "edit",
-      "note": "M10/M11: source review finds cap position snapping without corresponding binding update in build_youth_civil_outfit.py. Hypothesis only. Read-only actual original staged civilian LOD audit and separate candidate cap-weight correction limited to exactly coincident unambiguous original hand-cut seams. No body/geometry/motion/texture/identity modifications; numerical before/after, negative controls and real Godot evidence. No private GLB publication or production-builder modifications until measured evidence."
+      "note": "PR #193 head 4d518cb8600a4a3636e10dd9c02d9b88b412e776, actual push run 46065635264/job 140730144100 in_progress. 5 synthetic controls, owner-derived staging, four-LOD 60Hz seam A/B; no actual measurement result yet. Private GLBs excluded."
     },
     {
       "id": "VALLEY-MUSTER-IDENTITY",
@@ -729,6 +729,56 @@
       ],
       "access": "edit",
       "note": "Roadmap 01: N28 truncated (46055347080), old full regression failed authored Germanic swordsman assertion. Independent focused actual engine reproduction with identity, LOD and real scene provenance; retain original assertion and all budgets, no automatic model retry. No edits to formation runtime or concurrent visual tasks. Exact candidate a80af59f on fix/aeterna-valley-muster-identity-20261127, focused run 46065570928 observed in_progress. 46 lines added to test; original combat-camera assertion unchanged. Fresh production camera focused on enemy independently validates actual Germanic near/mid rig, per-UID family, scene path, LOD, frustum, pool deferrals at both contexts. No runtime changes; result pending."
+    },
+    {
+      "id": "VIS-I00-FRAMING-V2",
+      "revision": "9d3a08cc63758f4f6d8064c4c7347cc3aaaf4c81",
+      "scope": [
+        "prototype/scripts/cinematic/opening_director.gd",
+        "prototype/tests/opening_director_test.gd",
+        "docs/44_integration/USER_VISUAL_REGRESSION_20261127.md",
+        ".github/workflows/aeterna-visual-camera-regression.yml",
+        "prototype/scripts/cinematic/i00_stage.gd",
+        "prototype/scripts/cinematic/i00_camp_scenery.gd",
+        "prototype/tests/i00_stage_test.gd",
+        "prototype/tests/i00_terrain_capture_test.gd",
+        ".github/workflows/aeterna-i00-terrain-clearance.yml",
+        "docs/44_integration/AETERNA_VISUAL_30_MILESTONES_20261127.md"
+      ],
+      "note": "Combine exact verified #186 eye-framing files with #190 terrain and correct both Legion wide shots; retain 30-frame two-aspect capture and require all three rank groups each sampled wide frame. Prior 30 images independently reviewed; no claim of realism. Update existing #190 only.",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "run_id": null
+    },
+    {
+      "id": "VIS-MARKET-JUG-CAPTURE",
+      "revision": "39e1a6ab124ecaedc4f0f1eccaad15613a4409b6",
+      "scope": [
+        "prototype/scripts/world/village/i03_props.gd",
+        "prototype/tests/i03_flow_test.gd",
+        ".github/workflows/aeterna-market-jug-regression.yml"
+      ],
+      "note": "Preserve 88/88 and 5mm test; fix graphical timeout using already-proven I01 on-demand rendering. Update #189 only, retain genuine framebuffer and all simulation checks.",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "run_id": null
+    },
+    {
+      "id": "VIS-INDOOR-TYPED-FIXTURE",
+      "revision": "6d593cbbd2fc94247f6751a4f0b8f2a1a1005e04",
+      "scope": [
+        "prototype/scripts/world/camera_obstruction.gd",
+        "prototype/scripts/world/game_world.gd",
+        "prototype/tests/camera_collision_test.gd",
+        ".github/workflows/aeterna-indoor-camera-spacing.yml"
+      ],
+      "note": "Fix measured typed Array[RID] test invocation, preserve all original collision and shoulder-spacing assertions. Update #191 only.",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "run_id": null
     }
   ]
 }
