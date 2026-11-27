@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 60,
+  "version": 63,
   "tasks": [
     {
       "id": "K101",
@@ -213,8 +213,8 @@
         "prototype/scripts/domain/melee/melee_track_data.gd"
       ],
       "access": "read",
-      "note": "Run 46020399670/job 140578522207 completed success; full NVIDIA_ANSWER proposes close-range adult training fixture and active-frame timing. Independently validate original tracks, contact physics and actual production commands before any test/production patch; claimed green is unverified.",
-      "status": "review_pending"
+      "note": "Review complete: accept stale fixture finding; reject unscaled peak-time assertion. Independent scaled-geometry check plus negative controls and actual engine verification in N20-FIX/PR #174. No gameplay fix claimed until CI.",
+      "status": "done"
     },
     {
       "id": "N21",
@@ -231,7 +231,7 @@
         "prototype/tests/formation_motion_measurement.gd"
       ],
       "access": "read",
-      "note": "Run 46020399670/job 140578522143 completed success; full NVIDIA_ANSWER proposes removal of first zero-time rig present call. Independent analysis required, domain formation/wheeling and physical foot continuity not proven; do not blindly patch.",
+      "note": "Run 46020399670/job 140578522143 completed success; full NVIDIA_ANSWER proposes removal of first zero-time rig present call. Independent analysis required, domain formation/wheeling and physical foot continuity not proven; do not blindly patch. Independent source review confirms _match() early model_slot return lacks last_match evidence; baseline also fails domain wheeling, ownership, position and gait continuity. Removing a first visual present() alone cannot explain or resolve all these failures; do not apply without targeted authoritative slot and actual A/B measurement.",
       "status": "review_pending"
     },
     {
@@ -314,14 +314,14 @@
     {
       "id": "N20-FIX",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "f1f3fb96e64c4e6bc49a458e656eabcf01eef1a5",
-      "run_id": null,
+      "run_id": "46024129297",
       "scope": [
         "prototype/tests/adult_path_test.gd"
       ],
       "access": "edit",
-      "note": "Independent review of N20: existing adult fixture 1.3m from practice post cannot reach it; 0.1s is already live-window rather than windup. Preserve production contact authority; verify far miss, measured windup/contact, recovery and recruitment on isolated test branch."
+      "note": "Existing Coordinator lease fulfilled by isolated PR #174, candidate 6fce2e98f61958afea69359bcd587d462bb9b04e; actual CI in_progress/pending. Verified scaled youth track: adult first post contact at 0.6m frame 8 (not peak 13); 1.3m miss. Raider 0.7m contact frame 9; 1m miss. Added negative controls and no premature/double credit/damage. No production reach/damage or gate changes. Do not duplicate this task."
     }
   ]
 }
