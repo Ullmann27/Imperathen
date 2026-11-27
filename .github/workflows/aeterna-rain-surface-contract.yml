@@ -36,7 +36,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --only import village_scenery local_weather --report artifacts/rain-surface/headless
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --only import village_scenery village_look --report artifacts/rain-surface/headless
           grep -F 'AETERNA_RAIN_SURFACE' artifacts/rain-surface/headless/village_scenery.log
       - name: Independently verify submitted MultiMesh transforms on Compatibility
         if: always()
@@ -50,12 +50,15 @@ jobs:
           mkdir -p "$state"/{data,config,cache} "$PWD/artifacts/rain-surface/frames"
           export XDG_DATA_HOME="$state/data" XDG_CONFIG_HOME="$state/config" XDG_CACHE_HOME="$state/cache"
           export LIBGL_ALWAYS_SOFTWARE=1 IMPERATHEN_RAIN_CAPTURE_DIR="$PWD/artifacts/rain-surface/frames"
-          timeout --kill-after=10s 420s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --resolution 1280x720 --rendering-method gl_compatibility --rendering-driver opengl3 --script "$GITHUB_WORKSPACE/art/village/verify.gd" 2>&1 | tee artifacts/rain-surface/compatibility.log
+          # The prior headless check may fail before import; never assume its cache exists.
+          timeout --kill-after=10s 420s "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee artifacts/rain-surface/compatibility-import.log
+          if grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/rain-surface/compatibility-import.log; then exit 1; fi
+          timeout --kill-after=10s 420s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --resolution 1280x720 --rendering-method gl_compatibility --rendering-driver opengl3 --script "$GITHUB_WORKSPACE/art/village/verify.gd" 2>&1 | tee artifacts/rain-surface/compatibility.log
           grep -Fq 'VILLAGE_SCENERY errors []' artifacts/rain-surface/compatibility.log
           test "$(grep -c '^AETERNA_RAIN_SURFACE ' artifacts/rain-surface/compatibility.log)" -eq 4
           if grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/rain-surface/compatibility.log; then exit 1; fi
           python3 - <<'PY'
-          import hashlib, json, pathlib, struct
+          import hashlib, json, os, pathlib, struct
           root = pathlib.Path("artifacts/rain-surface/frames")
           frames = []
           for profile in ("low","balanced","high","very_high"):
@@ -64,7 +67,7 @@ jobs:
               width, height = struct.unpack(">II", data[16:24])
               assert width > 0 and height > 0
               frames.append({"profile": profile, "width": width, "height": height, "sha256": hashlib.sha256(data).hexdigest()})
-          (root / "receipt.json").write_text(json.dumps({"frames":frames,"device_acceptance":False},indent=2)+"\n")
+          (root / "receipt.json").write_text(json.dumps({"source_commit":os.environ["GITHUB_SHA"],"run_id":os.environ["GITHUB_RUN_ID"],"frames":frames,"device_acceptance":False},indent=2)+"\n")
           PY
       - name: Preserve physics and renderer proof
         if: always()
