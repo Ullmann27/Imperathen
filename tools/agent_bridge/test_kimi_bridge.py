@@ -91,12 +91,12 @@ class AdaptiveTransportTests(unittest.TestCase):
 
     def test_failure_diagnostics_are_redacted(self):
         self.assertEqual(k.failure_kind(common.BridgeError("NVIDIA response deadline exceeded")), "response_deadline")
-        self.assertEqual(k.failure_kind(common.BridgeError("API result pending (202)")), "pending_202")
+        self.assertEqual(k.failure_kind(common.BridgeError("API result pending (202)")), "pending_202_no_id")
         self.assertEqual(k.failure_kind(TimeoutError("secret")), "socket_timeout")
         self.assertEqual(k.failure_kind(common.BridgeError("untrusted provider text")), "bridge_validation")
 
     def test_pending_response_is_not_retried(self):
-        class Pending:
+        class Pending(io.BytesIO):
             status = 202
             headers = {}
             def __enter__(self):
@@ -111,6 +111,58 @@ class AdaptiveTransportTests(unittest.TestCase):
         opener = Opener()
         with self.assertRaisesRegex(common.BridgeError, "pending"):
             k.consult("task", [], 4096, "test-key", opener, "high")
+        self.assertEqual(opener.calls, 1)
+
+
+class MaxEffortStageTests(unittest.TestCase):
+    def test_text_only_json_max(self):
+        manifest = k.load_tasks(Path(k.__file__).with_name("kimi_recovery_tasks.json"))
+        first = manifest["K101"]
+        self.assertEqual(first["reasoning_effort"], "max")
+        self.assertEqual(first["images"], [])
+        self.assertEqual(first["response_mode"], "json")
+        payload = k.build_payload("bounded task", [], 16384, "max", "json")
+        self.assertFalse(payload["stream"])
+        self.assertNotIn("stream_options", payload)
+        self.assertEqual(payload["reasoning_effort"], "max")
+        self.assertEqual(payload["max_tokens"], 16384)
+
+    def test_pending_polls_existing_id_not_new_post(self):
+        ident = "12345678-1234-1234-1234-123456789abc"
+        final = json.dumps({"model": k.MODEL, "choices": [{"message": {"content": "patch"}, "finish_reason": "stop"}]}).encode()
+        class Response(io.BytesIO):
+            def __init__(self, status, headers, body=b""):
+                super().__init__(body)
+                self.status, self.headers = status, headers
+        class Opener:
+            def __init__(self):
+                self.calls = []
+            def open(self, request, timeout):
+                self.calls.append((request.get_method(), request.full_url))
+                if len(self.calls) == 1:
+                    return Response(202, {"NVCF-REQID": ident})
+                if len(self.calls) == 2:
+                    return Response(202, {})
+                return Response(200, {"Content-Type": "application/json"}, final)
+        opener = Opener()
+        with patch.object(k.time, "sleep"):
+            answer, meta = k.consult("task", [], 16384, "fake-key", opener, "max", "json")
+        self.assertEqual(answer, "patch")
+        self.assertTrue(meta["complete"])
+        self.assertEqual(opener.calls, [("POST", common.ENDPOINT), ("GET", k.STATUS_URL + ident), ("GET", k.STATUS_URL + ident)])
+
+    def test_malicious_pending_identifier_rejected(self):
+        class Pending(io.BytesIO):
+            status = 202
+            headers = {"NVCF-REQID": "https://example.com/steal"}
+        class Opener:
+            calls = 0
+            def open(self, request, timeout):
+                self.calls += 1
+                return Pending()
+        opener = Opener()
+        with self.assertRaisesRegex(common.BridgeError, "Invalid pending request ID"):
+            k.consult("task", [], 16384, "fake-key", opener, "max", "json")
         self.assertEqual(opener.calls, 1)
 
 

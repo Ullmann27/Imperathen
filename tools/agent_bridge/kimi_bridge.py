@@ -21,6 +21,12 @@ MODEL = "moonshotai/kimi-k3.1-pro"
 TASK_IDS = ("K01", "K02", "K03", "K04", "K05", "K06")
 TASK_ID = re.compile(r"K[0-9]{2,4}")
 EFFORTS = {"low", "high", "max"}
+RESPONSE_MODES = {"stream", "json"}
+STATUS_URL = "https://integrate.api.nvidia.com/v1/status/"
+REQUEST_ID = re.compile(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
+KIMI_DEADLINE = 1200
+POLL_INTERVAL = 15
+MAX_POLLS = 24
 MAX_TASKS = 6
 MAX_IMAGE = 2_200_000
 MAX_IMAGES = 3_800_000
@@ -51,15 +57,17 @@ def allowed_image(path):
 
 def validate_task(task):
     required = {"revision", "task", "files", "images", "max_tokens"}
-    if not isinstance(task, dict) or not required <= set(task) or set(task) - required - {"reasoning_effort"}:
+    if not isinstance(task, dict) or not required <= set(task) or set(task) - required - {"reasoning_effort", "response_mode"}:
         raise common.BridgeError("Unexpected task fields")
     if task.get("reasoning_effort", "max") not in EFFORTS:
         raise common.BridgeError("Unsupported reasoning effort")
-    common.validate_request({k: v for k, v in task.items() if k not in ("images", "reasoning_effort")})
+    if task.get("response_mode", "stream") not in RESPONSE_MODES:
+        raise common.BridgeError("Unsupported response mode")
+    common.validate_request({k: v for k, v in task.items() if k not in ("images", "reasoning_effort", "response_mode")})
     images = task["images"]
-    if (not isinstance(images, list) or not 1 <= len(images) <= 2
+    if (not isinstance(images, list) or not 0 <= len(images) <= 2
             or not all(allowed_image(x) for x in images) or len(set(images)) != len(images)):
-        raise common.BridgeError("Expected one or two distinct public review images")
+        raise common.BridgeError("Expected zero to two distinct public review images")
 
 
 def load_tasks(path):
@@ -96,12 +104,14 @@ def collect_images(task, opener):
     return parts, hashes
 
 
-def build_payload(prompt, images, tokens, effort="max"):
-    return {"model": MODEL, "messages": [
+def build_payload(prompt, images, tokens, effort="max", mode="stream"):
+    payload = {"model": MODEL, "messages": [
         {"role": "system", "content": SYSTEM},
         {"role": "user", "content": [{"type": "text", "text": prompt}, *images]},
-    ], "max_tokens": tokens, "reasoning_effort": effort, "stream": True,
-        "stream_options": {"include_usage": True}}
+    ], "max_tokens": tokens, "reasoning_effort": effort, "stream": mode == "stream"}
+    if payload["stream"]:
+        payload["stream_options"] = {"include_usage": True}
+    return payload
 
 
 def parse_json(raw):
@@ -126,23 +136,68 @@ def parse_json(raw):
                             "finish_reason": finish, "usage": value.get("usage"), "complete": finish == "stop"}
 
 
-def consult(prompt, images, tokens, key, opener, effort="max"):
-    request = Request(common.ENDPOINT, data=json.dumps(build_payload(prompt, images, tokens, effort)).encode("utf-8"),
-                      method="POST", headers={"Authorization": "Bearer " + key,
-                                               "Content-Type": "application/json",
-                                               "Accept": "text/event-stream, application/json"})
-    deadline = time.monotonic() + common.MAX_SECONDS
-    with opener.open(request, timeout=180) as response:
-        if response.status == 202:
-            raise common.BridgeError("API result pending (202)")
-        if response.status != 200:
-            raise common.BridgeError("Unexpected API status")
-        mime = response.headers.get("Content-Type", "").lower()
-        if "text/event-stream" in mime:
-            return common.parse_stream(response, deadline)
-        if "application/json" in mime:
-            return parse_json(response.read(MAX_JSON + 1))
-        raise common.BridgeError("Unexpected response type")
+def pending_id(response):
+    # The NVIDIA request ID must be a UUID. Never follow a server-supplied URL.
+    header = response.headers.get("NVCF-REQID", "").strip()
+    if header:
+        if not REQUEST_ID.fullmatch(header):
+            raise common.BridgeError("Invalid pending request ID")
+        return header
+    raw = response.read(16_385)
+    if len(raw) > 16_384:
+        raise common.BridgeError("Invalid pending request ID")
+    try:
+        body = json.loads(raw)
+    except (ValueError, TypeError):
+        body = {}
+    ident = body.get("requestId") if isinstance(body, dict) else None
+    if not isinstance(ident, str) or not REQUEST_ID.fullmatch(ident):
+        raise common.BridgeError("API result pending (202)")
+    return ident
+
+
+def call_response(payload, key, opener, deadline, decode):
+    """One POST, then bounded GET status polls only for an accepted invocation."""
+    headers = {"Authorization": "Bearer " + key, "Content-Type": "application/json",
+               "Accept": "text/event-stream" if payload.get("stream") else "application/json"}
+    request = Request(common.ENDPOINT, data=json.dumps(payload).encode("utf-8"),
+                      method="POST", headers=headers)
+    ident = None
+    for attempt in range(MAX_POLLS + 1):
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise common.BridgeError("NVIDIA response deadline exceeded")
+        with opener.open(request, timeout=min(300, remaining)) as response:
+            if response.status == 200:
+                return decode(response, deadline)
+            if response.status != 202:
+                raise common.BridgeError("Unexpected API status")
+            if ident is None:
+                ident = pending_id(response)
+            else:
+                returned = response.headers.get("NVCF-REQID", "").strip()
+                if returned and returned.lower() != ident.lower():
+                    raise common.BridgeError("Invalid pending request ID")
+        if attempt == MAX_POLLS or time.monotonic() + POLL_INTERVAL >= deadline:
+            raise common.BridgeError("Pending request budget exhausted")
+        print("KIMI_PENDING accepted invocation; polling existing request", flush=True)
+        time.sleep(POLL_INTERVAL)
+        request = Request(STATUS_URL + ident, method="GET", headers=headers)
+    raise common.BridgeError("Pending request budget exhausted")
+
+
+def decode_completion(response, deadline):
+    mime = response.headers.get("Content-Type", "").lower()
+    if "text/event-stream" in mime:
+        return common.parse_stream(response, deadline)
+    if "application/json" in mime:
+        return parse_json(response.read(MAX_JSON + 1))
+    raise common.BridgeError("Unexpected response type")
+
+
+def consult(prompt, images, tokens, key, opener, effort="max", mode="stream"):
+    return call_response(build_payload(prompt, images, tokens, effort, mode), key, opener,
+                         time.monotonic() + KIMI_DEADLINE, decode_completion)
 
 
 # Only controlled internal error categories are emitted. Never expose an
@@ -152,7 +207,9 @@ SAFE_ERRORS = {
     "Missing or incomplete final NVIDIA response": "incomplete_stream",
     "NVIDIA stream returned an error": "provider_stream_error",
     "Oversized stream event": "event_budget",
-    "API result pending (202)": "pending_202",
+    "API result pending (202)": "pending_202_no_id",
+    "Invalid pending request ID": "invalid_pending_id",
+    "Pending request budget exhausted": "pending_deadline",
     "Unexpected API status": "unexpected_status",
     "Unexpected response type": "unexpected_content_type",
     "Missing or incomplete answer": "incomplete_json",
@@ -191,6 +248,7 @@ def main():
     try:
         task = load_tasks(args.manifest)[args.task]
         effort = task.get("reasoning_effort", "max")
+        mode = task.get("response_mode", "stream")
         opener = build_opener(common.NoRedirect())
         stage = "source"
         print(f"KIMI_PHASE {stage}", flush=True)
@@ -199,11 +257,11 @@ def main():
         print(f"KIMI_PHASE {stage} sources={len(source_hashes)}", flush=True)
         images, image_hashes = collect_images(task, opener)
         stage = "inference"
-        print(f"KIMI_PHASE {stage} images={len(image_hashes)} max_tokens={task['max_tokens']} effort={effort}", flush=True)
-        answer, meta = consult(prompt, images, task["max_tokens"], key, opener, effort)
+        print(f"KIMI_PHASE {stage} images={len(image_hashes)} max_tokens={task['max_tokens']} effort={effort} response_mode={mode}", flush=True)
+        answer, meta = consult(prompt, images, task["max_tokens"], key, opener, effort, mode)
         stage = "archive"
         answer = common.KEY_PATTERN.sub("[REDACTED]", answer.replace(key, "[REDACTED]"))
-        receipt = {"task": args.task, "requested_model": MODEL, "reasoning_effort": effort,
+        receipt = {"task": args.task, "requested_model": MODEL, "reasoning_effort": effort, "response_mode": mode,
                    "source_revision": task["revision"], "source_sha256": source_hashes,
                    "image_sha256": image_hashes, "answer_sha256": hashlib.sha256(answer.encode()).hexdigest(),
                    "status": "answered" if meta["complete"] else "truncated", **meta}

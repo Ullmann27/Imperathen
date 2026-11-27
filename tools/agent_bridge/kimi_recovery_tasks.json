@@ -1,28 +1,14 @@
 {
-  "K01": {
+  "K101": {
     "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
-    "task": "Ein eng begrenzter Folgeauftrag: verbessere exakt ein belegtes Problem der Figurengeometrie oder des Gesichtsmaterials. Lies den vorhandenen Blender-Generator und vorhandene Tests; das Review-Bild kann älter sein. Liefere vollständigen kleinen Diff und Test. Keine Änderung von Rigs, Story- oder Ausrüstungslogik ohne Beleg.",
+    "task": "K01.1 / erste textbasierte MAX-Etappe: Prüfe ausschließlich die vorhandene Mimik-Implementierung facial_motion.gd und ihren Gesichtstest auf eine einzige konkret belegte Verbesserung. Liefere höchstens einen kleinen vollständigen Patch oder eine begründete konkrete Testverbesserung. Keine umfassende Neuentwicklung, keine Bildanalyse in dieser Etappe. REALISM QUALITY GATE: historische/anatomische Plausibilität, PBR und reproduzierbare V1/V2-Renderprüfung; keine erfundenen Test- oder Geräteergebnisse. Erhalte bestehende Story, Rigs, Spielautorität und Fold7-Qualitätsprofile. Nur einen konkreten vollständigen kleinen Schritt liefern, der nach unabhängiger Prüfung in den nächsten Auftrag übernommen werden kann. Interne Denkspuren nicht ausgeben.",
     "files": [
-      "tools/art/build_characters.py",
+      "prototype/scripts/visuals/facial_motion.gd",
       "prototype/tests/hero_face_test.gd"
     ],
-    "images": [
-      "art/frontier_people/runtime_review/legionary-face.png"
-    ],
-    "max_tokens": 4096,
-    "reasoning_effort": "high"
-  },
-  "K02": {
-    "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
-    "task": "Ein eng begrenzter Folgeauftrag: verbessere genau eine belegte geometrische Schwäche im vorhandenen Blender-Gebäudegenerator. Erhalte bestehende Maßstäbe und Export-/Materialverträge. Keine Innenraumänderungen (K61 separat). Liefere vollständigen kleinen Diff und einen reproduzierbaren Blender-Test; keine erfundenen Renderbelege.",
-    "files": [
-      "tools/art/build_architecture.py",
-      "tools/art/common.py"
-    ],
-    "images": [
-      "art/architecture/review/strasse_after.png"
-    ],
-    "max_tokens": 4096,
-    "reasoning_effort": "high"
+    "images": [],
+    "max_tokens": 16384,
+    "reasoning_effort": "max",
+    "response_mode": "json"
   }
 }

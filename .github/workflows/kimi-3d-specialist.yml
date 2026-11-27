@@ -34,10 +34,10 @@ jobs:
     needs: verify
     name: Kimi / ${{ matrix.task }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 22
+    timeout-minutes: 28
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 1
       matrix:
         task: ${{ fromJSON(needs.verify.outputs.tasks) }}
     steps:
