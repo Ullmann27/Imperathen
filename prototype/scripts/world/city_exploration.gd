@@ -463,6 +463,13 @@ func _read_catalog() -> void:
 	for value: Variant in data.get("families",[]):
 		if value is Dictionary and value.get("tiers") is Array and not value.tiers.is_empty():
 			catalog.append(value)
+	var recovery_path := "res://assets/meshy/recovery_catalog.json"
+	if FileAccess.file_exists(recovery_path):
+		var recovered: Variant = JSON.parse_string(FileAccess.get_file_as_string(recovery_path))
+		if recovered is Dictionary and recovered.get("format","") == "imperathen-meshy-recovery-catalog":
+			for row: Variant in recovered.get("families",[]):
+				if row is Dictionary and row.get("rig_status","") == "review_only_not_an_npc" and row.get("tiers") is Array and not row.tiers.is_empty() and not _catalog_path(row).is_empty():
+					catalog.append(row)
 	var label := Label3D.new()
 	label.text = "MODELLSAMMLUNG\n%d vorhandene Modellfamilien" % catalog.size()
 	label.font_size = 50
@@ -545,6 +552,8 @@ func _add_catalog_model(index: int,packed: PackedScene) -> void:
 	label.text = str(catalog[index].name)
 	if str(catalog[index].get("scale_status",""))=="unverified_source_units":
 		label.text += "\nMaßstab ungeprüft"
+	if catalog[index].get("rig_status","") == "review_only_not_an_npc":
+		label.text += "\nOriginalmodell · noch kein NPC"
 	label.font_size = 34
 	label.pixel_size = 0.008
 	label.position = Vector3(0,maxf(2,bounds.size.y+model.position.y+0.4),0)
