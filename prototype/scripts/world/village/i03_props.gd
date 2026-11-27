@@ -33,7 +33,11 @@ var _stall: Node3D
 func _init() -> void:
 	name = "I03MarketProps"
 	process_priority = 10
+	# The carrier root also moves in the physics phase, before idle animation.
+	# Reconcile the world-space prop after the default-priority player motion.
+	process_physics_priority = 10
 	set_process(false)
+	set_physics_process(false)
 
 
 ## Cinematic anchors in this node's space (the world root).
@@ -129,6 +133,7 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 	if not enabled:
 		_carrying = false
 		set_process(false)
+		set_physics_process(false)
 		if is_instance_valid(_jug):
 			_jug.hide()
 		return
@@ -147,6 +152,7 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 	_notch.visible = salt == "debt" and open
 	_carrying = state.village.childhood.get("carried", []).has("stall_water")
 	set_process(_carrying)
+	set_physics_process(_carrying)
 	if _carrying:
 		_ensure_hand()
 		_place_in_hand()
@@ -171,6 +177,14 @@ func jug_in_hand() -> bool:
 
 
 func _process(_delta: float) -> void:
+	_sync_held_jug()
+
+
+func _physics_process(_delta: float) -> void:
+	_sync_held_jug()
+
+
+func _sync_held_jug() -> void:
 	_ensure_hand()
 	_place_in_hand()
 
