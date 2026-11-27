@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 187,
+  "version": 189,
   "tasks": [
     {
       "id": "K101",
@@ -878,7 +878,7 @@
     {
       "id": "N29-SOCKET-SYNC",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "f79a2dc092ea7374fff7f94d7eff6c162fb60103",
       "run_id": "46080747402",
       "scope": [
@@ -886,7 +886,19 @@
         "prototype/tests/valley_muster_test.gd"
       ],
       "access": "edit",
-      "note": "Actual commit 9e8a0b26fe1e5aacfcd94df016f317675f6e39fe on PR #196, exact two files only, lease f79a2dc. Immediate local BoneAttachment transform sampled after seek; existing 3 cm gate and original battle UID test unchanged. Added direct bone/pelvis/saddle checks plus translated/yawed root gait samples. Focused Godot run 46080747402 observed in_progress; existing automatic PR checks 46080753788/46080753799 queued. No success yet, allocation independent; no duplicate dispatch."
+      "note": "Actual commit 9e8a0b26fe1e5aacfcd94df016f317675f6e39fe on PR #196, exact two files only, lease f79a2dc. Immediate local BoneAttachment transform sampled after seek; existing 3 cm gate and original battle UID test unchanged. Added direct bone/pelvis/saddle checks plus translated/yawed root gait samples. Focused Godot run 46080747402 observed in_progress; existing automatic PR checks 46080753788/46080753799 queued. No success yet, allocation independent; no duplicate dispatch. Actual 46080747402/job 140778892616: 125/126; 24 direct gait/root samples, maximum measured bone-to-pelvis 9.5367431640625e-7 m; original first UID still deferred (detail=3, absent rig), 3 others available. Socket sync technically passed; overall failure retained. Next test exercises real bounded materialization cadence without raising cap or contact limit."
+    },
+    {
+      "id": "N29-MUSTER-BOUNDED-PROMOTION",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "9e8a0b26fe1e5aacfcd94df016f317675f6e39fe",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/valley_muster_test.gd"
+      ],
+      "access": "edit",
+      "note": "Verify actual paused production _process cadence at 60 Hz, with 0.5s maximum to materialize eligible four riders. Preserve original UID and 3cm seat assertion; add all four contacts and per-pass three-instance quota checks. Diagnostic test only, not visual or device acceptance."
     }
   ]
 }
