@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 107,
+  "version": 108,
   "tasks": [
     {
       "id": "K101",
@@ -507,7 +507,7 @@
     {
       "id": "PREVIEW-MARCUS-TURN",
       "owner": "Coordinator",
-      "status": "review_pending",
+      "status": "done",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
       "run_id": "46052536805",
       "scope": [
@@ -516,7 +516,7 @@
         ".github/workflows/aeterna-preview-companion-turn.yml"
       ],
       "access": "edit",
-      "note": "Preview APK #219 actual run 46049893315, job 140678327076, fails strict companion turn at 60 Hz sign -1 (65/66; 15 mm gate unchanged). Isolated candidate on fix/aeterna-preview-companion-turn-20261127: squared heading alignment eases lateral travel while retaining full requested speed and angular/acceleration limits. Six added physical assertions and compact per-case diagnostics. Focused actual Marcus build/Godot regression run 46052536805 observed in_progress. Hypothesis, not verified correction. No integration until successful relevant tests and current preview HEAD/blob comparison. Do not edit overlapping scopes or repeat full APK unchanged; preview branch only, no main/release."
+      "note": "Preview APK #219 actual run 46049893315, job 140678327076, fails strict companion turn at 60 Hz sign -1 (65/66; 15 mm gate unchanged). Isolated candidate on fix/aeterna-preview-companion-turn-20261127: squared heading alignment eases lateral travel while retaining full requested speed and angular/acceleration limits. Six added physical assertions and compact per-case diagnostics. Focused actual Marcus build/Godot regression run 46052536805 observed in_progress. Hypothesis, not verified correction. No integration until successful relevant tests and current preview HEAD/blob comparison. Do not edit overlapping scopes or repeat full APK unchanged; preview branch only, no main/release. Actual focused CI 46052536805 succeeded on exact commit: 72/72 checks, maximum slip 30 Hz 0.001349 mm, 60 Hz 6.402415 mm, 120 Hz 12.429449 mm; real generated Marcus rig, all six directions/frequencies. Compared preview HEAD 26875fa to exact tested 1327bd6: ahead 1 behind 0, only the registered three files. Fast-forwarded preview via expected HEAD lease and read-back confirmed exact 1327bd6. Full QA APK export trigger configured; new run not yet observed at this checkpoint, no release/physical approval."
     }
   ]
 }
