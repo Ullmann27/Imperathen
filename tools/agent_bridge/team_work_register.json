@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 177,
+  "version": 179,
   "tasks": [
     {
       "id": "K101",
@@ -826,14 +826,14 @@
       "id": "NIGHT-BENCH-LIGHT-ACCOUNTING",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "review_pending",
       "revision": "4ebd7cb5eecd1d4d8d6d1919241ab97de83c8cf0",
       "run_id": "46075409038",
       "scope": [
         "prototype/tests/render_bench_views_test.gd",
         ".github/workflows/aeterna-night-light-accounting.yml"
       ],
-      "note": "Independent correction of stale fixed benchmark fixture after actual 46055915040/job 140698245043: eight night accounting failures. Preserve exact existing shadow and atlas checks, require exact authored door and pooled route identities and daylight cleanup. No runtime edits or overlaps with campaign lighting; focused test only; no visual acceptance. Exact candidate on fix/aeterna-night-bench-light-accounting-20261127. Source check retains day inventory, total omni count, exact synthetic torch/shadow and atlas constraints; adds exact door and route sets from fixed camera and independent profile budgets. Actual push CI observed in_progress 46075409038. No acceptance or merge until actual result."
+      "note": "Actual run 46075409038/job 140761865457 success: import, render_bench_views, route_fire, village_look passed; 94/94 benchmark checks, previous 8 fixture failures resolved. Artifact 15234713033 ZIP SHA256 28126f24e83567ffb1cabeccd046c3d283fbebba0a003eca8dcfb5488e7268f9. Independent diff review: exact door and route identities, exact authored/harness/total omni counts, daylight cleanup, original shadow/atlas gates retained. Test-only correction, no runtime light change or visual/device acceptance."
     },
     {
       "id": "N29",
@@ -849,6 +849,18 @@
         "prototype/tests/valley_muster_test.gd"
       ],
       "note": "New independently evidenced scope: actual 46066402676/job 140732645272, valley 52/53, mounted socket test fails after Germanic rig fairness candidate. Distinguish missing first UID, quota/LOD eligibility, available pose, stale bone attachment and transform residual; not a repeat of N28 Germanic identity or N19 player mount. One bounded read-only request, 8192 maximum completion tokens, concise minimal diff or diagnostic; no automatic retry. Prior N27/N28 ended truncated, not quota denial; actual remaining provider credit not exposed. No model patch may execute automatically. Actual bridge HEAD 9af16fdaa275072b8593e69ca71ee4df19957578 and run 46075607650 observed in_progress; no provider result yet."
+    },
+    {
+      "id": "CONSOLIDATED-VISUAL-CANDIDATE",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "scope": [
+        ".github/workflows/aeterna-consolidated-visual.yml"
+      ],
+      "access": "edit",
+      "note": "Isolated integration branch from Preview 1327bd6, exact immutable source/test blobs from already-reviewed PRs #188/#189/#190/#191/#192/#194 and night fixture 4ebd7cb. No new edits to their active scopes, no main merge. One new read-only focused combined regression workflow; no model dispatch, no APK release, visual/device pending."
     }
   ]
 }
