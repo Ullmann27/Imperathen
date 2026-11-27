@@ -12,6 +12,20 @@ func _initialize() -> void:
 	var stage := Stage.new()
 	root.add_child(stage)
 	stage.ensure_built()
+	var camp := stage.get_node_or_null("CampScenery") as Node3D
+	_check(camp != null and int(camp.get_meta("tent_count", 0)) == 6, "Six authored campaign tents replace the six red boxes")
+	var mud := camp.get_node_or_null("MudSurface") as MeshInstance3D
+	var puddles := camp.get_node_or_null("RainPuddles") as MeshInstance3D
+	_check(mud != null and mud.mesh is ArrayMesh and mud.mesh.surface_get_array_len(0) > 10000, "Textured-by-vertex muddy platform is actual geometry")
+	_check(puddles != null and int(puddles.get_meta("puddle_count", 0)) == 12 and puddles.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF, "Rain puddles are one bounded shadow-free scenery batch")
+	for i in 6:
+		var tent := camp.get_node_or_null("CampaignTent_%02d" % i) as Node3D
+		_check(tent != null and int(tent.get_meta("guy_count", 0)) == 4, "Tent has four authored guy ropes")
+		if tent:
+			var canvas := tent.get_node_or_null("Canvas") as MeshInstance3D
+			_check(canvas != null and canvas.mesh is ArrayMesh and canvas.mesh.surface_get_array_len(0) > 700, "Tent owns subdivided, sagging fabric with an open entrance")
+	stage.ensure_built()
+	_check(stage.find_children("CampScenery", "Node3D", false, false).size() == 1, "Repeated setup does not duplicate scenery")
 	var ranks: Node3D = stage.get_node_or_null("LegionBlocks")
 	_check(ranks != null and ranks._batches.has("spear"),"I-00 uses the shared animated soldier silhouette batch")
 	var bodies: MultiMeshInstance3D = ranks._batches.spear

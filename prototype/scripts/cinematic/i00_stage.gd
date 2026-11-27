@@ -9,6 +9,7 @@ const Person = preload("res://scripts/visuals/village_person.gd")
 const Ranks = preload("res://scripts/visuals/far_ranks.gd")
 const Art = preload("res://scripts/world/village_art.gd")
 const Vexillum := preload("res://scripts/cinematic/i00_vexillum.gd")
+const CampScenery := preload("res://scripts/cinematic/i00_camp_scenery.gd")
 const MESHY_SIGNIFER := "unit_roman_signifer"
 
 const OFFSET := Vector3(180.0, 0.0, 160.0)
@@ -23,9 +24,7 @@ const ANCHORS := {
 var _built := false
 var _speakers: Dictionary = {}
 var _iron: StandardMaterial3D
-var _cloth: StandardMaterial3D
 var _shield: StandardMaterial3D
-var _mud: StandardMaterial3D
 var _wood: StandardMaterial3D
 var _legions: Node3D
 var _legion_clock := 0.0
@@ -43,10 +42,8 @@ func ensure_built() -> void:
 	position = OFFSET
 	_iron = Art.material(Color("5e625f"), 0.62)
 	_iron.metallic = 0.42
-	_cloth = Art.material(Color("7b4037"), 0.92)
 	_shield = Art.material(Color("6d3029"), 0.70)
 	_shield.metallic = 0.10
-	_mud = Art.material(Color("37342e"), 0.82)
 	_wood = Art.material(Color("554638"), 0.94)
 	_build_ground()
 	_build_legions()
@@ -72,15 +69,7 @@ func speaker(id: String) -> Node3D:
 
 
 func _build_ground() -> void:
-	Art.box(self, Vector3(52.0, 0.18, 62.0), Vector3(0.0, -0.10, -8.0), _mud)
-	for z in [-28.0, -20.0, -12.0, -4.0, 8.0]:
-		Art.box(self, Vector3(6.0, 0.025, 0.20), Vector3(0.0, 0.01, z), _wood)
-	for x in [-18.0, 18.0]:
-		for z in [-18.0, -7.0, 4.0]:
-			var tent := Node3D.new()
-			tent.position = Vector3(x, 0.0, z)
-			add_child(tent)
-			Art.box(tent, Vector3(3.8, 1.4, 2.8), Vector3(0, 0.7, 0), _cloth)
+	CampScenery.build(self)
 	for x in [-9.0, 0.0, 9.0]:
 		_standard(Vector3(x, 0.0, -3.0))
 
