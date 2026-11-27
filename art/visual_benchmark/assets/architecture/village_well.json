@@ -7,7 +7,7 @@
   "gltf_up_axis": "Y",
   "gltf_front": "+Z",
   "triangles": 12644,
-  "mesh_batches": 10,
+  "mesh_batches": 17,
   "bounds_blender_z_up": [
     [
       -1.4882135391235352,
@@ -15,18 +15,18 @@
       0.0
     ],
     [
-      1.7100000381469727,
+      1.709999918937683,
       1.0783514976501465,
       3.265000104904175
     ]
   ],
   "dimensions_blender_z_up": [
-    3.198213577270508,
+    3.1982134580612183,
     2.156702995300293,
     3.265000104904175
   ],
-  "sha256": "21555082045da623d48eafa04ba69ed3d94126d8db006d638dca06912949e0a0",
-  "bytes": 4310940,
+  "sha256": "eec26a01480d535920d6bc39e98c02d8ec3f2a521316f07b14c2407181f0b81b",
+  "bytes": 4318928,
   "provenance": "Original procedural geometry and texture maps authored for IMPERATHEN; no third-party model downloads.",
   "license": "Project owner rights; no public redistribution license asserted.",
   "rigged": false,
