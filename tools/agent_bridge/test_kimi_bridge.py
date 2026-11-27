@@ -192,5 +192,88 @@ class MaxEffortStageTests(unittest.TestCase):
         self.assertEqual(opener.calls, 1)
 
 
+class TimeoutReceiptTests(unittest.TestCase):
+    def test_json_timeout_does_not_resubmit(self):
+        class Opener:
+            def __init__(self):
+                self.calls = []
+            def open(self, request, timeout):
+                self.calls.append((request.get_method(), dict(request.header_items()), timeout))
+                raise TimeoutError("do not log this")
+        opener = Opener()
+        with self.assertRaises(TimeoutError):
+            k.consult("bounded task", [], 16384, "fake-key", opener, "max", "json")
+        self.assertEqual(len(opener.calls), 1)
+        method, headers, timeout = opener.calls[0]
+        self.assertEqual(method, "POST")
+        normalized = {name.lower(): value for name, value in headers.items()}
+        self.assertEqual(normalized["nvcf-poll-seconds"], str(k.JSON_POLL_SECONDS))
+        self.assertGreater(timeout, k.JSON_POLL_SECONDS)
+
+
+    def test_long_max_inference_removes_300_second_cap(self):
+        class Response(io.BytesIO):
+            status = 200
+            headers = {"Content-Type": "application/json"}
+        final = b'{"choices":[{"message":{"content":"review candidate"},"finish_reason":"stop"}]}'
+        class Opener:
+            def __init__(self):
+                self.timeouts = []
+            def open(self, request, timeout):
+                self.timeouts.append(timeout)
+                return Response(final)
+        opener = Opener()
+        answer, meta = k.consult("task", [], 16384, "fake-key", opener, "max", "json")
+        self.assertEqual(answer, "review candidate")
+        self.assertTrue(meta["complete"])
+        self.assertEqual(len(opener.timeouts), 1)
+        self.assertGreater(opener.timeouts[0], 3500)
+
+    def test_only_acknowledged_get_can_recover_from_timeout(self):
+        ident = "12345678-1234-1234-1234-123456789abc"
+        final = b'{"choices":[{"message":{"content":"patch"},"finish_reason":"stop"}]}'
+        class Response(io.BytesIO):
+            def __init__(self, status, headers, raw=b""):
+                super().__init__(raw)
+                self.status, self.headers = status, headers
+        class Opener:
+            def __init__(self): self.calls = []
+            def open(self, request, timeout):
+                self.calls.append((request.get_method(), request.full_url))
+                if len(self.calls) == 1: return Response(202, {"NVCF-REQID": ident})
+                if len(self.calls) == 2: raise TimeoutError("transient read")
+                return Response(200, {"Content-Type":"application/json"}, final)
+        opener = Opener()
+        with patch.object(k.time, "sleep"):
+            self.assertEqual(k.consult("task", [], 16384, "fake-key", opener, "max", "json")[0], "patch")
+        self.assertEqual(opener.calls, [("POST",common.ENDPOINT),("GET",k.STATUS_URL+ident),("GET",k.STATUS_URL+ident)])
+
+    def test_failure_receipt_is_not_an_answer_or_retry_permission(self):
+        task = {"revision": "a" * 40, "max_tokens": 16384,
+                "reasoning_effort": "max", "response_mode": "json"}
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "artifacts"
+            with patch.dict(k.os.environ, {"GITHUB_RUN_ID": "46013490508"}):
+                k.write_failure_receipt(out, "K101", task, "inference", "socket_timeout", 300.4)
+            receipt = json.loads((out / "receipt.json").read_text())
+            self.assertEqual(receipt["status"], "failed")
+            self.assertFalse(receipt["complete"])
+            self.assertEqual(receipt["invocation_state"], "outcome_unknown")
+            self.assertFalse(receipt["automatic_post_retry"])
+            self.assertEqual(receipt["reasoning_effort"], "max")
+            self.assertEqual(receipt["max_tokens"], 16384)
+            self.assertEqual(receipt["workflow_run_id"], "46013490508")
+            self.assertNotIn("answer_sha256", receipt)
+            self.assertFalse((out / "answer.md").exists())
+
+    def test_pre_inference_failure_never_claims_submission(self):
+        with tempfile.TemporaryDirectory() as d:
+            k.write_failure_receipt(Path(d), "not-a-task", None, "manifest", "bridge_validation", 0.1)
+            receipt = json.loads((Path(d) / "receipt.json").read_text())
+            self.assertEqual(receipt["task"], "invalid")
+            self.assertEqual(receipt["invocation_state"], "not_submitted")
+            self.assertFalse(receipt["automatic_post_retry"])
+
+
 if __name__ == "__main__":
     unittest.main()

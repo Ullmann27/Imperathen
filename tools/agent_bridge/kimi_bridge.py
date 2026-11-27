@@ -16,6 +16,7 @@ from urllib.parse import quote
 from urllib.request import Request, build_opener
 
 import nemotron_bridge as common
+from kimi_production_context import production_context
 
 MODEL = "moonshotai/kimi-k3.1-pro"
 TASK_IDS = ("K01", "K02", "K03", "K04", "K05", "K06")
@@ -24,9 +25,10 @@ EFFORTS = {"low", "high", "max"}
 RESPONSE_MODES = {"stream", "json"}
 STATUS_URL = "https://integrate.api.nvidia.com/v1/status/"
 REQUEST_ID = re.compile(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
-KIMI_DEADLINE = 1200
-POLL_INTERVAL = 15
-MAX_POLLS = 24
+KIMI_DEADLINE = 3600
+POLL_INTERVAL = 30
+JSON_POLL_SECONDS = 60
+MAX_POLLS = 120
 MAX_TASKS = 6
 MAX_IMAGE = 2_200_000
 MAX_IMAGES = 3_800_000
@@ -131,7 +133,7 @@ def collect_images(task, opener):
 
 def build_payload(prompt, images, tokens, effort="max", mode="stream"):
     payload = {"model": MODEL, "messages": [
-        {"role": "system", "content": SYSTEM},
+        {"role": "system", "content": SYSTEM + "\n" + production_context()},
         {"role": "user", "content": [{"type": "text", "text": prompt}, *images]},
     ], "max_tokens": tokens, "reasoning_effort": effort, "stream": mode == "stream"}
     if payload["stream"]:
@@ -185,6 +187,11 @@ def call_response(payload, key, opener, deadline, decode):
     """One POST, then bounded GET status polls only for an accepted invocation."""
     headers = {"Authorization": "Bearer " + key, "Content-Type": "application/json",
                "Accept": "text/event-stream" if payload.get("stream") else "application/json"}
+    # Ask NVIDIA for an accepted/pending response. If the hosted endpoint
+    # ignores the wait hint, allow the full bounded local inference budget.
+    # Never send a second POST just because a socket timed out.
+    if not payload.get("stream"):
+        headers["NVCF-POLL-SECONDS"] = str(JSON_POLL_SECONDS)
     request = Request(common.ENDPOINT, data=json.dumps(payload).encode("utf-8"),
                       method="POST", headers=headers)
     ident = None
@@ -192,7 +199,24 @@ def call_response(payload, key, opener, deadline, decode):
         remaining = deadline - time.monotonic()
         if remaining <= 0:
             raise common.BridgeError("NVIDIA response deadline exceeded")
-        with opener.open(request, timeout=min(300, remaining)) as response:
+        # No five-minute socket cap. The timeout is the remaining inference
+        # budget, including the first response headers. A separate CI step
+        # deadline bounds the process even if a provider trickles bytes.
+        print(f"KIMI_WAIT method={request.get_method()} remaining_seconds={remaining:.0f}", flush=True)
+        try:
+            response = opener.open(request, timeout=min(KIMI_DEADLINE, remaining))
+        except (TimeoutError, URLError) as exc:
+            timed_out = isinstance(exc, TimeoutError) or isinstance(getattr(exc, "reason", None), TimeoutError)
+            # Once NVIDIA acknowledged an invocation, only its existing GET
+            # may be repeated after a transport timeout. Never retry a POST.
+            if ident is None or request.get_method() != "GET" or not timed_out:
+                raise
+            if attempt == MAX_POLLS or time.monotonic() + POLL_INTERVAL >= deadline:
+                raise common.BridgeError("Pending request budget exhausted") from None
+            print("KIMI_PENDING status connection timed out; retaining same invocation", flush=True)
+            time.sleep(POLL_INTERVAL)
+            continue
+        with response:
             if response.status == 200:
                 return decode(response, deadline)
             if response.status != 202:
@@ -258,6 +282,26 @@ def failure_kind(exc):
     return "io_error"
 
 
+def write_failure_receipt(output, task_id, task, stage, kind, elapsed):
+    # All fields are fixed categories or validated manifest metadata. Never
+    # persist an exception string, response body, headers, prompt or key.
+    receipt = {"task": task_id if TASK_ID.fullmatch(task_id) else "invalid",
+               "requested_model": MODEL, "status": "failed", "complete": False,
+               "stage": stage, "error_kind": kind, "elapsed_seconds": round(elapsed, 1),
+               "invocation_state": ("outcome_unknown" if stage == "inference" else
+                                    "response_received" if stage == "archive" else "not_submitted"),
+               "automatic_post_retry": False}
+    if task is not None:
+        receipt.update(source_revision=task["revision"], max_tokens=task["max_tokens"],
+                       reasoning_effort=task.get("reasoning_effort", "max"),
+                       response_mode=task.get("response_mode", "stream"))
+    run_id = os.environ.get("GITHUB_RUN_ID", "")
+    if re.fullmatch(r"[0-9]{1,24}", run_id):
+        receipt["workflow_run_id"] = run_id
+    output.mkdir(parents=True, exist_ok=True)
+    (output / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--task", required=True)
@@ -270,6 +314,7 @@ def main():
         return 2
     started = time.monotonic()
     stage = "manifest"
+    task = None
     try:
         task = load_tasks(args.manifest)[args.task]
         effort = task.get("reasoning_effort", "max")
@@ -300,9 +345,15 @@ def main():
         print("KIMI_RECEIPT " + json.dumps({"task": args.task, "status": receipt["status"], "source_revision": task["revision"]}))
         return 0 if meta["complete"] else 3
     except HTTPError as exc:
-        print(f"KIMI_ERROR stage={stage} kind=http_{exc.code} elapsed={time.monotonic()-started:.1f}s", file=sys.stderr)
+        kind = f"http_{exc.code}"
     except (common.BridgeError, URLError, TimeoutError, OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
-        print(f"KIMI_ERROR stage={stage} kind={failure_kind(exc)} elapsed={time.monotonic()-started:.1f}s", file=sys.stderr)
+        kind = failure_kind(exc)
+    elapsed = time.monotonic() - started
+    print(f"KIMI_ERROR stage={stage} kind={kind} elapsed={elapsed:.1f}s", file=sys.stderr)
+    try:
+        write_failure_receipt(args.output, args.task, task, stage, kind, elapsed)
+    except OSError:
+        print("KIMI_ERROR stage=archive kind=failure_receipt_io", file=sys.stderr)
     return 1
 
 

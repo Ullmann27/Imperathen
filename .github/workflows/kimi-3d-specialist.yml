@@ -27,14 +27,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m unittest discover -s tools/agent_bridge -p 'test_kimi_bridge.py' -v
+          python3 -m unittest discover -s tools/agent_bridge -p 'test_kimi*.py' -v
+          python3 -m unittest discover -s tools/agent_bridge -p 'test_campaign_journey.py' -v
+          python3 tools/agent_bridge/team_work_register.py show
           tasks="$(PYTHONPATH=tools/agent_bridge python3 -c 'import json; from pathlib import Path; import kimi_bridge as k; print(json.dumps(list(k.load_tasks(Path("tools/agent_bridge/kimi_tasks.json")))))')"
           printf 'tasks=%s\n' "$tasks" >> "$GITHUB_OUTPUT"
   consult:
     needs: verify
     name: Kimi / ${{ matrix.task }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 28
+    timeout-minutes: 75
     strategy:
       fail-fast: false
       max-parallel: 1
@@ -45,6 +47,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Request one concrete 3D engineering patch from Kimi
+        timeout-minutes: 65
         env:
           NVIDIA_KIMI_API_KEY: ${{ secrets.NVIDIA_KIMI_API_KEY }}
           KIMI_TASK: ${{ matrix.task }}

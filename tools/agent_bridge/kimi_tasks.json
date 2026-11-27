@@ -1,9 +1,8 @@
 {
-  "K101": {
-    "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
-    "task": "Enger MAX-Transport- und Entwicklungsbeweis für den Beginn der Story: Prüfe nur die tatsächliche Hauptmenü-Implementierung und ihren vorhandenen Test auf genau einen konkret belegbaren Defekt beim Button Neues Leben/Fortsetzen. Gib einen kleinen vollständigen Patch oder eine begründete konkrete Testverbesserung mit exakten Pfaden. Bewahre Speicherstände, Story-Start und Bedienbarkeit. Keine erfundenen visuellen Ergebnisse; echte Gameplay-Aufnahmen werden getrennt erzeugt. REALISM QUALITY GATE bleibt verpflichtend; keine pauschalen Profilreduktionen. Keine internen Denkspuren.",
+  "K102": {
+    "revision": "4f109b9853f7fa1213ed2ed548d421dca3da39d4",
+    "task": "Neuer enger MAX-Auftrag (kein K101-Retry): Überprüfe ausschließlich den bereits überarbeiteten realen Hauptmenü-Test roman_menu_test.gd. Analysiere, ob die neue Prüfung genau einer primären Kampagnenaktion bei vorhandenem oder fehlendem Spielstand einen konkreten verbleibenden Testmangel hat. Liefere einen einzigen kleinen vollständigen Testpatch oder begründe anhand des tatsächlichen Codes, warum kein Patch erforderlich ist. Keine neue Architektur, kein zweiter Auftrag im selben Response, keine erfundenen Test-/Renderresultate. RQG und Story-Verträge gelten. Benenne einen sinnvollen nächsten Teilauftrag.",
     "files": [
-      "prototype/scripts/ui/roman_hud/menu_kit.gd",
       "prototype/tests/roman_menu_test.gd"
     ],
     "images": [],

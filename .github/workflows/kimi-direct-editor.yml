@@ -11,7 +11,7 @@ concurrency:
 jobs:
   verify-and-edit:
     runs-on: ubuntu-24.04
-    timeout-minutes: 32
+    timeout-minutes: 135
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -20,6 +20,7 @@ jobs:
         run: |
           python3 -m unittest discover -s tools/agent_bridge -p 'test_kimi*.py' -v
       - name: Edit source in bounded workspace through Kimi tool calls
+        timeout-minutes: 125
         env:
           NVIDIA_KIMI_API_KEY: ${{ secrets.NVIDIA_KIMI_API_KEY }}
         run: python3 tools/agent_bridge/kimi_editor.py --request tools/agent_bridge/kimi_editor_request.json --output artifacts/kimi-editor

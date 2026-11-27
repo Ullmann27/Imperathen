@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": 1,
+  "tasks": [
+    {
+      "id": "K101",
+      "owner": "Kimi",
+      "status": "blocked",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": "46013490508",
+      "scope": [
+        "prototype/scripts/ui/roman_hud/menu_kit.gd",
+        "prototype/tests/roman_menu_test.gd"
+      ],
+      "access": "read",
+      "note": "300.4s socket timeout; no answer or UUID; provider execution unknown."
+    },
+    {
+      "id": "K102",
+      "owner": "Kimi",
+      "status": "reserved",
+      "revision": "4f109b9853f7fa1213ed2ed548d421dca3da39d4",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/roman_menu_test.gd"
+      ],
+      "access": "read",
+      "note": "Distinct small MAX proof; review updated menu regression, no duplicate K101 POST."
+    },
+    {
+      "id": "MENU-V2",
+      "owner": "Coordinator",
+      "status": "submitted",
+      "revision": "8807c03666683d564659f6f92dcd49b33a3dee99",
+      "run_id": "46015164122",
+      "scope": [
+        "prototype/scripts/ui/roman_hud/menu_kit.gd",
+        "prototype/tests/roman_menu_test.gd"
+      ],
+      "access": "read",
+      "note": "Independent visual candidate; check actual V2 status."
+    },
+    {
+      "id": "N17",
+      "owner": "Nemotron",
+      "status": "review_pending",
+      "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
+      "run_id": "46008020658",
+      "scope": [
+        "prototype/scripts/rendering/route_fire_lights.gd"
+      ],
+      "access": "read",
+      "note": "Complete answer; independent validation required."
+    },
+    {
+      "id": "N18",
+      "owner": "Nemotron",
+      "status": "blocked",
+      "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
+      "run_id": "46008020658",
+      "scope": [
+        "prototype/scripts/domain/calendar_ageing_participant.gd"
+      ],
+      "access": "read",
+      "note": "Truncated answer."
+    },
+    {
+      "id": "N19",
+      "owner": "Nemotron",
+      "status": "review_pending",
+      "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
+      "run_id": "46008020658",
+      "scope": [
+        "prototype/scripts/world/mounted_rider_pose.gd",
+        "prototype/scripts/world/mount_controller.gd"
+      ],
+      "access": "read",
+      "note": "Complete answer; independent validation required."
+    }
+  ]
+}

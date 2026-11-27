@@ -17,10 +17,11 @@ from urllib.request import Request, build_opener
 
 import kimi_bridge as visual
 import nemotron_bridge as common
+from kimi_production_context import production_context
 
 MAX_ROUNDS = 4
-TOKENS_PER_ROUND = 8192
-EDITOR_DEADLINE = 1500
+TOKENS_PER_ROUND = 16384
+EDITOR_DEADLINE = 7200
 MAX_TOOL_CALLS = 12
 MAX_EDIT_BYTES = 90_000
 MAX_NEW_FILES = 4
@@ -183,18 +184,20 @@ def request_model(messages, key, opener, deadline=None):
     return message, choice.get("finish_reason")
 
 
-def edit(task, key, opener):
+def edit(task, key, opener, checkpoint=None):
     workspace = Workspace(load_sources(task, opener), task["new_files"])
     images, image_hashes = visual.collect_images(task, opener)
     instructions = task["task"] + "\nRevision: " + task["revision"] + "\nStart with list_files, then use read_file/replace_text/create_file to produce actual changes. Do not only describe a patch."
-    messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": [
+    messages = [{"role": "system", "content": SYSTEM + "\n" + production_context()}, {"role": "user", "content": [
         {"type": "text", "text": instructions}, *images]}]
     count = 0
     final = ""
     deadline = time.monotonic() + EDITOR_DEADLINE
     for index in range(MAX_ROUNDS):
         print(f"KIMI_EDITOR_ROUND {index + 1}/{MAX_ROUNDS} prior_tool_calls={count}", flush=True)
-        message, finish = request_model(messages, key, opener, deadline)
+        if time.monotonic() >= deadline:
+            raise common.BridgeError("Editor session deadline exceeded")
+        message, finish = request_model(messages, key, opener, min(deadline, time.monotonic() + visual.KIMI_DEADLINE))
         calls = message.get("tool_calls") or []
         if not isinstance(calls, list) or len(calls) + count > MAX_TOOL_CALLS:
             raise common.BridgeError("Tool call budget exceeded")
@@ -225,7 +228,26 @@ def edit(task, key, opener):
                 result = {"error": "Invalid tool operation; check exact path, range and unique match."}
             messages.append({"role": "tool", "tool_call_id": call["id"],
                              "content": json.dumps(result, ensure_ascii=False)})
+            if checkpoint is not None and ("updated" in result or "created" in result):
+                checkpoint(workspace, count)
     raise common.BridgeError("Agent round budget exhausted; no candidate published")
+
+
+def write_checkpoint(output, task, workspace, count, key):
+    """Retain actual file edits only; no model reasoning, API IDs or credentials."""
+    changes, _ = workspace.candidate()
+    if not changes:
+        return
+    record = {"schema": 1, "model": visual.MODEL, "source_revision": task["revision"],
+              "tool_calls": count, "status": "incomplete_unreviewed", "changes": changes}
+    raw = json.dumps(record, ensure_ascii=False, indent=2)
+    if key in raw or common.KEY_PATTERN.search(raw):
+        raise common.BridgeError("Possible credential in checkpoint")
+    output.mkdir(parents=True, exist_ok=True)
+    temp = output / "checkpoint.json.tmp"
+    temp.write_text(raw + "\n", encoding="utf-8")
+    temp.replace(output / "checkpoint.json")
+    print("KIMI_EDITOR_CHECKPOINT changed_files=" + str(len(changes)), flush=True)
 
 
 def main():
@@ -240,7 +262,8 @@ def main():
     try:
         task = json.loads(args.request.read_text(encoding="utf-8"))
         validate_task(task)
-        changes, patch, final, images, count = edit(task, key, build_opener(common.NoRedirect()))
+        changes, patch, final, images, count = edit(task, key, build_opener(common.NoRedirect()),
+            checkpoint=lambda workspace, count: write_checkpoint(args.output, task, workspace, count, key))
         candidate = {"model": visual.MODEL, "revision": task["revision"], "images_sha256": images,
                      "tool_calls": count, "changes": changes, "status": "unreviewed"}
         serial = json.dumps(candidate, ensure_ascii=False, indent=2)
@@ -250,6 +273,7 @@ def main():
         (args.output / "candidate.json").write_text(serial + "\n", encoding="utf-8")
         (args.output / "candidate.diff").write_text(patch, encoding="utf-8")
         (args.output / "summary.md").write_text(common.KEY_PATTERN.sub("[REDACTED]", final.replace(key, "[REDACTED]")) + "\n", encoding="utf-8")
+        (args.output / "checkpoint.json").unlink(missing_ok=True)
         print("KIMI_EDITOR_CANDIDATE " + json.dumps({"revision": task["revision"], "tool_calls": count,
                     "changed_paths": [c["path"] for c in changes], "status": "unreviewed"}))
         return 0
