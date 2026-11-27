@@ -62,7 +62,8 @@ jobs:
           echo "NO_UNITY_PROJECT_OR_IMPERATHEN_GAME_FILE_MODIFIED" >> unity-cli-evidence/checks.txt
           echo "NO_CLOUD_AI_GENERATION_REQUESTED" >> unity-cli-evidence/checks.txt
           cat unity-cli-evidence/checks.txt
-      - name: Validate optional scoped Unity service account, without disclosing tokens
+      - name: Legacy Unity Cloud CLI compatibility diagnostic (non-gating)
+        continue-on-error: true
         shell: bash
         env:
           UNITY_SERVICE_ACCOUNT_ID: ${{ secrets.IMPERATHEN_UNITY_SA_ID }}
@@ -217,6 +218,7 @@ jobs:
             --output unity-cli-evidence/cloud-probe-sanitized.json \
             --org-candidate "heinzullmann2212"
       - name: Verify Asset Manager direct REST API with service-account read-only rights
+        id: asset_api
         if: always()
         shell: bash
         env:
@@ -230,6 +232,34 @@ jobs:
           export PATH="$HOME/.local/bin:$PATH"
           python3 tools/unity_bridge/probe_asset_manager_api.py \
             --report unity-cli-evidence/unity-asset-api-sanitized.json
+      - name: Gate real Imperathen project visibility (fail closed)
+        if: always()
+        shell: bash
+        env:
+          ASSET_API_STEP_OUTCOME: ${{ steps.asset_api.outcome }}
+        run: |
+          set -euo pipefail
+          if [[ "$ASSET_API_STEP_OUTCOME" != "success" ]]; then
+            echo "UNITY_PROJECT_VISIBILITY_BLOCKED_API_STEP_FAILED"
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path("unity-cli-evidence/unity-asset-api-sanitized.json")
+          if not path.is_file():
+              raise SystemExit("UNITY_PROJECT_VISIBILITY_BLOCKED_MISSING_REPORT")
+          report = json.loads(path.read_text(encoding="utf-8"))
+          if (report.get("provider") != "unity_asset_manager_api"
+                  or report.get("read_only") is not True
+                  or report.get("result") != "IMPERATHEN_VISIBLE"
+                  or report.get("project_seen") is not True
+                  or report.get("project_count_on_page", 0) < 1):
+              raise SystemExit("UNITY_PROJECT_VISIBILITY_BLOCKED_NOT_PROVEN")
+          with Path("unity-cli-evidence/checks.txt").open("a", encoding="utf-8") as out:
+              out.write("UNITY_IMPERATHEN_ASSET_MANAGER_API_CONFIRMED\\n")
+          print("UNITY_IMPERATHEN_ASSET_MANAGER_API_CONFIRMED")
+          PY
       - name: Keep only sanitized CLI evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
