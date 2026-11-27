@@ -207,6 +207,8 @@ func _simulation() -> Dictionary:
 	check(kinds.has("purchase") or kinds.has("haggle"), "the observed event stream shows trade")
 	check(kinds.has("conversation"), "the observed event stream shows a conversation")
 
+	_test_weather_in_transit(saved_text)
+
 	# At night the streets empty, guards stay out.
 	var night := Life.new()
 	night.load_state(JSON.parse_string(saved_text))
@@ -318,3 +320,82 @@ func _simulation() -> Dictionary:
 		"midday": midday, "stats_after_36h": a.state.stats, "budget_frames": frames, "budget_deferred_frames": unfinished,
 		"budget_worst_usec": worst, "events_processed_36h": a.summary().processed, "spoken_lines": spoken, "voiced_lines": voiced,
 		"audio_status": "text_only_until_voice_pool_recordings_land" if voiced == 0 else "voiced", "measurement": "desktop CPU, headless"}
+
+## A real mid-day city, not a synthetic resident state. Preserve the walking
+## route and slot reservation; only shorten an exposed activity's deadline.
+func _test_weather_in_transit(saved_text: String) -> void:
+	var city := Life.new()
+	if not city.load_state(JSON.parse_string(saved_text)):
+		check(false, "weather fixture loads: " + city.error)
+		return
+	city.set_weather("clear")
+	# Choose a real walking activity from the deterministic city population.
+	# Short advances also cover a fixture whose first snapshot has no walkers.
+	var walking := {}
+	for sample in 61:
+		walking.clear()
+		for person in city.state.residents.size():
+			var resident: Dictionary = city.state.residents[person]
+			if resident.act in Life.OUTDOOR_LEISURE and int(resident.arr) > int(city.state.t) and int(resident.until) > int(resident.arr) + 1 and not Anchors.has_tag(city.index.anchors[resident.at], "shelter"):
+				walking[person] = true
+		if not walking.is_empty():
+			break
+		city.advance(30, 0)
+	check(not walking.is_empty(), "actual city contains people walking toward exposed leisure")
+	if walking.is_empty():
+		return
+	var before := city.save_state()
+	var now := int(before.t)
+	var positions := {}
+	for person: int in walking:
+		positions[person] = city.position_of(person, now)
+	var seq := int(before.event_seq)
+	var expected := 0
+	var unchanged := true
+	var deadlines := true
+	var routes := true
+	var last_arrival := now
+	city.set_weather("rain")
+	for person in before.residents.size():
+		var old: Dictionary = before.residents[person]
+		var resident: Dictionary = city.state.residents[person]
+		var exposed: bool = old.act in Life.OUTDOOR_LEISURE and not Anchors.has_tag(city.index.anchors[old.at], "shelter")
+		var arrival := int(old.arr)
+		var deadline := arrival + 1 if arrival > now else now + 5 + person % 40
+		var changed: bool = exposed and int(old.until) > deadline
+		expected += int(changed)
+		if not changed:
+			unchanged = unchanged and resident == old
+			continue
+		deadlines = deadlines and int(resident.until) == deadline and int(resident.until) < int(old.until)
+		var expected_resident := old.duplicate(true)
+		expected_resident.until = deadline
+		if arrival <= now and int(old.wake) > deadline:
+			expected_resident.wake = deadline
+		routes = routes and resident == expected_resident
+		if walking.has(person):
+			last_arrival = maxi(last_arrival, arrival)
+			routes = routes and city.position_of(person, now).is_equal_approx(positions[person]) and int(resident.wake) == int(old.wake)
+	check(deadlines, "rain shortens exposed activities without extending a stay")
+	check(unchanged, "protected and unaffected residents are not changed")
+	check(routes, "weather preserves travel endpoints, arrival wakes, slots and physical positions")
+	var event: Dictionary = city.state.events[-1]
+	check(event.kind == "weather" and int(event.sheltering) == expected and int(city.state.event_seq) == seq + 1, "one weather event reports precisely the changed residents")
+	check(city.audit().ok and city.state.households == before.households and city.state.businesses == before.businesses and city.state.flow == before.flow and city.state.ledger == before.ledger, "weather changes no money, stock, jobs or household ledger")
+	var rain_hash := _hash(city)
+	city.set_weather("rain")
+	check(_hash(city) == rain_hash, "repeated same rain is idempotent")
+	var restored := Life.new()
+	if not restored.load_state(JSON.parse_string(JSON.stringify(city.save_state()))):
+		check(false, "rain save with travelling residents loads: " + restored.error)
+		return
+	check(_hash(restored) == rain_hash, "rain deadlines and walking routes survive JSON round trip")
+	city.advance_to(last_arrival + 2, 0)
+	restored.advance_to(last_arrival + 2, 0)
+	var renewed := true
+	for person: int in walking:
+		var resident: Dictionary = city.state.residents[person]
+		renewed = renewed and int(resident.dep) > int(before.residents[person].dep)
+	check(renewed, "all affected walkers make another normal decision after reaching their destination")
+	check(city.audit().ok and restored.audit().ok and _hash(city) == _hash(restored), "arrival decisions and economic conservation are deterministic after reload")
+
