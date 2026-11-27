@@ -85,6 +85,15 @@ jobs:
             echo "UNITY_SERVICE_ACCOUNT_AUTH_FAILED" >> unity-cli-evidence/checks.txt
             exit 1
           fi
+          # An auth-status success can mean environment credentials are
+          # configured but does not establish a successful Cloud token exchange.
+          # Try the documented non-persistent service-account login exactly once.
+          # The secret is passed via stdin and never appears on the command line.
+          if printf '%s' "$UNITY_SERVICE_ACCOUNT_SECRET" | unity --non-interactive auth login --client-id "$UNITY_SERVICE_ACCOUNT_ID" --secret-from-stdin --no-store > "$RUNNER_TEMP/unity-explicit-auth-private.json" 2>&1; then
+            echo "UNITY_EXPLICIT_SERVICE_LOGIN_SUCCEEDED" >> unity-cli-evidence/checks.txt
+          else
+            echo "UNITY_EXPLICIT_SERVICE_LOGIN_FAILED" >> unity-cli-evidence/checks.txt
+          fi
           # Current Unity CLI 1.0 uses the bare plural group, not the removed
           # 'unity cloud project list' subcommand (October 2026 change).
           if unity cloud projects --format json > "$RUNNER_TEMP/unity-cloud-projects-private.json" 2>&1; then
