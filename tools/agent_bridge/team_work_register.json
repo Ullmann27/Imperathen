@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 10,
+  "version": 14,
   "tasks": [
     {
       "id": "K101",
@@ -93,53 +93,53 @@
     {
       "id": "G001",
       "owner": "Gemini",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
-      "run_id": null,
+      "run_id": "46019720312",
       "scope": [
         "prototype/scripts/cinematic/opening_director.gd",
         "prototype/tests/opening_director_test.gd"
       ],
       "access": "read",
-      "note": "Independent specialist assignment; API access and free-tier eligibility not yet verified. No executable output or automatic retry."
+      "note": "GitHub workflow 46019720312, job 140576304218, offline checks passed; provider access/response not yet verified."
     },
     {
       "id": "E001",
       "owner": "ERNIE",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
-      "run_id": null,
+      "run_id": "46019720312",
       "scope": [
         "prototype/scripts/domain/npc_behavior.gd",
         "prototype/tests/npc_behavior_test.gd"
       ],
       "access": "read",
-      "note": "Independent specialist assignment; API access and free-tier eligibility not yet verified. No executable output or automatic retry."
+      "note": "GitHub workflow 46019720312, job 140576304213, offline checks passed; provider access/response not yet verified."
     },
     {
       "id": "V001",
       "owner": "SuperVL",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
-      "run_id": null,
+      "run_id": "46019720312",
       "scope": [
         "prototype/scripts/world/village/household_designs.gd",
         "prototype/scripts/world/village/house_interiors.gd"
       ],
       "access": "read",
-      "note": "Independent specialist assignment; API access and free-tier eligibility not yet verified. No executable output or automatic retry."
+      "note": "GitHub workflow 46019720312, job 140576304093, offline checks passed; provider access/response not yet verified."
     },
     {
       "id": "O001",
       "owner": "GPTOSS",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
-      "run_id": null,
+      "run_id": "46019720312",
       "scope": [
         "prototype/tests/companion_turn_motion_test.gd"
       ],
       "access": "read",
-      "note": "Independent specialist assignment; API access and free-tier eligibility not yet verified. No executable output or automatic retry."
+      "note": "GitHub workflow 46019720312, job 140576304279, offline checks passed; provider access/response not yet verified."
     }
   ]
 }
