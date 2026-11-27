@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 179,
+  "version": 180,
   "tasks": [
     {
       "id": "K101",
@@ -853,14 +853,14 @@
     {
       "id": "CONSOLIDATED-VISUAL-CANDIDATE",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
-      "run_id": null,
+      "run_id": "46075904136",
       "scope": [
         ".github/workflows/aeterna-consolidated-visual.yml"
       ],
       "access": "edit",
-      "note": "Isolated integration branch from Preview 1327bd6, exact immutable source/test blobs from already-reviewed PRs #188/#189/#190/#191/#192/#194 and night fixture 4ebd7cb. No new edits to their active scopes, no main merge. One new read-only focused combined regression workflow; no model dispatch, no APK release, visual/device pending."
+      "note": "Draft PR #195 on integration/aeterna-visual-candidate-20261127, exact commit d5cdcf3edb14dce44a11f1beed1942c131f5339f. Seven disjoint individually tested candidate sets copied with exact Git blob IDs (27 original files plus new focused CI; 28 total). Base Preview 1327bd6 unchanged; source compare ahead 1 behind 0. Real combined CI 46075904136 observed in_progress; 11 Godot groups incl. import, Prolog, family/market, camera, backdrop, rain, night/route lights. No full combined result, no main merge, no release or visual/device acceptance. Formation and valley mounted socket still blocked; Nemotron N29 independent. Do not duplicate this run."
     }
   ]
 }
