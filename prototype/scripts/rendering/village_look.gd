@@ -59,6 +59,7 @@ var _home := -1
 var time_of_day := -1.0
 ## "clear" keeps the season preset; see WEATHER.
 var weather := "clear"
+var _weather_sample: Dictionary = {}
 ## 0 by day, 1 in full night; drives the interior fire light.
 var night := 0.0
 var _fires: Array[Dictionary] = []
@@ -356,6 +357,11 @@ func _update_window_glow() -> void:
 
 
 ## 0 by day, 1 once dusk has fallen: door torches burn from dusk to dawn.
+func set_route_context(player_at: Vector3, route: PackedVector2Array) -> void:
+	if is_instance_valid(_route_fires):
+		_route_fires.set_route_context(player_at,route)
+
+
 func _torches_lit() -> float:
 	var from := float(VALUES.village_fires.lit_from)
 	return smoothstep(from, from + .25, night)
@@ -455,15 +461,36 @@ static func _rod(radius: float, height: float) -> CylinderMesh:
 ## Weather-dependent light: "clear", "overcast", "rain" or "mist".
 func set_weather(kind: String) -> void:
 	weather = kind if WEATHER.has(kind) else "clear"
+	_weather_sample = {}
+	apply_season(season)
+
+
+## One reset of the solar baseline, followed by a continuous weather blend.
+func set_conditions(hours: float, sample: Dictionary) -> void:
+	var next_hour := fposmod(hours,24.0) if hours>=0.0 else -1.0
+	if is_equal_approx(next_hour,time_of_day) and sample == _weather_sample:
+		return
+	time_of_day = next_hour
+	_weather_sample = sample.duplicate()
+	weather = str(sample.get("kind","clear"))
 	apply_season(season)
 
 
 func _apply_weather() -> void:
-	var w: Dictionary = WEATHER[weather]
-	if weather == "clear":
+	var w: Dictionary = WEATHER.get(weather,WEATHER.clear)
+	if not _weather_sample.is_empty():
+		var a: Dictionary = WEATHER.get(str(_weather_sample.get("from","clear")),WEATHER.clear)
+		var b: Dictionary = WEATHER.get(str(_weather_sample.get("to","clear")),WEATHER.clear)
+		var amount := clampf(float(_weather_sample.get("mix",1.0)),0.0,1.0)
+		w = {}
+		for key: String in ["coverage","sun","ambient","fog","height","grey"]:
+			w[key] = lerpf(float(a[key]),float(b[key]),amount)
+	elif weather == "clear":
 		return
 	sun.light_energy *= float(w.sun)
 	environment.ambient_light_energy *= float(w.ambient)
+	# Bad weather must not remove the night visibility floor.
+	environment.ambient_light_energy = maxf(environment.ambient_light_energy,0.15*night)
 	environment.fog_density *= float(w.fog)
 	environment.fog_height_density *= float(w.height)
 	var grey: Color = (VALUES.weather_grey.day as Color).lerp(VALUES.weather_grey.night, night)

@@ -44,6 +44,9 @@ func _initialize() -> void:
 			for line_id: String in authored:
 				var line: Dictionary = authored[line_id]
 				_add(mission_id, line_id, str(line.get("speaker_id", "")), str(line.get("text", "")), "missions/" + band + "/" + mission_id + ".json:slice.lines")
+			var contacts: Dictionary = mission.get("slice", {}).get("contact_lines", {})
+			for id: String in contacts:
+				_add(mission_id, mission_id + ".contact." + id, id, str(contacts[id]), "missions/" + band + "/" + mission_id + ".json:slice.contact_lines")
 	for id: String in Childhood.NEIGHBORS:
 		_add("village", "village.idle." + id, id, Childhood._idle_text(id), "village_childhood.NEIGHBORS")
 	for id: String in ["julia", "silvanus", "sextus"]:

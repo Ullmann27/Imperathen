@@ -53,6 +53,10 @@ var _world_seconds := -1.0
 var _restore_raiders := false
 var physical_raiders := false
 var raider_sight_check: Callable
+# Recovered from perf/runtime-optimization-20261126. Only cache the node
+# enumeration, never gameplay state or collision results.
+var _collision_bodies: Array[Node] = []
+var _collision_bodies_dirty := true
 
 
 func _physics_process(delta: float) -> void:
@@ -239,6 +243,13 @@ func _update_attention(delta: float) -> void:
 						partner = body.get_node_or_null("Figure") as Node3D
 			figure.set_gaze_target(partner)
 			figure.set_resident_prop(Activities.village_prop(activity))
+			# The actual story smith practices his trade at his own workplace,
+			# not in a catalogue or during a conversation. The domain still
+			# owns his position, life, quest state and all resource transfers.
+			if id == "sextus" and activity == "work" and contact.is_empty() and Childhood.enabled(state):
+				var here := Vector2(actor.position.x, actor.position.z)
+				if here.distance_to(Childhood.POINTS.smith) <= 1.8 and actor.get_meta("assignment", "idle") == "idle":
+					figure.keep_working()
 		var target := player
 		if activity in ["greet","socialize"]:
 			# A social decision is not a conversation until the two *visible*
@@ -460,8 +471,39 @@ func _road_detail(path: String, label: String, at: Vector3) -> Node3D:
 	return detail
 
 
+func _enter_tree() -> void:
+	_collision_bodies_dirty = true
+	get_tree().node_added.connect(_on_collision_node_added)
+	get_tree().node_removed.connect(_on_collision_node_removed)
+
+
+func _exit_tree() -> void:
+	get_tree().node_added.disconnect(_on_collision_node_added)
+	get_tree().node_removed.disconnect(_on_collision_node_removed)
+	_collision_bodies.clear()
+	_collision_bodies_dirty = true
+
+
+func _on_collision_node_added(node: Node) -> void:
+	if node is CollisionObject3D and is_ancestor_of(node):
+		_collision_bodies_dirty = true
+
+
+func _on_collision_node_removed(node: Node) -> void:
+	# node_removed may be emitted after the node lost its parent.
+	if node is CollisionObject3D and (is_ancestor_of(node) or _collision_bodies.has(node)):
+		_collision_bodies_dirty = true
+
+
 func _set_collisions(enabled: bool) -> void:
-	for body: CollisionObject3D in find_children("*","CollisionObject3D",true,false):
+	if _collision_bodies_dirty or not is_inside_tree():
+		_collision_bodies = find_children("*","CollisionObject3D",true,false)
+		_collision_bodies_dirty = not is_inside_tree()
+	for entry: Node in _collision_bodies:
+		if not is_instance_valid(entry) or not is_ancestor_of(entry):
+			_collision_bodies_dirty = true
+			continue
+		var body := entry as CollisionObject3D
 		if not body.has_meta("visible_layer"):
 			body.set_meta("visible_layer",body.collision_layer)
 		body.collision_layer = int(body.get_meta("visible_layer")) if enabled else 0
@@ -525,6 +567,8 @@ func _create_workplace(id: String, at: Vector2) -> void:
 
 func _sync_actor(id: String, caption: String, profession: String, person: Dictionary) -> void:
 	caption = Childhood.display_name(state, id, caption)
+	if id == "sextus" and Childhood.enabled(state):
+		profession = "Dorfschmied"
 	var at: Vector2 = Life.actor_position(state, id)
 	if not actors.has(id):
 		var actor := CharacterBody3D.new()

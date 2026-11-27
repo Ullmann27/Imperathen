@@ -14,7 +14,8 @@ func check(ok: bool, message: String) -> void:
 		push_error(message)
 
 func _run() -> void:
-	var require_morphs := OS.get_environment("IMPERATHEN_REQUIRE_PARENT_MORPHS") == "1"
+	var require_dedicated := OS.get_environment("IMPERATHEN_REQUIRE_DEDICATED_PARENTS") == "1"
+	var require_morphs := require_dedicated or OS.get_environment("IMPERATHEN_REQUIRE_PARENT_MORPHS") == "1"
 	for id: String in ["julia", "silvanus"]:
 		var female := id == "julia"
 		var actor := Person.new()
@@ -26,6 +27,8 @@ func _run() -> void:
 			check(actor.body != null and actor.detail == level and actor.resident_id == id, id + " retains its real identity and LOD")
 			if actor.body == null:
 				continue
+			if require_dedicated:
+				check(actor.active_model_path == Person.PARENT_PATH % [id,level], id + " uses dedicated parent model rather than generic civilian")
 			var body := actor.body.find_child("HeroBody", true, false) as MeshInstance3D
 			check(body != null and body.mesh != null, id + " real skinned body exists")
 			if body == null or body.mesh == null:

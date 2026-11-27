@@ -12,16 +12,23 @@ const COMPLEXIONS := [Color(1.00,.99,.97),Color(.96,.92,.89),Color(.91,.86,.80),
 
 static func apply(model: Node3D, seed_value: int, look: Dictionary = {}) -> void:
 	var parent := str(look.get("id", "")) in PARENTS
-	# Only activate the complete identity layer on a real exported identity
-	# model. Legacy rigs have neither these geometry controls nor these pieces.
-	if parent:
+	# Capability, not story-name, chooses the complete authored layer.
+	# Legacy Cast-only families and owner Meshy faces keep their old path.
+	if not look.is_empty() and str(look.get("kind","")) in ["civilian_man","civilian_woman","elder"]:
+		var body := model.find_child("HeroBody",true,false) as MeshInstance3D
+		var full := body != null and body.mesh != null
+		if full:
+			for key: String in ["ID_NoseWidth","ID_JawWidth","ID_EyeDepth","ID_Age","ID_Heavy"]:
+				if body.find_blend_shape_by_name(key)<0:
+					full=false
+					break
 		var identity_piece := "IdentityHairBound" if look.get("kind") == "civilian_woman" else "IdentityBeard"
-		if model.find_child(identity_piece, true, false) is MeshInstance3D:
+		if full and model.find_child(identity_piece,true,false) is MeshInstance3D:
 			var tier := 0
 			var source_path := model.scene_file_path.get_file().get_basename()
-			if source_path.get_slice_count("_") > 1:
-				tier = clampi(int(source_path.get_slice("_", source_path.get_slice_count("_") - 1)), 0, 3)
-			ResidentLook.apply(model, look, tier)
+			if source_path.get_slice_count("_")>1:
+				tier=clampi(int(source_path.get_slice("_",source_path.get_slice_count("_")-1)),0,3)
+			ResidentLook.apply(model,look,tier)
 			return
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value

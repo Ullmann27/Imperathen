@@ -91,15 +91,15 @@ const PEOPLE := {
 		"face": {"ID_NoseLength": -0.45, "ID_NoseWidth": -0.35, "ID_NoseBridge": -0.35, "ID_Lips": 0.35, "ID_Cheeks": 0.45, "ID_Brow": -0.85,
 			"ID_Chin": -0.6, "ID_JawWidth": -0.75, "ID_Cheekbones": 0.35, "ID_FaceLength": -0.4, "ID_EyeDepth": 0.15},
 		"build": {"ID_Heavy": 0.05, "ID_Shoulders": -0.75},
-		"face_age": 0.40, "skin": {"tone": "olive", "sun": 0.4, "flush": 0.35, "age": 0.48, "brow": 0.35, "stubble": 0.0},
-		"hair": {"style": "bound", "color": "dark_brown", "grey": 0.06, "keys": {"HAIR_Volume": -0.2}},
-		"wear": {"tunic": "woad", "belt": "dark_leather", "IdentityMantle": "faded_madder", "IdentityEarrings": "bronze"}, "hem": 0.25},
+		"face_age": 0.30, "skin": {"tone": "olive", "sun": 0.4, "flush": 0.35, "age": 0.31, "brow": 0.35, "stubble": 0.0},
+		"hair": {"style": "bound", "color": "dark_brown", "grey": 0.02, "keys": {"HAIR_Volume": 0.08}},
+		"wear": {"tunic": "woad", "belt": "dark_leather", "IdentityEarrings": "bronze"}, "hem": 0.15},
 	"silvanus": {"kind": "civilian_man", "role": "Vater des Jungen (Lastenträger)", "look_age": 40, "height": 1.03,
 		"face": {"ID_JawWidth": 0.85, "ID_Chin": 0.45, "ID_NoseBridge": 0.65, "ID_NoseLength": 0.35, "ID_Brow": 0.6, "ID_Cheeks": -0.4, "ID_EyeDepth": 0.4, "ID_FaceLength": 0.4},
 		"build": {"ID_Heavy": 0.25, "ID_Shoulders": 0.9},
-		"face_age": 0.52, "skin": {"tone": "olive", "sun": 0.75, "flush": 0.25, "age": 0.60, "stubble": 0.65},
-		"hair": {"style": "short", "color": "dark_brown", "grey": 0.16, "keys": {"HAIR_Short": 0.65, "HAIR_Recede": 0.25}},
-		"beard": {"color": "dark_brown", "full": 0.45, "grey": 0.18},
+		"face_age": 0.44, "skin": {"tone": "olive", "sun": 0.75, "flush": 0.25, "age": 0.42, "stubble": 0.65},
+		"hair": {"style": "short", "color": "dark_brown", "grey": 0.05, "keys": {"HAIR_Short": 0.55, "HAIR_Recede": 0.12}},
+		"beard": {"color": "dark_brown", "full": 0.20, "grey": 0.06},
 		"wear": {"tunic": "walnut", "belt": "dark_leather"}},
 	"valeria": {"kind": "civilian_woman", "role": "Wächterin", "eyes": "grey_blue", "look_age": 29, "height": 1.03,
 		"face": {"ID_Brow": 0.3, "ID_Cheekbones": 0.6, "ID_Chin": 0.5, "ID_NoseBridge": 0.3, "ID_Lips": -0.3},
@@ -344,8 +344,31 @@ static func _named(id: String) -> Dictionary:
 
 ## Generic villagers: a stable, varied identity from (appearance, variation).
 ## Fill strength is higher than for named people, so 18 variants never repeat.
-static func _generic(appearance: String, variation: int, years: int) -> Dictionary:
-	var key := "%s/%d" % [appearance, posmod(variation, 18)]
+## City residents use their full persistent population key, not 18 recycled
+## faces. Their profession/wealth alters clothing only, never saved economics.
+static func city_look(uid: String, appearance: String, variation: int, years: int, job: String, wealth: int) -> Dictionary:
+	if years < 18 or appearance not in KINDS:
+		return {}
+	var result := _generic(appearance,variation,years,"city:"+uid)
+	var rng := _rng("city:"+uid+"/clothing")
+	var palette := ["undyed","oatmeal","natural_grey","natural_brown","walnut"]
+	if job in ["vendor","craft"]:
+		palette = ["ochre","olive","faded_woad","faded_madder","natural_brown"]
+	elif wealth >= 2:
+		palette = ["woad","green","madder_brown","walnut","ochre"]
+	elif job == "guard":
+		palette = ["natural_grey","walnut","madder_brown"]
+	result.wear.tunic = _colour(str(palette[rng.randi_range(0,palette.size()-1)]),DYES)
+	result.role = job
+	result["city"] = true
+	result.height = rng.randf_range(0.95,1.05)
+	if appearance == "civilian_woman" and years >= 55:
+		result.hair.grey = clampf((float(years)-45.0)/43.0,0.08,0.7)
+	return result
+
+
+static func _generic(appearance: String, variation: int, years: int, stable_key: String = "") -> Dictionary:
+	var key := stable_key if not stable_key.is_empty() else "%s/%d" % [appearance, posmod(variation, 18)]
 	var rng := _rng(key)
 	var woman := appearance == "civilian_woman"
 	var elder := appearance == "elder"

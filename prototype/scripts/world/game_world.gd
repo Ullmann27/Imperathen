@@ -10,6 +10,10 @@ const Origins = preload("res://scripts/strategy/origins.gd")
 const VillageLifeWorld = preload("res://scripts/world/village_life_world.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
 const WorldCalendar = preload("res://scripts/domain/world_calendar.gd")
+const LocalWeather := preload("res://scripts/domain/local_weather.gd")
+var _weather_view: Dictionary = {}
+var _weather_stamp := ""
+var _route_light_tick := 0.0
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const YouthOutfit = preload("res://scripts/visuals/youth_outfit.gd")
 const CompanionWorld = preload("res://scripts/world/companion_world.gd")
@@ -148,6 +152,8 @@ func setup(state: Dictionary) -> void:
 	if state.get("world_id","") != _state.get("world_id",""):
 		_route_destination = "mission"
 	clear_frontier_focus()
+	_weather_stamp = ""
+	_route_light_tick = 0.0
 	_shown_health = -1
 	_shown_work = -1.0
 	_build_scene()
@@ -791,6 +797,8 @@ func _set_vegetation_origin(id: String) -> void:
 		vegetation.set_wind_time(_vegetation_wind_time)
 		if season_index >= 0:
 			vegetation.apply_season(season_index)
+		if not _weather_view.is_empty():
+			vegetation.set_weather_state(float(_weather_view.wind),float(_weather_view.wetness))
 
 
 func _create_terrain() -> void:
@@ -1292,6 +1300,11 @@ func _physics_process(delta: float) -> void:
 		vegetation.set_player_position(get_player_position())
 	if not _active:
 		return
+	_route_light_tick -= delta
+	if _route_light_tick <= 0.0 and look.night > 0.04 and _mode == "person":
+		_route_light_tick = 0.25
+		var nav := navigation_view()
+		look.set_route_context(get_player_position(),nav.get("route",PackedVector2Array()))
 	_animation_time += delta
 	_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
 	_attack_animation = maxf(0.0, _attack_animation - delta)
@@ -1960,19 +1973,27 @@ func _horizontal_distance(a: Vector3, b: Vector3) -> float:
 
 func _sync_world_light(state: Dictionary) -> void:
 	var clock: Variant = state.get("calendar", {}).get("clock")
-	if not WorldCalendar.validate_clock(clock):
-		_apply_season(posmod(int(state.get("strategy", {}).get("turn", 0)), 4))
-		if look.time_of_day >= 0.0:
-			look.set_time_of_day(-1.0)
-		return
-	_apply_season(WorldCalendar.season_index(int(clock.jdn)))
-	# Lighting is sampled every five world minutes to avoid rebuilding
-	# interior sunbeams on successive frames of the accelerated legacy day.
-	@warning_ignore("integer_division")
-	var sample := int(clock.second) / 300
-	var solar_hours := sample / 12.0
-	if not is_equal_approx(look.time_of_day, solar_hours):
-		look.set_time_of_day(solar_hours)
+	var origin := str(state.get("origin_id","italia"))
+	var legacy_season := posmod(int(state.get("strategy", {}).get("turn",0)),4)
+	var stamp := origin+"/legacy/"+str(legacy_season)
+	var solar_hours := -1.0
+	var season := legacy_season
+	var weather_clock: Variant = null
+	if WorldCalendar.validate_clock(clock):
+		season = WorldCalendar.season_index(int(clock.jdn))
+		@warning_ignore("integer_division")
+		var sample := int(clock.second)/300
+		solar_hours = sample/12.0
+		weather_clock = WorldCalendar.new_clock(int(clock.jdn),sample*300)
+		stamp = "%s/%d/%d" % [origin,int(clock.jdn),sample]
+	_apply_season(season)
+	if stamp != _weather_stamp:
+		_weather_stamp = stamp
+		_weather_view = LocalWeather.sample(weather_clock,origin,legacy_season)
+		look.set_conditions(solar_hours,_weather_view)
+		scenery.set_weather_state(_weather_view)
+		if is_instance_valid(vegetation):
+			vegetation.set_weather_state(float(_weather_view.wind),float(_weather_view.wetness))
 
 
 func _apply_season(index: int) -> void:

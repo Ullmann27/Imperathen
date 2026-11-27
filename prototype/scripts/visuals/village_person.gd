@@ -11,6 +11,7 @@ const LOOPS := ["idle","march","run","talk","work","retreat"]
 const COMPANY_STRIDES := {"march":1.30,"run":1.75,"retreat":1.48}
 const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
 const HeadGaze := preload("res://scripts/visuals/head_gaze.gd")
+const PoseDress := preload("res://scripts/visuals/pose_dress.gd")
 const SocialFocus := preload("res://scripts/visuals/social_focus.gd")
 const ResidentIdentity := preload("res://scripts/visuals/resident_identity.gd")
 const CharacterMotion := preload("res://scripts/visuals/character_motion.gd")
@@ -41,6 +42,7 @@ const MESHY_YOUTH_OUTFITS := {
 # The retarget report and the source-specific test verify these values.
 const YOUTH_MOCAP_STRIDES := {"march":1.36795,"run":2.38253}
 const FRONTIER_PATH := "res://assets/characters/frontier_%s_%d.glb"
+const PARENT_PATH := "res://assets/characters/frontier_parent_%s_%d.glb"
 const APPEARANCES := ["civilian_man", "civilian_woman", "elder", "legionary", "officer", "spearman", "archer"]
 const CLOTH_TINTS := [Color(1.0, 1.0, 1.0), Color(0.72, 0.90, 1.10), Color(1.10, 0.75, 0.60), Color(0.75, 1.05, 0.79), Color(1.15, 1.06, 0.76), Color(0.76, 0.73, 0.84)]
 const RESIDENT_HEIGHTS := [0.97, 1.03, 1.0, 0.95, 1.04, 0.99]
@@ -54,6 +56,7 @@ const OVERLAY_RATE := deg_to_rad(240.0)
 const CROWD_LOD_DISTANCES := [6.0,15.0,30.0]
 static var scenes := {}
 static var materials := {}
+static var _far_foot_contacts := {}
 var role := "player"
 var home := "italia"
 var age := 12
@@ -74,6 +77,9 @@ var _blade: MeshInstance3D
 var _face := FacialMotion.new()
 var _gaze := HeadGaze.new()
 var _social_focus := SocialFocus.new()
+var _cloth_targets: Array[Dictionary] = []
+var _cloth_weight := Vector2.ZERO
+var _pose_dress := PoseDress.new()
 var _motion := CharacterMotion.new()
 var _carrying_jug := false
 const ResidentActivity := preload("res://scripts/visuals/resident_activity.gd")
@@ -93,6 +99,8 @@ var appearance_id := ""
 var appearance_variation := 0
 ## Catalog identity only for named Italian adult residents; no new save fields.
 var resident_id := ""
+var _city_role := ""
+var _city_wealth := -1
 var look: Dictionary = {}
 var _resident_tempo := 1.0
 var _loaned_gear := false
@@ -141,6 +149,7 @@ func configure(kind: String, origin: String, years: int) -> void:
 	role = kind
 	_sync_gaze_physics()
 	resident_id = ""
+	meshy_asset_id = ""
 	look = {}
 	_resident_tempo = 1.0
 	home = origin
@@ -168,7 +177,7 @@ func configure_appearance(new_appearance: String, variation: int = 0) -> void:
 func configure_meshy(stable_id: String) -> bool:
 	# Keep authored child/player identity and retain the current live fallback
 	# until a complete imported derivative set exists.
-	var selected := stable_id if age >= 18 and role not in ["player", "companion"] and MeshyCharacters.has_complete_set(stable_id) and MeshyEquipment.has_complete_set(stable_id) else ""
+	var selected := stable_id if age >= 18 and role not in ["player", "companion"] and MeshyCharacters.owner_asset_allowed(stable_id, resident_id) and MeshyCharacters.has_complete_set(stable_id) and MeshyEquipment.has_complete_set(stable_id) else ""
 	if selected != meshy_asset_id:
 		meshy_asset_id = selected
 		_reload(maxi(0, detail))
@@ -203,7 +212,7 @@ func youth_path(level: int) -> String:
 	return String(MESHY_YOUTH_OUTFITS[youth_outfit].path) % level
 
 
-func configure_resident(origin: String, years: int, new_appearance: String, variation: int = 0, camera: Camera3D = null, actor_uid: String = "") -> void:
+func configure_resident(origin: String, years: int, new_appearance: String, variation: int = 0, camera: Camera3D = null, actor_uid: String = "", city_role: String = "", city_wealth: int = -1) -> void:
 	# Resident population builders already know the complete identity. Configure
 	# it atomically so they never load an unused generic body or a near LOD first.
 	var selected := new_appearance if new_appearance in APPEARANCES else ""
@@ -212,7 +221,12 @@ func configure_resident(origin: String, years: int, new_appearance: String, vari
 	var named_id := actor_uid.trim_prefix("vil:")
 	if origin != "italia" or years < 18 or not ResidentIdentity.has_person(named_id):
 		named_id = ""
-	var changed := face_seed != seed_value or role != "resident" or home != origin or age != years or appearance_id != selected or appearance_variation != selected_variation or resident_id != named_id
+	var assigned_asset := MeshyCharacters.story_asset(named_id, origin, years, selected)
+	# Existing military call sites may still select their own vetted model.
+	# Do not carry the old person's Meshy body into a new resident identity.
+	if assigned_asset.is_empty() and named_id == resident_id and face_seed == seed_value and not MeshyCharacters.is_owner_civilian(meshy_asset_id):
+		assigned_asset = meshy_asset_id
+	var changed := face_seed != seed_value or role != "resident" or home != origin or age != years or appearance_id != selected or appearance_variation != selected_variation or resident_id != named_id or meshy_asset_id != assigned_asset or _city_role != city_role or _city_wealth != city_wealth
 	if role != "resident":
 		clear_gaze_target()
 	role = "resident"
@@ -224,14 +238,20 @@ func configure_resident(origin: String, years: int, new_appearance: String, vari
 	appearance_variation = selected_variation
 	identity = "resident_%s_%d" % [appearance_id, appearance_variation] if not appearance_id.is_empty() else "resident"
 	resident_id = named_id
+	meshy_asset_id = assigned_asset
 	look = {} if resident_id.is_empty() else ResidentIdentity.look(resident_id, appearance_id, appearance_variation, age)
+	_city_role = city_role
+	_city_wealth = city_wealth
+	if resident_id.is_empty() and not city_role.is_empty() and actor_uid.begins_with("c") and actor_uid.substr(1).is_valid_int():
+		look = ResidentIdentity.city_look(actor_uid,appearance_id,variation,age,city_role,city_wealth)
 	# A catalog entry may not replace the live roster anatomy or equipment.
 	if str(look.get("kind", "")) != appearance_id:
 		look = {}
 	_resident_tempo = 1.0
 	if not look.is_empty():
-		identity = "resident_" + resident_id
-		var stable := float(absi(resident_id.hash()) % 100003) / 100003.0
+		var stable_id := str(look.get("id",resident_id))
+		identity = "resident_" + stable_id
+		var stable := float(absi(stable_id.hash()) % 100003) / 100003.0
 		_resident_tempo = 0.92 + 0.16 * fposmod(stable * 7.31, 1.0)
 		if not body and clip == "idle" and not _posed:
 			phase = stable
@@ -278,6 +298,13 @@ func _path(level: int) -> String:
 				complete_set = false
 		if complete_set:
 			return HERO_PATH % level
+	if role == "resident" and age >= 18 and resident_id in ["julia", "silvanus"]:
+		var complete_parent := true
+		for tier in 4:
+			if not ResourceLoader.exists(PARENT_PATH % [resident_id, tier], "PackedScene"):
+				complete_parent = false
+		if complete_parent:
+			return PARENT_PATH % [resident_id, level]
 	var frontier := _frontier_identity()
 	if not frontier.is_empty():
 		var complete_set := true
@@ -364,9 +391,13 @@ func _reload(level: int) -> void:
 	if active_model_path.begins_with("res://assets/characters/frontier_") and (level < 2 or not look.is_empty()):
 		preload("res://scripts/visuals/roman_faces.gd").apply(body, face_seed, look)
 	_face.bind(body, identity)
+	_bind_cloth_sway()
 	var imported_youth := active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
 	var civilian_motion := role in ["player", "companion", "regional_worker"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"])
-	_motion.bind(body, civilian_motion and not imported_youth, identity)
+	_motion.bind(body, civilian_motion and not imported_youth and not _uses_owner_civilian(), identity)
+	_pose_dress.clear()
+	if resident_id == "julia":
+		_pose_dress.bind(body)
 	var keep_gaze := _motion_identity == identity and not previous_path.is_empty()
 	var eye_offsets := MarcusModel.eye_offsets(age >= 18) if MarcusModel.owns(path) else {}
 	_gaze.bind(_motion.skeleton if is_instance_valid(_motion.skeleton) else null, keep_gaze, eye_offsets)
@@ -402,6 +433,7 @@ func _reload(level: int) -> void:
 		_motion.restore_lod_transition(transition)
 	if keep_gaze and not _posed:
 		_apply_gaze(0.0)
+	_update_pose_dress()
 	# Retaining every hero PackedScene would also retain every embedded texture
 	# tier. Live instances keep their own references; inactive tiers may unload.
 	if path.begins_with("res://assets/characters/hero_quality_") or previous_path.begins_with("res://assets/characters/hero_quality_"):
@@ -478,7 +510,7 @@ func _style(shape: MeshInstance3D) -> void:
 		elif active_model_path.begins_with("res://assets/characters/frontier_") and source.resource_name in ["FrontierCloth", "HeroHair", "FrontierGreyHair"]:
 			var key := "%d/frontier/%d" % [source.get_instance_id(), appearance_variation]
 			if not look.is_empty():
-				key += "/" + resident_id
+				key += "/" + str(look.get("id",resident_id))
 			var mat: StandardMaterial3D
 			if materials.has(key):
 				mat = (materials[key] as WeakRef).get_ref() as StandardMaterial3D
@@ -591,6 +623,7 @@ func sample_service_combat(style: String, normalized: float) -> bool:
 
 
 func sample_combat(technique: String, normalized: float) -> void:
+	_set_cloth_sway(Vector2.ZERO)
 	_gaze.suspend()
 	if not technique in CharacterMotion.TECHNIQUES:
 		return
@@ -845,6 +878,7 @@ func locomotion_stride(action: String) -> float:
 
 
 func sample_pose(action: String, normalized: float) -> void:
+	_set_cloth_sway(Vector2.ZERO)
 	if action in CharacterMotion.TECHNIQUES:
 		sample_combat(action, normalized)
 		return
@@ -856,6 +890,7 @@ func sample_pose(action: String, normalized: float) -> void:
 	_play(action,normalized,0)
 	_face.pose(action,normalized,detail)
 	_apply_motion(true)
+	_update_pose_dress()
 
 
 func _play(action: String, normalized: float, blend: float) -> void:
@@ -880,6 +915,7 @@ func _play(action: String, normalized: float, blend: float) -> void:
 	animator.seek(phase*animation.length,true)
 	animator.advance(0)
 	_apply_motion()
+	_update_pose_dress()
 
 
 func _playback_animation(name_in_file: String, looping: bool) -> Animation:
@@ -947,7 +983,7 @@ func _sync_resident_prop() -> void:
 	if not is_instance_valid(_resident_prop):
 		return
 	_resident_prop.hide()
-	if role != "resident" or not _motion.civilian or not _motion.available or not _combat_id.is_empty() or _service_external or _posed or clip not in ["idle","march","talk"]:
+	if role != "resident" or (not _motion.civilian and not _uses_owner_civilian()) or not _motion.available or not _combat_id.is_empty() or _service_external or _posed or clip not in ["idle","march","talk"]:
 		return
 	var skeleton := _motion.skeleton
 	if not is_instance_valid(skeleton):
@@ -981,7 +1017,16 @@ func _apply_jug_carry() -> void:
 		_hands.set_grip(.65)
 
 
+func _uses_owner_civilian() -> bool:
+	return MeshyCharacters.is_owner_civilian(meshy_asset_id) and active_model_path.begins_with(MeshyCharacters.family_prefix(meshy_asset_id))
+
+
 func _apply_motion(review: bool = false) -> void:
+	if _uses_owner_civilian():
+		# These are the actual fitted and tested imported body clips. Never
+		# replace them with the procedural base-rig pose at the same time.
+		_motion.blend_transition()
+		return
 	if active_model_path.begins_with("res://assets/characters/hero_meshy_italia_"):
 		# Preserve the fitted adolescent rig's authored limb and sword clips.
 		_motion.blend_transition()
@@ -1118,6 +1163,7 @@ func _process(delta: float) -> void:
 		_check_lod = 0.32
 		refresh_lod(get_viewport().get_camera_3d())
 	if not _combat_id.is_empty():
+		_set_cloth_sway(Vector2.ZERO)
 		if is_instance_valid(_resident_prop):
 			_resident_prop.hide()
 		if not _combat_external and _combat_duration > 0.0:
@@ -1131,6 +1177,7 @@ func _process(delta: float) -> void:
 		_ground_youth()
 		return
 	if _posed or _service_external:
+		_set_cloth_sway(Vector2.ZERO)
 		if is_instance_valid(_resident_prop):
 			_resident_prop.hide()
 		_ground_youth()
@@ -1138,6 +1185,7 @@ func _process(delta: float) -> void:
 		# is applied only after the authored pose. Combat samples stay pure.
 		if not _service_external and is_instance_valid(_social_focus.target()):
 			_apply_gaze(delta)
+		_update_pose_dress()
 		return
 	if clip != "death":
 		_remaining = maxf(0,_remaining - delta)
@@ -1171,6 +1219,7 @@ func _process(delta: float) -> void:
 	_ground_youth()
 	_face.advance(delta,clip,detail)
 	_apply_gaze(delta)
+	_update_cloth_sway(delta)
 
 
 func gaze_anchor() -> Vector3:
@@ -1225,7 +1274,49 @@ func _physics_process(delta: float) -> void:
 
 func _apply_gaze(delta: float) -> void:
 	var relevant := role in ["player", "companion"] or is_instance_valid(_social_focus.target())
-	_gaze.apply(delta, global_basis, _social_focus.point(), clip, relevant and _gaze_allowed())
+	# The original youth has a chest/neck but no independent eyeball rig.
+	# Only add subtle torso motion when it cannot disturb held props or combat.
+	var natural_scan := role == "player" and _social_focus.ambient_enabled and not _posed
+	var upper_body := role == "player" and _uses_youth_mocap() and not _carrying_jug and not _posed and not _loaned_gear
+	_gaze.apply(delta, global_basis, _social_focus.point(), clip, relevant and _gaze_allowed(), natural_scan, upper_body)
+
+
+func _bind_cloth_sway() -> void:
+	_cloth_targets.clear()
+	for mesh: MeshInstance3D in body.find_children("*", "MeshInstance3D", true, false):
+		var left := mesh.find_blend_shape_by_name("ClothHemLeft")
+		var right := mesh.find_blend_shape_by_name("ClothHemRight")
+		if left >= 0 and right >= 0:
+			_cloth_targets.append({"mesh":mesh,"left":left,"right":right})
+	_set_cloth_sway(_cloth_weight if clip in ["march","run"] and detail < 2 else Vector2.ZERO)
+
+
+func _set_cloth_sway(weights: Vector2) -> void:
+	_cloth_weight = weights
+	for entry: Dictionary in _cloth_targets:
+		var mesh: MeshInstance3D = entry.mesh
+		if is_instance_valid(mesh):
+			mesh.set_blend_shape_value(int(entry.left), weights.x)
+			mesh.set_blend_shape_value(int(entry.right), weights.y)
+
+
+func _update_pose_dress() -> void:
+	if _pose_dress.bound() and is_instance_valid(body):
+		_pose_dress.apply(body.global_position.y)
+
+
+func _update_cloth_sway(delta: float) -> void:
+	_update_pose_dress()
+	if _cloth_targets.is_empty():
+		return
+	var swing := 0.0
+	if clip in ["march","run"] and detail < 2:
+		# Phase-lagged lower hem only. Sleeves, body and hands have zero
+		# morph delta. This is bounded secondary animation, not cloth physics.
+		var intensity := clampf(speed / 3.5, 0.0, 1.0)
+		swing = intensity * sin(phase * TAU - 0.55)
+	var target := Vector2(maxf(-swing,0.0), maxf(swing,0.0))
+	_set_cloth_sway(_cloth_weight.lerp(target,1.0-exp(-12.0*clampf(delta,0.0,0.1))))
 
 
 func _ground_youth() -> void:
@@ -1233,7 +1324,22 @@ func _ground_youth() -> void:
 		_youth_soles.apply_to_floor(youth_ground_floor_y,clip,phase)
 
 
+static func far_foot_contacts(profile_id: String) -> bool:
+	if _far_foot_contacts.is_empty():
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://assets/quality_profiles.json"))
+		var profiles: Dictionary = parsed.get("profiles",{}) if parsed is Dictionary else {}
+		for id: String in profiles:
+			_far_foot_contacts[id] = bool(profiles[id].get("far_actor_foot_contacts",true))
+		_far_foot_contacts["__loaded"] = true
+	return bool(_far_foot_contacts.get(profile_id,true))
+
+
 func _plant_contacts(delta: float) -> void:
+	# Recovered profile-gated far-foot optimisation. Never remove near,
+	# story, player, companion or combat contacts; authored gait remains.
+	if detail == 3 and role == "resident" and resident_id.is_empty() and clip in ["idle","march","run"] and not far_foot_contacts(profile):
+		_motion.reset_world_contacts()
+		return
 	# The recorded defensive step already includes its own foot placement.
 	# Do not lock both ankles through a captured guard or flatten toe roll.
 	if _uses_youth_mocap() and clip in ["idle","block"]:

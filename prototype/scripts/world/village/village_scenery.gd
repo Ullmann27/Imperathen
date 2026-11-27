@@ -16,7 +16,9 @@ const WORKSHOP := Vector3(-9.2,0,-7.35)
 const STORE := Vector3(-10.6,0,15.6)
 const MARKET := Vector3(-9,0,0)
 const RANGES := {"low":24.0,"balanced":40.0,"high":58.0,"very_high":72.0}
-const FLORA_SITES := 5600
+const FLORA_SITES := 6500
+const RAIN_SITES := 360
+const RAIN_BUDGET := {"low":64,"balanced":144,"high":244,"very_high":360}
 const CELL := 14.0
 const GUST := [.78,.55,1.48,1.04]
 const WET := [.2,.03,.83,.42]
@@ -34,6 +36,14 @@ var _stockade: Array[MultiMeshInstance3D] = []
 var _fence_near: Mesh
 var _fence_far: Mesh
 var _rain: MultiMeshInstance3D
+var _rain_amount := 0.0
+var _rain_cursor := 0
+var _rain_valid := 0
+var _rain_anchor := Vector3.INF
+var _rain_offsets: Array[Vector2] = []
+var _weather_wind := 1.0
+var _weather_wet := 0.0
+var _gravel: Array[MultiMeshInstance3D] = []
 var _time := 0.0
 var _sky_tick := 0.0
 var _fixed_time := -1.0
@@ -78,10 +88,7 @@ func _process(delta: float) -> void:
 	if _sky_tick >= 2.0 and _fixed_time < 0 and profile != "low":
 		_sky_tick = 0
 		sky_material.set_shader_parameter("phase",_time)
-	if _rain and _rain.visible:
-		var camera := get_viewport().get_camera_3d()
-		if camera:
-			_rain.global_position = Vector3(camera.global_position.x,0,camera.global_position.z)
+
 
 func set_quality(next_profile: String) -> void:
 	profile = next_profile if RANGES.has(next_profile) else "balanced"
@@ -100,9 +107,11 @@ func set_quality(next_profile: String) -> void:
 		bay.multimesh.mesh = _fence_far if profile == "low" else _fence_near
 	ground_material.set_shader_parameter("relief_strength",.44 if profile == "low" else .78)
 	water_material.set_shader_parameter("detail",0.0 if profile == "low" else 1.0)
+	for patch: MultiMeshInstance3D in _gravel:
+		patch.multimesh.visible_instance_count = ceili(patch.multimesh.instance_count*fraction)
+		patch.visibility_range_end = float({"low":8.0,"balanced":13.0,"high":21.0,"very_high":30.0}[profile])
 	if _rain:
-		_rain.multimesh.visible_instance_count = roundi(_rain.multimesh.instance_count*fraction)
-		_rain.visible = season == 2 and profile != "low"
+		_update_rain_count()
 
 func apply_season(index: int, sun: DirectionalLight3D, environment: Environment) -> void:
 	season = posmod(index,4)
@@ -112,15 +121,69 @@ func apply_season(index: int, sun: DirectionalLight3D, environment: Environment)
 	_season_tint = soil[season]
 	LandSurface.apply_season(land_materials,season,_season_tint)
 	grass_material.set_shader_parameter("season_tint",leaves[season])
-	grass_material.set_shader_parameter("gust",GUST[season])
+	grass_material.set_shader_parameter("gust",GUST[season]*_weather_wind)
 	grass_material.set_shader_parameter("bloom",[1.0,.85,.25,0.0][season])
-	for material in [ground_material,water_material]:
-		material.set_shader_parameter("wetness",WET[season])
-	HouseFamily.set_wetness(WET[season])
+	_apply_wetness(maxf(WET[season]*0.30,_weather_wet))
 	# Sun, sky, ambient and haze presets are owned by the look script.
 	Look.apply_season_light(season,sun,environment,sky_material)
-	if _rain:
-		_rain.visible = season == 2 and profile != "low"
+	
+func set_weather_state(sample: Dictionary) -> void:
+	var old_amount := _rain_amount
+	_rain_amount = clampf(float(sample.get("rain",0.0)),0.0,1.0)
+	_weather_wind = clampf(float(sample.get("wind",1.0)),0.2,2.5)
+	_weather_wet = clampf(float(sample.get("wetness",0.0)),0.0,1.0)
+	_apply_wetness(maxf(WET[season]*0.30,_weather_wet))
+	grass_material.set_shader_parameter("gust",GUST[season]*_weather_wind)
+	rain_material.set_shader_parameter("intensity",_rain_amount)
+	rain_material.set_shader_parameter("wind",_weather_wind)
+	if old_amount <= 0.025 and _rain_amount > 0.025:
+		_rain_anchor = Vector3.INF
+		_rain_cursor = 0
+		_rain_valid = 0
+	_update_rain_count()
+
+func _apply_wetness(wet: float) -> void:
+	for material: ShaderMaterial in land_materials:
+		if material == ground_material or material.shader == LandSurface.TERRAIN_SHADER:
+			material.set_shader_parameter("wetness",wet)
+	water_material.set_shader_parameter("wetness",wet)
+	HouseFamily.set_wetness(wet)
+
+func _update_rain_count() -> void:
+	if not is_instance_valid(_rain):
+		return
+	var amount := mini(_rain_valid,ceili(float(RAIN_BUDGET[profile])*_rain_amount))
+	_rain.multimesh.visible_instance_count = amount
+	_rain.visible = _rain_amount > 0.025 and amount > 0
+
+func _physics_process(_delta: float) -> void:
+	if not is_visible_in_tree() or _rain_amount <= 0.025 or not is_instance_valid(_rain):
+		return
+	var camera := get_viewport().get_camera_3d()
+	if not is_instance_valid(camera):
+		return
+	var eye := camera.global_position
+	var next := Vector3(snappedf(eye.x,2.0),snappedf(eye.y,2.0),snappedf(eye.z,2.0))
+	if not _rain_anchor.is_finite() or next.distance_squared_to(_rain_anchor)>4.01:
+		_rain_anchor=next
+		_rain.global_position=next
+		_rain_cursor=0
+		_rain_valid=0
+	var space := get_world_3d().direct_space_state
+	# Up to 32 exact static-surface queries per physics frame. Rain starts
+	# ABOVE roof/terrain hits rather than continuing through interiors.
+	for probe in range(_rain_cursor,mini(_rain_cursor+32,_rain_offsets.size())):
+		var offset: Vector2 = _rain_offsets[probe]
+		var at := _rain_anchor+Vector3(offset.x,0,offset.y)
+		var ray := PhysicsRayQueryParameters3D.create(at+Vector3.UP*16.0,at-Vector3.UP*14.0,1)
+		var hit := space.intersect_ray(ray)
+		if not hit.is_empty():
+			var surface: Vector3=hit.position
+			var yaw := float(posmod(probe*137,360))*PI/180.0
+			_rain.multimesh.set_instance_transform(_rain_valid,Transform3D(Basis(Vector3.UP,yaw),surface-_rain_anchor))
+			_rain_valid+=1
+		_rain_cursor=probe+1
+	_update_rain_count()
 
 func create_land() -> void:
 	brook_source_z = _brook_source()
@@ -152,6 +215,7 @@ func create_land() -> void:
 	add_child(stream)
 	_make_ridge()
 	_make_flora()
+	_make_gravel()
 	_make_rain()
 	set_quality(profile)
 
@@ -163,6 +227,7 @@ func register_land(material: ShaderMaterial) -> void:
 	land_materials.append(material)
 	LandSurface.follow_village_ground(ground_material,land_materials.slice(1))
 	LandSurface.apply_season(land_materials,season,_season_tint)
+	_apply_wetness(maxf(WET[season]*0.30,_weather_wet))
 
 func _sync_atmosphere() -> void:
 	var world := get_world_3d()
@@ -249,8 +314,14 @@ func _make_flora() -> void:
 			var to: Vector2 = corners[(front+2+edge)%4]
 			p = from.lerp(to,t)
 			kind = "tall" if rng.randf()<.55 else "meadow"
-		else:
+		elif i<5600:
 			p = Vector2(rng.randf_range(-42,44),rng.randf_range(-48,34))
+		else:
+			# Denser planted margins of the newer side streets, not the tread.
+			match i%3:
+				0: p=Vector2(30.0+side*rng.randf_range(2.65,4.9),rng.randf_range(-44,27))
+				1: p=Vector2(rng.randf_range(-17,33),-36.5+side*rng.randf_range(2.6,4.8))
+				2: p=Vector2(rng.randf_range(-18,44),28.0+side*rng.randf_range(1.7,3.6))
 		if not _free_verge(p,kind):
 			continue
 		if kind == "meadow":
@@ -367,28 +438,70 @@ func _plant_mesh(kind: String,share := 1.0) -> ArrayMesh:
 	mesh.index()
 	return mesh.commit()
 
+## Small real stones on the authored lanes, separate from the existing
+## colour/relief maps. Never change collision or obstruct player movement.
+func _make_gravel() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed=78161
+	var clusters := {}
+	for i in 1800:
+		var p := Vector2.ZERO
+		var z := rng.randf_range(-47.0,28.0)
+		var side := 1.0 if i%2==0 else -1.0
+		var lateral := side*rng.randf_range(0.4,1.83)
+		match i%4:
+			0: p=Vector2(Land.lane_x(z)+lateral,z)
+			1: p=Vector2(rng.randf_range(-21.0,24.0),4.0+lateral*0.7)
+			2: p=Vector2(30.0+lateral,z)
+			3: p=Vector2(rng.randf_range(-17.0,33.0),-36.5+lateral)
+		if Layout.reserved(p,0.6) or Land.water_distance(p,brook_source_z)<1.15:
+			continue
+		if Rect2(4.8,-4.2,19.4,17.5).has_point(p):
+			continue
+		var key := Vector2i(floori(p.x/12.0),floori(p.y/12.0))
+		if not clusters.has(key):
+			clusters[key]=[]
+		var radius := rng.randf_range(0.012,0.048)
+		var size := Vector3(radius*2.0,radius*rng.randf_range(0.42,0.85),radius*rng.randf_range(1.2,2.2))
+		var basis := Basis(Vector3.UP,rng.randf_range(0.0,TAU)).scaled(size)
+		var height := Land.bed_offset(p,brook_source_z)
+		clusters[key].append(Transform3D(basis,Vector3(p.x,height+size.y*0.28+0.008,p.y)))
+	var pebble := SphereMesh.new()
+	pebble.radius=0.5
+	pebble.height=1.0
+	pebble.radial_segments=6
+	pebble.rings=3
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color=Color("81796a")
+	mat.roughness=0.92
+	pebble.material=mat
+	for key: Vector2i in clusters:
+		var patch := _batch(pebble,clusters[key])
+		patch.name="FineGravel_%d_%d" % [key.x,key.y]
+		patch.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(patch)
+		_gravel.append(patch)
+
 func _make_rain() -> void:
 	var streak := SurfaceTool.new()
 	streak.begin(Mesh.PRIMITIVE_TRIANGLES)
 	streak.set_material(rain_material)
-	for v in [Vector3(-.022,.22,0),Vector3(.003,0,0),Vector3(.019,.22,0)]:
+	for v: Vector3 in [Vector3(-0.009,0.22,0),Vector3(0.002,0,0),Vector3(0.009,0.22,0)]:
 		streak.add_vertex(v)
 	var rain := MultiMesh.new()
-	rain.transform_format = MultiMesh.TRANSFORM_3D
-	rain.use_custom_data = true
-	rain.mesh = streak.commit()
-	rain.instance_count = 260
+	rain.transform_format=MultiMesh.TRANSFORM_3D
+	rain.mesh=streak.commit()
+	rain.instance_count=RAIN_SITES
+	rain.visible_instance_count=0
 	var rng := RandomNumberGenerator.new()
-	rng.seed = 71591
-	for i in rain.instance_count:
-		var pos := Vector3(rng.randf_range(-11,11),rng.randf_range(7,11),rng.randf_range(-11,11))
-		rain.set_instance_transform(i,Transform3D(Basis(Vector3.UP,rng.randf_range(0,TAU)),pos))
-		rain.set_instance_custom_data(i,Color(rng.randf(),0,0,1))
-	rain.custom_aabb = AABB(Vector3(-12,-3,-12),Vector3(24,15,24))
-	_rain = MultiMeshInstance3D.new()
-	_rain.name = "AutumnDrizzle"
-	_rain.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_rain.multimesh = rain
+	rng.seed=71591
+	for i in RAIN_SITES:
+		_rain_offsets.append(Vector2(rng.randf_range(-11.0,11.0),rng.randf_range(-11.0,11.0)))
+	rain.custom_aabb=AABB(Vector3(-12,-15,-12),Vector3(24,42,24))
+	_rain=MultiMeshInstance3D.new()
+	_rain.name="AutumnDrizzle"
+	_rain.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_rain.multimesh=rain
 	_rain.hide()
 	add_child(_rain)
 

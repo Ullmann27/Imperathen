@@ -30,6 +30,7 @@
       "shadow_distance_metres": 24,
       "mesh_lod_threshold": 3,
       "decoration_fraction": 0.22,
+      "far_actor_foot_contacts": false,
       "glow": false,
       "look": {"shadow_splits": 1, "shadow_filter": "hard", "sky_radiance": 64, "aerial_perspective": 0.4, "interior_bounce": false, "light_shafts": false, "ssao": false, "fire_lights": 1},
       "review_limits": {

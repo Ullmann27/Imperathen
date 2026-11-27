@@ -196,6 +196,14 @@
       "fog": 4,
       "height": 3.5,
       "grey": 0.3
+    },
+    "storm": {
+      "coverage": 1,
+      "sun": 0.1,
+      "ambient": 0.96,
+      "fog": 3.25,
+      "height": 2.6,
+      "grey": 0.71
     }
   },
   "weather_grey": {

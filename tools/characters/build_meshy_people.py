@@ -26,6 +26,15 @@ SOURCE = ROOT / "prototype/assets/meshy/source/character"
 OUT = ROOT / "prototype/assets/meshy/characters"
 REPORT = ROOT / "docs/20_meshy_assets/character-build.json"
 PROFILES = {
+    # Owner's restored, visually inspected originals. Explicit candidate builds only.
+    "unit_legacy_blacksmith": {"height": 1.76, "head": .84, "shoulder": .79, "hip": .52,
+                                "elbow": .65, "wrist": .495, "hand_x": .188, "elbow_x": .157,
+                                "shoulder_x": .115, "lower_arm_start": .128, "separated_downarms": True, "wrist_support": (.385,.410),
+                                "sha256": "9f972cab24f3ea8dd896e7d19058dc2c83688942c2cfffd46357670c2aa947e0"},
+    "unit_legacy_tunic_villager": {"height": 1.73, "head": .84, "shoulder": .80, "hip": .53,
+                                "elbow": .66, "wrist": .54, "hand_x": .214, "elbow_x": .166,
+                                "shoulder_x": .102, "lower_arm_start": .134, "separated_downarms": True, "wrist_support": (.370,.405),
+                                "sha256": "a7b1bcbe364ae636d7571886401d298099f5472bec2a82f0df45401d6e7e9507"},
     "unit_roman_signifer": {"height": 1.85, "head": .79, "shoulder": .755, "hip": .51,
                             "elbow": .61, "wrist": .475, "hand_x": .145, "shoulder_x": .113,
                             "wrist_support": (.430, .465),
@@ -266,7 +275,7 @@ def skeleton(profile):
     }
     for side, sign in (("L", 1), ("R", -1)):
         shoulder_x = sign * profile["shoulder_x"]
-        elbow_x = sign * (profile["hand_x"] - .008)
+        elbow_x = sign * profile.get("elbow_x", profile["hand_x"] - .008)
         wrist_x = sign * profile["hand_x"]
         joints.update({
             "Arm_" + side: ((shoulder_x, 0, shoulder), (elbow_x, -.005, profile["elbow"]), "Spine"),
@@ -315,13 +324,16 @@ def weights(point, profile, skin_hand=False):
     torso = smooth(.52, .66, z)
     center = {"Pelvis": 1 - torso, "Spine": torso}
     arm_start = profile["shoulder_x"] - .018
-    arm_strength = smooth(arm_start, arm_start + .030, ax)
+    if "lower_arm_start" in profile:
+        t = 1.0 - smooth(profile["elbow"], profile["shoulder"], z)
+        arm_start += (profile["lower_arm_start"] - arm_start) * t
+    arm_strength = smooth(arm_start, arm_start + (.018 if profile.get("separated_downarms") else .030), ax)
     arm_strength *= smooth(.35, .39, z) * (1 - smooth(profile["shoulder"] + .01, profile["shoulder"] + .05, z))
     arm_strength *= smooth(*profile["wrist_support"], z)
     # A topology-selected hand must follow the arm chain in full, including
     # its inner fingers. Distance-based mixing back into the pelvis stretched
     # those fingers. Blend into the original arm field only above the wrist.
-    hand_support = (1 - smooth(profile["wrist"] + .015, profile["wrist"] + .10, z)) if skin_hand else 0.0
+    hand_support = (1 - smooth(profile["wrist"] + .015, profile["wrist"] + .10, z)) if skin_hand and not profile.get("separated_downarms") else 0.0
     arm_strength = max(arm_strength, hand_support)
     # The broad hanging cape is behind the elbows, not a third pair of arms.
     arm_strength *= 1 - smooth(.065, .10, y)
@@ -626,7 +638,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--types", nargs="+", default=["all"])
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
-    requested = list(PROFILES) if args.types == ["all"] else args.types
+    requested = ["unit_roman_signifer", "unit_germanic_axe_fighter"] if args.types == ["all"] else args.types
     if any(asset_id not in PROFILES for asset_id in requested):
         raise ValueError("Only explicitly reviewed source poses may be processed")
     OUT.mkdir(parents=True, exist_ok=True)

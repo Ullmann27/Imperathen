@@ -1,0 +1,32 @@
+{
+  "upstream_repository": "https://github.com/makehumancommunity/makehuman",
+  "revision": "a8bc2d54ff0ac92e78ff71431b1023eda42bf482",
+  "license": "CC0-1.0 graphical assets, same upstream revision and license as source/provenance.json",
+  "license_evidence": [
+    "LICENSE.md section C",
+    "LICENSE.ASSETS.md"
+  ],
+  "targets": {
+    "caucasian-female-young.target": {
+      "git_blob_sha": "9d1f0cbeedc9a6a51abe33f1ebb5fa7c5a7edbf1",
+      "bytes": 420559,
+      "upstream_path": "makehuman/data/targets/macrodetails/caucasian-female-young.target"
+    },
+    "caucasian-female-old.target": {
+      "git_blob_sha": "2359bb525ddc620d43d309ba3dfea12b1fa88671",
+      "bytes": 408930,
+      "upstream_path": "makehuman/data/targets/macrodetails/caucasian-female-old.target"
+    },
+    "caucasian-male-old.target": {
+      "git_blob_sha": "07b1f5526a3139dbd528efe07452d0a454106d0d",
+      "bytes": 400125,
+      "upstream_path": "makehuman/data/targets/macrodetails/caucasian-male-old.target"
+    },
+    "caucasian-female-child.target": {
+      "git_blob_sha": "ff74bbad4e2b3cfb68faff34f25b06d6017202a1",
+      "bytes": 446405,
+      "upstream_path": "makehuman/data/targets/macrodetails/caucasian-female-child.target"
+    }
+  },
+  "usage": "Independent adult and child art candidates only. Existing player geometry, source hero.blend and release GLBs are not replaced."
+}

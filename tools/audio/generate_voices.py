@@ -118,6 +118,7 @@ def main():
     ap.add_argument("--strict", action="store_true", help="Reject output above the existing MAX_WER threshold")
     ap.add_argument("--attempts", type=int, default=ATTEMPTS,
                     help="Maximum distinct deterministic seeds per line (1-32)")
+    ap.add_argument("--continue-on-rejected", action="store_true", help="With --strict, skip failed lines and preserve the other accepted candidate recordings")
     a = ap.parse_args()
     if not 1 <= a.attempts <= 32:
         ap.error("--attempts must be between 1 and 32")
@@ -230,6 +231,9 @@ def main():
                 break
         err, seed, p, sr, hyp, variant = best
         if a.strict and err > MAX_WER:
+            if a.continue_on_rejected:
+                print(f"REJECTED_VOICE {line['line_id']}: WER {err:.3f}", flush=True)
+                continue
             raise SystemExit(f"Unaccepted transcription for {line['line_id']}: WER {err:.3f}")
         wave, _ = sf.read(p)
         post = speakers[sid].get("post")

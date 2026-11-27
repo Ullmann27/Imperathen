@@ -7,8 +7,11 @@ const Land := preload("res://scripts/world/village/valdora_land.gd")
 const FLAME := preload("res://scripts/rendering/fire_flame.gdshader")
 const CITY_GRAPH := "res://assets/city/street_graph.json"
 const MAX_LIGHTS := 4
-const SPACING := 9.0
-const RANGE := 9.0
+const SPACING := 6.0
+const RANGE := 11.5
+const PATH_LOOKAHEAD := 15.0
+var _route_player := Vector3.INF
+var _route_samples := PackedVector2Array()
 var sites: Array[Vector3] = []
 var _candidates: Array[Vector3] = []
 var _pool: Array[OmniLight3D] = []
@@ -23,16 +26,22 @@ static func village_candidates() -> Array[Vector3]:
 	var points: Array[Vector3] = []
 	# Central lane, civic crossroad, east lane, south road and both ends of
 	# the bridge. Offset from the actual tread; never put a bowl in the lane.
-	for z: int in range(-46, 30, 9):
-		points.append(Vector3(Land.lane_x(z) + (2.9 if posmod(z, 2) == 0 else -2.9), 0, z))
-	for z: int in range(-42, 28, 10):
+	for z: int in range(-45,30,6):
+		var side := 1.0 if posmod(floori(float(z+45)/6.0),2)==0 else -1.0
+		points.append(Vector3(Land.lane_x(z)+side*2.9,0,z))
+		points.append(Vector3(Land.lane_x(z)-side*2.9,0,z+1.5))
+	for z: int in range(-42,28,7):
 		points.append(Vector3(26.9, 0, z))
-	for x: int in range(-16, 29, 9):
+	for x: int in range(-16,29,7):
 		points.append(Vector3(x, 0, -33.8))
-	for x: int in range(-16, 45, 10):
+	for x: int in range(-16,45,7):
 		points.append(Vector3(x, 0, 30.1))
 	for at: Vector3 in [Vector3(-23,0,7.2), Vector3(-34,0,7.2), Vector3(46,0,-10.0), Vector3(4,0,-48)]:
 		points.append(at)
+	# Outer gate approach: fixed road edge sites on the level village plane.
+	for x: int in range(54,87,7):
+		points.append(Vector3(x,0,-10.0))
+		points.append(Vector3(x,0,-16.0))
 	var result: Array[Vector3] = []
 	for p: Vector3 in points:
 		var planar := Vector2(p.x, p.z)
@@ -79,12 +88,42 @@ func set_quality(profile: String) -> void:
 	_budget = int({"low":1, "balanced":2, "high":3, "very_high":4}.get(profile, 2))
 
 func set_darkness(value: float) -> void:
-	_night = clampf(value, 0.0, 1.0)
+	var next := clampf(value,0.0,1.0)
+	if is_equal_approx(next,_night):
+		return
+	_night=next
 	_update_flames()
 	if _night <= 0.04:
 		for light: OmniLight3D in _pool:
 			light.hide()
 	_elapsed = 0.0
+
+## Use the same actual mission route as the HUD. Select forward sample points
+## by path distance, not straight lines through houses. No light is invented
+## at a mission marker: only verified, fixed roadside fixtures may illuminate.
+func set_route_context(player_at: Vector3, route: PackedVector2Array) -> void:
+	if not player_at.is_finite():
+		return
+	_route_player=player_at
+	_route_samples=PackedVector2Array()
+	var last:=Vector2(player_at.x,player_at.z)
+	var distance:=0.0
+	var next_sample:=4.0
+	for point: Vector2 in route:
+		if not point.is_finite():
+			continue
+		var segment:=last.distance_to(point)
+		while segment>0.001 and next_sample<=minf(PATH_LOOKAHEAD,distance+segment):
+			_route_samples.append(last.lerp(point,clampf((next_sample-distance)/segment,0.0,1.0)))
+			next_sample+=4.0
+		distance+=segment
+		last=point
+		if distance>=PATH_LOOKAHEAD:
+			break
+	if distance<PATH_LOOKAHEAD and not route.is_empty():
+		_route_samples.append(last)
+	_elapsed=0.0
+
 
 func _physics_process(_delta: float) -> void:
 	if _installed:
@@ -169,7 +208,7 @@ func _build_batches() -> void:
 		light.name = "NearbyBrazierLight%d" % i
 		light.light_color = Color("ffad62")
 		light.omni_range = RANGE
-		light.omni_attenuation = 1.35
+		light.omni_attenuation = 1.2
 		light.shadow_enabled = false
 		light.light_specular = 0.20
 		light.hide()
@@ -212,15 +251,24 @@ func _process(delta: float) -> void:
 		var light := _pool[i]
 		if light.visible:
 			var phase := light.position.x * 0.37 + light.position.z * 0.71
-			light.light_energy = lit * 2.15 * (1.0 + 0.09 * sin(_clock * 9.2 + phase) + 0.045 * sin(_clock * 17.3 + phase))
+			light.light_energy = lit * 2.75 * (1.0 + 0.09 * sin(_clock * 9.2 + phase) + 0.045 * sin(_clock * 17.3 + phase))
 
 func _select_nearest(eye: Vector3) -> void:
 	var ranked: Array[Dictionary] = []
+	var anchor := _route_player if _route_player.is_finite() else eye
 	for at: Vector3 in sites:
-		var distance := eye.distance_squared_to(at)
+		var distance := anchor.distance_squared_to(at)
 		if distance < 29.0 * 29.0:
-			ranked.append({"at":at, "distance":distance})
-	ranked.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.distance) < float(b.distance))
+			var score := distance
+			for point: Vector2 in _route_samples:
+				score=minf(score,Vector2(at.x,at.z).distance_squared_to(point)+12.0)
+			ranked.append({"at":at,"distance":distance,"score":score})
+	# Keep the closest player-side light even when the camera is behind a wall.
+	ranked.sort_custom(func(a: Dictionary,b: Dictionary)->bool: return float(a.distance)<float(b.distance))
+	if ranked.size()>1:
+		var first: Dictionary=ranked.pop_front()
+		ranked.sort_custom(func(a: Dictionary,b: Dictionary)->bool: return float(a.score)<float(b.score))
+		ranked.push_front(first)
 	for i in _pool.size():
 		var light := _pool[i]
 		light.visible = i < mini(_budget, ranked.size())

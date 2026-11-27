@@ -101,8 +101,10 @@ static func apply(body: Node3D, look: Dictionary, level: int) -> void:
 		elif part == "FrontierBeard":
 			# The flat legacy chin patch is replaced by the shaped identity beard.
 			mesh.visible = false
-		elif part in ["HeroHair", "FrontierHairBun"] or part.begins_with("FrontierBoundLocks"):
+		elif part == "HeroHair" or part.begins_with("FrontierBoundLocks"):
 			mesh.visible = not bound_hair
+		elif part == "FrontierHairBun":
+			mesh.visible = true
 		if not mesh.visible:
 			continue
 		for index in mesh.mesh.get_blend_shape_count():
@@ -235,5 +237,9 @@ static func _hair(colour: Color, grey: float, source: StandardMaterial3D) -> Sha
 	material.set_shader_parameter("reference_luminance", float(HAIR_REFERENCE.get(source.resource_name, 0.12)))
 	material.set_shader_parameter("hair_color", colour)
 	material.set_shader_parameter("grey", clampf(grey, 0.0, 1.0))
+	# Reduce the high-frequency, overbright grey/streak contrast observed
+	# in the real parent framebuffer; age is not a white painted pattern.
+	material.set_shader_parameter("grey_color", colour.lerp(Color(0.48,0.43,0.38),0.48))
+	material.set_shader_parameter("normal_strength",0.46)
 	material.set_shader_parameter("roughness", clampf(source.roughness, 0.55, 0.9))
 	return material

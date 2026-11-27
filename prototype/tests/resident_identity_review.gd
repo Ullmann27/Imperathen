@@ -37,7 +37,9 @@ func _initialize() -> void:
 
 ## The same id, appearance, age and variation the two live builders assign.
 static func roster() -> Array[Dictionary]:
-	var result: Array[Dictionary] = []
+	var result: Array[Dictionary] = [
+		{"id":"player","name":"Spieler","role":"Jugendlicher","appearance":"","age":12,"variation":0,"source":"player"},
+		{"id":"marcus","name":"Marcus","role":"Jugendfreund","appearance":"","age":12,"variation":0,"source":"companion"}]
 	var index := 0
 	for person: Dictionary in Economy.PEOPLE:
 		var id := str(person.id)
@@ -141,6 +143,11 @@ func _spawn(entry: Dictionary, at: Vector3) -> Person:
 	figure.profile = profile
 	actor.add_child(figure)
 	figure.set_process(false)
+	if str(entry.source) in ["player","companion"]:
+		figure.configure(str(entry.source),"italia",int(entry.age))
+		if entry.source == "player" and Person.youth_outfit_installed("civil"):
+			figure.configure_meshy_youth(true,"civil")
+		return figure
 	# Newer builds accept the stable resident id; older builds ignore it.
 	var arguments := 5
 	for method: Dictionary in figure.get_script().get_script_method_list():
@@ -151,6 +158,8 @@ func _spawn(entry: Dictionary, at: Vector3) -> Person:
 		figure.call("configure_resident", "italia", int(entry.age), str(entry.appearance), int(entry.variation), camera, str(entry.id))
 	else:
 		figure.call("configure_resident", "italia", int(entry.age), str(entry.appearance), int(entry.variation), camera)
+	if entry.id == "severus":
+		figure.configure_meshy("unit_roman_signifer")
 	return figure
 
 
@@ -215,7 +224,10 @@ func _single(entry: Dictionary, shot: String) -> void:
 	for i in 4:
 		await RenderingServer.frame_post_draw
 	var name := "%s-%s-%s-%dx%d.png" % [entry.id, shot, profile, root.size.x, root.size.y]
-	root.get_texture().get_image().save_png(output.path_join(name))
+	if root.get_texture().get_image().save_png(output.path_join(name)) != OK:
+		report.errors.append("capture failed " + name)
+		actor.free()
+		return
 	var rig := figure.body.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
 	report.captures.append({"id": entry.id, "name": entry.name, "role": entry.role, "shot": shot, "file": name,
 		"clip": clip, "clip_time": at, "joints": rig.get_bone_count(),

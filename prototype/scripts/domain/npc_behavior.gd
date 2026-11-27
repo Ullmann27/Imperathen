@@ -7,6 +7,7 @@ const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Economy = preload("res://scripts/domain/village_economy.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const LocalWeather := preload("res://scripts/domain/local_weather.gd")
 const SocialMemory = preload("res://scripts/domain/npc_social_memory.gd")
 const VERSION := 1
 const STEP := 0.5
@@ -182,7 +183,7 @@ static func _decide_all(data: Dictionary, delta: float, sight_check: Callable = 
 	player_ground[1] = float(player_ground[1])-PLAYER_CENTER_HEIGHT
 	var player_at := Vector2(float(player[0]),float(player[2]))
 	var raid: Dictionary = data.village.get("raid",{})
-	var rain := int(data.get("strategy",{}).get("turn",0))%4 == 2
+	var rain := float(LocalWeather.for_state(data).rain) >= 0.35
 	var catalog := roster()
 	# Decide from one snapshot. Iteration order does not change who appears to
 	# be a conversational partner in the same tick.

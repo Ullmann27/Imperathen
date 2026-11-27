@@ -1,0 +1,7 @@
+# German mission speech candidate production
+
+At PR #153's audited mission data, the 14 indexed band-one files contain 101 authored dialogue/narrator entries with no exact text+speaker recording in the manifest. This is an inventory count, not a count of unique missing audio assets after de-duplication. I-01 and I-02 are covered by manifest text/cast matching. Other runtime, idle and non-mission lines require their own coverage audit.
+
+The candidate workflow reads the actual mission index, all steps/bridges, and branch-specific slice lines. It generates only missing German speech for the nine implicated registered speakers using the existing pinned Qwen, ASR and viseme tools. Existing verified audio supplies the same fictional voice; for voices without recordings the registered synthetic design seed is used. Each recording must meet the existing German transcription threshold, exact text/speaker identity, file checksums and one-frame viseme alignment. A rejected line is reported, not silently installed or substituted. The output is a manifest fragment and candidate audio artifacts, never an automatic change to shipped audio.
+
+No paid speech service, no cloned real person's voice, no repository write from the workflow. Listening, actual audio import/runtime playback, and device lip-sync QA are still required before integrating any candidate. New recordings are not claimed to exist merely because their generation workflow has been committed.

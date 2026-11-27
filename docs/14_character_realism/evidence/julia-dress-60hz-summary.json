@@ -1,0 +1,43 @@
+{
+  "report_sha256": "20062beacb99f84d903ef1e397c9209ad3f4c323cf5801d28848d93072f0c5e0",
+  "sample_hz": 60,
+  "poses": 3044,
+  "radial_samples": 942938,
+  "tears": 0,
+  "misses": 0,
+  "min_floor_y": -4.163336342344337e-17,
+  "rejected": [
+    [
+      0,
+      "death",
+      10.48
+    ],
+    [
+      1,
+      "death",
+      22.71
+    ],
+    [
+      2,
+      "death",
+      25.74
+    ],
+    [
+      3,
+      "death",
+      33.77
+    ]
+  ],
+  "sources": [
+    "6afc845ebf601b48cded142e106532b2372c37923daba6553bb18d65f0a84ea9",
+    "f98d796db28a5ca41d909114142f286b73a22dd4846f3e99c22d702d40e9423d",
+    "cd28a56df677093c6186fc429f662f49cbf589138baec9de859c90be52793c40",
+    "d4dd59e403625ce467c854a6fe2a8dc5c7f5a193630f4dc91a9f299be3b7b84b"
+  ],
+  "candidates": [
+    "68ba812966fc75c343b298b23449171ade174d49773cb923156438df467dfc6f",
+    "88d7d6cb4a3039c349a16d4a0f9e897e9abd8e2fad4643254b4be42782699132",
+    "0078ccb91990598a7f672853a82e8309a1a76d55f0b782e959fc13d77417849e",
+    "8780af8d31cf5aceee7aac73113c6fe27740afd86225e41458cd93b9ed201a70"
+  ]
+}

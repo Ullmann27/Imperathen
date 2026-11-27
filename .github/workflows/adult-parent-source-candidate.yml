@@ -1,0 +1,196 @@
+name: Adult parent anatomical candidate
+on:
+  pull_request:
+    paths:
+      - 'tools/characters/build_hero.py'
+      - 'tools/characters/build_frontier_people.py'
+      - 'art/hero_quality/source/parent_anatomy_provenance.json'
+      - 'art/hero_quality/source/caucasian-female-*.target'
+      - 'art/hero_quality/source/caucasian-male-old.target'
+      - 'tools/characters/fit_julia_dress.py'
+      - 'prototype/scripts/visuals/pose_dress.gd'
+      - 'prototype/tests/pose_dress_runtime_test.gd'
+      - '.github/workflows/adult-parent-source-candidate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: adult-parent-anatomy-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      IMPERATHEN_DISPOSABLE_PARENT_BUILD: '1'
+      IMPERATHEN_REQUIRE_PARENT_MORPHS: '1'
+      IMPERATHEN_REQUIRE_DEDICATED_PARENTS: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install Blender and verify Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends blender python3-numpy python3-scipy xvfb xauth libgl1-mesa-dri zstd
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Build anatomically distinct adults without changing the player
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/parent-anatomy
+          bash tools/characters/install_marcus_blender.sh "$RUNNER_TEMP/adult-blender" > artifacts/parent-anatomy/blender-install.log 2>&1
+          export PATH="$RUNNER_TEMP/adult-blender:$PATH"
+          blender --version
+          git rev-parse HEAD > artifacts/parent-anatomy/commit.txt
+          sha256sum art/hero_quality/hero.blend prototype/assets/characters/hero_quality_*.glb > "$RUNNER_TEMP/original-hero.sha256"
+          for pair in julia:civilian_woman silvanus:civilian_man; do
+            id="${pair%:*}"
+            kind="${pair#*:}"
+            dest="$RUNNER_TEMP/anatomy-$id"
+            blender -b -t 2 --python-exit-code 1 -P tools/characters/build_hero.py -- --adult-candidate "$id" --candidate-dir "$dest" --no-render 2>&1 | tee "artifacts/parent-anatomy/$id-source.log"
+            cp "$dest/anatomy.json" "artifacts/parent-anatomy/$id-anatomy.json"
+            blender -b -t 2 --python-exit-code 1 -P tools/characters/build_frontier_people.py -- --types "$kind" --hero-source "$dest/hero.blend" --authored-adult 2>&1 | tee "artifacts/parent-anatomy/$id-frontier.log"
+          done
+          blender -b -t 2 --python-exit-code 1 -P art/village_characters/build_resident_identity.py -- --kinds civilian_man civilian_woman 2>&1 | tee artifacts/parent-anatomy/identity-export.log
+          sha256sum --check "$RUNNER_TEMP/original-hero.sha256"
+          cp art/village_characters/resident_identity_report.json artifacts/parent-anatomy/
+          # The new anatomies belong only to the two story parents. Never
+          # replace the same generic model for every civilian in the village.
+          for level in 0 1 2 3; do
+            cp "prototype/assets/characters/frontier_civilian_woman_$level.glb" "prototype/assets/characters/frontier_parent_julia_$level.glb"
+            cp "prototype/assets/characters/frontier_civilian_man_$level.glb" "prototype/assets/characters/frontier_parent_silvanus_$level.glb"
+          done
+          git restore -- prototype/assets/characters/frontier_civilian_{man,woman}_*.glb
+          sha256sum prototype/assets/characters/frontier_parent_*.glb > artifacts/parent-anatomy/parent-models.sha256
+      - name: Capture actual closeups and living village in Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$GITHUB_WORKSPACE/artifacts/parent-anatomy"
+          mkdir -p "$out"/{studio,live} "$RUNNER_TEMP/parent-state"/{data,config,cache}
+          export XDG_DATA_HOME="$RUNNER_TEMP/parent-state/data"
+          export XDG_CONFIG_HOME="$RUNNER_TEMP/parent-state/config"
+          export XDG_CACHE_HOME="$RUNNER_TEMP/parent-state/cache"
+          "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee "$out/import.log"
+          status=0
+          for profile in high very_high; do
+            timeout --kill-after=10s 180s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --resolution 1280x720 --fixed-fps 60 --script res://tests/resident_identity_review.gd -- "$out/studio" "$profile" close,talk,full,walk julia,silvanus 2>&1 | tee "$out/studio-$profile.log" || status=1
+          done
+          timeout --kill-after=10s 600s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --resolution 1280x720 --fixed-fps 60 --script res://tests/resident_live_review.gd -- "$out/live" high,very_high julia,silvanus 2>&1 | tee "$out/live.log" || status=1
+          python3 - "$out" <<'PY'
+          import json, pathlib, sys
+          root = pathlib.Path(sys.argv[1])
+          reports = list(root.glob("studio/*.json"))
+          assert len(reports) == 2
+          for file in reports + [root/"live/live-review.json"]:
+              data = json.loads(file.read_text())
+              expected = 4 if file.parent.name == "live" else 8
+              assert not data["errors"] and len(data["captures"]) == expected
+              for entry in data["captures"]:
+                  assert (file.parent/entry["file"]).stat().st_size > 0
+          PY
+          exit "$status"
+      - name: Verify real parent morphs
+        run: |
+          set -euo pipefail
+          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/parent_visual_contract_test.gd 2>&1 | tee artifacts/parent-anatomy/contract.log
+          grep -Fq PARENT_VISUAL_CONTRACT_PASS artifacts/parent-anatomy/contract.log
+      - name: Archive candidate files without changing repository
+        if: always()
+        run: |
+          mkdir -p artifacts/parent-anatomy/candidate
+          shopt -s nullglob
+          for file in prototype/assets/characters/frontier_parent_*.glb; do cp "$file" artifacts/parent-anatomy/candidate/; done
+      - name: Save candidate renders and logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: adult-parent-anatomy-candidate-${{ github.run_id }}
+          path: artifacts/parent-anatomy/
+          retention-days: 30
+          if-no-files-found: error
+
+  dress:
+    name: Julia measured pose-driven dress (isolated candidate)
+    needs: candidate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      IMPERATHEN_REQUIRE_JULIA_DRESS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: adult-parent-anatomy-candidate-${{ github.run_id }}
+          path: "${{ runner.temp }}/parent-input"
+      - name: Measure fitted cloth on actual source bytes at 60 Hz, every LOD
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends python3-numpy xvfb xauth libgl1-mesa-dri
+          mkdir -p artifacts/pose-dress
+          git rev-parse HEAD > artifacts/pose-dress/commit.txt
+          python3 tools/characters/fit_julia_dress.py --source-dir "$RUNNER_TEMP/parent-input/candidate" --output artifacts/pose-dress/models --hz 60 2>&1 | tee artifacts/pose-dress/measurement.log
+      - name: Install exact Godot and stage only the fitted QA candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+          cd "$GITHUB_WORKSPACE"
+          cp artifacts/pose-dress/models/frontier_parent_julia_*.glb prototype/assets/characters/
+      - name: Test actual engine poses and render fitted dress
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$GITHUB_WORKSPACE/artifacts/pose-dress"
+          mkdir -p "$out/render" "$RUNNER_TEMP/dress-state"/{data,config,cache}
+          export XDG_DATA_HOME="$RUNNER_TEMP/dress-state/data"
+          export XDG_CONFIG_HOME="$RUNNER_TEMP/dress-state/config"
+          export XDG_CACHE_HOME="$RUNNER_TEMP/dress-state/cache"
+          "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee "$out/import.log"
+          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/pose_dress_runtime_test.gd -- "$out/runtime.json" 2>&1 | tee "$out/runtime.log"
+          grep -Fq POSE_DRESS_RUNTIME_PASS "$out/runtime.log"
+          timeout --kill-after=10s 240s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --resolution 1280x720 --fixed-fps 60 --script res://tests/resident_identity_review.gd -- "$out/render" very_high full,walk,talk julia 2>&1 | tee "$out/render.log"
+      - name: Archive measured result even on rejection
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: julia-pose-dress-${{ github.run_id }}
+          path: artifacts/pose-dress/
+          retention-days: 30
+          if-no-files-found: error

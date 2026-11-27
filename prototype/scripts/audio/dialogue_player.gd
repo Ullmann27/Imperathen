@@ -66,7 +66,7 @@ func play_line_id(line_id: String, emitter: Node3D = null, mouth_height := 1.55)
 func _start(entry: Dictionary, text: String, speaker_label: String, emitter: Node3D, mouth_height: float) -> Dictionary:
 	stop()
 	current = {"text": text, "speaker": speaker_label, "voiced": not entry.is_empty(),
-		"line_id": str(entry.get("line_id", "")), "speaker_id": VoiceLines.speaker_id(speaker_label)}
+		"line_id": str(entry.get("line_id", "")), "speaker_id": VoiceLines.speaker_id(speaker_label), "lip_sync_valid": false}
 	_frame_time = 0.0
 	_last_clock = 0.0
 	_started = false
@@ -95,8 +95,10 @@ func _start(entry: Dictionary, text: String, speaker_label: String, emitter: Nod
 		_player.stream = stream
 		_player.bus = AudioBuses.VOICE
 		_player.play()
+		var track := VoiceLines.viseme_track(entry)
+		current.lip_sync_valid = not track.is_empty()
 		if is_instance_valid(face):
-			face.set_track(VoiceLines.viseme_track(entry), clock)
+			face.set_track(track, clock)
 	else:
 		current.voiced = false
 		# Reading time ~15 characters per second, at least 2.5 s.

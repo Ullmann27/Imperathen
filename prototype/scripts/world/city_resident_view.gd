@@ -5,7 +5,9 @@ const Life = preload("res://scripts/domain/city_life.gd")
 const Population = preload("res://scripts/domain/city_population.gd")
 const Figure = preload("res://scripts/visuals/village_person.gd")
 const Activities := preload("res://scripts/visuals/resident_activity.gd")
-const LIMITS := {"low": 3, "balanced": 6, "high": 9, "very_high": 12}
+# Higher profiles allow denser true simulated people, not duplicate extras.
+# The limits are QA candidates, not verified Fold7 frame-time claims.
+const LIMITS := {"low": 3, "balanced": 8, "high": 16, "very_high": 24}
 const ENTER_RANGE := 48.0
 const LEAVE_RANGE := 58.0
 const SCAN_PER_STEP := 24
@@ -34,6 +36,20 @@ func _physics_process(delta: float) -> void:
 	if delta <= 0.0:
 		return
 	var now := int(life.state.t)
+	# A graphics downgrade must actually reduce the active pool. Retire at
+	# most one distant body per frame; the underlying residents remain saved.
+	var limit := int(LIMITS.get(profile,8))
+	if actors.size() > limit:
+		var furthest := -1
+		var farthest_distance := -1.0
+		for person: int in actors:
+			var body: CharacterBody3D = actors[person]
+			var distance := observer.global_position.distance_squared_to(body.global_position)
+			if distance > farthest_distance or (distance == farthest_distance and person > furthest):
+				farthest_distance = distance
+				furthest = person
+		if furthest >= 0:
+			_retire(furthest)
 	for person: int in actors.keys():
 		var actor: CharacterBody3D = actors[person]
 		if life.is_indoors(person, now) or observer.position.distance_squared_to(actor.position) > LEAVE_RANGE * LEAVE_RANGE:
@@ -82,7 +98,9 @@ func _physics_process(delta: float) -> void:
 		if distance > ENTER_RANGE * ENTER_RANGE:
 			continue
 		var replace := -1
-		if actors.size() >= int(LIMITS.get(profile, 6)):
+		if actors.size() > limit:
+			break
+		if actors.size() >= limit:
 			# A closer pedestrian can enter a full pool. The margin keeps
 			# neighbours at nearly equal distances from trading slots.
 			var worst := distance + 36.0
@@ -188,8 +206,9 @@ func _materialize(person: int, resident: Dictionary, point: Vector3) -> bool:
 	figure.position.y = 0.90
 	figure.rotation.y = life.slot_facing(resident.at, int(resident.slot))
 	actor.add_child(figure)
-	var appearance := "elder" if life.age(resident) >= 62 else ("civilian_woman" if resident.female else "civilian_man")
-	figure.configure_resident(resident.origin, life.age(resident), appearance, int(resident.look), camera, Population.resident_id(person))
+	var appearance := "civilian_woman" if resident.female else ("elder" if life.age(resident) >= 62 else "civilian_man")
+	figure.configure_resident(resident.origin, life.age(resident), appearance, int(resident.look), camera, Population.resident_id(person), str(resident.role), int(resident.tier))
+	actor.set_meta("profession",str(resident.role))
 	actors[person] = actor
 	return true
 

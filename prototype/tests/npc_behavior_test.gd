@@ -4,6 +4,8 @@ extends SceneTree
 const Model = preload("res://scripts/domain/world_model.gd")
 const Behavior = preload("res://scripts/domain/npc_behavior.gd")
 const Economy = preload("res://scripts/domain/village_economy.gd")
+const Weather := preload("res://scripts/domain/local_weather.gd")
+const Calendar := preload("res://scripts/domain/world_calendar.gd")
 var checks := 0
 var failures: Array[String] = []
 
@@ -142,6 +144,16 @@ func _test_senses() -> void:
 	_check(Behavior.view(data,"flavia").activity != "flee","A defeated enemy no longer triggers flight")
 	data.village.raid.active = false
 	data.strategy.turn = 2
+	# Select an actual autumn rain period from the shared deterministic clock.
+	var rainy: Dictionary={}
+	var autumn := Calendar.to_jdn(-58,9,1)
+	for day in 90:
+		var candidate := Calendar.new_clock(autumn+day,9*3600)
+		if float(Weather.sample(candidate,"italia",2).rain)>=0.35:
+			rainy=candidate
+			break
+	_check(not rainy.is_empty(),"Shared autumn weather has a rain period")
+	data.calendar.clock=rainy
 	for person: Dictionary in data.village.behavior.people.values():
 		person.next_decision = float(data.village.behavior.seconds)
 	_step(data,0.5)

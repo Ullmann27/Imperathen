@@ -43,6 +43,7 @@ hero = module("frontier_hero_source", ROOT / "tools/characters/build_hero.py")
 soldier = module("frontier_soldier_source", ROOT / "art/soldiers/build.py")
 skirt_seam = module("frontier_skirt_seam", ROOT / "tools/characters/smooth_frontier_skirt_seam.py")
 identity_shapes = module("frontier_identity_shapes", ROOT / "tools/characters/sculpt_roman_faces.py")
+adult_rig = module("frontier_adult_rig", ROOT / "tools/characters/extend_adult_rig.py")
 kit_rivets = module("frontier_kit_rivets", ROOT / "tools/characters/rebind_frontier_kit_rivets.py")
 
 
@@ -50,8 +51,8 @@ def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def reset_to_source():
-    bpy.ops.wm.open_mainfile(filepath=str(HERO))
+def reset_to_source(hero_source=HERO):
+    bpy.ops.wm.open_mainfile(filepath=str(hero_source))
     for obj in list(bpy.context.scene.objects):
         if obj.type not in ("MESH", "ARMATURE") or obj.name == "PracticeBlade":
             bpy.data.objects.remove(obj, do_unlink=True)
@@ -183,7 +184,7 @@ def apply_position_function(obj, function):
             vertex.co = function(vertex.co.copy())
 
 
-def civilian_identity(kind, arm):
+def civilian_identity(kind, arm, authored_adult=False):
     # Different silhouettes are actual geometry. Runtime colour variations add
     # individual identity without duplicating another complete set of textures.
     body = bpy.data.objects["HeroBody"]
@@ -201,23 +202,25 @@ def civilian_identity(kind, arm):
             else:
                 p.x *= 1.025
         return p
-    for obj in (body, bpy.data.objects["HeroEyes"]):
-        apply_position_function(obj, face)
+    if not authored_adult:
+        for obj in (body, bpy.data.objects["HeroEyes"]):
+            apply_position_function(obj, face)
     if kind == "civilian_woman":
         def silhouette(p):
             torso = max(0., min(1., (p.z - .78) / .16)) * max(0., min(1., (1.30 - p.z) / .09))
             p.x *= 1 - .13 * torso
             p.y = -.025 + (p.y + .025) * (1 - .065 * torso)
             return p
-        for obj in list(bpy.context.scene.objects):
-            if obj.type == "MESH":
-                apply_position_function(obj, silhouette)
-        bpy.context.view_layer.objects.active = arm
-        bpy.ops.object.mode_set(mode="EDIT")
-        for bone in arm.data.edit_bones:
-            bone.head = silhouette(bone.head.copy())
-            bone.tail = silhouette(bone.tail.copy())
-        bpy.ops.object.mode_set(mode="OBJECT")
+        if not authored_adult:
+            for obj in list(bpy.context.scene.objects):
+                if obj.type == "MESH":
+                    apply_position_function(obj, silhouette)
+            bpy.context.view_layer.objects.active = arm
+            bpy.ops.object.mode_set(mode="EDIT")
+            for bone in arm.data.edit_bones:
+                bone.head = silhouette(bone.head.copy())
+                bone.tail = silhouette(bone.tail.copy())
+            bpy.ops.object.mode_set(mode="OBJECT")
         hair = bpy.data.objects["HeroHair"]
         def sweep(p):
             back = max(0.0, min(1.0, (p.y + .06) / .10))
@@ -410,14 +413,14 @@ def soldier_identity(kind, source_arm):
     return target_arm
 
 
-def make_source(kind):
-    arm = reset_to_source()
+def make_source(kind, hero_source=HERO, authored_adult=False):
+    arm = reset_to_source(hero_source)
     neutral_eyes()
     colour_cloth(kind)
     if kind in SOLDIERS:
         arm = soldier_identity(kind, arm)
     else:
-        civilian_identity(kind, arm)
+        civilian_identity(kind, arm, authored_adult)
     hero.fit_belt_clearance(bpy.data.objects["HeroBelt"],
                             [bpy.data.objects["HeroTunic"], bpy.data.objects["HeroTunicSkirt"]])
     arm.name = "FrontierRig"
@@ -537,13 +540,26 @@ def main():
     parser.add_argument("--export", action="store_true")
     parser.add_argument("--review-only", action="store_true")
     parser.add_argument("--types", nargs="+", choices=TYPES, default=list(TYPES))
+    parser.add_argument("--hero-source", type=Path, help="Explicit anatomy candidate source")
+    parser.add_argument("--authored-adult", action="store_true", help="Avoid applying legacy male-to-female deformation twice")
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
+    if args.hero_source or args.authored_adult:
+        if not args.hero_source or not args.authored_adult or args.export or args.review_only or len(args.types) != 1 or args.types[0] not in ("civilian_woman","civilian_man"):
+            parser.error("Adult anatomy source is a one-kind disposable source build, not a release export")
+        if not args.hero_source.is_file() or args.hero_source.resolve() == HERO.resolve():
+            parser.error("A separate generated candidate .blend is required")
+        if __import__("os").environ.get("IMPERATHEN_DISPOSABLE_PARENT_BUILD") != "1":
+            parser.error("Use a disposable candidate checkout; original frontier source will be replaced there")
+        receipt = json.loads((args.hero_source.parent / "anatomy.json").read_text(encoding="utf-8"))
+        expected = "julia" if args.types[0] == "civilian_woman" else "silvanus"
+        if receipt.get("candidate") != expected or receipt.get("blend_sha256") != digest(args.hero_source):
+            parser.error("Candidate identity or source checksum mismatch")
     for path in (ART, OUT, ART / "review"):
         path.mkdir(parents=True, exist_ok=True)
     records = []
     for kind in args.types:
         if not args.review_only:
-            make_source(kind)
+            make_source(kind, args.hero_source or HERO, args.authored_adult)
             if args.export:
                 records.append({"identity": kind, "lods": export(kind)})
         else:

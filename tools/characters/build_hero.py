@@ -87,12 +87,45 @@ def normalize_weights(values):
     return {name:w/total for name,w in pairs} if total>0 else {'Head':1.}
 
 
-def load_anatomy():
+def verified_parent_target(name, count):
+    receipt = json.loads((SRC/'parent_anatomy_provenance.json').read_text(encoding='utf-8'))
+    record = receipt['targets'][name]
+    path = SRC/name
+    data = path.read_bytes()
+    git_hash = hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+    if len(data) != record['bytes'] or git_hash != record['git_blob_sha']:
+        raise ValueError('Parent anatomy source checksum mismatch: '+name)
+    return target(path, count)
+
+
+def load_anatomy(adult_candidate=None, *, child_candidate=None):
     raw,uv,faces,groups,uvfaces=obj_data(SRC/'base.obj')
     child=target(SRC/'caucasian-male-child.target',len(raw))
     adult=target(SRC/'caucasian-male-young.target',len(raw))
     muscle=target(SRC/'universal-male-young-maxmuscle-averageweight.target',len(raw))
-    variants=[raw+.78*child+.22*adult,raw+adult+.20*muscle]
+    adult_points = raw+adult+.20*muscle
+    # Keep the original child anatomy and common rest-rig contract untouched.
+    # Adult candidate age mixtures are artistic controls, not clinical ages.
+    if adult_candidate == 'julia':
+        young = verified_parent_target('caucasian-female-young.target', len(raw))
+        old = verified_parent_target('caucasian-female-old.target', len(raw))
+        adult_points = raw+.78*young+.22*old
+    elif adult_candidate == 'silvanus':
+        old = verified_parent_target('caucasian-male-old.target', len(raw))
+        adult_points = raw+.70*adult+.30*old+.12*muscle
+    elif adult_candidate is not None:
+        raise ValueError('Unknown adult candidate: '+str(adult_candidate))
+    variants=[raw+.78*child+.22*adult,adult_points]
+    if child_candidate is not None:
+        if adult_candidate is not None or child_candidate not in ('boy_child','girl_child','boy_teen','girl_teen'):
+            raise ValueError('Invalid child candidate: '+str(child_candidate))
+        if child_candidate.startswith('girl_'):
+            child=verified_parent_target('caucasian-female-child.target',len(raw))
+            adult=verified_parent_target('caucasian-female-young.target',len(raw))
+        # Artistic age controls; independent anatomical rest geometry and joints.
+        fraction=.05 if child_candidate.endswith('_child') else .45
+        youth=raw+(1.-fraction)*child+fraction*adult
+        variants=[youth,youth.copy()]
     facegroups=defaultdict(set)
     for face,group in zip(faces,groups):facegroups[group].update(face)
     weights_json=json.loads((SRC/'default_weights.mhw').read_text())['weights']
@@ -177,7 +210,7 @@ def texture_material(name, color=(1,1,1,1), texture=None, normal=None, roughness
     return mat
 
 
-def generated_maps():
+def generated_maps(tunic_colour=None):
     """Native material maps: microscopic relief and woven linen, no baked light."""
     size=512;y,x=np.mgrid[0:size,0:size]
     rng=np.random.default_rng(22112026)
@@ -187,7 +220,7 @@ def generated_maps():
         img=bpy.data.images.new(name,width=size,height=size,is_data=colorspace=='Non-Color')
         rgba=np.ones((size,size,4),dtype=np.float32);rgba[:,:,:3]=data
         img.pixels.foreach_set(rgba.ravel());img.pack();return img
-    linen=image('HeroLinen_woven_base',np.clip(np.array([.39,.35,.28])[None,None,:]*(1+weave[:,:,None]+grain[:,:,None]),0,1))
+    linen=image('HeroLinen_woven_base',np.clip(np.array(tunic_colour if tunic_colour is not None else [.39,.35,.28])[None,None,:]*(1+weave[:,:,None]+grain[:,:,None]),0,1))
     rough=image('HeroLinen_roughness',np.repeat(np.clip(.83+grain,0,1)[:,:,None],3,axis=2),'Non-Color')
     normal=image('HeroSkin_micro_normal',np.stack((.5+grain,.5+np.roll(grain,1,0),np.ones_like(grain)),axis=2),'Non-Color')
     linen_normal=image('HeroLinen_weave_normal',np.stack((.5+.04*np.cos(x*1.7),.5+.04*np.cos(y*1.7),np.ones_like(grain)),axis=2),'Non-Color')
@@ -812,10 +845,10 @@ def render_deformations(arm,camera):
     scene.frame_set(0)
 
 
-def export_lods(*, connector_delivery=True):
+def export_lods(*, connector_delivery=True, source_file=None, output_dir=None, file_prefix='hero_quality'):
     report=[]
     for level,ratio,texsize in ((0,1.,2048),(1,.50,1024),(2,.22,512),(3,.085,256)):
-        bpy.ops.wm.open_mainfile(filepath=str(ART/'hero.blend'))
+        bpy.ops.wm.open_mainfile(filepath=str(source_file or ART/'hero.blend'))
         bpy.ops.object.select_all(action='DESELECT')
         for obj in list(bpy.context.scene.objects):
             if obj.type not in ('MESH','ARMATURE'):bpy.data.objects.remove(obj,do_unlink=True);continue
@@ -848,7 +881,7 @@ def export_lods(*, connector_delivery=True):
         for image in bpy.data.images:
             if image.size[0]>texsize or image.size[1]>texsize:
                 factor=texsize/max(image.size);image.scale(max(1,round(image.size[0]*factor)),max(1,round(image.size[1]*factor)));image.pack()
-        path=OUT/f'hero_quality_{level}.glb'
+        path=(output_dir or OUT)/f'{file_prefix}_{level}.glb'
         bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,
             export_animation_mode='NLA_TRACKS',export_force_sampling=True,export_frame_step=1,
             export_animations=True,export_morph=True,export_morph_animation=False,export_def_bones=False)
@@ -937,10 +970,78 @@ def preserve_grounded_death_keys(path, arm):
     return len(frames)
 
 
+def child_hair_style(kind, anatomy, arm):
+    """Independent, fitted child hair silhouettes; no changes to original hero.
+    The shared short02 scalp source remains licensed and head-bound. Hair is
+    displaced by anatomical height/rear masks, with a separate braided mesh
+    for the older girl. This is an art candidate, not an AAA claim.
+    """
+    hair=bpy.data.objects.get('HeroHair')
+    if hair is None:return
+    coords=np.array([tuple(v.co) for v in hair.data.vertices],dtype=float)
+    lo=coords.min(axis=0);hi=coords.max(axis=0)
+    center=(lo+hi)/2
+    neck=anatomy['joints']['Head'][0].z
+    def deform(point):
+        p=Vector(point)
+        side=min(1.,abs(p.x-center[0])/max(.001,(hi[0]-lo[0])/2))
+        rear=max(0.,min(1.,(p.y-center[1]+.015)/.10))
+        lower=max(0.,min(1.,(hi[2]-p.z)/max(.001,hi[2]-lo[2])))
+        if kind=='boy_child':
+            p.z-=.012*lower*rear
+        elif kind=='boy_teen':
+            p.x+=.014*(1-lower)*(.4+rear)
+            p.z+=.018*(1-lower)
+        elif kind=='girl_child':
+            amount=max(rear,.80*side)*lower*lower
+            p.z=max(neck-.055,p.z-.15*amount)
+            p.y+=.014*rear*lower
+        elif kind=='girl_teen':
+            p.y+=.026*rear*lower
+            p.x*=1.-.07*side*lower
+        return p
+    for v in hair.data.vertices:v.co=deform(v.co)
+    if hair.data.shape_keys:
+        for key in hair.data.shape_keys.key_blocks:
+            for v in key.data:v.co=deform(v.co)
+    hair.data.update()
+    if kind=='girl_teen':
+        # Three woven strands along a curved, head-bound braid at the rear.
+        # Braid is separate geometry, tapered and fitted to the actual scalp.
+        mat=hair.data.materials[0]
+        z0=float(center[2]-.025);y0=float(hi[1]-.010)
+        for strand in range(3):
+            vertices=[];radii=[]
+            for i in range(33):
+                t=i/32.;phase=math.tau*(4.0*t+strand/3.)
+                radius=.015*(1.-.55*t)
+                vertices.append(Vector((center[0]+.012*math.sin(phase)*(1-.65*t),
+                                        y0+.035*math.sin(math.pi*t)+.010*math.cos(phase),
+                                        z0-.18*t)))
+                radii.append(radius)
+            tube('YouthBraidedHair_'+str(strand),vertices,radii,mat,arm,'Head',n=8)
+
+
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--preview-only',action='store_true');parser.add_argument('--export',action='store_true');parser.add_argument('--no-render',action='store_true');parser.add_argument('--clay',action='store_true')
     parser.add_argument('--refit-existing', action='store_true', help='Preserve the authored hero geometry/materials and correct its skirt weights and fall')
+    parser.add_argument('--adult-candidate', choices=('julia','silvanus'))
+    parser.add_argument('--child-candidate', choices=('boy_child','girl_child','boy_teen','girl_teen'))
+    parser.add_argument('--candidate-dir', type=Path)
     args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+    if args.adult_candidate and args.child_candidate:
+        parser.error('Choose one candidate type')
+    if args.adult_candidate or args.child_candidate:
+        if not args.candidate_dir or args.refit_existing or args.export or args.clay:
+            parser.error('Adult candidate requires --candidate-dir and cannot export or replace the original hero')
+        candidate_dir = args.candidate_dir.resolve()
+        if candidate_dir == ART.resolve() or candidate_dir == OUT.resolve() or candidate_dir.is_relative_to(SRC.resolve()):
+            parser.error('Candidate must not overwrite original hero sources')
+        if args.child_candidate and (candidate_dir.is_relative_to(ART.resolve()) or candidate_dir.is_relative_to((ROOT/'prototype').resolve())):
+            parser.error('Child review artifacts must be outside authored/runtime assets')
+        candidate_dir.mkdir(parents=True, exist_ok=False)
+    elif args.candidate_dir:
+        parser.error('--candidate-dir requires --adult-candidate')
     for d in (ART,OUT,REVIEW):d.mkdir(parents=True,exist_ok=True)
     if args.refit_existing:
         bpy.ops.wm.open_mainfile(filepath=str(ART/'hero.blend'))
@@ -971,9 +1072,13 @@ def main():
         print('HERO_MOTION_REFIT_COMPLETE',json.dumps({'skirt':skirt_fit,'tunic':tunic_fit,'death':death_contact,'lods':len(levels)}))
         return
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    anatomy=load_anatomy();arm=make_rig(anatomy['joints'])
-    maps=generated_maps()
-    skin_path=SRC/'system_assets/skins/young_caucasian_female/young_lightskinned_female_diffuse.png'
+    anatomy=load_anatomy(args.adult_candidate,child_candidate=args.child_candidate);arm=make_rig(anatomy['joints'])
+    child_colours={'boy_child':(.50,.43,.31),'girl_child':(.36,.17,.14),
+                   'boy_teen':(.22,.29,.19),'girl_teen':(.20,.30,.42)}
+    maps=generated_maps(child_colours.get(args.child_candidate))
+    masculine=args.adult_candidate=='silvanus' or str(args.child_candidate).startswith('boy_')
+    skin_path=SRC/('system_assets/skins/young_caucasian_male/young_lightskinned_male_diffuse.png'
+                   if masculine else 'system_assets/skins/young_caucasian_female/young_lightskinned_female_diffuse.png')
     if not skin_path.is_file() and not args.clay:raise FileNotFoundError(skin_path)
     skin=texture_material('HeroSkin',texture=skin_path if skin_path.is_file() else None,color=(.55,.40,.30,1),roughness=.63)
     attach_map(skin,maps[2],'Normal',True);attach_map(skin,maps[4],'Roughness')
@@ -986,11 +1091,65 @@ def main():
     if not args.clay:
         hairmat=texture_material('HeroHair',texture=hairpath/'short02_diffuse.png',normal=hairpath/'short02_normal.png',roughness=.71,alpha=True)
         accessory('HeroHair',hairpath/'short02.obj',hairpath/'short02.mhclo',anatomy,arm,hairmat)
+    if args.child_candidate and not args.clay:
+        # Use the fitted, licensed brow and lash meshes, rather than painted
+        # identical eye outlines. Keep this change in independent child art.
+        for label,folder,stem in [('HeroEyebrows','eyebrows/eyebrow001','eyebrow001'),
+                                  ('HeroEyelashes','eyelashes/eyelashes01','eyelashes01')]:
+            path=SRC/'system_assets'/folder
+            material=texture_material(label,texture=path/(stem+'.png'),roughness=.76,alpha=True)
+            accessory(label,path/(stem+'.obj'),path/(stem+'.mhclo'),anatomy,arm,material)
+        child_hair_style(args.child_candidate,anatomy,arm)
     clothing(anatomy,arm,linen,leather)
+    if args.child_candidate:
+        blade=bpy.data.objects.get('PracticeBlade')
+        if blade is not None:bpy.data.objects.remove(blade,do_unlink=True)
     animate(arm)
     death_contact = fit_death_ground_contact(arm)
     camera=setup_scene()
     bpy.context.preferences.filepaths.save_version=0
+    if args.child_candidate:
+        destination=candidate_dir/(args.child_candidate+'.blend')
+        bpy.ops.wm.save_as_mainfile(filepath=str(destination),compress=True)
+        scene=bpy.context.scene;scene.cycles.samples=12;scene.cycles.use_denoising=True
+        scene.render.threads_mode='FIXED';scene.render.threads=2
+        scene.render.image_settings.file_format='PNG'
+        if arm.animation_data:
+            arm.animation_data.action=None
+            for track in arm.animation_data.nla_tracks:track.mute=True
+        for bone in arm.pose.bones:bone.matrix_basis.identity()
+        scene.frame_set(0);bpy.context.view_layer.update()
+        for label,pos,aim,lens,x,y in (
+            ('face',(.38,-1.12,1.46),(0,-.02,1.35),78,480,540),
+            ('full',(1.15,-3.8,1.65),(0,0,.77),70,480,660)):
+            camera_at(camera,pos,aim,lens)
+            scene.render.resolution_x=x;scene.render.resolution_y=y
+            scene.render.filepath=str(candidate_dir/(label+'.png'))
+            bpy.ops.render.render(write_still=True)
+        levels=export_lods(connector_delivery=False,source_file=destination,output_dir=candidate_dir,file_prefix='city_'+args.child_candidate)
+        (candidate_dir/'candidate.json').write_text(json.dumps({
+            'candidate':args.child_candidate,'blender':bpy.app.version_string,
+            'normalized_height_m':1.50,'suggested_height_m':{'boy_child':1.22,'girl_child':1.20,'boy_teen':1.57,'girl_teen':1.53}[args.child_candidate],
+            'joints':list(anatomy['joints']),
+            'lods':levels,'death_contact':death_contact,
+            'acceptance':'ART_REVIEW_REQUIRED',
+            'limitations':['Fitted hair silhouettes, separate dyes and sex-specific licensed skin sources; all require visual review.',
+                           'No runtime installation; age-dependent height, gait and cloth clearance need QA.',
+                           'Technical animation library is not a child behavior policy.']},indent=2)+'\n')
+        print('CHILD_ANATOMY_CANDIDATE',args.child_candidate,len(levels))
+        return
+    if args.adult_candidate:
+        destination = candidate_dir/'hero.blend'
+        bpy.ops.wm.save_as_mainfile(filepath=str(destination),compress=True)
+        packaging = pack_blend_lossless(destination)
+        (candidate_dir/'anatomy.json').write_text(json.dumps({
+            'candidate':args.adult_candidate,'source_receipt':'art/hero_quality/source/parent_anatomy_provenance.json',
+            'common_joints':list(anatomy['joints']),'child_anatomy_preserved':True,
+            'blend_sha256':hashlib.sha256(destination.read_bytes()).hexdigest(),
+            'source_packaging':packaging,'acceptance':'unreviewed anatomy candidate, not release asset'
+        },indent=2)+'\n')
+        print('PARENT_ANATOMY_SOURCE_CANDIDATE',args.adult_candidate,destination)
+        return
     bpy.ops.wm.save_as_mainfile(filepath=str(ART/'hero.blend'),compress=True)
     source_packaging=pack_blend_lossless(ART/'hero.blend')
     if not args.no_render:

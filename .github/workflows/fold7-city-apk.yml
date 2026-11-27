@@ -109,6 +109,14 @@ jobs:
           cp "$RUNNER_TEMP"/private-temple/roman_meshy_temple_*.glb prototype/assets/world/
           cp "$RUNNER_TEMP/private-temple/temple_review.json" prototype/assets/world/roman_temple_review.json
           echo "PRIVATE_TEMPLE_LODS_PRESENT: actual privately supplied model; measured bounds in temple_review.json"
+      - name: Stage exact owner story models for Android QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/characters/stage_owner_runtime.py --archive "$RUNNER_TEMP/sextus-runtime.zip" --report artifacts/city/sextus-stage.json
+          echo "IMPERATHEN_REQUIRE_SEXTUS=1" >> "$GITHUB_ENV"
+          python3 tools/characters/stage_owner_runtime.py --family vibius --archive "$RUNNER_TEMP/vibius-runtime.zip" --report "artifacts/city/vibius-stage.json"
+          echo "IMPERATHEN_REQUIRE_VIBIUS=1" >> "$GITHUB_ENV"
       - name: Import the user's already rigged original boy without new secrets
         shell: bash
         run: |
