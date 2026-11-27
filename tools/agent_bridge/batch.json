@@ -1,10 +1,5 @@
 {
   "requests": [
-    "10-combat-equipment-authority",
-    "11-companion-motion-diagnosis",
-    "12-cinematic-lighting-exposure",
-    "13-resident-streaming-locality",
-    "14-land-material-sync",
-    "15-mission-attempt-ownership"
+    "16-i00-prolog-visual"
   ]
 }
