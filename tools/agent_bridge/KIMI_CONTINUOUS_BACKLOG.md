@@ -4,6 +4,8 @@
 
 ## Produktionsvertrag
 
+**Verbindlich für alle K01–K90 und Folgeaufträge:** [REALISM QUALITY GATE](KIMI_REALISM_QUALITY_GATE.md). Jedes Asset wird tatsächlich gerendert, kritisch begutachtet, iterativ verbessert und anhand seiner Einzelbefunde, Godot-Verträge und Fold7-Zielprofile abgenommen. Der erste Entwurf ist niemals automatisch die finale Fassung. Dies gilt ausdrücklich auch für kleinste Gegenstände. Die Anforderungen in jede neue Kimi-Anfrage aufnehmen; laufende Anfragen im nächsten Review anhand dieses Standards nachprüfen.
+
 Kimi erhält gepinnte, öffentliche Quelltexte und ausgewählte echte Review-Bilder. Pro Anfrage ein vollständiger prüfbarer Patch oder Blender-Generator. Die Entwicklungsleitung prüft vorgeschlagenen Code unabhängig, setzt ihn auf isoliertem Branch um, committet und öffnet PRs. Keine automatische Ausführung beliebigen Modelloutputs, keine Ausgabe von Secrets, kein unkontrollierter Write-Zugriff, kein automatisches Merge oder APK-Release. Vor jedem nächsten Batch laufende Jobs prüfen, Quoten beachten, höchstens zwei gleichzeitige API-Aufträge, keine endlosen Retries. Modellantworten und Tests sind unterschiedliche Zustände. Für Grafik: echte Blender-/Godot-Render, für Android: reale Gerätedaten oder ausdrücklich ausstehend. Nemotron liefert unabhängig konkrete Codepatches, Review und Gegenprüfungen; bei Konflikten Evidenz statt Vertrauen.
 
 ## Erste grafische Spezialrunde
