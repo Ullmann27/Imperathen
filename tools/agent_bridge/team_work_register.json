@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 58,
+  "version": 60,
   "tasks": [
     {
       "id": "K101",
@@ -308,8 +308,20 @@
         "prototype/tests/roman_menu_test.gd"
       ],
       "access": "edit",
-      "note": "User-directed whole-game integration on integration/aeterna-campaign-continuity-20261127; base e113d4d (#173), exact passed night/menu sources, production I04 watch-to-anvil film handoff and preserved checkpoint. CI in_progress; do not change this branch while run active. Keep #162 and #173 refs until their running checks complete. Next: verify continuous I00–I05 real Main regression; repair Marcus strict .015m, real combat, interiors and other failures on independent branches. Chronological Journey and RQG unchanged; no release.",
-      "status": "submitted"
+      "note": "Verified real Godot integration run 46023103096 success on f1f3fb96; CAMPAIGN_FORGE_CONTINUITY_PASS and I03_FLOW_PASS checks=109 failures=0; isolated technical integration only. RQG visual and device acceptance not granted.",
+      "status": "review_pending"
+    },
+    {
+      "id": "N20-FIX",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "f1f3fb96e64c4e6bc49a458e656eabcf01eef1a5",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/adult_path_test.gd"
+      ],
+      "access": "edit",
+      "note": "Independent review of N20: existing adult fixture 1.3m from practice post cannot reach it; 0.1s is already live-window rather than windup. Preserve production contact authority; verify far miss, measured windup/contact, recovery and recruitment on isolated test branch."
     }
   ]
 }
