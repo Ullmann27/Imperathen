@@ -1301,7 +1301,10 @@ func _physics_process(delta: float) -> void:
 	_update_camera(delta)
 	far_relief.follow(get_player_position(), _quality_profile)
 	if _state.get("village", {}).get("enabled", false):
-		regional_terrain.follow(get_player_position(), _quality_profile)
+		# The last completed physics step provides real movement, not an input
+		# vector or a simulated riding speed. Inactive scenes do not prefetch.
+		var stream_velocity := _player.get_real_velocity() if _active and _mode == "person" and is_instance_valid(_player) else Vector3.ZERO
+		regional_terrain.follow(get_player_position(), _quality_profile, stream_velocity)
 		regional_terrain.waystation.update_nearby(get_player_position(),_state.village.economy.get("freight",{}),delta)
 	population.update_nearby(get_player_position(),_active and _mode == "person")
 	if is_instance_valid(vegetation):

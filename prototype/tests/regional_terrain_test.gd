@@ -19,7 +19,7 @@ func _check(condition: bool, label: String) -> void:
 		printerr("FAIL ",label)
 
 
-func _follow(terrain: Node3D, position: Vector3, quality: String) -> void:
+func _follow(terrain: Node3D, position: Vector3, quality: String, velocity: Vector3 = Vector3.ZERO) -> void:
 	var before_meshes := {}
 	var before_colliders := {}
 	for sector: Node3D in terrain.sectors.values():
@@ -27,7 +27,7 @@ func _follow(terrain: Node3D, position: Vector3, quality: String) -> void:
 		if sector.has_node("GroundCollision"):
 			before_colliders[sector.get_node("GroundCollision").get_instance_id()] = true
 	var started := Time.get_ticks_usec()
-	terrain.follow(position,quality)
+	terrain.follow(position,quality,velocity)
 	var elapsed_ms := float(Time.get_ticks_usec()-started)/1000.0
 	var report: Dictionary = terrain.report()
 	var actual_mesh_builds := 0
@@ -205,7 +205,7 @@ func _walk_boundary(stage: Node3D, terrain: Node3D, quality: String, start: Vect
 		body.velocity.x = 0.0 if frame < 25 else direction.x * 4.0
 		body.velocity.z = 0.0 if frame < 25 else direction.z * 4.0
 		body.velocity.y -= 20.0*delta
-		_follow(terrain,body.global_position,quality)
+		_follow(terrain,body.global_position,quality,body.get_real_velocity())
 		body.move_and_slide()
 		if frame == 24:
 			grounded_before = body.is_on_floor()
@@ -279,6 +279,48 @@ func _test_stream_lifecycle(stage: Node3D, terrain: Node3D) -> void:
 		_check(not _ray(stage,corner+offset).is_empty(),"Actual collision covers each side of a sector corner")
 
 
+## Verify actual pre-created ground bodies, not just planned cell ids.
+func _test_predictive_support(stage: Node3D, terrain: Node3D) -> void:
+	var start := Vector3(1246.0, 0.0, 1014.0)
+	_follow(terrain, start, "low")
+	_drain(terrain, start, "low")
+	var current: String = Plan.sector_id(Plan.sector_for_position(start))
+	var next: String = Plan.sector_id(Plan.sector_for_position(start + Vector3.RIGHT * 6.0))
+	var current_mesh: int = terrain.sectors[current].get_instance_id()
+	var next_mesh: int = terrain.sectors[next].get_instance_id()
+	_check(not terrain.sectors[next].has_node("GroundCollision"), "No neighboring collider is created at rest outside support margin")
+	_follow(terrain, start, "low", Vector3.RIGHT * 4.0)
+	await physics_frame
+	await physics_frame
+	_check(terrain.report().prefetch_sectors == 1 and terrain.sectors[next].has_node("GroundCollision"), "Ahead collider is promoted four metres before crossing")
+	_check(not _ray(stage, start + Vector3.RIGHT * 6.0).is_empty(), "A real physics ray hits the prefetched floor")
+	_check(terrain.sectors[current].get_instance_id() == current_mesh and terrain.sectors[next].get_instance_id() == next_mesh, "Prediction promotes existing geometry rather than duplicating it")
+	_follow(terrain, start, "low", Vector3.LEFT * 4.0)
+	_check(terrain.report().prefetch_sectors == 0 and not terrain.sectors[next].has_node("GroundCollision"), "Turning away discards obsolete predicted physics")
+	_follow(terrain, start, "low", Vector3(NAN, 0, 0))
+	_check(terrain.report().prefetch_sectors == 0 and terrain.sectors[current].has_node("GroundCollision"), "Invalid velocity retains verified current support")
+	var corner := Vector3(1246.0, 0.0, 1246.0)
+	_follow(terrain, corner, "low")
+	_drain(terrain, corner, "low")
+	_follow(terrain, corner, "low", Vector3(4.0, 0, 4.0))
+	_follow(terrain, corner, "low", Vector3(4.0, 0, 4.0))
+	await physics_frame
+	await physics_frame
+	_check(terrain.report().prefetch_sectors == 3 and terrain.report().collision_sectors == 4, "Swept corner promotes both side cells and diagonal within per-call budgets")
+	for offset: Vector3 in [Vector3.ZERO, Vector3(6,0,0), Vector3(0,0,6), Vector3(6,0,6)]:
+		_check(not _ray(stage, corner + offset).is_empty(), "Swept corner has actual floor under each side")
+	_follow(terrain, corner, "low")
+	_drain(terrain, corner, "low")
+	_check(terrain.report().prefetch_sectors == 0 and terrain.report().collision_sectors == 1, "Stationary low profile returns to its normal physics residency")
+	_check_residency(terrain, corner, "low")
+	# Saturated world edges must not produce out-of-world or duplicate cells.
+	_follow(terrain, Vector3(15999,0,15999), "low", Vector3(1000,0,1000))
+	_check(terrain.report().prefetch_sectors == 0, "Outward motion at the modeled world corner creates no fictitious cells")
+	_follow(terrain, Vector3(15999,0,15999), "low")
+	_drain(terrain, Vector3(15999,0,15999), "low")
+	_check_residency(terrain, Vector3(15999,0,15999), "low")
+
+
 func _run() -> void:
 	var nodes_before := get_node_count()
 	var orphans_before := int(Performance.get_monitor(Performance.OBJECT_ORPHAN_NODE_COUNT))
@@ -343,6 +385,7 @@ func _run() -> void:
 	hit = _ray(stage,Vector3(15999,0,15999))
 	_check(not hit.is_empty(),"Physics reaches the modeled world corner")
 	await _test_stream_lifecycle(stage,terrain)
+	await _test_predictive_support(stage,terrain)
 	for quality: String in ["low", "balanced", "high", "very_high"]:
 		await _walk_boundary(stage,terrain,quality,Vector3(248,0,14),Vector3.RIGHT)
 	await _walk_boundary(stage,terrain,"low",Vector3(-248,0,-14),Vector3.LEFT)
