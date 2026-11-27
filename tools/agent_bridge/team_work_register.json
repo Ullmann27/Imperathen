@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 143,
+  "version": 144,
   "tasks": [
     {
       "id": "K101",
@@ -689,9 +689,9 @@
     {
       "id": "VIS-INDOOR-CAMERA-SPACING",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
-      "run_id": null,
+      "run_id": "46065039724",
       "scope": [
         "prototype/scripts/world/camera_obstruction.gd",
         "prototype/scripts/world/game_world.gd",
@@ -699,7 +699,7 @@
         ".github/workflows/aeterna-indoor-camera-spacing.yml"
       ],
       "access": "edit",
-      "note": "M06/M24 follow-up from actual I01 father-delivery frame artifact 15229328974. Existing camera obstruction excludes player and retracts into arbitrarily close clear poses. Candidate bounded alternative sweep for shoulder camera only when too close; retain current collision sphere, ray, overview, history, and sealed-volume contracts. Add real physics negative-control fixture; no full visual/device acceptance."
+      "note": "PR #191 exact 6d593cbbd2fc94247f6751a4f0b8f2a1a1005e04, four commits; actual focused push 46065039724/job 140728194211 in_progress. Seven new physics assertions. 1.05m provisional horizontal normal shoulder spacing, capped to 85% of requested distance, bounded alternate sweeps retain all previous collision safety. Actual I01 source image still visual failure. No acceptance. Separate from #186/#190. M03 I00 terrain job 140726953601 independently verified 87/87, stage y=5.981636, min mud clearance 0.332749m, old buried vertices 16128; capture job 140726954021 still running."
     }
   ]
 }
