@@ -110,6 +110,7 @@ func _test_stack_path() -> void:
 	var far: Dictionary = _act(model, "i04_stack")
 	_check(not far.ok and str(far.message).contains("Schmiede"), "The work is chosen in the forge, not from afar: " + str(far.message))
 	_check(_play(model, "i04_stack").ok and _stage(model) == "i04_stack_take", "Stacking starts at the delivered bundle")
+	_check(not I04Film.vid_a(model.data, Childhood.i04_ctx(model.data)).has("chain_to"), "Stacking must return to gameplay instead of skipping real work")
 	var wrong: Dictionary = _act(model, "i04_stack_put")
 	_check(not wrong.ok, "Nothing can be stacked before it is taken")
 	for trip in I04.STICKS:
@@ -141,6 +142,7 @@ func _test_stack_path() -> void:
 func _test_message_route() -> void:
 	var model = _at_forge()
 	_check(_play(model, "i04_message").ok and model.data.village.childhood.carried.has("sextus_note") and _stage(model) == "i04_note_give", "Other route: the boy carries Sextus' wax tablet")
+	_check(not I04Film.vid_a(model.data, Childhood.i04_ctx(model.data)).has("chain_to"), "Message route must return to gameplay instead of skipping delivery")
 	_check(str(Childhood.view(model.data).hud_title).contains("Fabius"), "The HUD names Fabius: " + str(Childhood.view(model.data).hud_title))
 	var ctx: Dictionary = Childhood.i04_ctx(model.data)
 	model.set_player_position(Vector3((ctx.sextus as Vector2).x, 1.35, (ctx.sextus as Vector2).y))
@@ -198,7 +200,10 @@ func _test_films() -> void:
 	_check(lines.has("I04_A_SILVANUS") and lines.has("I04_A_MEMORY"), "Silvanus introduces the boy; Sextus answers with their shared memory")
 	var choice: Array = a.beats.filter(func(b): return bool(b.get("await_choice", false)))
 	_check(choice.size() == 1 and str(choice[0].choice_step) == "i04_work" and choice[0].choices.size() == 3, "VID-A ends in the choice of work")
+	_check(not a.has("chain_to"), "The unchosen introduction cannot decide for the player")
 	_play(model, "i04_watch")
+	var watched: Dictionary = I04Film.restore(model.data, I04Film.VID_A, ctx)
+	_check(str(watched.get("chain_to", "")) == I04Film.VID_B, "A saved watch decision reconstructs the anvil handoff")
 	var b: Dictionary = Cinematics.sequence_for(model.data, {"id":"i04_work", "mission":"I-04"}, Childhood.current_step(model.data))
 	_check(str(b.get("id", "")) == I04Film.VID_B and str(b.beats[0].anchor) == "i04_tongs", "VID-B opens on the two tongs on the anvil")
 	_check(b.beats.filter(func(x): return bool(x.get("silent", false))).size() >= 2, "VID-B has pauses")

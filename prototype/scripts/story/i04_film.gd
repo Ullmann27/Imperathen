@@ -69,8 +69,14 @@ static func vid_a(data: Dictionary, ctx: Dictionary) -> Dictionary:
 		ask,
 		_choice("i04_a_choice", "i04_work", data),
 		_beat("i04_a_react", "duo_close", "I04_A_REACT_" + (work.to_upper() if not work.is_empty() else "STACK"), 5.0, "sextus")]
-	return _sequence(VID_A, "I-04.VID-A", "In der Schmiede", beats,
-		str(I04.current_step(data, ctx).get("objective", "Sextus wartet auf deine Antwort.")))
+	var next_step := I04.current_step(data, ctx)
+	var sequence := _sequence(VID_A, "I-04.VID-A", "In der Schmiede", beats,
+		str(next_step.get("objective", "Sextus wartet auf deine Antwort.")))
+	# Only the actual watch choice needs an immediate film-to-film handoff.
+	# Rebuilding the saved sequence reconstructs this presentation-only edge.
+	if work == "watch" and str(next_step.get("id", "")) == "i04_topic":
+		sequence["chain_to"] = VID_B
+	return sequence
 
 
 ## VID-B: the two tongs on the anvil, Sextus' care, his word on the boy's

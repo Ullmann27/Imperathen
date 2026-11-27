@@ -42,10 +42,47 @@ func _run() -> void:
 		if light.visible and light.light_energy > 0.0:
 			count += 1
 	check(count == 2,"Balanced profile limits actual illuminating lights")
+	# The nearest player light is guaranteed, even when route samples rank another.
+	fire.set_route_context(Vector3(0,0,-4),PackedVector2Array([Vector2(10,-4)]))
+	fire._process(0.25)
+	check(fire._pool[0].global_position.is_equal_approx(Vector3(0,1.46,-4)),"Closest player fixture remains the first light")
+	check(fire._pool[1].global_position.is_equal_approx(Vector3(10,1.46,-4)),"Second light follows the actual route")
+	fire.set_route_context(Vector3.INF,PackedVector2Array())
+	check(not fire._route_player.is_finite() and fire._route_samples.is_empty(),"Invalid route clears its previous player anchor and samples")
+	fire._process(0.25)
+	check(fire._pool[0].global_position.is_equal_approx(Vector3(0,1.46,-4)),"Invalid route restores camera-nearest fixture")
+	fire.set_quality("low")
+	check(not fire._pool[1].visible,"Lower quality immediately disables excess lights")
+	var previous_holder: WeakRef = weakref(fire._holders)
+	var previous_flames: WeakRef = weakref(fire._flames)
+	var previous_light: WeakRef = weakref(fire._pool[0])
+	check(previous_holder.get_ref() == fire._holders and previous_flames.get_ref() == fire._flames and previous_light.get_ref() == fire._pool[0],"Weak references identify the original live visual nodes before replacement")
+	var replacement: Array[Vector3] = [Vector3(20,0,0),Vector3(30,0,0)]
+	fire.configure(replacement,"high")
+	check(previous_holder.get_ref() == null and previous_flames.get_ref() == null and previous_light.get_ref() == null,"Reconfiguration releases previous batches and light pool")
+	check(fire.sites.is_empty() and not fire._installed,"Reconfiguration clears old fixture locations")
+	for i in 4:
+		await physics_frame
+	check(fire.sites.size() == 2 and fire._pool.size() == Fires.MAX_LIGHTS,"Replacement installation has exactly two grounded fixtures and bounded pool")
+	check(fire.get_child_count() == Fires.MAX_LIGHTS+2,"Reconfiguration does not duplicate visual nodes")
+	check(fire._flames.visible,"Night state survives replacement installation")
+	fire.set_route_context(Vector3(20,0,0),PackedVector2Array([Vector2(30,0)]))
+	fire._process(0.25)
+	check(fire._pool[0].global_position.is_equal_approx(Vector3(20,1.46,0)),"New installation lights the replacement sites")
 	fire.set_darkness(0.0)
 	check(not fire._flames.visible,"Flames disappear during day")
 	for light: OmniLight3D in fire._pool:
 		check(not light.visible,"Day does not waste point lights")
+	var empty: Array[Vector3] = []
+	fire.configure(empty,"balanced")
+	for i in 4:
+		await physics_frame
+	check(fire.sites.is_empty() and fire._pool.is_empty() and fire.get_child_count() == 0,"Empty replacement removes all former visuals")
+	var detached := Fires.new()
+	detached.configure(points,"balanced")
+	detached._physics_process(0.016)
+	check(not detached._installed and detached.sites.is_empty(),"Detached installation waits for a real physics world")
+	detached.free()
 	var sun := DirectionalLight3D.new()
 	world.add_child(sun)
 	var env := Environment.new()

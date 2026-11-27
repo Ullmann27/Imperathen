@@ -1341,6 +1341,19 @@ func _opening_finish() -> void:
 		return
 	var chain_to := str(opening_sequence.get("chain_to", ""))
 	var finished_id := str(opening_sequence.get("id", ""))
+	# The watch choice advances the objective inside the first film, where
+	# the ordinary command-triggered transition is intentionally suppressed.
+	if finished_id == I04Film.VID_A and chain_to == I04Film.VID_B and Childhood.enabled(model.data):
+		if str(Childhood.current_step(model.data).get("id", "")) == "i04_topic":
+			var next_film: Dictionary = _film_sequence(chain_to)
+			if not next_film.is_empty():
+				# Keep the old final beat recoverable until the next film's
+				# own atomic checkpoint replaces it.
+				_begin_opening(next_film)
+				if opening_checkpoint_failed:
+					ui.notify("Der Fortschritt der Schmiedeszene konnte nicht gespeichert werden. Beim Fortsetzen kann die letzte Übergabe erneut erscheinen.")
+				print("IMPERATHEN_OPENING_CHAINED " + finished_id + " -> " + chain_to)
+				return
 	_write_opening_checkpoint(true)
 	var checkpoint_failed := opening_checkpoint_failed
 	_release_opening()
