@@ -22,6 +22,13 @@ def path_ok(path):
     p=PurePosixPath(path)
     return not p.is_absolute() and p.as_posix()==path and not any(x.startswith(".") for x in p.parts) and path.startswith(("prototype/","tools/art/","art/","docs/"))
 
+def scope_ok(path, owner):
+    # Register only: recording coordinator CI files grants no execution or model access.
+    if path_ok(path):
+        return True
+    return (owner == "Coordinator" and isinstance(path, str)
+            and re.fullmatch(r"\.github/workflows/[A-Za-z0-9][A-Za-z0-9_-]{0,100}\.ya?ml", path) is not None)
+
 def overlap(a,b):
     return a==b or a.startswith(b+"/") or b.startswith(a+"/")
 
@@ -36,7 +43,7 @@ def validate(data):
         ids.add(task["id"])
         require(task["owner"] in OWNERS and task["status"] in STATES and task["access"] in ("read","edit"), "Invalid task state")
         require(isinstance(task["revision"],str) and SHA.fullmatch(task["revision"]), "Pinned revision required")
-        require(isinstance(task["scope"],list) and 1<=len(task["scope"])<=12 and all(path_ok(p) for p in task["scope"]), "Invalid source scope")
+        require(isinstance(task["scope"],list) and 1<=len(task["scope"])<=12 and all(scope_ok(p,task["owner"]) for p in task["scope"]), "Invalid source scope")
         require(task["run_id"] is None or isinstance(task["run_id"],str) and RUN.fullmatch(task["run_id"]), "Invalid workflow run")
         require(task["status"]!="submitted" or task["run_id"] is not None, "Submitted requires actual run")
         require(isinstance(task["note"],str) and len(task["note"])<=1500, "Invalid note")

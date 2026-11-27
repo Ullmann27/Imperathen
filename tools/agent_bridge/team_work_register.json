@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 108,
+  "version": 110,
   "tasks": [
     {
       "id": "K101",
@@ -517,6 +517,37 @@
       ],
       "access": "edit",
       "note": "Preview APK #219 actual run 46049893315, job 140678327076, fails strict companion turn at 60 Hz sign -1 (65/66; 15 mm gate unchanged). Isolated candidate on fix/aeterna-preview-companion-turn-20261127: squared heading alignment eases lateral travel while retaining full requested speed and angular/acceleration limits. Six added physical assertions and compact per-case diagnostics. Focused actual Marcus build/Godot regression run 46052536805 observed in_progress. Hypothesis, not verified correction. No integration until successful relevant tests and current preview HEAD/blob comparison. Do not edit overlapping scopes or repeat full APK unchanged; preview branch only, no main/release. Actual focused CI 46052536805 succeeded on exact commit: 72/72 checks, maximum slip 30 Hz 0.001349 mm, 60 Hz 6.402415 mm, 120 Hz 12.429449 mm; real generated Marcus rig, all six directions/frequencies. Compared preview HEAD 26875fa to exact tested 1327bd6: ahead 1 behind 0, only the registered three files. Fast-forwarded preview via expected HEAD lease and read-back confirmed exact 1327bd6. Full QA APK export trigger configured; new run not yet observed at this checkpoint, no release/physical approval."
+    },
+    {
+      "id": "N27",
+      "owner": "Nemotron",
+      "status": "queued",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/village_backdrop_test.gd",
+        "prototype/scripts/world/village/backdrop_hills.gd",
+        "prototype/scripts/world/village/village_scenery.gd",
+        "prototype/scripts/world/village/valdora_land.gd",
+        "prototype/scripts/world/regional_terrain.gd"
+      ],
+      "access": "read",
+      "note": "AETERNA Schritt 01; neuer disjunkter Read-only-Auftrag 27-valdora-visible-collision. Quelldateien auf gepinntem Preview überprüft. Auftragsdatei in isoliertem Bridge-Kandidaten e814cbc14727ba4440e878b62d1f32a5e2d50317; Probe 46055100225 läuft. Keine Übermittlung vor erfolgreicher Probe, aktuellem Repro-/HEAD-Abgleich, gültiger Reservierung und Ausschluss paralleler Jobs. Keine Doppelwiederholung N23–N26."
+    },
+    {
+      "id": "N28",
+      "owner": "Nemotron",
+      "status": "queued",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/valley_muster_test.gd",
+        "prototype/scripts/tactics/valley_scene.gd",
+        "prototype/scripts/visuals/valley_tribal_soldier.gd",
+        "prototype/scripts/battle/soldier_roster.gd"
+      ],
+      "access": "read",
+      "note": "AETERNA Schritt 01; neuer disjunkter Read-only-Auftrag 28-germanic-muster-identity. Quelldateien auf gepinntem Preview überprüft. Auftragsdatei in isoliertem Bridge-Kandidaten e814cbc14727ba4440e878b62d1f32a5e2d50317; Probe 46055100225 läuft. Keine Übermittlung vor erfolgreicher Probe, aktuellem Repro-/HEAD-Abgleich, gültiger Reservierung und Ausschluss paralleler Jobs. Keine Doppelwiederholung N23–N26."
     }
   ]
 }
