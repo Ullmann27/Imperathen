@@ -93,7 +93,7 @@ func _run() -> void:
 	# its own exact text, correct speaker, imported audio and matching track.
 	for line_id: String in I01.slice().get("lines", {}):
 		var authored: Dictionary = I01.line(line_id)
-		var entry := VoiceLines.find(str(authored.text))
+		var entry := VoiceLines.find(str(authored.text), str(authored.speaker_id))
 		_check(not entry.is_empty(), "I-01 branch recording: " + line_id)
 		if not entry.is_empty():
 			var expected := VoiceLines.speaker_id(str(authored.speaker_id))
@@ -125,13 +125,14 @@ func _run() -> void:
 	world.add_child(dialogue)
 	var speaker_ids := {}
 	for line: Dictionary in lines:
-		var entry := VoiceLines.find(line.text)
+		var entry := VoiceLines.find(line.text, line.speaker)
 		_check(not entry.is_empty(), "voiced: %s" % line.text.left(50))
 		if entry.is_empty():
 			var subtitle := dialogue.play(line.text, line.speaker)
 			_check(subtitle.text == line.text and not subtitle.voiced and dialogue._player == null, "An unavailable recording keeps the exact subtitle")
 			dialogue.stop()
 			continue
+		_check(VoiceLines.find(line.text, "__unregistered_speaker__").is_empty(), "Exact text cannot play in an unrelated speaker's voice")
 		_check(entry.speaker_id == VoiceLines.speaker_id(line.speaker), "%s speaker %s == %s" % [entry.line_id, entry.speaker_id, line.speaker])
 		speaker_ids[entry.speaker_id] = true
 		var stream := VoiceLines.stream_for(entry)

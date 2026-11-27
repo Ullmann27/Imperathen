@@ -81,7 +81,10 @@ func _run() -> void:
 			for i in 4:
 				await RenderingServer.frame_post_draw
 			var name := "live-%s-%s-%dx%d.png" % [id, profile, root.size.x, root.size.y]
-			root.get_texture().get_image().save_png(output.path_join(name))
+			var saved := root.get_texture().get_image().save_png(output.path_join(name))
+			if saved != OK:
+				report.errors.append("could not save " + name)
+				continue
 			report.captures.append({"id": id, "profile": profile, "file": name, "model": figure.active_model_path,
 				"lod": figure.detail, "ground": str(ground)})
 	var file := FileAccess.open(output.path_join("live-review.json"), FileAccess.WRITE)
@@ -89,4 +92,4 @@ func _run() -> void:
 	file.close()
 	print("RESIDENT_LIVE_REVIEW ", JSON.stringify(report.errors))
 	game.free()
-	quit(0)
+	quit(0 if report.errors.is_empty() else 1)

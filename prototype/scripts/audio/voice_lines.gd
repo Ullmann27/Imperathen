@@ -29,14 +29,24 @@ static func manifest() -> Dictionary:
 				_by_id[str(line.line_id)] = line
 				# Barks share texts between voices; only story lines are found by text.
 				if str(line.get("kind", "story")) == "story":
-					_by_key[str(line.text_key)] = line
+					var key := str(line.text_key)
+					var cast: Dictionary = _by_key.get(key, {})
+					cast[str(line.speaker_id)] = line
+					_by_key[key] = cast
 	return _manifest
 
 
 ## Returns the manifest entry for exactly this text, or {} when not voiced.
-static func find(text: String) -> Dictionary:
+static func find(text: String, speaker_label: String = "") -> Dictionary:
 	manifest()
-	return _by_key.get(text_key(text), {})
+	var cast: Dictionary = _by_key.get(text_key(text), {})
+	var line: Dictionary = {}
+	if not speaker_label.is_empty():
+		line = cast.get(speaker_id(speaker_label), {})
+	elif cast.size() == 1:
+		line = cast.values()[0]
+	# A text-hash collision or conflicting cast must never play wrong words.
+	return line if line.get("text", "") == text else {}
 
 
 static func find_line_id(line_id: String) -> Dictionary:

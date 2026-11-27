@@ -101,7 +101,7 @@ static func apply(body: Node3D, look: Dictionary, level: int) -> void:
 		elif part == "FrontierBeard":
 			# The flat legacy chin patch is replaced by the shaped identity beard.
 			mesh.visible = false
-		elif part == "HeroHair" or part.begins_with("FrontierBoundLocks"):
+		elif part in ["HeroHair", "FrontierHairBun"] or part.begins_with("FrontierBoundLocks"):
 			mesh.visible = not bound_hair
 		if not mesh.visible:
 			continue
@@ -118,6 +118,17 @@ static func apply(body: Node3D, look: Dictionary, level: int) -> void:
 			var material := _material_for(look, mask_kind, part, source)
 			if material:
 				mesh.set_surface_override_material(surface, material)
+
+
+## The shipped legacy frontier meshes share the resident atlas UVs. Keep their
+## geometry and clothing; use the existing age/crease shader only when both
+## real detail maps exist. Never turn a missing optional asset into a blank skin.
+static func parent_skin(look: Dictionary, source: StandardMaterial3D) -> ShaderMaterial:
+	if source == null or source.resource_name != "FrontierSkin" or source.albedo_texture == null:
+		return null
+	if _texture(TEXTURE_PATH % "skin_mask") == null or _texture(TEXTURE_PATH % "skin_detail") == null:
+		return null
+	return _material_for(look, str(look.kind), "HeroBody", source) as ShaderMaterial
 
 
 static func _material_for(look: Dictionary, mask_kind: String, part: String, source: StandardMaterial3D) -> Material:
