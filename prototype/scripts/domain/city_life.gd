@@ -1584,7 +1584,7 @@ func _set_weather(kind: String, t: int) -> void:
 			# arrival wake. Once there, the resident can choose shelter using
 			# the normal decision system. Never extend an already short stay.
 			var arrival := int(resident.arr)
-			var deadline := arrival + 1 if arrival > t else t + 5 + person % 40
+			var deadline: int = arrival + 1 if arrival > t else t + 5 + int(person) % 40
 			if int(resident.until) <= deadline:
 				continue
 			resident.until = deadline

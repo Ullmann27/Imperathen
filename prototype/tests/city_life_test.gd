@@ -361,7 +361,7 @@ func _test_weather_in_transit(saved_text: String) -> void:
 		var resident: Dictionary = city.state.residents[person]
 		var exposed: bool = old.act in Life.OUTDOOR_LEISURE and not Anchors.has_tag(city.index.anchors[old.at], "shelter")
 		var arrival := int(old.arr)
-		var deadline := arrival + 1 if arrival > now else now + 5 + person % 40
+		var deadline: int = arrival + 1 if arrival > now else now + 5 + int(person) % 40
 		var changed: bool = exposed and int(old.until) > deadline
 		expected += int(changed)
 		if not changed:
@@ -395,7 +395,7 @@ func _test_weather_in_transit(saved_text: String) -> void:
 	var renewed := true
 	for person: int in walking:
 		var resident: Dictionary = city.state.residents[person]
-		renewed = renewed and int(resident.dep) > int(before.residents[person].dep)
+		renewed = renewed and int(resident.n) > int(before.residents[person].n)
 	check(renewed, "all affected walkers make another normal decision after reaching their destination")
 	check(city.audit().ok and restored.audit().ok and _hash(city) == _hash(restored), "arrival decisions and economic conservation are deterministic after reload")
 
