@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 185,
+  "version": 187,
   "tasks": [
     {
       "id": "K101",
@@ -853,14 +853,14 @@
     {
       "id": "CONSOLIDATED-VISUAL-CANDIDATE",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
       "run_id": "46075904136",
       "scope": [
         ".github/workflows/aeterna-consolidated-visual.yml"
       ],
       "access": "edit",
-      "note": "Draft PR #195 on integration/aeterna-visual-candidate-20261127, exact commit d5cdcf3edb14dce44a11f1beed1942c131f5339f. Seven disjoint individually tested candidate sets copied with exact Git blob IDs (27 original files plus new focused CI; 28 total). Base Preview 1327bd6 unchanged; source compare ahead 1 behind 0. Real combined CI 46075904136 observed in_progress; 11 Godot groups incl. import, Prolog, family/market, camera, backdrop, rain, night/route lights. No full combined result, no main merge, no release or visual/device acceptance. Formation and valley mounted socket still blocked; Nemotron N29 independent. Do not duplicate this run."
+      "note": "Actual exact d5cdcf3edb14dce44a11f1beed1942c131f5339f #195: combined focused CI 46075904136, Story 46075919478, camera 46075919449, NPC 46075919412/46075919533, I01 image 46075919519, first play 46075919367 success. QA build 233 46075919336 verified arm64-v8a v2/v3 and separate package, artifact 15235563511, 768370869 APK bytes. Full Fold7 46075919397 failure: formation_agents 7/87, formation_levels 4/22, valley_muster 1/37 Germanic rig missing. No Preview integration, release or physical acceptance; retain real failures. QA artifact is isolated test-only."
     },
     {
       "id": "N29-SOCKET-DIAGNOSTIC",
@@ -878,15 +878,15 @@
     {
       "id": "N29-SOCKET-SYNC",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "f79a2dc092ea7374fff7f94d7eff6c162fb60103",
-      "run_id": null,
+      "run_id": "46080747402",
       "scope": [
         "prototype/scripts/visuals/valley_rider.gd",
         "prototype/tests/valley_muster_test.gd"
       ],
       "access": "edit",
-      "note": "Independent minimal runtime correction after N29 direct engine evidence: synchronize BoneAttachment local transform to actual skeleton-local pose immediately after manual seek before saddle/pelvis alignment; add transformed-root and independent bone/pelvis and saddle regression. Existing 3 cm limits, allocation test and budgets unchanged. No edits to formation allocation or Kimi branches except shared register."
+      "note": "Actual commit 9e8a0b26fe1e5aacfcd94df016f317675f6e39fe on PR #196, exact two files only, lease f79a2dc. Immediate local BoneAttachment transform sampled after seek; existing 3 cm gate and original battle UID test unchanged. Added direct bone/pelvis/saddle checks plus translated/yawed root gait samples. Focused Godot run 46080747402 observed in_progress; existing automatic PR checks 46080753788/46080753799 queued. No success yet, allocation independent; no duplicate dispatch."
     }
   ]
 }
