@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 36,
+  "version": 47,
   "tasks": [
     {
       "id": "K101",
@@ -151,8 +151,8 @@
         "prototype/tests/route_fire_test.gd"
       ],
       "access": "edit",
-      "note": "Independent implementation of N17 lifecycle repair, actual focused CI. Preserve nearest-player guarantee and four-light cap. Actual run state: completed / failure. No automatic integration.",
-      "status": "submitted"
+      "note": "Run 46019923875 failed at parse lines 56–58: weakref return inferred as Variant with warnings treated as errors. Superseded only by N17-FIX-TYPE; no integration.",
+      "status": "blocked"
     },
     {
       "id": "N19-FIX",
@@ -165,8 +165,8 @@
         "prototype/tests/mount_controller_test.gd"
       ],
       "access": "edit",
-      "note": "Independent implementation of N19 gaze/pose ownership and boarding rollback, real fixture CI. Actual run state: in_progress. No automatic integration.",
-      "status": "submitted"
+      "note": "Verified isolated engine 34/34. Source unchanged. Combined candidate tracked by MAP-MOUNT-INTEGRATE; not merged into #162.",
+      "status": "done"
     },
     {
       "id": "MAP-SCALE",
@@ -178,8 +178,8 @@
         "prototype/tests/regional_map_test.gd"
       ],
       "access": "edit",
-      "note": "Independent local repair of confirmed unsupported %g map scale runtime error. Real all-five-level viewport CI; D001 provider remains blocked. Actual run state: in_progress. No automatic integration.",
-      "status": "submitted"
+      "note": "Verified isolated actual Godot render test of five levels. Combined candidate tracked by MAP-MOUNT-INTEGRATE; not merged into #162.",
+      "status": "done"
     },
     {
       "id": "I00-INTEGRATE",
@@ -249,6 +249,47 @@
       ],
       "access": "read",
       "note": "Actual bounded batch in_progress at d1d9aea. Independent engineering only; no response yet, no edit permission or merge.",
+      "status": "submitted"
+    },
+    {
+      "id": "N17-FIX-TYPE",
+      "owner": "Coordinator",
+      "revision": "e5354465628fab36a69844d2b5c55013c54e7da2",
+      "run_id": "46021669947",
+      "scope": [
+        "prototype/scripts/rendering/route_fire_lights.gd",
+        "prototype/tests/route_fire_test.gd"
+      ],
+      "access": "edit",
+      "note": "Explicit WeakRef typing and pre-replacement identity regression. Prior lighting implementation unchanged. CI in_progress. Await actual results before integration.",
+      "status": "submitted"
+    },
+    {
+      "id": "MAP-MOUNT-INTEGRATE",
+      "owner": "Coordinator",
+      "revision": "e113d4ded6b05a05106c34bb0e34e7eaf53df410",
+      "run_id": "46021766345",
+      "scope": [
+        "prototype/scripts/world/mounted_rider_pose.gd",
+        "prototype/scripts/world/mount_controller.gd",
+        "prototype/tests/mount_controller_test.gd",
+        "prototype/scripts/ui/regional_map.gd",
+        "prototype/tests/regional_map_test.gd"
+      ],
+      "access": "edit",
+      "note": "Draft #173 exact source/test blobs from passed runs 46020024550 and 46020155432, combined base 9fa7b14. Combined mount 46021766345 in_progress, map 46021766333 in_progress. Keep #162 ref and running full CI unchanged until safe and relevant tests green.",
+      "status": "submitted"
+    },
+    {
+      "id": "HOUSE-INTERIOR-PARSE",
+      "owner": "Coordinator",
+      "revision": "1b87724a9fe62c751d02a04668f8c924b7c7c7a0",
+      "run_id": "46021975525",
+      "scope": [
+        "prototype/tests/house_interiors_test.gd"
+      ],
+      "access": "edit",
+      "note": "Confirmed prior full regression 46001919674 line 569 inference failure on unchanged candidate test blob. Explicit bool only; genuine complete house/forge fixture CI in_progress. No claims about actual mesh or geometry acceptance.",
       "status": "submitted"
     }
   ]
