@@ -164,7 +164,8 @@ func _test_close_wall_spacing() -> void:
 	_wall(Vector3(0,2,0.65),Vector3(1.40,4,0.12))
 	await physics_frame
 	var space: PhysicsDirectSpaceState3D = world.get_world_3d().direct_space_state
-	var former: Vector3 = world._camera_obstruction.place(space,_anchor(),_desired(),Vector3.INF,0.0,[world._player.get_rid()])
+	var excluded: Array[RID] = [world._player.get_rid()]
+	var former: Vector3 = world._camera_obstruction.place(space,_anchor(),_desired(),Vector3.INF,0.0,excluded)
 	_check(_horizontal_spacing(former) < 0.65 and _position_free(former), "Negative control: direct boom can be collision-free but almost inside the player")
 	world._camera_obstruction.reset()
 	world._update_camera(0.0)
