@@ -1,0 +1,3 @@
+# Furnished interiors regression — parser repair
+
+Baseline 46001919674/job 140515583708 failed parsing house_interiors_test.gd line 569. The identical failing test blob 16794e0dba6cdb0be6e2fb69317ef4f428290aea is present in candidate 9fa7b14. Declare fitted explicitly as bool, preserving the existing mesh identity, visibility, manifest, and all geometry/collision checks. The independent bounded Godot workflow executes the entire original fixture and requires nonzero measured checks and zero failures, no SCRIPT ERROR or ERROR. No production code, content, visual budget or tolerances changed. Runtime result remains pending.
