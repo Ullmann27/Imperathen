@@ -1,0 +1,76 @@
+name: Kimi K3.1 Pro API smoke test
+on:
+  push:
+    branches: ['test/kimi-api-smoke-20261127']
+    paths: ['.github/workflows/kimi-api-smoke.yml']
+permissions: {}
+concurrency:
+  group: imperathen-kimi-api-smoke
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Verify NVIDIA Kimi endpoint without exposing credentials
+        env:
+          NVIDIA_KIMI_API_KEY: ${{ secrets.NVIDIA_KIMI_API_KEY }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import sys
+          import urllib.error
+          import urllib.request
+
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  raise urllib.error.HTTPError(req.full_url, code, "Redirect refused", headers, fp)
+
+          def fail(message):
+              print(message)
+              sys.exit(1)
+
+          key = os.environ.get("NVIDIA_KIMI_API_KEY", "").strip()
+          if not key:
+              fail("FAIL: NVIDIA_KIMI_API_KEY is unavailable to this workflow.")
+          model = "moonshotai/kimi-k3.1-pro"
+          endpoint = "https://integrate.api.nvidia.com/v1/chat/completions"
+          payload = {
+              "model": model,
+              "messages": [{"role": "user", "content": [{"type": "text", "text": "Reply only with KIMI_OK."}]}],
+              "max_tokens": 1024,
+              "stream": False,
+          }
+          request = urllib.request.Request(
+              endpoint, data=json.dumps(payload).encode("utf-8"),
+              headers={"Authorization": "Bearer " + key, "Content-Type": "application/json",
+                       "Accept": "application/json"}, method="POST")
+          try:
+              with urllib.request.build_opener(NoRedirect()).open(request, timeout=100) as response:
+                  raw = response.read(2_000_001)
+                  if response.status != 200 or len(raw) > 2_000_000:
+                      fail("FAIL: unexpected response status or size.")
+                  result = json.loads(raw)
+          except urllib.error.HTTPError as error:
+              fail(f"FAIL: NVIDIA returned HTTP {error.code}. No response body logged.")
+          except (urllib.error.URLError, TimeoutError, ValueError, OSError):
+              fail("FAIL: connection, timeout, or JSON decoding error. No raw details logged.")
+
+          if not isinstance(result, dict) or result.get("error"):
+              fail("FAIL: API returned an error or invalid response.")
+          choices = result.get("choices")
+          if not isinstance(choices, list) or not choices or not isinstance(choices[0], dict):
+              fail("FAIL: no valid completion choice.")
+          choice = choices[0]
+          message = choice.get("message")
+          if not isinstance(message, dict):
+              fail("FAIL: no completion message.")
+          content = message.get("content")
+          if not isinstance(content, str) or not content.strip():
+              fail("FAIL: no final text; token budget or model response requires review.")
+          if content.strip() != "KIMI_OK" or choice.get("finish_reason") != "stop":
+              fail("FAIL: API returned final text, but the smoke-test assertion was not met.")
+          print("PASS: authenticated NVIDIA Kimi K3.1 Pro endpoint returned the expected completion.")
+          PY
