@@ -260,6 +260,30 @@ jobs:
               out.write("UNITY_IMPERATHEN_ASSET_MANAGER_API_CONFIRMED\\n")
           print("UNITY_IMPERATHEN_ASSET_MANAGER_API_CONFIRMED")
           PY
+      - name: Inspect real Imperathen Unity Asset Manager inventory (read-only)
+        if: always()
+        shell: bash
+        env:
+          UNITY_SERVICE_ACCOUNT_ID: ${{ secrets.IMPERATHEN_UNITY_SA_ID }}
+          UNITY_SERVICE_ACCOUNT_SECRET: ${{ secrets.IMPERATHEN_UNITY_SA_SECRET }}
+          UNITY_CLOUD_ORG_ID: ${{ vars.UNITY_CLOUD_ORG_ID }}
+        run: |
+          set -euo pipefail
+          python3 tools/unity_bridge/inventory_asset_manager.py \
+            --report unity-cli-evidence/unity-inventory-sanitized.json
+      - name: Inspect Unity AI generator production readiness (read-only, zero credits)
+        if: always()
+        shell: bash
+        env:
+          UNITY_SERVICE_ACCOUNT_ID: ${{ secrets.IMPERATHEN_UNITY_SA_ID }}
+          UNITY_SERVICE_ACCOUNT_SECRET: ${{ secrets.IMPERATHEN_UNITY_SA_SECRET }}
+          UNITY_CLOUD_ORG_ID: ${{ vars.UNITY_CLOUD_ORG_ID }}
+          UNITY_NON_INTERACTIVE: "1"
+        run: |
+          set -euo pipefail
+          export PATH="$HOME/.local/bin:$PATH"
+          python3 tools/unity_bridge/probe_ai_readiness.py \
+            --report unity-cli-evidence/unity-ai-readiness-sanitized.json
       - name: Keep only sanitized CLI evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
