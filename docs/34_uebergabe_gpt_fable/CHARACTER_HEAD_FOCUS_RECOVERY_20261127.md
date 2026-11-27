@@ -12,3 +12,5 @@ Base: 62bd372ad2aef997cf086d126a21fca95ba90657 (PR #150). Do not merge into the 
 
 ## Acceptance
 Existing `marcus_character` QA now includes actual model neutral front, speaker switch, near pass-by, walking and combat isolation checks. Existing full asset acceptance stages the private civil youth and rebuilds Marcus before running this suite. No device, render or APK pass is claimed by the source commit. Fold7 measurements and eye/face visual acceptance must remain open until actual evidence exists.
+
+Follow-up hardening: preserve gaze angles on LOD rebind; cap frame delta for hitch recovery; disable per-physics callbacks for unfocused residents and proximity scans in menus; use existing city conversational pairs for reciprocal gaze; actual physics wall, LOD and sprint checks added to the runtime suite. No independent eye actuation or private source facial sculpt is claimed.

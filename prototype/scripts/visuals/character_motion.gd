@@ -68,6 +68,7 @@ static func playback_animation(source: Animation, mode: Animation.LoopMode) -> A
 
 func bind(model: Node3D, is_civilian: bool, actor_identity: String = "") -> void:
 	available = false
+	skeleton = null
 	civilian = is_civilian
 	# Stable individuality across LOD replacement and independent actors.
 	_style_phase = float(posmod(actor_identity.hash(), 997)) / 997.0

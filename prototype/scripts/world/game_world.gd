@@ -272,6 +272,8 @@ func set_mode(mode: String) -> void:
 	if mode not in ["person", "city", "map"]:
 		return
 	_mode = mode
+	if is_instance_valid(_figure):
+		_figure.set_ambient_gaze(_active and mode == "person")
 	if mode != "person":
 		action_requested.emit("combat_interrupt", {})
 		_actions.reset()

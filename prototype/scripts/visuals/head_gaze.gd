@@ -17,14 +17,15 @@ var _eye_angles := Vector2.ZERO
 var _initialized := false
 var _time := 0.0
 
-func bind(rig: Skeleton3D) -> void:
+func bind(rig: Skeleton3D, preserve_angles: bool = false) -> void:
 	restore()
 	skeleton = rig
 	head = -1
 	neck = -1
 	eyes.clear()
-	_initialized = false
+	_initialized = _initialized and preserve_angles
 	if not is_instance_valid(rig):
+		_initialized = false
 		return
 	head = rig.find_bone("Head")
 	neck = rig.find_bone("Neck")
@@ -113,6 +114,7 @@ func apply(delta: float, actor_basis: Basis, point: Vector3, action: String, ena
 	if not available() or not enabled or action not in ["idle", "march", "talk"] or not is_finite(delta) or delta < 0.0:
 		_initialized = false
 		return
+	delta = minf(delta, 0.10)
 	_time += delta
 	if not _initialized:
 		_head_angles = angles_for(direction_world(), actor_basis)

@@ -48,9 +48,31 @@ static func run(tree: SceneTree, check: Callable) -> void:
 	check.call(absf(_angle(player) - before) < 10.0, "Speaker switch has no snap")
 	_tick(player, 0.9)
 	check.call(_angle(player) < -18.0, "Active speaker overrides dialog partner")
+	var tracked := _angle(player)
+	player._reload(1)
+	check.call(absf(_angle(player) - tracked) < 6.0, "Live gaze survives compatible LOD replacement")
+	player._reload(0)
 	player.clear_gaze_target()
 	_tick(player, 0.9)
 	check.call(absf(_angle(player)) < 3.0, "Clear focus returns to neutral")
+	# Use an actual physics collider between the real character eye lines.
+	var wall := StaticBody3D.new()
+	wall.collision_layer = 1
+	var wall_shape := CollisionShape3D.new()
+	var wall_box := BoxShape3D.new()
+	wall_box.size = Vector3(3, 3, 0.2)
+	wall_shape.shape = wall_box
+	wall.add_child(wall_shape)
+	scene.add_child(wall)
+	wall.position = Vector3(0, 0.5, -1.0)
+	await tree.physics_frame
+	await tree.physics_frame
+	player.set_gaze_target(first)
+	_tick(player, 0.8)
+	check.call(player._social_focus.target() == null and absf(_angle(player)) < 4.0, "World geometry blocks conversation gaze")
+	player.clear_gaze_target()
+	wall.free()
+	await tree.physics_frame
 	player.set_ambient_gaze(true)
 	first.position = Vector3(-0.9, 0, -1.5)
 	second.position = Vector3(0, 0, 8)
@@ -65,6 +87,9 @@ static func run(tree: SceneTree, check: Callable) -> void:
 	player.drive(1.2)
 	_tick(player, 0.7)
 	check.call(player.clip == "march" and _angle(player) > 12.0 and absf(_angle(player)) <= 42.0, "Walking gaze retains march and bounds")
+	player.drive(3.8)
+	_tick(player, 0.5)
+	check.call(player.clip == "run" and player._gaze._saved.is_empty(), "Sprint owns the unmodified animation pose")
 	player.sample_combat("jab_right", 0.4)
 	check.call(player._gaze._saved.is_empty(), "Combat samples clear gaze before authoring the pose")
 	player._process(1.0 / 60.0)
@@ -77,4 +102,5 @@ static func run(tree: SceneTree, check: Callable) -> void:
 	# Fallback is explicit rather than assuming that painted eyes can rotate.
 	check.call(player._gaze.eyes.is_empty() and first._gaze.eyes.is_empty(), "Current source rigs expose no independent eye pair")
 	print("HEAD_FOCUS_ACTUAL_MODELS ", player.active_model_path, " | ", first.active_model_path)
+	print("HEAD_FOCUS_RIGS player=", player._gaze.skeleton.get_bone_count(), " neck=", player._gaze.neck, " eyes=", player._gaze.eyes.size(), " marcus=", first._gaze.skeleton.get_bone_count(), " neck=", first._gaze.neck, " eyes=", first._gaze.eyes.size())
 	scene.free()
