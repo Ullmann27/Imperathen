@@ -269,12 +269,14 @@ func _apply_sample(normalized_time: float) -> void:
 			fov_end = 49.0
 		"legions_rain":
 			var anchor := _anchor("i00_legions")
-			start = anchor+Vector3(12.5,5.9,15.0)
-			end = anchor+Vector3(7.5,3.5,10.6)
-			target_start = anchor+Vector3(-3.2,1.35,-1.7)
-			target_end = anchor+Vector3(-2.2,1.45,.8)
+			# Retain all three actual rank blocks throughout the wide shot,
+			# including the narrower 1180x1312 Fold-style viewport.
+			start = anchor+Vector3(10.0,7.8,29.0)
+			end = anchor+Vector3(4.0,5.7,25.0)
+			target_start = anchor+Vector3(0,1.3,-.25)
+			target_end = anchor+Vector3(0,1.2,-.25)
 			fov_start = 57.0
-			fov_end = 51.0
+			fov_end = 55.0
 		"caesar_orders":
 			var anchor := _anchor("i00_caesar")
 			start = anchor + Vector3(3.2, 1.95, 3.1)
@@ -292,13 +294,15 @@ func _apply_sample(normalized_time: float) -> void:
 			fov_start = 48.0
 			fov_end = 44.0
 		"legions_depart":
-			var anchor := _anchor("i00_road")
-			start = anchor + Vector3(14.0, 7.0, 18.0)
-			end = anchor + Vector3(9.0, 5.2, 12.0)
-			target_start = anchor + Vector3(0.0, 1.0, 8.0)
-			target_end = anchor + Vector3(0.0, 1.0, 3.0)
-			fov_start = 55.0
-			fov_end = 50.0
+			# The old road anchor let the lens travel beyond the formation
+			# and finish on an empty field. Keep the route behind the ranks.
+			var anchor := _anchor("i00_legions")
+			start = anchor + Vector3(-10.0, 9.0, 29.0)
+			end = anchor + Vector3(-4.0, 7.0, 26.0)
+			target_start = anchor + Vector3(0.0, 1.3, -1.5)
+			target_end = anchor + Vector3(0.0, 1.2, -1.2)
+			fov_start = 58.0
+			fov_end = 56.0
 		"valley":
 			var anchor := _anchor("road")
 			start = anchor + Vector3(12.5, 10.2, 17.5)
@@ -351,7 +355,7 @@ func _apply_sample(normalized_time: float) -> void:
 				forward = Vector3.FORWARD
 			forward = forward.normalized()
 			var lateral := Vector3.UP.cross(forward).normalized()
-			var face := anchor + Vector3.UP * 0.39
+			var face := _face_anchor(figure, anchor + Vector3.UP * 0.39)
 			start = face + forward * 2.35 + lateral * 0.9 + Vector3.UP * 0.16
 			end = face + forward * 1.80 + lateral * 0.52 + Vector3.UP * 0.10
 			target_start = face
@@ -454,7 +458,7 @@ func _i01_framing(id: String) -> Array:
 			var subject_id := "julia" if id == "i01_react_julia" else (mission_actor_id if mission_actor_id in ["julia", "silvanus"] else "silvanus")
 			var subject := _mission_figure(subject_id)
 			var listener := _mission_figure("player")
-			var face := (subject.global_position if is_instance_valid(subject) else _anchor("i01_" + subject_id) + Vector3.UP * 0.9) + Vector3.UP * 0.42
+			var face := _face_anchor(subject, (subject.global_position if is_instance_valid(subject) else _anchor("i01_" + subject_id) + Vector3.UP * 0.9) + Vector3.UP * 0.42)
 			var toward := (listener.global_position if is_instance_valid(listener) else _anchor("i01_player_table") + Vector3.UP * 0.9) - face
 			toward.y = 0.0
 			toward = toward.normalized() if toward.length() > 0.1 else Vector3.BACK
@@ -466,7 +470,7 @@ func _i01_framing(id: String) -> Array:
 			var listening := _mission_figure("player")
 			var adult_id := mission_actor_id if mission_actor_id in ["julia", "silvanus"] else "silvanus"
 			var adult := _mission_figure(adult_id)
-			var boy_face := (listening.global_position if is_instance_valid(listening) else _anchor("i01_player_table") + Vector3.UP * 0.9) + Vector3.UP * 0.36
+			var boy_face := _face_anchor(listening, (listening.global_position if is_instance_valid(listening) else _anchor("i01_player_table") + Vector3.UP * 0.9) + Vector3.UP * 0.36)
 			var away := (adult.global_position if is_instance_valid(adult) else _anchor("i01_silvanus") + Vector3.UP * 0.9) - boy_face
 			away.y = 0.0
 			away = away.normalized() if away.length() > 0.1 else Vector3.FORWARD
@@ -519,8 +523,8 @@ func _duo_framing(id: String) -> Array:
 	var gap := clampf(axis.length(), 0.8, 5.0)
 	axis = axis.normalized() if axis.length() > 0.1 else Vector3.FORWARD
 	var side := Vector3.UP.cross(axis).normalized()
-	var speaker_face := speaker_at + Vector3.UP * 0.42
-	var boy_face := boy_at + Vector3.UP * 0.36
+	var speaker_face := _face_anchor(speaker, speaker_at + Vector3.UP * 0.42)
+	var boy_face := _face_anchor(boy, boy_at + Vector3.UP * 0.36)
 	match id:
 		"duo_wide":
 			var middle := (speaker_at + boy_at) * 0.5 + Vector3.UP * 0.12
@@ -552,6 +556,17 @@ func _duo_framing(id: String) -> Array:
 			return [prop + from * 0.66 + beside * 0.24 + Vector3.UP * 0.30, prop + from * 0.54 + beside * 0.19 + Vector3.UP * 0.26,
 				prop, prop, 35.0, 31.5]
 	return [boy_at, boy_at + Vector3.UP, boy_at, boy_at, 45.0, 45.0]
+
+
+## Use the live rig's eye line instead of an assumed offset from its root.
+## Unloaded and legacy actors retain the finite authored fallback. This does
+## not move actors or certify that the view is free of foreground geometry.
+func _face_anchor(figure: Node3D, fallback: Vector3) -> Vector3:
+	if is_instance_valid(figure) and figure.has_method("gaze_anchor"):
+		var point: Variant = figure.call("gaze_anchor")
+		if point is Vector3 and (point as Vector3).is_finite():
+			return point as Vector3
+	return fallback
 
 
 func _mission_figure(actor_id: String) -> Node3D:

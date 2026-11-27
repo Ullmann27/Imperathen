@@ -2,6 +2,13 @@ extends RefCounted
 ## I-00 presentation scenery. All dimensions in metres; deterministic and
 ## deliberately independent of navigation, NPC logic and combat authority.
 const Art = preload("res://scripts/world/village_art.gd")
+const Terrain = preload("res://scripts/world/regional_terrain.gd")
+const Plan = preload("res://scripts/world/world_stream_plan.gd")
+const PLATFORM_MIN := Vector2(-26.0, -39.0)
+const PLATFORM_MAX := Vector2(26.0, 23.0)
+const TERRAIN_CLEARANCE := 0.12
+const APRON_WIDTH := 12.0
+const APRON_RINGS := 3
 const HALF_W := 1.90
 const HALF_D := 1.45
 const RIDGE := 2.12
@@ -9,11 +16,27 @@ const HEM := 0.07
 const GRID_X := 48
 const GRID_Z := 56
 
+## Each streamed terrain triangle is linear between the regular grid vertices.
+## Cover the entire platform with the enclosing grid, not just its centre.
+## These are regional/world-local coordinates, as used by the stage OFFSET.
+static func grounded_elevation(at: Vector2) -> float:
+	var step := Plan.SECTOR_SIZE_M / float(Terrain.GRID)
+	var low := at + PLATFORM_MIN
+	var high := at + PLATFORM_MAX
+	var highest := -INF
+	for z in range(floori(low.y / step), ceili(high.y / step) + 1):
+		for x in range(floori(low.x / step), ceili(high.x / step) + 1):
+			var ground := Terrain.surface_height(Vector2(float(x) * step, float(z) * step))
+			highest = maxf(highest, ground)
+	return highest + TERRAIN_CLEARANCE
+
+
 static func build(parent: Node3D) -> Node3D:
 	var camp := Node3D.new()
 	camp.name = "CampScenery"
 	parent.add_child(camp)
 	_ground(camp)
+	_terrain_apron(camp, parent.position)
 	var pole_mesh := CylinderMesh.new()
 	pole_mesh.top_radius = 1.0
 	pole_mesh.bottom_radius = 1.0
@@ -95,6 +118,58 @@ static func _ground(parent: Node3D) -> void:
 	mud.vertex_color_use_as_albedo = true
 	_material_mesh(parent, "MudSurface", surface, mud)
 	_puddles(parent)
+
+
+## A visual-only embankment closes the raised platform into the existing
+## landscape. Its inner edge uses the exact mud grid; its outer edge samples
+## the actual streamed surface. No collision/streaming state is modified.
+static func _terrain_apron(parent: Node3D, origin: Vector3) -> void:
+	var inner: Array[Vector2] = [PLATFORM_MIN, Vector2(PLATFORM_MAX.x, PLATFORM_MIN.y), PLATFORM_MAX, Vector2(PLATFORM_MIN.x, PLATFORM_MAX.y)]
+	var low := PLATFORM_MIN - Vector2.ONE * APRON_WIDTH
+	var high := PLATFORM_MAX + Vector2.ONE * APRON_WIDTH
+	var outer: Array[Vector2] = [low, Vector2(high.x, low.y), high, Vector2(low.x, high.y)]
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for side in range(4):
+		var next := (side + 1) % 4
+		var steps := GRID_X if side % 2 == 0 else GRID_Z
+		for i in range(steps):
+			var u0 := float(i) / float(steps)
+			var u1 := float(i + 1) / float(steps)
+			var a := inner[side].lerp(inner[next], u0)
+			var b := inner[side].lerp(inner[next], u1)
+			var oa := outer[side].lerp(outer[next], u0)
+			var ob := outer[side].lerp(outer[next], u1)
+			for ring in range(APRON_RINGS):
+				var t0 := float(ring) / float(APRON_RINGS)
+				var t1 := float(ring + 1) / float(APRON_RINGS)
+				var p0 := _apron_point(origin, oa, a, t0)
+				var p1 := _apron_point(origin, ob, b, t0)
+				var p2 := _apron_point(origin, ob, b, t1)
+				var p3 := _apron_point(origin, oa, a, t1)
+				_apron_triangle(surface, origin, [p0, p1, p2], [t0, t0, t1])
+				_apron_triangle(surface, origin, [p0, p2, p3], [t0, t1, t1])
+	var paint := Art.material(Color.WHITE, 0.86, false)
+	paint.vertex_color_use_as_albedo = true
+	_material_mesh(parent, "TerrainApron", surface, paint)
+
+
+static func _apron_point(origin: Vector3, outer: Vector2, inner: Vector2, t: float) -> Vector3:
+	var at := outer.lerp(inner, t)
+	if t >= 1.0:
+		return _ground_point(inner.x, inner.y)
+	var terrain := Terrain.surface_height(Vector2(origin.x + at.x, origin.z + at.y)) - origin.y
+	var crest := _ground_point(inner.x, inner.y).y
+	var y := lerpf(terrain + 0.035, crest, smoothstep(0.0, 1.0, t))
+	return Vector3(at.x, maxf(terrain + 0.035, y), at.y)
+
+
+static func _apron_triangle(surface: SurfaceTool, origin: Vector3, points: Array[Vector3], blend: Array[float]) -> void:
+	var normal := (points[2] - points[0]).cross(points[1] - points[0]).normalized()
+	for i in range(3):
+		var p := points[i]
+		var color := Terrain.ground_color(origin + p).lerp(_mud_color(p), blend[i])
+		_vertex(surface, p, color, normal)
 
 
 static func _puddles(parent: Node3D) -> void:

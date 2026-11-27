@@ -169,6 +169,26 @@ func _prop_at_hand(prop: Node3D, hand: String, offset: Vector3) -> bool:
 	return prop.global_position.distance_to(expected) < 0.002
 
 
+## The visible grip is the measured GLB handle, not the jug's mesh origin.
+## Derive the expected palm target from the live skeleton independently of
+## the jug transform. This tests the contact anchor, not individual fingers.
+func _check_jug_grip(jug: Node3D, label: String) -> void:
+	var rig: Skeleton3D = game.world._figure._motion.skeleton
+	if not check(is_instance_valid(jug) and jug.is_visible_in_tree() and is_instance_valid(rig), label + ": visible pitcher and actual rig"):
+		return
+	var hand := rig.find_bone("Hand_L")
+	if not check(hand >= 0, label + ": actual left wrist exists"):
+		return
+	var wrist := rig.to_global(rig.get_bone_global_pose(hand).origin)
+	var expected_basis := rig.global_basis.orthonormalized()
+	if rig.get_bone_global_rest(hand).origin.x < 0.0:
+		expected_basis *= Basis(Vector3.UP, PI)
+	var palm := wrist + expected_basis * Vector3(0, 0, 0.035)
+	var error_m := jug.to_global(Vector3(0.168, 0.28, 0)).distance_to(palm)
+	check(error_m < 0.002, label + ": measured GLB handle within 2 mm of palm target (" + str(error_m) + ")")
+	check(jug.global_basis.y.normalized().dot(Vector3.UP) > 0.98, label + ": pitcher stays upright during carry")
+
+
 ## Cover every authored branch, not just the one dialogue path the player
 ## selects during the integration playthrough.
 func _check_i01_voice_catalog() -> void:
@@ -302,6 +322,7 @@ func _test_hud_and_props() -> void:
 	await _interact()
 	check(_childhood().screenplay.i01_water == "empty_jug" and props.jug_in_hand() and not props.full_jug_carried(), "Real pickup gives the empty jug")
 	await frames(40)
+	_check_jug_grip(props.jug_node(), "Empty family pitcher")
 	await capture("empty-jug")
 	_place(I01.POINTS.well + Vector2(1.5, 0.3))
 	await _interact()
@@ -321,6 +342,7 @@ func _test_hud_and_props() -> void:
 	check(is_instance_valid(carried_jug) and props.jug_node() == carried_jug
 		and carried_jug.get_parent() == props and props.full_jug_carried(),
 		"The filled jug survives a second model replacement and remains in two-hand carry")
+	_check_jug_grip(carried_jug, "Full family pitcher after model replacement")
 	_place(I01.POINTS.player_table)
 	await _interact()
 	check(_childhood().screenplay.i01_water == "poured" and game.screen == "opening" and game.opening_sequence.id == I01Film.VID_B, "Return with water directly opens the continuation film")
@@ -493,7 +515,8 @@ func _test_marcus_and_vid_c() -> void:
 	var props = game.world.i01_props
 	var jug: Node3D = props.jug_node()
 	await frames(40)
-	check(_prop_at_hand(jug, "Hand_L", props.JUG_HAND), "The jug is carried in the boy's hand")
+	_check_jug_grip(jug, "Later delivery to Silvanus")
+	await capture("father-delivery-jug")
 	var father: Vector2 = Life.actor_position(game.model.data, "silvanus")
 	_place(father + Vector2(0.6, 0.6))
 	check(game._command("village_childhood_action", {"action_id":"father_morning"}).ok, "Jug handed to Silvanus")

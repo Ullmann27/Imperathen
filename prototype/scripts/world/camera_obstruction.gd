@@ -26,7 +26,7 @@ func reset() -> void:
 
 
 func place(space: PhysicsDirectSpaceState3D, anchor: Vector3, wanted: Vector3,
-		previous: Vector3, smoothing: float, excluded: Array[RID] = []) -> Vector3:
+		previous: Vector3, smoothing: float, excluded: Array[RID] = [], minimum_planar_distance: float = 0.0) -> Vector3:
 	_query.exclude = excluded
 	if not anchor.is_finite() or not wanted.is_finite() or not is_finite(smoothing):
 		return _verified_history(space,previous)
@@ -43,8 +43,40 @@ func place(space: PhysicsDirectSpaceState3D, anchor: Vector3, wanted: Vector3,
 	var safe := _sweep(space,sweep_anchor,wanted)
 	if previous.is_finite():
 		safe = _sweep(space,sweep_anchor,previous.lerp(safe,clampf(smoothing,0.0,1.0)))
+	# A world-clear camera can still be unusably close to the excluded
+	# player. Try bounded shoulder alternatives only for a normal person
+	# camera; every proposed pose must pass the same original volume sweep.
+	if is_finite(minimum_planar_distance) and minimum_planar_distance > 0.0 and _planar_distance(safe,anchor) < minimum_planar_distance:
+		safe = _spaced_shoulder(space,sweep_anchor,anchor,wanted,previous,safe,minimum_planar_distance)
 	_last_clear = safe
 	return safe
+
+
+func _planar_distance(a: Vector3, b: Vector3) -> float:
+	return Vector2(a.x-b.x,a.z-b.z).length()
+
+
+func _spaced_shoulder(space: PhysicsDirectSpaceState3D, sweep_anchor: Vector3,
+		anchor: Vector3, wanted: Vector3, previous: Vector3, fallback: Vector3, minimum: float) -> Vector3:
+	var planar := Vector3(wanted.x-anchor.x,0.0,wanted.z-anchor.z)
+	if planar.length() < minimum:
+		return fallback
+	# Retain a previous viable shoulder while the direct boom is blocked,
+	# but do not retain an arbitrarily distant view after player movement.
+	if previous.is_finite() and _planar_distance(previous,anchor) >= minimum and previous.distance_to(anchor) <= wanted.distance_to(anchor)+0.25:
+		var retained := _sweep(space,sweep_anchor,previous)
+		if retained.distance_to(previous) <= 0.01 and _planar_distance(retained,anchor) >= minimum:
+			return retained
+	var distance := minf(planar.length(),minimum+0.65)
+	var rise := clampf(wanted.y-anchor.y,0.15,0.85)
+	for angle: float in [45.0,-45.0,75.0,-75.0,105.0,-105.0]:
+		var alternate := anchor+planar.normalized().rotated(Vector3.UP,deg_to_rad(angle))*distance+Vector3.UP*rise
+		var candidate := _sweep(space,sweep_anchor,alternate)
+		if _planar_distance(candidate,anchor) >= minimum:
+			return candidate
+	# A truly cramped room may have no spaced pose. Preserve the verified
+	# collision-free fallback; never force the camera through a wall.
+	return fallback
 
 
 func _verified_history(space: PhysicsDirectSpaceState3D, previous: Vector3) -> Vector3:

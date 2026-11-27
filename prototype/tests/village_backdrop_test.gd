@@ -11,6 +11,7 @@ const Hills = preload("res://scripts/world/village/backdrop_hills.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Scenery = preload("res://scripts/world/village/village_scenery.gd")
 const Land = preload("res://scripts/world/village/valdora_land.gd")
+const VegetationField = preload("res://scripts/vegetation/vegetation_field.gd")
 ## Village ground plane (VillageScenery.create_land) and its collider top.
 const PLANE := Rect2(-90, -100, 180, 170)
 const PLANE_Y := -.008
@@ -22,6 +23,9 @@ var world
 var hill_body: StaticBody3D
 var hills: FaceField
 var ground: FaceField
+var vegetation: VegetationField
+var vegetation_ray_hits := 0
+var vegetation_ray_faults: Array[String] = []
 
 
 class FaceField:
@@ -121,7 +125,11 @@ func _run() -> void:
 	print("VILLAGE_BACKDROP mesh triangles=%d collision_faces=%d" % [faces.size() / 3, shape.get_faces().size() / 3])
 	_test_on_terrain()
 	_test_closed_rim(ridge)
+	vegetation = world.get_node_or_null("Landscape/Vegetation") as VegetationField
 	await _test_physics_surface()
+	print("BACKDROP_VEGETATION_RAYS hits=%d faults=%s" % [vegetation_ray_hits, vegetation_ray_faults])
+	_check(vegetation != null and vegetation_ray_hits > 0, "The unchanged world ray actually encounters authored vegetation colliders")
+	_check(vegetation_ray_faults.is_empty(), "Every intercepted vegetation ray matches its physical trunk and planted mesh; no unknown body is excluded")
 	await _test_walk()
 	_test_corridor()
 	_test_brook()
@@ -195,6 +203,80 @@ func _test_closed_rim(ridge: MeshInstance3D) -> void:
 	_check(span.position.x < -200 and span.end.x > 200 and span.position.y < -145 and span.end.y > -72, "The rim runs round the back, both ends and the foot")
 
 
+## A raw world ray may legitimately hit an authored trunk before the terrain.
+## Verify that first hit independently, then measure the actual terrain on
+## the identical segment excluding ONLY the single known vegetation RID.
+## No collision body is removed, no movement query is changed, and all
+## existing terrain tolerances and assertions remain in force.
+func _surface_ray(query: PhysicsRayQueryParameters3D) -> Dictionary:
+	var raw := _space().intersect_ray(query)
+	if raw.is_empty() or vegetation == null or raw.get("collider") != vegetation:
+		return raw
+	vegetation_ray_hits += 1
+	var rid: RID = raw.get("rid", RID())
+	var index := int(raw.get("shape", -1))
+	if not _verified_trunk(rid, index, raw.position):
+		vegetation_ray_faults.append("unverified trunk %d at %s" % [index, raw.position])
+		return raw
+	var surface := PhysicsRayQueryParameters3D.create(query.from, query.to, query.collision_mask, [rid])
+	return _space().intersect_ray(surface)
+
+
+func _verified_trunk(rid: RID, index: int, hit: Vector3) -> bool:
+	if not rid.is_valid() or rid != vegetation._body or vegetation.ecology == null:
+		return false
+	var entries: Array = vegetation.ecology.colliders
+	if index < 0 or index >= entries.size() or PhysicsServer3D.body_get_shape_count(rid) != entries.size():
+		return false
+	if PhysicsServer3D.body_get_collision_layer(rid) != 1:
+		return false
+	var entry: Array = entries[index]
+	var base: Vector3 = entry[0]
+	var radius := snappedf(float(entry[1]), .05)
+	var shape := PhysicsServer3D.body_get_shape(rid, index)
+	if PhysicsServer3D.shape_get_type(shape) != PhysicsServer3D.SHAPE_BOX:
+		return false
+	var half: Vector3 = PhysicsServer3D.shape_get_data(shape)
+	var transform := PhysicsServer3D.body_get_shape_transform(rid, index)
+	var body_transform: Transform3D = PhysicsServer3D.body_get_state(rid, PhysicsServer3D.BODY_STATE_TRANSFORM)
+	var centre := base + Vector3.UP * 1.6
+	if not half.is_equal_approx(Vector3(radius * .85, 1.6, radius * .85)) or not (body_transform * transform).origin.is_equal_approx(centre):
+		return false
+	if not AABB(centre - half, half * 2.0).grow(.02).has_point(hit):
+		return false
+	# Match the ecology record to the actual render batch input, not a
+	# collider name alone. An invisible or orphaned trunk still fails.
+	var cell := Vector2i(floori(base.x / VegetationField.CELL), floori(base.z / VegetationField.CELL))
+	var positions: Dictionary = vegetation._cells.get(cell, {}).get("positions", {})
+	for tree: Dictionary in vegetation.ecology.trees:
+		if not tree.collider or tree.legacy or tree.position != base:
+			continue
+		var asset: String = tree.asset
+		var placed: PackedVector3Array = positions.get(asset, PackedVector3Array())
+		var lods: Array = vegetation._assets.get(asset, {}).get("lods", [])
+		if placed.has(base) and not lods.is_empty():
+			return true
+	return false
+
+
+## Retain exact collision provenance for any remaining terrain failure.
+func _ray_fault(kind: String, start: Vector3, finish: Vector3, hit: Dictionary, expected: Vector3) -> void:
+	var collider: Object = hit.get("collider")
+	var actual: Vector3 = hit.get("position", Vector3.INF)
+	print("BACKDROP_RAY_FAULT ", JSON.stringify({
+		"kind": kind, "start": str(start), "end": str(finish),
+		"expected": str(expected), "actual": str(actual),
+		"collider": str((collider as Node).get_path()) if collider is Node else str(collider),
+		"is_hill": collider == hill_body,
+		"shape": int(hit.get("shape", -1)), "face": int(hit.get("face_index", -1)),
+		"normal": str(hit.get("normal", Vector3.ZERO)),
+		"expected_hill": str(hills.height(expected.x, expected.z)) if expected.is_finite() else "none",
+		"expected_ground": str(ground.height(expected.x, expected.z)) if expected.is_finite() else "none",
+		"actual_hill": str(hills.height(actual.x, actual.z)) if actual.is_finite() else "none",
+		"actual_ground": str(ground.height(actual.x, actual.z)) if actual.is_finite() else "none",
+	}))
+
+
 func _test_physics_surface() -> void:
 	var worst := 0.0
 	var probes := 0
@@ -205,11 +287,14 @@ func _test_physics_surface() -> void:
 			if visible <= PLANE_Y + .02:
 				continue
 			var query := PhysicsRayQueryParameters3D.create(Vector3(xi, 80, zi), Vector3(xi, -20, zi), 1)
-			var hit := _space().intersect_ray(query)
+			var hit := _surface_ray(query)
 			probes += 1
 			if hit.is_empty() or hit.collider != hill_body:
 				wrong += 1
+				_ray_fault("down_other", query.from, query.to, hit, Vector3(xi, visible, zi))
 				continue
+			if absf(hit.position.y - visible) > .02:
+				_ray_fault("down_height", query.from, query.to, hit, Vector3(xi, visible, zi))
 			worst = maxf(worst, absf(hit.position.y - visible))
 	print("VILLAGE_BACKDROP downward_rays=%d not_hill=%d max_difference_m=%.6f" % [probes, wrong, worst])
 	_check(probes > 500 and wrong == 0 and worst <= .02, "Downward rays meet the hill collision at the visible surface")
@@ -250,7 +335,7 @@ func _test_physics_surface() -> void:
 ## ground, on the body of that surface; "clear": the line meets neither and
 ## physics agrees; anything else is a "fault". Only hill stops count as blocked.
 func _sight_line(start: Vector3, finish: Vector3) -> String:
-	var hit := _space().intersect_ray(PhysicsRayQueryParameters3D.create(start, finish, 1))
+	var hit := _surface_ray(PhysicsRayQueryParameters3D.create(start, finish, 1))
 	var crossing := -1.0
 	var on_hill := false
 	var shared := false
@@ -265,13 +350,20 @@ func _sight_line(start: Vector3, finish: Vector3) -> String:
 			shared = absf(hill - base) < .001
 			break
 	if crossing < 0.0:
+		if not hit.is_empty():
+			_ray_fault("horizontal_unexpected", start, finish, hit, Vector3.INF)
 		return "clear" if hit.is_empty() else "fault"
 	if hit.is_empty() or start.lerp(finish, crossing).distance_to(hit.position) > (finish - start).length() / 800.0 + .05:
+		_ray_fault("horizontal_surface", start, finish, hit, start.lerp(finish, crossing))
 		return "fault"
 	if shared:
 		return "blocked" if hit.collider == hill_body else "terrain"
 	if on_hill:
+		if hit.collider != hill_body:
+			_ray_fault("horizontal_expected_hill", start, finish, hit, start.lerp(finish, crossing))
 		return "blocked" if hit.collider == hill_body else "fault"
+	if hit.collider == hill_body:
+		_ray_fault("horizontal_expected_terrain", start, finish, hit, start.lerp(finish, crossing))
 	return "terrain" if hit.collider != hill_body else "fault"
 
 
