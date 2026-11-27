@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "source_revision": "2a286cec428940e4c7d09d0c12745e2cac5a30f8",
+  "source_revision": "8807c03666683d564659f6f92dcd49b33a3dee99",
   "capture": "actual Godot menu and production New Life I-01 playthrough",
   "renderer": "gl_compatibility / Linux software",
   "physical_device_pass": false,
@@ -13,6 +13,14 @@
       "marker_found": true,
       "passed": true,
       "log": "import.log"
+    },
+    {
+      "name": "menu_contract",
+      "exit_code": 0,
+      "timeout": false,
+      "marker_found": true,
+      "passed": true,
+      "log": "menu_contract.log"
     },
     {
       "name": "menu",
@@ -34,10 +42,10 @@
   "images": [
     {
       "file": "menu.png",
-      "sha256": "8390daf18d2f0fe8e140e89fdb7975627bfae6e33ea23929eeb84478f620236e",
+      "sha256": "b9b3df173e85fda116e8bc3336b7006ddfb937d4da2a5c18fc9508b06a95b9c5",
       "width": 1280,
       "height": 720,
-      "bytes": 408281
+      "bytes": 410125
     },
     {
       "file": "01-prolog.png",
@@ -91,5 +99,5 @@
   ],
   "missing_or_invalid_images": [],
   "engine_pass": true,
-  "workflow_run_id": "46012575656"
+  "workflow_run_id": "46015164122"
 }
