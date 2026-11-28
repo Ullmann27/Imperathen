@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 275,
+  "version": 276,
   "tasks": [
     {
       "id": "K101",
@@ -1362,15 +1362,15 @@
       "id": "YOUTH-ARMOUR-CONSTRAINED-WEIGHTS",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "8d915d6af14516ab2ff375a8599a313f54497e98",
-      "run_id": null,
+      "run_id": "46115227980",
       "scope": [
         "tools/art/youth_armour_local_weights.py",
         "tools/art/test_youth_armour_local_weights.py",
         ".github/workflows/aeterna-youth-armour-constrained.yml"
       ],
-      "note": "Actual average endpoint binding rejected by original no-regression check. Solve independent two-endpoint normalized named weights (same four joints, coincident seams locked) using source skin affine transforms over all actual clip frames; convex length constraints preserve every incident edge's original allowance and strict target limit with quantization margin, seam constraints preserved. Deterministic bounded active-set optimizer, independent existing offline and original full Godot V1/V2 validation, negative infeasible control, fail closed if no feasible solution. Original staged source hash pinned, no owner GLB publication or threshold relaxation."
+      "note": "Actual average endpoint binding rejected by original no-regression check. Solve independent two-endpoint normalized named weights (same four joints, coincident seams locked) using source skin affine transforms over all actual clip frames; convex length constraints preserve every incident edge's original allowance and strict target limit with quantization margin, seam constraints preserved. Deterministic bounded active-set optimizer, independent existing offline and original full Godot V1/V2 validation, negative infeasible control, fail closed if no feasible solution. Original staged source hash pinned, no owner GLB publication or threshold relaxation. Actual three-file commit d1d08c73f4d8a0e07e7eb3039bf780a9c80d1277; independent constrained/negative/no-change unit cases; source0d9ccf7c test954cd04b. Actual push-only run46115227980 in progress, full strict original Godot A/B and unchanged unrelated hashes retained. No candidate accepted yet."
     }
   ]
 }
