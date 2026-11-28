@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 289,
+  "version": 293,
   "tasks": [
     {
       "id": "K101",
@@ -1389,7 +1389,7 @@
       "id": "NIGHT-CONSOLIDATION-FORGE-NPC",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "done",
       "revision": "1b0b63034bd291451cd7f1a9e6786fc98bd6f992",
       "run_id": "46115416843",
       "scope": [
@@ -1399,13 +1399,13 @@
         "prototype/tests/npc_social_memory_test.gd",
         ".github/workflows/aeterna-night-consolidation.yml"
       ],
-      "note": "On verified same consolidated branch, transfer exact source/test blobs from #206 and #207 only, old source blobs unchanged vs common baseline. Extend existing joint push CI to original I04 lifecycle, NPC memory/behavior/physical conversation/team B, keep all ten previous tests and original pin checks. No full APK/device approval. All source branches remain isolated. Actual atomic head7820c4c6d8f0cb9df550956c041ed08c53a0624e, five-file compare exact four source/test blobs; 17 joint groups including extra NPC world and UI. Previous ten-group run46114746584 success (artifact15251501122). Actual new run46115416843 in progress; wait before next branch advance."
+      "note": "On verified same consolidated branch, transfer exact source/test blobs from #206 and #207 only, old source blobs unchanged vs common baseline. Extend existing joint push CI to original I04 lifecycle, NPC memory/behavior/physical conversation/team B, keep all ten previous tests and original pin checks. No full APK/device approval. All source branches remain isolated. Actual atomic head7820c4c6d8f0cb9df550956c041ed08c53a0624e, five-file compare exact four source/test blobs; 17 joint groups including extra NPC world and UI. Previous ten-group run46114746584 success (artifact15251501122). Actual new run46115416843 in progress; wait before next branch advance. | Verified actual run46115416843 success, 17 joint groups; artifact15252205424. Exact head7820c4c6, all previous groups and 173 forge/106 memory pass; no final device/visual/APK."
     },
     {
       "id": "CITY-RESIDENT-DEPARTURE-PROJECTION",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "done",
       "revision": "7820c4c6d8f0cb9df550956c041ed08c53a0624e",
       "run_id": "46115703248",
       "scope": [
@@ -1413,7 +1413,7 @@
         "prototype/tests/city_resident_departure_test.gd",
         ".github/workflows/aeterna-city-resident-departure.yml"
       ],
-      "note": "M28 actual city NPC movement: CityLife._haul_step explicitly waits 60s before departure, but resident view _target returns destination whenever is_walking=false, causing premature walking/retirement/respawn across walls during loading. Sample authoritative route origin until actual departure; maintain existing speed, bounded pool and six-metre catchup. Use consistent global distances and global physics ray/shape coordinates for translated city roots and observer in another hierarchy. Real CityLife anchor and imported resident fixture covers loading, departure, arrival, translated physical floor, bounded movement, no premature retirement, no mutation. Isolated push-only fix/aeterna-city-resident-departure-20261128; no integration until existing and focused Godot regressions pass. Actual three-file head527b5b4f71c0e4a70e16439c4ee43aa419dd20de; runtime049161c5 testdc73b709, +240/-13. Actual push-only run46115703248 in_progress, four focused Godot groups. No pass or integration claim."
+      "note": "M28 actual city NPC movement: CityLife._haul_step explicitly waits 60s before departure, but resident view _target returns destination whenever is_walking=false, causing premature walking/retirement/respawn across walls during loading. Sample authoritative route origin until actual departure; maintain existing speed, bounded pool and six-metre catchup. Use consistent global distances and global physics ray/shape coordinates for translated city roots and observer in another hierarchy. Real CityLife anchor and imported resident fixture covers loading, departure, arrival, translated physical floor, bounded movement, no premature retirement, no mutation. Isolated push-only fix/aeterna-city-resident-departure-20261128; no integration until existing and focused Godot regressions pass. Actual three-file head527b5b4f71c0e4a70e16439c4ee43aa419dd20de; runtime049161c5 testdc73b709, +240/-13. Actual push-only run46115703248 in_progress, four focused Godot groups. No pass or integration claim. | Verified actual run46115703248 success: 38/38 new departure, city life119, resident activity and ambient27 pass; artifact15250809916. Keep ready for later exact-blob consolidation; no final visual or device claim."
     },
     {
       "id": "CITY-MARKET-STAFF-AUTHORITY",
