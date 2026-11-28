@@ -40,14 +40,18 @@ static func advance(social: Dictionary, people: Dictionary, available: Dictionar
 			social.pairs[key] = {"shared_seconds":0.0,"encounters":0,"last_contact":now-delta,
 				"session_seconds":0.0,"session_counted":false,"last_encounter":-1.0}
 		var pair: Dictionary = social.pairs[key]
-		# A second observation of the same simulation tick grants no time or bond.
-		if now <= float(pair.last_contact)+0.00000001:
+		# A second observation of the same tick grants nothing. With overlapping
+		# intervals only the previously unobserved suffix may earn credit.
+		# A gap never fabricates elapsed conversation time.
+		var elapsed := now-float(pair.last_contact)
+		if elapsed <= 0.00000001:
 			continue
-		if now-float(pair.last_contact) > SESSION_GAP+0.00000001:
+		var credit := minf(delta,elapsed)
+		if elapsed > SESSION_GAP+0.00000001:
 			pair.session_seconds = 0.0
 			pair.session_counted = false
-		pair.shared_seconds = minf(MAX_SHARED_SECONDS,float(pair.shared_seconds)+delta)
-		pair.session_seconds = minf(MAX_SHARED_SECONDS,float(pair.session_seconds)+delta)
+		pair.shared_seconds = minf(MAX_SHARED_SECONDS,float(pair.shared_seconds)+credit)
+		pair.session_seconds = minf(MAX_SHARED_SECONDS,float(pair.session_seconds)+credit)
 		pair.last_contact = now
 		if not pair.session_counted and float(pair.session_seconds)+0.00000001 >= ENCOUNTER_SECONDS and (float(pair.last_encounter) < 0.0 or now-float(pair.last_encounter)+0.00000001 >= ENCOUNTER_COOLDOWN):
 			pair.encounters = mini(MAX_ENCOUNTERS,int(pair.encounters)+1)
@@ -56,7 +60,9 @@ static func advance(social: Dictionary, people: Dictionary, available: Dictionar
 
 
 static func close_conversation(person: Dictionary, other: Dictionary, sight_check: Callable = Callable(), visibility_cache: Variant = null) -> bool:
-	if not person.get("observed",false) or not other.get("observed",false):
+	if typeof(person.get("observed")) != TYPE_BOOL or typeof(other.get("observed")) != TYPE_BOOL or not person.observed or not other.observed:
+		return false
+	if not _observed_point(person.get("position")) or not _observed_point(other.get("position")):
 		return false
 	var here: Array = person.position
 	var there: Array = other.position
@@ -64,6 +70,10 @@ static func close_conversation(person: Dictionary, other: Dictionary, sight_chec
 
 
 static func clear_sight(first: Array, second: Array, sight_check: Callable = Callable(), visibility_cache: Variant = null) -> bool:
+	# Invalid transient observations cannot become a sight result, even when
+	# no physics adapter is present. Never cache or query non-finite endpoints.
+	if not _observed_point(first) or not _observed_point(second):
+		return false
 	# Domain-only fixtures have no physics adapter. Runtime supplies a geometry
 	# query; cache only this decision round, never persist a stale visibility flag.
 	if not sight_check.is_valid():
@@ -122,6 +132,8 @@ static func validate(value: Variant, ids: Array, now: float) -> String:
 			return "Unbelegte soziale Begegnungszahl."
 		if not _number(pair.last_contact,0.0,now+0.001) or not _number(pair.last_encounter,-1.0,float(pair.last_contact)):
 			return "Ungültige soziale Erinnerungszeit."
+		if float(pair.shared_seconds) > float(pair.last_contact)+0.001:
+			return "Soziale Gesprächsdauer überschreitet die letzte beobachtete Kontaktzeit."
 		if (int(pair.encounters) == 0 and float(pair.last_encounter) != -1.0) or (int(pair.encounters) > 0 and float(pair.last_encounter) < 0.0):
 			return "Widersprüchliche soziale Begegnungszeit."
 		if int(pair.encounters) > 0 and float(pair.last_encounter)+0.001 < ENCOUNTER_SECONDS+(int(pair.encounters)-1)*ENCOUNTER_COOLDOWN:
@@ -148,6 +160,15 @@ static func _keys(value: Variant, keys: Array) -> bool:
 		return false
 	for key: Variant in keys:
 		if not value.has(key):
+			return false
+	return true
+
+
+static func _observed_point(value: Variant) -> bool:
+	if typeof(value) != TYPE_ARRAY or value.size() != 3:
+		return false
+	for component: Variant in value:
+		if typeof(component) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(component)):
 			return false
 	return true
 
