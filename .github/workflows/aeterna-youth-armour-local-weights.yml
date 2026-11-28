@@ -1,7 +1,7 @@
-name: Aeterna actual youth armour source mapping and local weights
+name: Aeterna exact Godot youth import weight mapping
 on:
   push:
-    branches: ['fix/aeterna-youth-armour-source-mapping-20261128']
+    branches: ['fix/aeterna-youth-armour-import-weights-20261128']
 permissions:
   contents: read
 jobs:
@@ -50,7 +50,7 @@ jobs:
           set -euo pipefail
           src=prototype/assets/characters/hero_meshy_italia_0.glb
           expected="$(awk '$2 == "prototype/assets/characters/hero_meshy_italia_0.glb" {print $1}' artifacts/youth-cap/V1_ASSET_SHA256.txt)"
-          test -n "$expected"
+          test "$expected" = dcb52efb544fd68be316ef59e6e835fc98f94485cf24d6609bb8a6fac7646605
           mkdir -p "$RUNNER_TEMP/armour-candidate"
           timeout --kill-after=10s 420s /usr/bin/python3 tools/art/youth_armour_local_weights.py build "$src" "$RUNNER_TEMP/armour-candidate/hero_meshy_italia_0.glb" --expected-sha "$expected" 2>&1 | tee artifacts/youth-cap/candidate.log
       - name: Install checksum-verified Godot

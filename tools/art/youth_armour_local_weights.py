@@ -19,6 +19,8 @@ NAMES = ("Shin_L", "Shin_R", "Thigh_L", "Thigh_R")
 REST = np.array([[-.028654, .559037, .128714], [-.026529, .556183, .127301]])
 EXPECTED = np.array([[.1335622221, .1693446189, .2946669757, .4024109244],
                      [.1917143464, .1208819747, .4306401014, .2567330301]])
+EXPECTED_CODES = np.array([[8753, 11098, 19311, 26372],
+                           [12564, 7922, 28222, 16825]], dtype=np.int64)
 REST_LENGTH = .0038287178613
 POSITION_EPS = 2e-6
 WEIGHT_EPS = 2e-6
@@ -36,6 +38,26 @@ def topology(indices, count):
     tri = indices.reshape(-1, 3)
     return np.unique(np.sort(np.concatenate([tri[:, [0, 1]], tri[:, [1, 2]],
                                              tri[:, [2, 0]]]), axis=1), axis=0)
+
+
+def godot_import_weight_codes(weights):
+    """Exact four-influence float32 normalization and UINT16 packing.
+
+    Godot 4.7.2-stable, ed1daf0bf001b61586d9930840f2f1394092c079:
+    modules/gltf/gltf_document.cpp:1661-1682 normalizes in source-slot order.
+    servers/rendering/rendering_server.cpp:839-854 truncates w*65535.
+    Readback at 1649-1662 divides the stored integer by 65535.
+    This is an encoding conversion, not a wider matching tolerance.
+    """
+    raw = np.asarray(weights, dtype=np.float32)
+    if raw.ndim != 2 or raw.shape[1] != 4 or not np.isfinite(raw).all() or np.any(raw < 0):
+        raise ValueError("Invalid source weights")
+    total = np.zeros(len(raw), dtype=np.float32)
+    for slot in range(4):
+        total += raw[:, slot]
+    normalized = np.zeros_like(raw)
+    np.divide(raw, total[:, None], out=normalized, where=total[:, None] > 0)
+    return np.clip(normalized * np.float32(65535), 0, 65535).astype(np.uint16).astype(np.int64)
 
 
 def matching_edges(position, joints, weights, names, edges):
@@ -57,7 +79,13 @@ def matching_edges(position, joints, weights, names, edges):
     columns = np.stack([np.where(joints == j, weights, 0).sum(axis=1) for j in named], axis=1)
     unrelated = np.where(np.isin(joints, named), 0, weights).sum(axis=1)
     errors = [np.abs(columns - row).sum(axis=1) + unrelated for row in EXPECTED]
-    groups = [set(map(int, np.flatnonzero(e <= WEIGHT_EPS))) for e in errors]
+    codes = godot_import_weight_codes(weights)
+    named_codes = np.stack([np.where(joints == j, codes, 0).sum(axis=1) for j in named], axis=1)
+    unrelated_codes = np.where(np.isin(joints, named), 0, codes).sum(axis=1)
+    code_errors = [np.abs(named_codes - row).sum(axis=1) + unrelated_codes for row in EXPECTED_CODES]
+    # Require exact imported code equality and no positive unrelated raw
+    # influence. The named source weights are retained for actual editing.
+    groups = [set(map(int, np.flatnonzero((e == 0) & (unrelated == 0)))) for e in code_errors]
     transforms = [(axes, signs, REST[:, axes] * np.asarray(signs))
                   for axes in permutations(range(3))
                   for signs in product((-1., 1.), repeat=3)]
@@ -88,6 +116,7 @@ def matching_edges(position, joints, weights, names, edges):
     evidence = {"vertices": len(position),
                 "weight_matches": [len(g) for g in groups],
                 "minimum_binding_l1": [float(e.min()) if len(e) else None for e in errors],
+                "minimum_import_code_l1": [int(e.min()) if len(e) else None for e in code_errors],
                 "connected_weight_pairs": connected, "length_matches": length_matches,
                 "minimum_length_error_m": min_length if math.isfinite(min_length) else None,
                 "minimum_axis_position_error_m": min_position if math.isfinite(min_position) else None,
