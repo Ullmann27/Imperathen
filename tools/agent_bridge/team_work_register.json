@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 263,
+  "version": 270,
   "tasks": [
     {
       "id": "K101",
@@ -1200,7 +1200,7 @@
       "id": "TRIBAL-GUARD-POSE",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "603e4354ddfcd1545d26e6d695239f9efe6876f0",
       "run_id": "46108635420",
       "scope": [
@@ -1211,7 +1211,7 @@
         "prototype/assets/germanic_warriors/forest_skirmisher_far.glb",
         ".github/workflows/aeterna-tribal-sole-topology.yml"
       ],
-      "note": "Independent actual game patch on new branch from 603e435. Mirror the canonical company authoring guard pose (block/wall/testudo) using left thigh/shin pivot rotations with lower-leg/hip spatial blending in both CPU and shader; exact source-derived ground lift, not arbitrary probe tuning. Add direct actual rig comparison for guard and existing static gate. Apply same proven conforming transverse midpoint topology refinement to other two original tribal far GLBs, keep 900 triangles/one material/atlas. Reproduce all three binaries, retain every original 40mm and full formation check. No main/Preview/APK until green. GitLab read-only connected, no IMPERATHEN project; do not touch unrelated projects or bypass quotas. Actual commit 89e62f50d75a4a9cdc39efa0311cd9169b832670; six-file diff. Swordsman885->899 triangles/one material, skirmisher880->900, both atlases unchanged; new exact blobs b523f7dd/98c9aba7. Source-derived guard CPU/GPU and direct actual rig check. CI 46108635420 in_progress; no successful Godot/visual/device claim."
+      "note": "Actual isolated head89e62f50d75a4a9cdc39efa0311cd9169b832670. Run46108635420/job140866957392 failed overall: actual static guard 205/205 max20.107mm; contact28/28, muster133/133, full formation60 87/89,180 20/22; walking LOD foot gate remains red. Retain guard and original asset topology, 900 triangle caps, unchanged 40mm limit; no full integration or release. Independent 798-sample moving diagnostics run46113829341:264 failures, max52.317mm. Source-keyframe gait successor reserved separately."
     },
     {
       "id": "YOUTH-ARMOUR-IMPORT-WEIGHTS",
@@ -1301,7 +1301,7 @@
       "id": "I04-CARRY-RIG-LIFECYCLE",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "done",
       "revision": "8a8256a30145918739312588d70c4585768fa568",
       "run_id": "46114403076",
       "scope": [
@@ -1309,13 +1309,13 @@
         "prototype/tests/i04_props_lifecycle_test.gd",
         ".github/workflows/aeterna-i04-props-lifecycle.yml"
       ],
-      "note": "M23 I04 forge carry lifecycle. Existing _ensure_hands returns on missing carrier/body without invalidating old still-live hand sockets, so props can remain attached to the wrong actor; process-only updates can lag actual skeleton. Replace cached disposable attachment nodes with current rig bone transform and skeleton_updated binding, clear/disconnect immediately on carrier loss/LOD change and hide absent props. Preserve original models, offsets, story authority, wood/tablet counts and existing I04 test. Add isolated real WorldModel path and imported VillagePerson rig regression for hand transforms, LOD, carrier swap/loss, no duplicate/phantom and no state mutation. New branch fix/aeterna-i04-props-lifecycle-20261128 only; no main, no new costs, no release. Actual runtime repair draft #206 at 5e37472d69b97a5301897cd93e893cc13779f040, exact 3 files +408/-48. Targeted Godot run46114403076 observed in_progress; existing automatic runs46114403019/46114402993/46114402981 also observed, no manual duplicates. No tests/visual/device pass yet."
+      "note": "Exact isolated draft #206, head 5e37472d69b97a5301897cd93e893cc13779f040. Actual run46114403076/job140884857090 success: 173/173 real production actor/forge lifecycle checks and unchanged I04 slice 271/271; artifact15250984034. Source366aa3b143d1922b4b0e6976ec2f4083f0e61310 test72f1e37757980bf1198dfe3310a61d1007455836. Current rig bone transforms and skeleton_updated binding; immediate cleanup/rebind on carrier/LOD change. No story/authority mutation; public actual production actor, not visual/private youth/device proof. Ready exact-blob consolidation."
     },
     {
       "id": "NPC-MEMORY-OBSERVATION-OVERLAP",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "done",
       "revision": "8a8256a30145918739312588d70c4585768fa568",
       "run_id": "46114516718",
       "scope": [
@@ -1323,15 +1323,15 @@
         "prototype/tests/npc_social_memory_test.gd",
         ".github/workflows/aeterna-npc-memory-overlap.yml"
       ],
-      "note": "M28 living-world data integrity independent of Argon's new preview. Existing Social.advance adds full delta even when observation time intervals overlap, allowing duplicate seconds and premature friendship; malformed position arrays can create invalid perception or errors. Clip credited time to the unobserved suffix using last_contact, retain same fixed-step behavior, strict finite numeric 3D observation positions, validate shared time against last_contact. Add regression for overlap, replay, actual encounter threshold, serialized continuity and malformed observations; preserve all existing tests, schema, reward/quest contracts. New isolated branch fix/aeterna-npc-memory-overlap-20261128 only; no external calls or release. | Actual runtime/test/CI draft #207, head 1f4143e4dfd331e562e27eeeda65b98e65ed8ce0, three files +143/-6. Actual run46114516718 observed in_progress; no pass yet."
+      "note": "Exact isolated draft #207, head1f4143e4dfd331e562e27eeeda65b98e65ed8ce0. Actual run46114516718/job140885228102 success: import, npc_behavior, npc_social_memory 106 checks, npc_physical_conversation and team_b_integration all pass; artifact15250833187. Source92ccc29def33041aa1436070fe3539ee4fd48b53 testf30ec17e719c424ab10a9976bcc850f7a245b9e1. Only unobserved suffix credited, invalid/nonfinite geometry fails closed, persistence chronology validated; same schema/rewards/thresholds. Ready exact-blob consolidation."
     },
     {
       "id": "NIGHT-CONSOLIDATION-I02-WORLD",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "077075ed08e1e90ee4b865d10bb66437f187b4ac",
-      "run_id": null,
+      "run_id": "46114746584",
       "scope": [
         "prototype/scripts/world/game_world.gd",
         "prototype/scripts/world/village/i02_props.gd",
@@ -1341,7 +1341,22 @@
         "prototype/tests/i02_world_props_test.gd",
         ".github/workflows/aeterna-night-consolidation.yml"
       ],
-      "note": "Single isolated accumulation candidate integration/aeterna-night-consolidated-20261128 from exact #200 head (both city corrections, technical focused and real render checks passed, full formation/device gates open). Include exact tested I02 module/test blobs from #204 (96/96 actual original civil youth) and facial module/test from #205 (14/14 actual). Wire I02 world-owned node, authoritative sync and finite moving world-space cinematic anchors in GameWorld; existing camera/other prop logic preserved. Actual GameWorld test both completion paths, root translation, LOD, ownership, no phantom, save/load; combined Godot/city verification before further integration. No CI-only source branches merged, no private assets published, main unchanged, no final APK. No duplicate full-build dispatch."
+      "note": "Single isolated accumulation candidate integration/aeterna-night-consolidated-20261128 from exact #200 head (both city corrections, technical focused and real render checks passed, full formation/device gates open). Include exact tested I02 module/test blobs from #204 (96/96 actual original civil youth) and facial module/test from #205 (14/14 actual). Wire I02 world-owned node, authoritative sync and finite moving world-space cinematic anchors in GameWorld; existing camera/other prop logic preserved. Actual GameWorld test both completion paths, root translation, LOD, ownership, no phantom, save/load; combined Godot/city verification before further integration. No CI-only source branches merged, no private assets published, main unchanged, no final APK. No duplicate full-build dispatch. Actual seven-file atomic head1b0b63034bd291451cd7f1a9e6786fc98bd6f992, CI46114746584 in progress; wait for joint results before advancing branch (no cancellation)."
+    },
+    {
+      "id": "FORMATION-AUTHORED-KEYFRAME-GAIT",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "89e62f50d75a4a9cdc39efa0311cd9169b832670",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/visuals/far_ranks.gd",
+        "prototype/shaders/rank_stride.gdshader",
+        "prototype/tests/formation_stride_contact_test.gd",
+        ".github/workflows/aeterna-formation-authored-gait.yml"
+      ],
+      "note": "Mirror exact source company gait sagittal hinge keyframes (art/soldiers/build.py, 25/18/22 intervals) with shared CPU/GPU key table, retain static guard, source sole topology, existing stride helper and original strict 40mm/full tests. Preflight against 798 actual rig samples reproduces old distances within 3um; predicts 264->54 failures, not engine proof or full fix. New isolated push-only candidate; no arbitrary offsets, no budget/gate relaxation, no main/APK."
     }
   ]
 }
