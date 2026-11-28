@@ -1,7 +1,7 @@
-name: Aeterna isolated armoured youth local weight candidate
+name: Aeterna actual youth armour source mapping and local weights
 on:
   push:
-    branches: ['fix/aeterna-youth-armour-local-weights-20261128']
+    branches: ['fix/aeterna-youth-armour-source-mapping-20261128']
 permissions:
   contents: read
 jobs:

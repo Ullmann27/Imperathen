@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+from itertools import permutations, product
 import json
 import math
 import sys
@@ -37,29 +38,68 @@ def topology(indices, count):
                                              tri[:, [2, 0]]]), axis=1), axis=0)
 
 
-def locate(position, joints, weights, names, edges):
-    """Match measured Godot vertex signatures, never assume importer index order."""
+def matching_edges(position, joints, weights, names, edges):
+    """Match actual source topology and named skin bindings, not import indices.
+
+    The engine may change vertex order, primitive order and coordinate axes.
+    Enumerate only signed orthogonal axis permutations, with no free scale,
+    translation, nearest-neighbor substitution, or tolerance increase.
+    """
     if len(set(names)) != len(names) or not set(NAMES) <= set(names):
         raise ValueError("Missing or ambiguous named skin joints")
+    if position.ndim != 2 or position.shape[1] != 3 or joints.shape != weights.shape or len(joints) != len(position) or joints.shape[1] != 4:
+        raise ValueError("Unexpected four-influence vertex layout")
+    if not np.isfinite(position).all() or not np.isfinite(weights).all() or np.any(weights < 0):
+        raise ValueError("Nonfinite or negative source geometry/weights")
     named = [names.index(name) for name in NAMES]
-    signatures = [dict(zip(named, row)) for row in EXPECTED]
-    pairs = set()
-    for z in (1, -1):
-        wanted = REST * np.array([1., 1., z])
-        groups = []
-        for i in range(2):
-            nearby = np.flatnonzero(np.linalg.norm(position - wanted[i], axis=1) <= POSITION_EPS)
-            groups.append([int(v) for v in nearby
-                           if weight_delta(weight_signature(joints[v], weights[v]), signatures[i]) <= WEIGHT_EPS])
-        for a in groups[0]:
-            for b in groups[1]:
-                if abs(np.linalg.norm(position[a] - position[b]) - REST_LENGTH) <= POSITION_EPS and np.any(
-                        np.all(edges == sorted((a, b)), axis=1)):
-                    pairs.add((a, b))
-    if len(pairs) != 1:
-        raise ValueError(f"Expected one measured connected edge, found {len(pairs)}")
-    return next(iter(pairs)), named
+    # Exactly the original L1 named-binding criterion; unrelated positive
+    # influences contribute to the error and cannot be silently discarded.
+    columns = np.stack([np.where(joints == j, weights, 0).sum(axis=1) for j in named], axis=1)
+    unrelated = np.where(np.isin(joints, named), 0, weights).sum(axis=1)
+    errors = [np.abs(columns - row).sum(axis=1) + unrelated for row in EXPECTED]
+    groups = [set(map(int, np.flatnonzero(e <= WEIGHT_EPS))) for e in errors]
+    transforms = [(axes, signs, REST[:, axes] * np.asarray(signs))
+                  for axes in permutations(range(3))
+                  for signs in product((-1., 1.), repeat=3)]
+    result = {}
+    connected = 0
+    length_matches = 0
+    min_position = math.inf
+    min_length = math.inf
+    for i, j in edges:
+        i, j = int(i), int(j)
+        for a, b in ((i, j), (j, i)):
+            if a not in groups[0] or b not in groups[1]:
+                continue
+            connected += 1
+            error = abs(float(np.linalg.norm(position[a] - position[b])) - REST_LENGTH)
+            min_length = min(min_length, error)
+            if error > POSITION_EPS:
+                continue
+            length_matches += 1
+            points = position[[a, b]]
+            for axes, signs, wanted in transforms:
+                error = float(np.linalg.norm(points - wanted, axis=1).max())
+                min_position = min(min_position, error)
+                if error <= POSITION_EPS:
+                    result.setdefault((a, b), []).append({
+                        "axes": list(axes), "signs": list(signs),
+                        "position_error_m": error})
+    evidence = {"vertices": len(position),
+                "weight_matches": [len(g) for g in groups],
+                "minimum_binding_l1": [float(e.min()) if len(e) else None for e in errors],
+                "connected_weight_pairs": connected, "length_matches": length_matches,
+                "minimum_length_error_m": min_length if math.isfinite(min_length) else None,
+                "minimum_axis_position_error_m": min_position if math.isfinite(min_position) else None,
+                "matched_pairs": len(result)}
+    return result, named, evidence
 
+
+def locate(position, joints, weights, names, edges):
+    matches, named, evidence = matching_edges(position, joints, weights, names, edges)
+    if len(matches) != 1:
+        raise ValueError(f"Expected one measured connected edge, found {len(matches)}: {json.dumps(evidence, allow_nan=False)}")
+    return next(iter(matches)), named
 
 def candidate_weights(position, joints, weights, pair, named):
     """Only average the two measured bindings; preserve coincident split seams."""
@@ -147,17 +187,30 @@ def build(source, destination, expected_sha):
         raise ValueError("Expected one MeshyYouthBody")
     node = nodes[0]
     mesh_id = rig.nodes[node]["mesh"]
-    primitive = glb.document["meshes"][mesh_id]["primitives"][0]
-    prim = next(p for p in rig.primitives if p["node"] == node)
-    attrs = primitive["attributes"]
-    if primitive.get("mode", 4) != 4 or "indices" not in primitive or "WEIGHTS_1" in attrs:
-        raise ValueError("Unexpected body topology/influences")
-    accessor = glb.document["accessors"][attrs["WEIGHTS_0"]]
-    if accessor["componentType"] != 5126 or accessor.get("normalized") or accessor.get("sparse"):
-        raise ValueError("Expected unquantized float skin weights")
-    names = [rig.nodes[j].get("name") for j in prim["joints"]]
-    edges = topology(glb.accessor(primitive["indices"]).astype(int).reshape(-1), len(prim["position"]))
-    pair, named = locate(prim["position"], prim["joint_index"], prim["weight"], names, edges)
+    primitives = glb.document["meshes"][mesh_id]["primitives"]
+    body_primitives = [p for p in rig.primitives if p["node"] == node]
+    if len(primitives) != len(body_primitives):
+        raise ValueError("Source body primitive mapping differs")
+    matches = []
+    evidence = []
+    for primitive_index, (primitive, prim) in enumerate(zip(primitives, body_primitives)):
+        attrs = primitive["attributes"]
+        if primitive.get("mode", 4) != 4 or "indices" not in primitive or "WEIGHTS_1" in attrs:
+            raise ValueError("Unexpected body topology/influences")
+        accessor = glb.document["accessors"][attrs["WEIGHTS_0"]]
+        if accessor["componentType"] != 5126 or accessor.get("normalized") or accessor.get("sparse"):
+            raise ValueError("Expected unquantized float skin weights")
+        names = [rig.nodes[j].get("name") for j in prim["joints"]]
+        edges = topology(glb.accessor(primitive["indices"]).astype(int).reshape(-1), len(prim["position"]))
+        found, named, report = matching_edges(prim["position"], prim["joint_index"], prim["weight"], names, edges)
+        evidence.append({"primitive": primitive_index, **report})
+        for pair, transforms in found.items():
+            matches.append((primitive_index, prim, edges, pair, named, transforms))
+    print("YOUTH_ARMOUR_SOURCE_MAP " + json.dumps({"source_sha256": expected_sha, "primitives": evidence,
+          "matching_edges": len(matches)}, allow_nan=False), flush=True)
+    if len(matches) != 1:
+        raise ValueError(f"Expected one measured connected edge across original body primitives, found {len(matches)}")
+    primitive_index, prim, edges, pair, named, transforms = matches[0]
     revised, changed, seams = candidate_weights(prim["position"], prim["joint_index"], prim["weight"], pair, named)
     for other in rig.primitives:
         if other is prim:
@@ -169,7 +222,7 @@ def build(source, destination, expected_sha):
     writer = Writer(source.read_bytes())
     original_bytes = bytes(writer.b)
     new_weights = writer.append(revised.astype(np.float32), "VEC4", 5126, target=34962)
-    writer.d["meshes"][mesh_id]["primitives"][0]["attributes"]["WEIGHTS_0"] = new_weights
+    writer.d["meshes"][mesh_id]["primitives"][primitive_index]["attributes"]["WEIGHTS_0"] = new_weights
     if bytes(writer.b[:len(original_bytes)]) != original_bytes:
         raise AssertionError("Original asset binary changed")
     destination.write_bytes(writer.encode())
@@ -182,7 +235,8 @@ def build(source, destination, expected_sha):
     if not np.array_equal(expected[untouched], prim["weight"][untouched]):
         raise AssertionError("Unrelated weights changed")
     return {"source_sha256": expected_sha, "candidate_sha256": sha(destination),
-            "source_indices": list(pair), "changed_rows": changed, "split_seams": seams,
+            "source_primitive": primitive_index, "source_indices": list(pair), "source_axes": transforms,
+            "changed_rows": changed, "split_seams": seams,
             "offline": measured, "status": "GODOT_REVIEW_REQUIRED"}
 
 

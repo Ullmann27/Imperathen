@@ -25,6 +25,38 @@ class LocalWeightTests(unittest.TestCase):
             np.testing.assert_allclose([dict(zip(self.joints[v], revised[v]))[j] for j in named],
                                        EXPECTED.mean(axis=0) / EXPECTED.mean(axis=0).sum())
 
+    def test_signed_axis_permutation_preserves_unique_binding_identity(self):
+        for axes, signs in [((0, 1, 2), (-1, 1, -1)),
+                            ((2, 1, 0), (1, -1, 1)),
+                            ((1, 2, 0), (-1, -1, 1))]:
+            transformed = self.pos[:, axes] * np.array(signs)
+            pair, named = locate(transformed, self.joints, self.weights, self.names, self.edges)
+            self.assertEqual(pair, (0, 1))
+            self.assertEqual(named, [2, 4, 1, 3])
+
+    def test_translation_is_not_guessed(self):
+        with self.assertRaises(ValueError):
+            locate(self.pos + np.array([.01, 0, 0]), self.joints, self.weights, self.names, self.edges)
+
+    def test_scaled_edge_is_not_guessed(self):
+        with self.assertRaises(ValueError):
+            locate(self.pos * 1.01, self.joints, self.weights, self.names, self.edges)
+
+    def test_duplicate_connected_matches_fail_closed(self):
+        pos = np.concatenate([self.pos, self.pos])
+        joints = np.concatenate([self.joints, self.joints])
+        weights = np.concatenate([self.weights, self.weights])
+        edges = topology(np.array([0, 1, 2, 3, 4, 5]), 6)
+        with self.assertRaises(ValueError):
+            locate(pos, joints, weights, self.names, edges)
+
+    def test_weight_tolerance_not_relaxed(self):
+        changed = self.weights.copy()
+        changed[0, 0] += 1e-4
+        changed[0, 1] -= 1e-4
+        with self.assertRaises(ValueError):
+            locate(self.pos, self.joints, changed, self.names, self.edges)
+
     def test_no_topological_edge_rejects(self):
         with self.assertRaises(ValueError):
             locate(self.pos, self.joints, self.weights, self.names, np.array([[0, 2], [1, 2]]))
