@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 254,
+  "version": 255,
   "tasks": [
     {
       "id": "K101",
@@ -1286,7 +1286,7 @@
     {
       "id": "FACIAL-LOD-NEUTRAL-LIFECYCLE",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "review_pending",
       "revision": "8a8256a30145918739312588d70c4585768fa568",
       "run_id": "46114087278",
       "scope": [
@@ -1295,7 +1295,7 @@
         ".github/workflows/aeterna-facial-motion-lifecycle.yml"
       ],
       "access": "edit",
-      "note": "M15: facial_motion.advance currently returns at detail >=2 without neutralising previously uploaded shapes; same-identity rebinding retains values, root MeshInstance3D omitted. Implement one-shot LOD neutralisation, root mesh binding and Godot lifecycle regression (no lip-sync changes), isolated branch fix/aeterna-facial-lod-lifecycle-20261128. No release. | Actual draft #205 head 0bb3ed22ec0e90a3fd430a3d1cfa6d0b24cae715, module ebe187496e37ddd4ba3281bad7ae4c934291e364, test d7d45bbdf33009c068830d9ad121e2db4f38c7e7, workflow 650040b9df1b705cb661677ed6f7f8e1b956c047. Exact diff three paths +169/-5; mergeable. Actual targeted run 46114087278 in progress, existing automatic runs 46114087165/46114087252 observed (no duplicate dispatch). Test is engine ArrayMesh values, not original character/visual proof. No integration/device pass."
+      "note": "M15: facial_motion.advance currently returns at detail >=2 without neutralising previously uploaded shapes; same-identity rebinding retains values, root MeshInstance3D omitted. Implement one-shot LOD neutralisation, root mesh binding and Godot lifecycle regression (no lip-sync changes), isolated branch fix/aeterna-facial-lod-lifecycle-20261128. No release. | Actual draft #205 head 0bb3ed22ec0e90a3fd430a3d1cfa6d0b24cae715, module ebe187496e37ddd4ba3281bad7ae4c934291e364, test d7d45bbdf33009c068830d9ad121e2db4f38c7e7, workflow 650040b9df1b705cb661677ed6f7f8e1b956c047. Exact diff three paths +169/-5; mergeable. Actual targeted run 46114087278/job140883863178 success, exact head and source blobs in logs, Godot 4.7.2 FACIAL_LOD_RESULT checks=14 failures=0, FACIAL_LOD_PASS, artifact15250284819, existing automatic runs 46114087165/46114087252 observed (no duplicate dispatch). Test is engine ArrayMesh values, not original character/visual proof. No integration/device pass."
     },
     {
       "id": "I04-CARRY-RIG-LIFECYCLE",
