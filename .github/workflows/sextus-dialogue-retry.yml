@@ -1,0 +1,60 @@
+name: IMPERATHEN targeted exact Sextus dialogue recovery
+on:
+  push:
+    branches: ['fix/astra-sol-sextus-exact-voice-20261128']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  synthesize:
+    name: German voice candidate (${{ matrix.speaker }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        speaker: [sextus]
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: german-runtime-recovery-inventory
+          path: artifacts/voice-inventory
+          run-id: 46147196180
+          github-token: ${{ github.token }}
+      - name: Install open-source CPU speech and alignment tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng libsndfile1 sox
+          python3 -m venv "$RUNNER_TEMP/audio-venv"
+          "$RUNNER_TEMP/audio-venv/bin/python" -m pip install --upgrade pip
+          "$RUNNER_TEMP/audio-venv/bin/python" -m pip install torch==2.8.0 torchaudio==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+          printf 'torch==2.8.0\ntorchaudio==2.8.0\ntransformers==4.57.3\n' > "$RUNNER_TEMP/audio-constraints.txt"
+          "$RUNNER_TEMP/audio-venv/bin/python" -m pip install -c "$RUNNER_TEMP/audio-constraints.txt" qwen-tts==0.1.1 praat-parselmouth==0.4.7 pyloudnorm==0.2.0 soundfile librosa scipy
+          "$RUNNER_TEMP/audio-venv/bin/python" -m pip check
+          "$RUNNER_TEMP/audio-venv/bin/python" -c 'import torch, torchaudio; from qwen_tts import Qwen3TTSModel; assert torch.version.cuda is None; assert "+cpu" in torchaudio.__version__; print(torch.__version__, torchaudio.__version__)'
+      - name: Verify exact phrase segmentation and source audio preservation
+        run: '"$RUNNER_TEMP/audio-venv/bin/python" tools/audio/test_segmented_voice.py'
+      - name: Synthesize exact missing German mission lines (candidate only)
+        shell: bash
+        env:
+          SPEAKER: ${{ matrix.speaker }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/german-voices
+          "$RUNNER_TEMP/audio-venv/bin/python" tools/audio/produce_dialogue_candidates.py --speaker "$SPEAKER" --authored artifacts/voice-inventory/missing.json --work "$RUNNER_TEMP/german-$SPEAKER" --out "artifacts/german-voices/$SPEAKER" --attempts 12 --seed-offset 32 --segmented --line-id I04_A_REACT_MESSAGE 2>&1 | tee "artifacts/german-voices/$SPEAKER.log"
+      - name: Preserve validated audio and exact rejection report (no release)
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: german-dialogue-segmented-${{ matrix.speaker }}-${{ github.run_id }}
+          path: artifacts/german-voices/
+          retention-days: 30
+          if-no-files-found: warn

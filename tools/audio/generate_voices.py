@@ -108,6 +108,43 @@ def trim_and_master(wave, sr):
     return wave.astype(np.float32), meter.integrated_loudness(wave)
 
 
+def split_exact_phrases(text):
+    """Split only at existing punctuation. Every authored word is retained."""
+    parts = [part.strip() for part in re.split(r"(?<=[.!?;])\s+", text) if part.strip()]
+    if not parts or norm_words(" ".join(parts)) != norm_words(text):
+        raise ValueError("Invalid exact speech segmentation")
+    return parts
+
+
+def join_generated_phrases(waves, sr):
+    """Preserve same-speaker audio, trim only quiet outer padding, smooth joins."""
+    if sr <= 0 or not waves:
+        raise ValueError("No generated speech")
+    result = []
+    for index, raw in enumerate(waves):
+        wave = np.asarray(raw, dtype=np.float64).reshape(-1)
+        if not wave.size or not np.isfinite(wave).all():
+            raise ValueError("Invalid generated speech segment")
+        audible = np.flatnonzero(np.abs(wave) > 10 ** (-50 / 20))
+        if not audible.size:
+            raise ValueError("Silent generated speech segment")
+        # Same -50 dBFS criterion as the existing mastering pass. Leave
+        # 60 ms before/after audible samples; fade only the retained padding.
+        lo = max(0, int(audible[0]) - round(.06 * sr))
+        hi = min(wave.size, int(audible[-1]) + 1 + round(.06 * sr))
+        wave = wave[lo:hi].copy()
+        fade_in = min(round(.008 * sr), int(audible[0])-lo)
+        fade_out = min(round(.008 * sr), hi-int(audible[-1])-1)
+        if fade_in > 0:
+            wave[:fade_in] *= np.linspace(0,1,fade_in)
+        if fade_out > 0:
+            wave[-fade_out:] *= np.linspace(1,0,fade_out)
+        if index:
+            result.append(np.zeros(round(.10*sr),dtype=np.float64))
+        result.append(wave)
+    return np.concatenate(result)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--lines", required=True)
@@ -119,9 +156,13 @@ def main():
     ap.add_argument("--attempts", type=int, default=ATTEMPTS,
                     help="Maximum distinct deterministic seeds per line (1-32)")
     ap.add_argument("--continue-on-rejected", action="store_true", help="With --strict, skip failed lines and preserve the other accepted candidate recordings")
+    ap.add_argument("--segmented", action="store_true", help="Retry exact multi-sentence text in shorter phrases using the same voice reference; full joined waveform still must pass original ASR")
+    ap.add_argument("--seed-offset", type=int, default=0, help="Offset deterministic attempt range without repeating previously rejected seeds")
     a = ap.parse_args()
     if not 1 <= a.attempts <= 32:
         ap.error("--attempts must be between 1 and 32")
+    if not 0 <= a.seed_offset <= 1000000:
+        ap.error("--seed-offset must be between 0 and 1000000")
     from qwen_tts import Qwen3TTSModel
     from transformers import pipeline
 
@@ -213,17 +254,34 @@ def main():
         best = None
         base_seed = int(hashlib.sha256(line["line_id"].encode()).hexdigest()[:6], 16)
         for attempt in range(a.attempts):
-            seed = base_seed + attempt
+            seed = base_seed + a.seed_offset + attempt
             # Preserve the first 16 deterministic attempts for the existing
             # repair; later attempts vary phrasing boundaries, not words.
-            variant = variants[0] if attempt < 16 else variants[(attempt - 16) % len(variants)]
-            torch.manual_seed(seed)
+            absolute_attempt = a.seed_offset + attempt
+            variant = variants[0] if absolute_attempt < 16 else variants[(absolute_attempt - 16) % len(variants)]
             t0 = time.time()
-            w, sr = base.generate_voice_clone(text=variant, language="German", voice_clone_prompt=prompts[sid], max_new_tokens=token_budget(text))
+            if a.segmented:
+                parts = split_exact_phrases(variant)
+                waves = []
+                sr = None
+                for index, part in enumerate(parts):
+                    torch.manual_seed(seed + index * 1000003)
+                    w, rate = base.generate_voice_clone(text=part, language="German", voice_clone_prompt=prompts[sid], max_new_tokens=token_budget(part))
+                    if sr is not None and sr != rate:
+                        raise ValueError("Inconsistent sample rates across speech segments")
+                    sr = rate
+                    waves.append(w[0])
+                raw = join_generated_phrases(waves, sr)
+            else:
+                torch.manual_seed(seed)
+                w, sr = base.generate_voice_clone(text=variant, language="German", voice_clone_prompt=prompts[sid], max_new_tokens=token_budget(text))
+                raw = w[0]
             p = work / "raw" / f"{line['line_id']}_{seed}.wav"
-            sf.write(p, w[0], sr)
+            sf.write(p, raw, sr)
             hyp = transcribe(p)
-            err = wer(text, hyp) + (1.0 if too_long(len(w[0]) / sr, text) else 0.0)
+            # Never score separate words independently in place of the real
+            # delivered waveform. Same full-text WER and duration threshold.
+            err = wer(text, hyp) + (1.0 if too_long(len(raw) / sr, text) else 0.0)
             print(f"line {line['line_id']} [{sid}] seed={seed} wer={err:.2f} gen={time.time()-t0:.0f}s :: {hyp}", flush=True)
             if best is None or err < best[0]:
                 best = (err, seed, p, sr, hyp, variant)
@@ -250,6 +308,9 @@ def main():
             "kind": line.get("kind", "story"), "spoken_text": variant, "model": BASE[0] + "@" + BASE[1][:12], "voice_design_model": DESIGN[0] + "@" + DESIGN[1][:12],
             "reference_seed": refs_meta[sid]["seed"], "reference_audio_sha256": refs_meta[sid]["sha256"],
             "reference_line_id": refs_meta[sid].get("line_id"), "seed": seed, "asr_wer": round(err, 3), "asr_text": hyp.strip(),
+            "generation_mode": "exact_joined_phrases" if a.segmented else "continuous",
+            "generation_phrases": split_exact_phrases(variant) if a.segmented else [variant],
+            "segment_seeds": [seed+i*1000003 for i in range(len(split_exact_phrases(variant)))] if a.segmented else [seed],
             "lufs_integrated": round(lufs, 2), "duration_s": round(len(mastered) / sr, 3), "sample_rate": sr,
             "master_wav_sha256": sha256(master_wav), "file": f"lines/{ogg.name}", "sha256": sha256(ogg),
             "metrics": measure(str(master_wav)), "post": post or None,

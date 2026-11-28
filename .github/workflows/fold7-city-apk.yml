@@ -2,7 +2,7 @@ name: IMPERATHEN Fold7 candidate – real city, genuine APK, image checks
 
 on:
   push:
-    branches: ['integration/fold7-release-candidate-20261125', 'hoplite/*--stand-zero', 'integration/astra-sol-stand-zero-20261128', 'integration/astra-sol-complete-20261128', 'integration/astra-sol-apk-finalization-20261128']
+    branches: ['integration/fold7-release-candidate-20261125', 'hoplite/*--stand-zero', 'integration/astra-sol-stand-zero-20261128', 'integration/astra-sol-complete-20261128', 'integration/astra-sol-apk-finalization-20261128', 'integration/astra-sol-apk-finalization-v2-20261128']
   pull_request:
     paths:
       - 'prototype/**'
@@ -210,6 +210,14 @@ jobs:
           path: artifacts/voice-candidates
           run-id: 46147196180
           github-token: ${{ github.token }}
+      - name: Recover targeted Sextus retry if available
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          pattern: german-dialogue-segmented-sextus-46156428119
+          path: artifacts/voice-targeted
+          run-id: 46156428119
+          github-token: ${{ github.token }}
       - name: Stage accepted German speech before source fingerprint and export
         shell: bash
         run: |
@@ -220,6 +228,23 @@ jobs:
           python3 tools/audio/test_voice_contract.py
           python3 tools/audio/test_reanchor_imported_voice_onsets.py
           python3 tools/audio/stage_verified_dialogue.py --authored artifacts/voice/authored.json --candidates artifacts/voice-candidates --report artifacts/voice/staged.json --missing artifacts/voice/missing.json
+          # Stage the targeted retry against the already validated manifest:
+          # if the general recovery supplied the same line it remains the
+          # authoritative recording. Never replace or silently duplicate it.
+          if [[ -d artifacts/voice-targeted ]] && find artifacts/voice-targeted -name manifest.fragment.json -print -quit | grep -q .; then
+            python3 tools/audio/stage_verified_dialogue.py --authored artifacts/voice/authored.json --candidates artifacts/voice-targeted --report artifacts/voice/staged-targeted.json --missing artifacts/voice/missing.json
+            python3 - <<'PY'
+          import json,pathlib
+          p=pathlib.Path("artifacts/voice/staged.json")
+          a=json.loads(p.read_text())
+          b=json.loads(p.with_name("staged-targeted.json").read_text())
+          rows=a["rows"]+b["rows"]
+          if len({r["line_id"] for r in rows})!=len(rows):
+              raise SystemExit("Duplicate staged recording receipt")
+          a.update(staged=len(rows),remaining_unrecorded=b["remaining_unrecorded"],rows=rows,skipped=a["skipped"]+b["skipped"])
+          p.write_text(json.dumps(a,ensure_ascii=False,indent=2)+"\n")
+          PY
+          fi
           "$GODOT_BIN" --headless --path prototype --import --quit
           "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/dialogue_lipsync_test.gd -- "--measure-staged-onsets=$GITHUB_WORKSPACE/artifacts/voice/staged.json" "--onset-output=$GITHUB_WORKSPACE/artifacts/voice/imported-onsets.json" 2>&1 | tee artifacts/voice/imported-onsets.log
           grep -q IMPORTED_VOICE_ONSETS_PASS artifacts/voice/imported-onsets.log
@@ -303,6 +328,18 @@ jobs:
             grep -q ROMAN_CITY_ROUTES_PASS artifacts/city/routes.log
           }
           export -f city_routes
+          quarter_graph() {
+            timeout --kill-after=10s 420s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/quarter_street_walk_test.gd 2>&1 | tee artifacts/city/quarter-graph.log
+            grep -q QUARTER_STREET_WALK_PASS artifacts/city/quarter-graph.log
+            ! grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/city/quarter-graph.log
+          }
+          export -f quarter_graph
+          quarter_buildings() {
+            timeout --kill-after=10s 420s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/roman_quarter_test.gd 2>&1 | tee artifacts/city/quarter-buildings.log
+            grep -q ROMAN_QUARTER_PASS artifacts/city/quarter-buildings.log
+            ! grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/city/quarter-buildings.log
+          }
+          export -f quarter_buildings
           voice_coverage() {
             python3 tools/audio/audit_german_dialogue.py artifacts/voice/authored.json --report artifacts/voice/coverage.json --strict
           }
@@ -317,7 +354,7 @@ jobs:
             python3 tools/motion_quality_gate.py --evidence artifacts/engine-checks
           }
           export -f motion_quality
-          for name in engine_full real_assets real_walk youth_mocap i02_props city_crowd city_surface portico_walk city_routes voice_coverage voice_lipsync motion_quality; do
+          for name in city_routes quarter_graph quarter_buildings voice_coverage voice_lipsync real_assets real_walk youth_mocap i02_props city_crowd city_surface portico_walk engine_full motion_quality; do
             gate "$name"
           done
           # A successful export still requires every original gate, including

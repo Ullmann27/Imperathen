@@ -32,6 +32,37 @@ func _walk(city: Node3D, start: Vector3, axis: Vector2, count: int) -> Vector3:
 	return city.player.position
 
 
+## Follow a complete round trip using the real controller without a reset,
+## speed override, or teleport between the entrance and the exit.
+func _walk_domus_to(city: Node3D, target_x: float, axis: Vector2) -> Dictionary:
+	var start: Vector3 = city.player.global_position
+	var max_frames := ceili((absf(target_x-start.x)/City.WALK_SPEED+2.0)*Engine.physics_ticks_per_second)
+	city._touch_move = axis
+	var frames := 0
+	var reached := false
+	for i in max_frames:
+		await physics_frame
+		await process_frame
+		frames = i+1
+		var at: Vector3 = city.player.global_position
+		if (axis.x < 0.0 and at.x <= target_x) or (axis.x > 0.0 and at.x >= target_x):
+			reached = true
+			break
+	var position: Vector3 = city.player.global_position
+	if not reached:
+		var hit := KinematicCollision3D.new()
+		var body: CharacterBody3D = city.player
+		if body.test_move(body.global_transform,Vector3(axis.x,0.0,axis.y)*0.08,hit,body.safe_margin,false):
+			var collider := hit.get_collider() as Node
+			print("DOMUS_BLOCKING_CONTACT ",JSON.stringify({
+				"collider":String(collider.name) if is_instance_valid(collider) else "",
+				"point":str(hit.get_position()),"normal":str(hit.get_normal()),
+				"body":str(position),"target_x":target_x}))
+	city._touch_move = Vector2.ZERO
+	await _frames(18)
+	return {"reached":reached,"position":position,"frames":frames,"budget":max_frames}
+
+
 func _run() -> void:
 	var city := City.new()
 	city.persist = false
@@ -78,8 +109,20 @@ func _run() -> void:
 		var inside := await _walk(city, Vector3(30.05, 1.15, door_z), Vector2.RIGHT, 180)
 		_check(inside.x > 33.5 and absf(inside.y - 1.184) < 0.045, "Player climbs the curb and walks through door at %.1f: %s" % [door_z, inside])
 	for door_z: float in [0.8, 4.9]:
-		var inside := await _walk(city, Vector3(25.9, 1.15, door_z), Vector2.LEFT, 155)
-		_check(inside.x < 22.7 and absf(inside.y - 1.184) < 0.075, "Player crosses the opposite sidewalk through the house at %.1f: %s" % [door_z, inside])
+		city.teleport(Vector3(25.9, 1.15, door_z))
+		await _frames(14)
+		# The old 155-frame fixture stopped after 3.13 m, 7 cm short of
+		# its checkpoint even though the graph route already completed.
+		# Demand a substantially deeper interior target and the return
+		# route, with a bounded distance-derived time budget instead.
+		var inward: Dictionary = await _walk_domus_to(city,21.7,Vector2.LEFT)
+		var inside: Vector3 = inward.position
+		_check(bool(inward.reached) and inside.x < 22.7 and absf(inside.y-1.184)<0.075 and absf(inside.z-door_z)<0.15,
+			"Player crosses the opposite sidewalk and enters the room at %.1f: %s" % [door_z,inward])
+		var outward: Dictionary = await _walk_domus_to(city,25.6,Vector2.RIGHT)
+		var outside: Vector3 = outward.position
+		_check(bool(outward.reached) and outside.x>=25.6 and absf(outside.z-door_z)<0.15,
+			"Player leaves the same room and returns to the street at %.1f: %s" % [door_z,outward])
 	var blocked := await _walk(city, Vector3(31.1, 1.2, 0.0), Vector2.RIGHT, 90)
 	_check(blocked.x < 32.5 and blocked.x > 31.7, "Same movement is blocked by the facade between doors")
 	var fountain := await _walk(city, Vector3(25.1, 1.17, -4.3), Vector2.LEFT, 120)
