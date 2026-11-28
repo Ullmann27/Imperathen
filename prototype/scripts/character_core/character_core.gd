@@ -6,6 +6,7 @@ signal rig_bound(skeleton: Skeleton3D)
 signal motion_state_changed(previous: int, current: int)
 signal grounded_changed(grounded: bool)
 signal movement_sampled(world_velocity: Vector3, grounded: bool)
+signal animation_intent_sampled(world_velocity: Vector3, speed: float, yaw_rate: float, grounded: bool)
 signal command_rejected(reason: String)
 
 enum Gait { IDLE, WALK, RUN, SPRINT, TURN, AIRBORNE }
@@ -20,6 +21,7 @@ const Ground = preload("res://scripts/visuals/authored_ground.gd")
 @export var response: float = 8.0
 @export var turn_speed: float = 5.0
 @export var gravity: float = 19.6
+@export_range(0.0,0.4,0.01) var step_height: float = 0.25
 @export var pelvis_name: StringName = &"Pelvis"
 @export var spine_name: StringName = &"Spine"
 @export var head_name: StringName = &"Head"
@@ -173,6 +175,37 @@ func _gait_speed() -> float:
 		Gait.SPRINT: return sprint_speed
 		_: return walk_speed
 
+## Only take a step when all three body-volume sweeps succeed and the
+## landing normal is walkable. This cannot teleport through a tall wall.
+func _try_step_up(horizontal: Vector3) -> bool:
+	if not is_on_floor() or step_height <= 0.0 or horizontal.length_squared()<0.000001:
+		return false
+	var origin: Transform3D = global_transform
+	var obstruction: KinematicCollision3D = KinematicCollision3D.new()
+	if not test_move(origin,horizontal,obstruction,safe_margin,false):
+		return false
+	if obstruction.get_normal().dot(Vector3.UP)>=cos(floor_max_angle):
+		return false
+	var raise_motion: Vector3 = Vector3.UP*step_height
+	if test_move(origin,raise_motion,null,safe_margin,false):
+		return false
+	var raised: Transform3D = origin
+	raised.origin += raise_motion
+	if test_move(raised,horizontal,null,safe_margin,false):
+		return false
+	raised.origin += horizontal
+	var landing: KinematicCollision3D = KinematicCollision3D.new()
+	if not test_move(raised,Vector3.DOWN*(step_height+floor_snap_length),landing,safe_margin,false):
+		return false
+	if landing.get_normal().dot(Vector3.UP)<cos(floor_max_angle):
+		return false
+	var end: Vector3 = raised.origin+landing.get_travel()
+	var rise: float = end.y-origin.origin.y
+	if rise < 0.015 or rise > step_height+0.002:
+		return false
+	global_position = end
+	return true
+
 func _physics_process(delta: float) -> void:
 	if not _valid or not is_finite(delta) or delta<=0.0:
 		return
@@ -195,8 +228,16 @@ func _physics_process(delta: float) -> void:
 	velocity.x = current.x
 	velocity.z = current.z
 	velocity.y = -0.5 if is_on_floor() else velocity.y-gravity*delta
+	var before: Vector3 = global_position
+	var stepped: bool = _try_step_up(current*delta)
+	if stepped:
+		velocity.x = 0.0
+		velocity.z = 0.0
 	move_and_slide()
-	var real: Vector3 = get_real_velocity()
+	if stepped:
+		velocity.x = current.x
+		velocity.z = current.z
+	var real: Vector3 = (global_position-before)/delta
 	_planar_speed = Vector2(real.x,real.z).length()
 	var grounded: bool = is_on_floor()
 	if grounded != _grounded:
@@ -220,3 +261,4 @@ func _physics_process(delta: float) -> void:
 	_graph.advance(delta,_planar_speed,_yaw_rate/maxf(0.01,turn_speed),grounded)
 	_feet.update_pose(delta,grounded,_planar_speed,_yaw_rate)
 	movement_sampled.emit(real,grounded)
+	animation_intent_sampled.emit(real,_planar_speed,_yaw_rate,grounded)

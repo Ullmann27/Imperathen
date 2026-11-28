@@ -106,8 +106,8 @@ func bind(body: CharacterBody3D, skeleton: Skeleton3D, pelvis: int, spine: int, 
 	var facing: Vector3 = (head_rest.inverse()*-body.global_basis.z).normalized()
 	var up: Vector3 = (head_rest.inverse()*Vector3.UP).normalized()
 	_head_look.forward_axis = _axis_for(facing) as SkeletonModifier3D.BoneAxis
-	var primary: int = _axis_for(up)/2
-	if primary == int(_head_look.forward_axis)/2:
+	var primary: int = floori(float(_axis_for(up))*0.5)
+	if primary == floori(float(_head_look.forward_axis)*0.5):
 		primary = (primary+1)%3
 	_head_look.primary_rotation_axis = primary as Vector3.Axis
 	skeleton.modifier_callback_mode_process = Skeleton3D.MODIFIER_CALLBACK_MODE_PROCESS_MANUAL
@@ -207,10 +207,11 @@ func update_pose(delta: float, on_floor: bool, speed: float, yaw_rate: float) ->
 				leg.lock_point = leg.lock_surface.to_global(leg.local_lock)
 				leg.lock_normal = (leg.lock_surface.global_basis*leg.local_normal).normalized()
 			if planted:
-				if not leg.locked or Vector2(point.x-leg.lock_point.x,point.z-leg.lock_point.z).length() > maximum_plant_drift:
+				var collider: Node3D = leg.ray.get_collider() as Node3D
+				if not leg.locked or collider != leg.lock_surface or absf(point.y-leg.lock_point.y)>0.12 or Vector2(point.x-leg.lock_point.x,point.z-leg.lock_point.z).length() > maximum_plant_drift:
 					leg.lock_point = point
 					leg.lock_normal = normal
-					leg.lock_surface = leg.ray.get_collider() as Node3D
+					leg.lock_surface = collider
 					if is_instance_valid(leg.lock_surface):
 						leg.local_lock = leg.lock_surface.to_local(point)
 						leg.local_normal = (leg.lock_surface.global_basis.inverse()*normal).normalized()

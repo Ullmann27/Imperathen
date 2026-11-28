@@ -1,0 +1,81 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/character_core/character_core.gd" id="1_core"]
+[ext_resource type="PackedScene" path="res://assets/characters/frontier_legionary_0.glb" id="2_rig"]
+[ext_resource type="Script" path="res://scripts/character_core/foot_placement.gd" id="3_feet"]
+
+[sub_resource type="CapsuleShape3D" id="Capsule_body"]
+radius = 0.29
+height = 1.78
+
+[node name="ImperathenCharacter" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 1
+floor_snap_length = 0.32
+floor_max_angle = 0.837758
+floor_stop_on_slope = true
+floor_constant_speed = true
+safe_margin = 0.001
+script = ExtResource("1_core")
+walk_speed = 1.45
+run_speed = 3.8
+sprint_speed = 5.4
+acceleration = 5.5
+braking = 8.0
+response = 8.0
+turn_speed = 5.0
+gravity = 19.6
+step_height = 0.25
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.89, 0)
+shape = SubResource("Capsule_body")
+
+[node name="RigRoot" type="Node3D" parent="."]
+
+[node name="OriginalRig" parent="RigRoot" instance=ExtResource("2_rig")]
+
+[node name="AnimationTree" type="AnimationTree" parent="."]
+active = false
+
+[node name="FootPlacement" type="Node3D" parent="."]
+script = ExtResource("3_feet")
+probe_up = 0.32
+probe_down = 0.48
+maximum_pelvis_drop = 0.18
+maximum_plant_drift = 0.24
+swing_threshold = 0.055
+turn_step_height = 0.085
+
+[node name="LeftRay" type="RayCast3D" parent="FootPlacement"]
+target_position = Vector3(0, -0.9, 0)
+collision_mask = 1
+collide_with_areas = false
+collide_with_bodies = true
+
+[node name="RightRay" type="RayCast3D" parent="FootPlacement"]
+target_position = Vector3(0, -0.9, 0)
+collision_mask = 1
+collide_with_areas = false
+collide_with_bodies = true
+
+[node name="LeftTarget" type="Marker3D" parent="FootPlacement"]
+
+[node name="RightTarget" type="Marker3D" parent="FootPlacement"]
+
+[node name="LeftPole" type="Marker3D" parent="FootPlacement"]
+
+[node name="RightPole" type="Marker3D" parent="FootPlacement"]
+
+[node name="HeadTarget" type="Marker3D" parent="FootPlacement"]
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+avoidance_enabled = false
+use_3d_avoidance = false
+radius = 0.29
+height = 1.78
+max_speed = 5.4
+neighbor_distance = 3.0
+max_neighbors = 8
+path_desired_distance = 0.35
+target_desired_distance = 0.45

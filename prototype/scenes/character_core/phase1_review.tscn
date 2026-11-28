@@ -1,0 +1,88 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/character_core/imperathen_character.tscn" id="1_character"]
+[ext_resource type="Script" path="res://scripts/character_core/phase1_review.gd" id="2_review"]
+
+[sub_resource type="StandardMaterial3D" id="GroundMaterial"]
+albedo_color = Color(0.23, 0.28, 0.20, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="FloorMesh"]
+material = SubResource("GroundMaterial")
+size = Vector3(44, 0.2, 44)
+
+[sub_resource type="BoxShape3D" id="FloorShape"]
+size = Vector3(44, 0.2, 44)
+
+[sub_resource type="BoxMesh" id="RampMesh"]
+material = SubResource("GroundMaterial")
+size = Vector3(5, 0.3, 5)
+
+[sub_resource type="BoxShape3D" id="RampShape"]
+size = Vector3(5, 0.3, 5)
+
+[sub_resource type="BoxMesh" id="StepMesh"]
+material = SubResource("GroundMaterial")
+size = Vector3(2.2, 0.18, 2.2)
+
+[sub_resource type="BoxShape3D" id="StepShape"]
+size = Vector3(2.2, 0.18, 2.2)
+
+[node name="Phase1Review" type="Node3D"]
+script = ExtResource("2_review")
+
+[node name="Ground" type="StaticBody3D" parent="."]
+position = Vector3(0, -0.1, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("FloorMesh")
+
+[node name="Shape" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("FloorShape")
+
+[node name="Slope" type="StaticBody3D" parent="."]
+position = Vector3(4, 0.45, -5)
+rotation_degrees = Vector3(12, 0, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="Slope"]
+mesh = SubResource("RampMesh")
+
+[node name="Shape" type="CollisionShape3D" parent="Slope"]
+shape = SubResource("RampShape")
+
+[node name="Step" type="StaticBody3D" parent="."]
+position = Vector3(-3, 0.09, -4)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="Step"]
+mesh = SubResource("StepMesh")
+
+[node name="Shape" type="CollisionShape3D" parent="Step"]
+shape = SubResource("StepShape")
+
+[node name="ImperathenCharacter" parent="." instance=ExtResource("1_character")]
+position = Vector3(0, 0.04, 0)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-48, -32, 0)
+light_energy = 1.15
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(4, 2.7, 5)
+current = true
+fov = 58.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Status" type="Label" parent="CanvasLayer"]
+offset_left = 12.0
+offset_top = 12.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+text = "IMPERATHEN · Phase 1"
