@@ -51,7 +51,9 @@ entsprechend vieler spielbarer Abschnitte.
   Godot-Kompatibilitätsaufnahmen. Das Artefakt belegt keine Fold7-Hardware,
   keine signierte APK und keine vollständige Bewegungsfreigabe.
 - Startmenü, Prolog, Speichern/Fortsetzen, I-01, I-03 und der vorhandene
-  I-04-Fachtest wurden lokal ausgeführt. Das zivile Originalrig für den
+  I-04-Fachtest wurden lokal ausgeführt. Der I-04-Hauptszenentest prüft
+  den Einstieg aus einer Vorgeschichte, Überspringen bis zur Auswahl,
+  Speichern/Fortsetzen und Rückkehr ins Spiel. Das zivile Originalrig für den
   strengen I-02-Korbtest ist nur im dafür vorgesehenen Build verfügbar.
   I-03/I-04 besitzen keine vollständig abgenommene deutsche Sprachfassung.
 - Das Bewegungs-Gate verlangt Messprotokolle und visuelle Abnahmen aus
