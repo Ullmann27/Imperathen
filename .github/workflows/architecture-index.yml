@@ -27,25 +27,5 @@ jobs:
           persist-credentials: false
       - name: Check declaration inventory generator
         run: node tools/architecture/test_index.mjs
-      - name: Verify or bootstrap architecture index
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ -f ARCHITEKTUR_INDEX.md ]]; then
-            node tools/architecture/build_index.mjs --check
-          elif [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF" == refs/heads/setup/architecture-foundation ]]; then
-            node tools/architecture/build_index.mjs
-            node tools/architecture/build_index.mjs --check
-            node --input-type=module - <<'NODE'
-          import { readFileSync } from 'node:fs';
-          import { execFileSync } from 'node:child_process';
-          const bytes=readFileSync('ARCHITEKTUR_INDEX.md');
-          const data=bytes.toString('base64');
-          const chunks=data.match(/.{1,6000}/g)??[];
-          console.log('ARCH_INDEX_META '+JSON.stringify({head:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),blob:execFileSync('git',['hash-object','ARCHITEKTUR_INDEX.md'],{encoding:'utf8'}).trim(),bytes:bytes.length,chunks:chunks.length}));
-          chunks.forEach((value,i)=>console.log('ARCH_INDEX_CHUNK '+i+' '+value));
-          NODE
-          else
-            echo "Missing committed ARCHITEKTUR_INDEX.md" >&2
-            exit 1
-          fi
+      - name: Verify committed architecture index
+        run: node tools/architecture/build_index.mjs --check
