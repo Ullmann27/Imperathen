@@ -1,0 +1,113 @@
+name: German dialogue recovery – existing recordings and missing lines
+on:
+  push:
+    branches: ['fix/astra-sol-voice-recovery-20261128']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inventory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install renderer and verify Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends libgl1-mesa-dri ffmpeg
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+
+      - name: Download exact prior candidate run (no generation)
+        uses: actions/download-artifact@v4
+        with:
+          pattern: german-dialogue-*-46131134266
+          path: artifacts/previous-voices
+          run-id: 46131134266
+          github-token: ${{ github.token }}
+      - name: Export actual runtime dialogue and verify existing recordings
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/voice-inventory
+          "$GODOT_BIN" --headless --path prototype --import --quit
+          "$GODOT_BIN" --headless --path prototype --script res://tests/tools/export_dialogue_lines.gd -- "$GITHUB_WORKSPACE/artifacts/voice-inventory/authored.json"
+          python3 tools/audio/test_voice_contract.py
+          python3 tools/audio/audit_german_dialogue.py artifacts/voice-inventory/authored.json --report artifacts/voice-inventory/coverage-before.json
+          python3 tools/audio/stage_verified_dialogue.py --authored artifacts/voice-inventory/authored.json --candidates artifacts/previous-voices --report artifacts/voice-inventory/staged.json --missing artifacts/voice-inventory/missing.json
+          python3 tools/audio/audit_german_dialogue.py artifacts/voice-inventory/authored.json --report artifacts/voice-inventory/coverage.json
+          "$GODOT_BIN" --headless --path prototype --import --quit
+          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/dialogue_lipsync_test.gd 2>&1 | tee artifacts/voice-inventory/lipsync.log
+          grep -q DIALOGUE_LIPSYNC_PASS artifacts/voice-inventory/lipsync.log
+          ! grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/voice-inventory/lipsync.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: german-runtime-recovery-inventory
+          path: artifacts/voice-inventory/
+          if-no-files-found: error
+  synthesize:
+    needs: inventory
+    name: German voice candidate (${{ matrix.speaker }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        speaker: [silvanus, sextus, decimus, narrator, fabius]
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: german-runtime-recovery-inventory
+          path: artifacts/voice-inventory
+      - name: Install open-source CPU speech and alignment tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng libsndfile1 sox
+          python3 -m venv "$RUNNER_TEMP/audio-venv"
+          "$RUNNER_TEMP/audio-venv/bin/python" -m pip install --upgrade pip
+          "$RUNNER_TEMP/audio-venv/bin/python" -m pip install torch==2.8.0 torchaudio==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+          printf 'torch==2.8.0\ntorchaudio==2.8.0\ntransformers==4.57.3\n' > "$RUNNER_TEMP/audio-constraints.txt"
+          "$RUNNER_TEMP/audio-venv/bin/python" -m pip install -c "$RUNNER_TEMP/audio-constraints.txt" qwen-tts==0.1.1 praat-parselmouth==0.4.7 pyloudnorm==0.2.0 soundfile librosa scipy
+          "$RUNNER_TEMP/audio-venv/bin/python" -m pip check
+          "$RUNNER_TEMP/audio-venv/bin/python" -c 'import torch, torchaudio; from qwen_tts import Qwen3TTSModel; assert torch.version.cuda is None; assert "+cpu" in torchaudio.__version__; print(torch.__version__, torchaudio.__version__)'
+      - name: Synthesize exact missing German mission lines (candidate only)
+        shell: bash
+        env:
+          SPEAKER: ${{ matrix.speaker }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/german-voices
+          "$RUNNER_TEMP/audio-venv/bin/python" tools/audio/produce_dialogue_candidates.py --speaker "$SPEAKER" --authored artifacts/voice-inventory/missing.json --work "$RUNNER_TEMP/german-$SPEAKER" --out "artifacts/german-voices/$SPEAKER" --attempts 24 2>&1 | tee "artifacts/german-voices/$SPEAKER.log"
+      - name: Preserve validated audio and exact rejection report (no release)
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: german-dialogue-recovery-${{ matrix.speaker }}-${{ github.run_id }}
+          path: artifacts/german-voices/
+          retention-days: 30
+          if-no-files-found: warn
