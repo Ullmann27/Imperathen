@@ -1,0 +1,57 @@
+name: AETERNA visual and mounted candidate – combined regression
+on:
+  push:
+    branches: ['integration/aeterna-visual-mounted-20261128']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install checksum-verified Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot" artifacts/visual-mounted-integration
+          git rev-parse HEAD > artifacts/visual-mounted-integration/source.txt
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Combined actual Godot story, camera, environment, light and formation regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --only import i00_stage opening_director i01_flow i03_flow camera_collision village_backdrop village_scenery render_bench_views route_fire village_look valley_muster formation_agents formation_levels --report artifacts/visual-mounted-integration/headless
+          grep -F 'VALLEY_MUSTER_PASS' artifacts/visual-mounted-integration/headless/valley_muster.log
+          grep -F 'I00_STAGE_PASS' artifacts/visual-mounted-integration/headless/i00_stage.log
+          grep -F 'I01_FLOW_PASS' artifacts/visual-mounted-integration/headless/i01_flow.log
+          grep -F 'I03_FLOW_PASS' artifacts/visual-mounted-integration/headless/i03_flow.log
+          grep -F 'CAMERA_COLLISION_PASS' artifacts/visual-mounted-integration/headless/camera_collision.log
+          grep -F 'VILLAGE_BACKDROP_PASS' artifacts/visual-mounted-integration/headless/village_backdrop.log
+          grep -F 'RENDER_BENCH_VIEWS_PASS' artifacts/visual-mounted-integration/headless/render_bench_views.log
+          grep -F 'ROUTE_FIRE_PASS' artifacts/visual-mounted-integration/headless/route_fire.log
+          grep -F 'VILLAGE_LOOK_PASS' artifacts/visual-mounted-integration/headless/village_look.log
+          if grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/visual-mounted-integration/headless/*.log; then exit 1; fi
+      - name: Preserve source-bound test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: aeterna-visual-mounted-integration-${{ github.run_id }}
+          path: artifacts/visual-mounted-integration/
+          if-no-files-found: warn
+          retention-days: 30
