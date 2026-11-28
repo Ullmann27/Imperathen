@@ -27,7 +27,7 @@ static func build_mesh() -> ArrayMesh:
 static func _append_platter(mesh: ArrayMesh) -> void:
 	var tool := SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
-	tool.set_material(_surface_material("oak"))
+	tool.set_material(_surface_material("prima_bread_board"))
 	var center_top := Vector3(PLATTER_CENTER.x, PLATTER_TOP_Y, PLATTER_CENTER.z)
 	var center_bottom := Vector3(PLATTER_CENTER.x, 0.0, PLATTER_CENTER.z)
 	for segment in PLATTER_SEGMENTS:
@@ -57,7 +57,7 @@ static func _append_platter(mesh: ArrayMesh) -> void:
 static func _append_loaf(mesh: ArrayMesh) -> void:
 	var tool := SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
-	tool.set_material(_surface_material("food"))
+	tool.set_material(_surface_material("prima_bread_loaf"))
 	var stride := LOAF_AROUND + 1
 	for ring in range(LOAF_SEGMENTS + 1):
 		var longitudinal := lerpf(-1.0, 1.0, float(ring) / float(LOAF_SEGMENTS))
@@ -85,7 +85,7 @@ static func _append_loaf(mesh: ArrayMesh) -> void:
 static func _append_scores(mesh: ArrayMesh) -> void:
 	var tool := SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
-	tool.set_material(_surface_material("bread_cut"))
+	tool.set_material(_surface_material("prima_bread_cut"))
 	for score in 3:
 		var lane := float(score - 1) * LOAF_HALF_LENGTH * 0.34
 		for segment in SCORE_SEGMENTS:
@@ -143,10 +143,10 @@ static func _platter_point(angle: float, radius: float, y: float) -> Vector3:
 static func _triangle(tool: SurfaceTool, a: Vector3, b: Vector3, c: Vector3) -> void:
 	tool.set_uv(_uv(a))
 	tool.add_vertex(a)
-	tool.set_uv(_uv(b))
-	tool.add_vertex(b)
 	tool.set_uv(_uv(c))
 	tool.add_vertex(c)
+	tool.set_uv(_uv(b))
+	tool.add_vertex(b)
 
 
 static func _uv(point: Vector3) -> Vector2:
@@ -158,10 +158,10 @@ static func _surface_material(slot: String) -> StandardMaterial3D:
 	material.resource_name = "INT_" + slot
 	material.roughness = 0.94
 	match slot:
-		"oak":
-			material.albedo_color = Color(0.70, 0.49, 0.29)
-		"bread_cut":
-			material.albedo_color = Color(0.60, 0.37, 0.22)
+		"prima_bread_board":
+			material.albedo_color = Color(0.45, 0.27, 0.13)
+		"prima_bread_cut":
+			material.albedo_color = Color(0.43, 0.23, 0.12)
 		_:
-			material.albedo_color = Color(0.86, 0.63, 0.37)
+			material.albedo_color = Color(0.78, 0.49, 0.22)
 	return material
