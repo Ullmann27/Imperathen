@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 222,
+  "version": 223,
   "tasks": [
     {
       "id": "K101",
@@ -1080,6 +1080,36 @@
         ".github/workflows/aeterna-formation-wheel-attribution.yml"
       ],
       "note": "Independent correction of proven cross-company test attribution, not runtime fix. Keep target zero refile/rematch requirement, same rank owners, outer-file speed, arrival and all numerical limits. Independently validate every other refile/rematch against adjacent authoritative model snapshots and exact global/per-company accounting; global zero remains required absent valid unrelated events. Existing full formation test remains default; focused wheel-only mode adds no bypass to full CI. No integration before actual focused/full tests and blob comparison. Actual commit e84d7a0e22433db87898eabaa228786d39b51b75 on fix/aeterna-formation-wheel-attribution-20261128. Two-file diff verified. Original targeted zero refile/rematch, same owners, speed, arrival and all motion thresholds preserved; independently tracks consecutive authoritative rule-facing and roster/layout snapshots, consumes each counter event at most once, requires exact global count accounting and no invalid events. Default full suite unchanged except corrected attribution. Focused Godot run 46104212413 observed queued, no pass or integration claim. Existing body sweep CI continues on disjoint branch."
+    },
+    {
+      "id": "N32",
+      "owner": "Nemotron",
+      "access": "read",
+      "status": "reserved",
+      "revision": "2612b01b00951facf8ce77303325903b6189e77a",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/tribal_lod_contract_test.gd",
+        "prototype/scripts/visuals/valley_tribal_soldier.gd",
+        "prototype/scripts/visuals/soldier_visual.gd",
+        "prototype/scripts/visuals/far_ranks.gd",
+        "prototype/scripts/visuals/authored_ground.gd"
+      ],
+      "note": "New measured asset repair task, not repeat N31 diagnostic. Actual static trace 46103635941 failed all 32 cases, idle 83.102mm, block 92.799mm; actual right sole/far mismatch 128.751mm and left proxy/actual 129.014mm. Propose minimally authored family-specific geometry/skin calibration and reproducible export/validation preserving 40mm limit, real sole geometry and budgets. No provider writes, only approved public source; no private GLB. Do not mask failures or change existing gates."
+    },
+    {
+      "id": "N33",
+      "owner": "Nemotron",
+      "access": "read",
+      "status": "reserved",
+      "revision": "bd4af0b2b33cfcb6cb753386915ad4bf40596c0c",
+      "run_id": null,
+      "scope": [
+        "tools/art/youth_cap_binding.py",
+        "prototype/tests/motion_skin_measurement.gd",
+        "prototype/tests/youth_outfit_skin_test.gd"
+      ],
+      "note": "New production-parity youth residual deformation repair. Actual 46101989464 692/692 original checks; armoured LOD0 run 5 and side_kick 9 severe edge samples, worst same MeshyYouthBody surface0 edge 26845/26850, 7.911mm excess in run, 1.351mm in side_kick. Civil LOD0/2 and armour LOD2 zero. Propose isolated local asset-weight correction experiment with exact vertex/weights/source identity and full all-clip guard, no private asset transfer or editor lease; no whole-body smoothing, no gate relaxation."
     }
   ]
 }
