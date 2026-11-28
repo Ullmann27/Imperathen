@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 223,
+  "version": 224,
   "tasks": [
     {
       "id": "K101",
@@ -1085,9 +1085,9 @@
       "id": "N32",
       "owner": "Nemotron",
       "access": "read",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "2612b01b00951facf8ce77303325903b6189e77a",
-      "run_id": null,
+      "run_id": "46104913449",
       "scope": [
         "prototype/tests/tribal_lod_contract_test.gd",
         "prototype/scripts/visuals/valley_tribal_soldier.gd",
@@ -1095,21 +1095,21 @@
         "prototype/scripts/visuals/far_ranks.gd",
         "prototype/scripts/visuals/authored_ground.gd"
       ],
-      "note": "New measured asset repair task, not repeat N31 diagnostic. Actual static trace 46103635941 failed all 32 cases, idle 83.102mm, block 92.799mm; actual right sole/far mismatch 128.751mm and left proxy/actual 129.014mm. Propose minimally authored family-specific geometry/skin calibration and reproducible export/validation preserving 40mm limit, real sole geometry and budgets. No provider writes, only approved public source; no private GLB. Do not mask failures or change existing gates."
+      "note": "New measured asset repair task, not repeat N31 diagnostic. Actual static trace 46103635941 failed all 32 cases, idle 83.102mm, block 92.799mm; actual right sole/far mismatch 128.751mm and left proxy/actual 129.014mm. Propose minimally authored family-specific geometry/skin calibration and reproducible export/validation preserving 40mm limit, real sole geometry and budgets. No provider writes, only approved public source; no private GLB. Do not mask failures or change existing gates. Actual bridge commit c62af999d25a3ed464c8eda92a619cd62c80eb59; run 46104913449 observed in_progress. Exactly two tasks, 12288 tokens each, max parallel 2, existing authorization and unchanged bridge limits. API responses and proposed patches not yet verified."
     },
     {
       "id": "N33",
       "owner": "Nemotron",
       "access": "read",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "bd4af0b2b33cfcb6cb753386915ad4bf40596c0c",
-      "run_id": null,
+      "run_id": "46104913449",
       "scope": [
         "tools/art/youth_cap_binding.py",
         "prototype/tests/motion_skin_measurement.gd",
         "prototype/tests/youth_outfit_skin_test.gd"
       ],
-      "note": "New production-parity youth residual deformation repair. Actual 46101989464 692/692 original checks; armoured LOD0 run 5 and side_kick 9 severe edge samples, worst same MeshyYouthBody surface0 edge 26845/26850, 7.911mm excess in run, 1.351mm in side_kick. Civil LOD0/2 and armour LOD2 zero. Propose isolated local asset-weight correction experiment with exact vertex/weights/source identity and full all-clip guard, no private asset transfer or editor lease; no whole-body smoothing, no gate relaxation."
+      "note": "New production-parity youth residual deformation repair. Actual 46101989464 692/692 original checks; armoured LOD0 run 5 and side_kick 9 severe edge samples, worst same MeshyYouthBody surface0 edge 26845/26850, 7.911mm excess in run, 1.351mm in side_kick. Civil LOD0/2 and armour LOD2 zero. Propose isolated local asset-weight correction experiment with exact vertex/weights/source identity and full all-clip guard, no private asset transfer or editor lease; no whole-body smoothing, no gate relaxation. Actual bridge commit c62af999d25a3ed464c8eda92a619cd62c80eb59; run 46104913449 observed in_progress. Exactly two tasks, 12288 tokens each, max parallel 2, existing authorization and unchanged bridge limits. API responses and proposed patches not yet verified."
     }
   ]
 }
