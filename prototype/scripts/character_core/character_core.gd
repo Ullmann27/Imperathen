@@ -280,18 +280,26 @@ func _try_step_up(horizontal: Vector3) -> bool:
 	_step_direction = horizontal.normalized()
 	return true
 
+# Signals and native animation/skeleton evaluation can invoke listeners
+# synchronously. A listener may remove a dependency during this very tick.
+# Recheck at those boundaries instead of waiting for the next physics frame.
+func _require_live_runtime() -> bool:
+	if not _valid or is_queued_for_deletion():
+		return false
+	if is_character_ready():
+		return true
+	_valid = false
+	set_physics_process(false)
+	if is_instance_valid(_tree):
+		_tree.active = false
+	if is_instance_valid(_feet):
+		_feet._disable_bound_runtime()
+	command_rejected.emit("CharacterCore dependency removed")
+	push_warning("CharacterCore: dependency removed during movement")
+	return false
+
 func _physics_process(delta: float) -> void:
-	if not _valid or not is_finite(delta) or delta<=0.0:
-		return
-	if not is_character_ready():
-		_valid = false
-		set_physics_process(false)
-		if is_instance_valid(_tree):
-			_tree.active = false
-		if is_instance_valid(_feet):
-			_feet._disable_bound_runtime()
-		command_rejected.emit("CharacterCore dependency removed")
-		push_warning("CharacterCore: dependency removed during movement")
+	if not is_finite(delta) or delta<=0.0 or not _require_live_runtime():
 		return
 	var direction: Vector3 = _direction if _motion_allowed else Vector3.ZERO
 	var amount: float = _amount if _motion_allowed else 0.0
@@ -326,6 +334,8 @@ func _physics_process(delta: float) -> void:
 	if grounded != _grounded:
 		_grounded = grounded
 		grounded_changed.emit(grounded)
+		if not _require_live_runtime():
+			return
 	var next: int = Gait.IDLE
 	if not grounded:
 		next = Gait.AIRBORNE
@@ -341,7 +351,15 @@ func _physics_process(delta: float) -> void:
 		var previous: int = _state
 		_state = next
 		motion_state_changed.emit(previous,next)
+		if not _require_live_runtime():
+			return
 	_graph.advance(delta,_planar_speed,_yaw_rate/maxf(0.01,turn_speed),grounded)
+	if not _require_live_runtime():
+		return
 	_feet.update_pose(delta,grounded,_planar_speed,_yaw_rate)
+	if not _require_live_runtime():
+		return
 	movement_sampled.emit(real,grounded)
+	if not _require_live_runtime():
+		return
 	animation_intent_sampled.emit(real,_planar_speed,_yaw_rate,grounded)
