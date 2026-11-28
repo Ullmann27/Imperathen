@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 226,
+  "version": 227,
   "tasks": [
     {
       "id": "K101",
@@ -1115,15 +1115,29 @@
       "id": "YOUTH-ARMOUR-LOCAL-WEIGHTS",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
-      "revision": "bd4af0b2b33cfcb6cb753386915ad4bf40596c0c",
-      "run_id": null,
+      "status": "submitted",
+      "revision": "458bb1d666d4f440d2459a78c76bed629d128c18",
+      "run_id": "46105418620",
       "scope": [
         "tools/art/youth_armour_local_weights.py",
         "tools/art/test_youth_armour_local_weights.py",
         ".github/workflows/aeterna-youth-armour-local-weights.yml"
       ],
-      "note": "Independent implementation following reviewed N33; isolated new tools/workflow only, do not edit active youth parity test/workflow or original source assets. Pin production retarget revision, verify named weights/rest position/real edge topology, exact source hash, reject ambiguous split seams; only local four-weight candidate. Existing full Godot youth regression unchanged, compare actual A/B per-clip counts and sole positions. No private binary artifact or acceptance claim."
+      "note": "Independent implementation following reviewed N33; isolated new tools/workflow only, do not edit active youth parity test/workflow or original source assets. Pin production retarget revision, verify named weights/rest position/real edge topology, exact source hash, reject ambiguous split seams; only local four-weight candidate. Existing full Godot youth regression unchanged, compare actual A/B per-clip counts and sole positions. No private binary artifact or acceptance claim. Actual commit 458bb1d666d4f440d2459a78c76bed629d128c18, exactly 3 new files, no edits to prior tests or assets; named rest geometry and real edge matching, normalized local average, coincident seam and cross-primitive rejection, actual local 60Hz no-new/no-worse edge guard, original full 692-check engine A/B and zero residual requirement. Actual run 46105418620 in_progress; no successful source match or candidate generation yet."
+    },
+    {
+      "id": "N34",
+      "owner": "Nemotron",
+      "access": "read",
+      "status": "reserved",
+      "revision": "65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/formation/formation_agents.gd",
+        "prototype/tests/formation_contact_trace_test.gd",
+        "prototype/scripts/formation/formation_levels.gd"
+      ],
+      "note": "New review of post-fix swept body broadphase performance/progress, not re-diagnosing N21/N24/N30. Actual run 46104088321: 28/28 focused, original root/phase gates all green, static LOD/wheel separate. Check bounded candidate enumeration, deterministic update ordering, possible mutual blocking/starvation and dense formations. Propose independent new negative-control tests/measurements without modifying validated limits or active branches. Existing CI cost limits, no paid requests."
     }
   ]
 }
