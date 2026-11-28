@@ -16,7 +16,18 @@ run() {
   home=$(mktemp -d "$logs/$name.XXXXXX")
   XDG_DATA_HOME="$home/data" XDG_CONFIG_HOME="$home/config" XDG_CACHE_HOME="$home/cache" \
     timeout --kill-after=10s 600s "$godot" "$@" 2>&1 | tee "$home/run.log"
-  if grep -Eq '^(SCRIPT ERROR|ERROR):' "$home/run.log"; then return 1; fi
+  if grep -Eq '^(SCRIPT ERROR|ERROR):|Parse Error:' "$home/run.log"; then return 1; fi
+  local marker=''
+  case "$name" in
+    city_resident_departure) marker=CITY_RESIDENT_DEPARTURE_PASS ;;
+    city_life) marker=CITY_LIFE_PASS ;;
+    resident_activity) marker=RESIDENT_ACTIVITY_PASS ;;
+    city_ambient_people) marker=CITY_AMBIENT_PEOPLE_PASS ;;
+  esac
+  if [[ -n "$marker" ]] && ! grep -Eq "^${marker}([[:space:]]|$)" "$home/run.log"; then
+    echo "Missing success marker $marker in $name" >&2
+    return 1
+  fi
 }
 run import --headless --path prototype --import --quit
 node tools/architecture/test_index.mjs
@@ -26,6 +37,7 @@ tests=(character_core_phase1 character_equipment_phase2 roman_menu opening_story
        i01_well_asset_contract i01_slice i01_flow
        dialogue_lipsync house_interiors fold7_graphics_policy)
 tests+=(genesis_mission_event_batch i04_slice campaign_forge_continuity)
+tests+=(city_resident_departure city_life resident_activity city_ambient_people)
 for path in prototype/tests/operation_prima_*_test.gd; do
   name=${path##*/}; tests+=("${name%_test.gd}")
 done

@@ -33,7 +33,7 @@ func setup(source: Life, player: CharacterBody3D, view: Camera3D, quality: Strin
 func _physics_process(delta: float) -> void:
 	if life == null or not is_instance_valid(observer):
 		return
-	if delta <= 0.0:
+	if not is_finite(delta) or delta <= 0.0:
 		return
 	var now := int(life.state.t)
 	# A graphics downgrade must actually reduce the active pool. Retire at
@@ -52,11 +52,13 @@ func _physics_process(delta: float) -> void:
 			_retire(furthest)
 	for person: int in actors.keys():
 		var actor: CharacterBody3D = actors[person]
-		if life.is_indoors(person, now) or observer.position.distance_squared_to(actor.position) > LEAVE_RANGE * LEAVE_RANGE:
+		if life.is_indoors(person, now) or observer.global_position.distance_squared_to(actor.global_position) > LEAVE_RANGE * LEAVE_RANGE:
 			_retire(person)
 			continue
-		var target := _target(person, now)
-		var way := Vector3(target.x - actor.position.x, 0, target.z - actor.position.z)
+		# CityLife anchors are city-local; physics velocities use world axes.
+		var target := to_global(_target(person, now))
+		var way := target - actor.global_position
+		way.y = 0.0
 		# A long calendar skip changes the projection immediately. Re-stream
 		# the person at the new place instead of crossing intervening walls.
 		if way.length_squared() > 36.0:
@@ -66,10 +68,12 @@ func _physics_process(delta: float) -> void:
 		var step := way.limit_length(speed * delta)
 		actor.velocity = Vector3(step.x / delta, -0.4 if actor.is_on_floor() else actor.velocity.y - 19.6 * delta, step.z / delta)
 		var before := actor.position
+		var before_world := actor.global_position
 		actor.move_and_slide()
 		var movement := Vector2(actor.position.x - before.x, actor.position.z - before.z)
+		var world_movement := actor.global_position - before_world
 		var figure: Figure = actor.get_node("Figure")
-		var actual_speed := movement.length() / delta
+		var actual_speed := Vector2(world_movement.x,world_movement.z).length() / delta
 		figure.drive(actual_speed)
 		actor.set_meta("actual_speed",actual_speed)
 		if movement.length_squared() > 0.000001:
@@ -94,7 +98,7 @@ func _physics_process(delta: float) -> void:
 		if life.age(resident) < 18:
 			continue # The current resident rig has adult proportions.
 		var foot := life.position_of(person, now)
-		var distance := observer.position.distance_squared_to(foot)
+		var distance := observer.global_position.distance_squared_to(to_global(foot))
 		if distance > ENTER_RANGE * ENTER_RANGE:
 			continue
 		var replace := -1
@@ -105,7 +109,7 @@ func _physics_process(delta: float) -> void:
 			# neighbours at nearly equal distances from trading slots.
 			var worst := distance + 36.0
 			for other: int in actors:
-				var d := observer.position.distance_squared_to((actors[other] as Node3D).position)
+				var d := observer.global_position.distance_squared_to((actors[other] as Node3D).global_position)
 				if d > worst:
 					worst = d
 					replace = other
@@ -180,16 +184,21 @@ func _update_visible_activities(now: int, delta: float, refresh_contact: bool) -
 
 
 func _target(person: int, now: int) -> Vector3:
-	if not life.is_walking(person, now):
-		var resident: Dictionary = life.state.residents[person]
+	var resident: Dictionary = life.state.residents[person]
+	if now >= int(resident.arr):
 		return life.slot_position(resident.at, int(resident.slot))
-	# Follow toward the *next* simulation sample at gait speed between whole
-	# clock seconds. Pure graph sampling never changes the simulated resident.
+	# A loaded porter can wait 60 seconds before departure. is_walking()
+	# is false during loading, but the actor is still at the source, not at
+	# the destination slot. Respect that phase and never prematurely re-stream.
+	if now < int(resident.dep):
+		return life.position_of(person, now)
+	# Follow toward the next simulation sample only after actual departure.
 	return life.position_of(person, now + 1)
 
 func _materialize(person: int, resident: Dictionary, point: Vector3) -> bool:
 	var space := get_world_3d().direct_space_state
-	var ray := PhysicsRayQueryParameters3D.create(point + Vector3.UP * 0.65, point + Vector3.DOWN * 0.95, 1)
+	var world_point := to_global(point)
+	var ray := PhysicsRayQueryParameters3D.create(world_point + Vector3.UP * 0.65, world_point + Vector3.DOWN * 0.95, 1)
 	var hit := space.intersect_ray(ray)
 	if hit.is_empty() or (hit.normal as Vector3).y < 0.70:
 		return false
@@ -206,7 +215,7 @@ func _materialize(person: int, resident: Dictionary, point: Vector3) -> bool:
 	actor.collision_layer = 2
 	actor.collision_mask = 3
 	actor.floor_snap_length = 0.24
-	actor.position = foot + Vector3.UP * 0.003
+	actor.position = to_local(foot + Vector3.UP * 0.003)
 	var shape := CollisionShape3D.new()
 	shape.shape = _capsule
 	shape.position.y = _capsule.height / 2.0
