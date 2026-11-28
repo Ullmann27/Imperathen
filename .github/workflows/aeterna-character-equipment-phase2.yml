@@ -1,0 +1,98 @@
+name: IMPERATHEN native equipment phase 2A
+on:
+  push:
+    branches: ['feature/aeterna-character-equipment-phase2-20261128']
+permissions:
+  contents: read
+concurrency:
+  group: aeterna-character-equipment-phase2-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Pin source, original rig and install checksum-verified Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot" artifacts/character-phase1
+          git rev-parse HEAD > artifacts/character-phase1/source.txt
+          git hash-object prototype/assets/characters/frontier_legionary_0.glb | tee artifacts/character-phase1/original-rig.txt
+          test "$(cat artifacts/character-phase1/original-rig.txt)" = a40e2a1e710dfb809fbecb48b77c640dcdfec6e7
+          git ls-tree -r HEAD prototype/scripts/character_core prototype/scenes/character_core prototype/tests/character_core_phase1_test.gd > artifacts/character-phase1/source-blobs.txt
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 --connect-timeout 15 --max-time 120 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 --connect-timeout 15 --max-time 300 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Import and actual native IK and movement regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          export XDG_DATA_HOME="$RUNNER_TEMP/phase1-data"
+          export XDG_CONFIG_HOME="$RUNNER_TEMP/phase1-config"
+          export XDG_CACHE_HOME="$RUNNER_TEMP/phase1-cache"
+          mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME"
+          timeout --kill-after=10s 600s "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee artifacts/character-phase1/import.log
+          status=0
+          timeout --kill-after=10s 420s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/character_core_phase1_test.gd 2>&1 | tee artifacts/character-phase1/test.log || status=$?
+          test "$status" -eq 0
+          grep -Fxq CHARACTER_PHASE1_PASS artifacts/character-phase1/test.log
+          grep -Eq '^CHARACTER_PHASE1_RESULT checks=[1-9][0-9]* failures=0$' artifacts/character-phase1/test.log
+          if grep -Eq 'SCRIPT ERROR:|Parse Error:|^ERROR:|^CHARACTER_PHASE1_FAIL' artifacts/character-phase1/{import,test}.log; then exit 1; fi
+      - name: Verify architecture and actual Phase 2A equipment regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/architecture/test_index.mjs
+          node tools/architecture/build_index.mjs --check
+          export XDG_DATA_HOME="$RUNNER_TEMP/phase1-data"
+          export XDG_CONFIG_HOME="$RUNNER_TEMP/phase1-config"
+          export XDG_CACHE_HOME="$RUNNER_TEMP/phase1-cache"
+          status=0
+          timeout --kill-after=10s 420s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/character_equipment_phase2_test.gd 2>&1 | tee artifacts/character-phase1/equipment.log || status=$?
+          test "$status" -eq 0
+          grep -Fxq CHARACTER_PHASE2_PASS artifacts/character-phase1/equipment.log
+          grep -Eq '^CHARACTER_PHASE2_RESULT checks=[1-9][0-9]* failures=0
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout --kill-after=10s 120s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --quit-after 120 res://scenes/character_core/phase1_review.tscn 2>&1 | tee artifacts/character-phase1/review-scene.log
+          ! grep -Eq 'SCRIPT ERROR:|Parse Error:|^ERROR:' artifacts/character-phase1/review-scene.log
+      - name: Retain actual engine evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-phase2a-${{ github.run_id }}
+          path: artifacts/character-phase1/
+          if-no-files-found: warn
+          retention-days: 14
+ artifacts/character-phase1/equipment.log
+          ! grep -Eq 'SCRIPT ERROR:|Parse Error:|^ERROR:|^CHARACTER_PHASE2_FAIL' artifacts/character-phase1/equipment.log
+      - name: Verify the interactive review scene loads
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout --kill-after=10s 120s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --quit-after 120 res://scenes/character_core/phase1_review.tscn 2>&1 | tee artifacts/character-phase1/review-scene.log
+          ! grep -Eq 'SCRIPT ERROR:|Parse Error:|^ERROR:' artifacts/character-phase1/review-scene.log
+      - name: Retain actual engine evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-phase1-${{ github.run_id }}
+          path: artifacts/character-phase1/
+          if-no-files-found: warn
+          retention-days: 14
