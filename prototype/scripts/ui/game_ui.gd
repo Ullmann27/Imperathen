@@ -1234,6 +1234,12 @@ func clear_notification() -> void:
 
 
 func notify(message: String) -> void:
+	_show_notice(message,0.0)
+
+
+# Only Main's exact recorded mission result supplies a nonzero voice length.
+# The same notification UI and all existing callers remain intact.
+func _show_notice(message: String, voice_seconds: float) -> void:
 	if _toast_panel == null:
 		return
 	if _toast_tween != null and _toast_tween.is_valid():
@@ -1252,10 +1258,15 @@ func notify(message: String) -> void:
 	_toast_panel.show()
 	_toast_panel.modulate.a = 1.0
 	_toast_tween = create_tween()
-	if not _reduce_motion:
+	var narrated: bool = is_finite(voice_seconds) and voice_seconds > 0.0
+	if not _reduce_motion and not narrated:
 		_toast_panel.modulate.a = 0.0
 		_toast_tween.tween_property(_toast_panel, "modulate:a", 1.0, HudStyle.MOTION_BASE)
-	_toast_tween.tween_interval(clampf(2.5 + message.length() * 0.025, 3.0, 7.0))
+	var hold: float = clampf(2.5 + message.length() * 0.025, 3.0, 7.0)
+	if narrated:
+		# At least two display frames beyond the exact stream duration.
+		hold = maxf(hold,voice_seconds+2.0/60.0)
+	_toast_tween.tween_interval(hold)
 	if not _reduce_motion:
 		_toast_tween.tween_property(_toast_panel, "modulate:a", 0.0, 0.3)
 	_toast_tween.tween_callback(_toast_panel.hide)

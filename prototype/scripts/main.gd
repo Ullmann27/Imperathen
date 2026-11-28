@@ -62,6 +62,7 @@ var _live_dialogue_body: Node3D
 var _live_dialogue_paused: bool = false
 var _speech_face_figure: Node3D
 var _speech_forced_detail: bool = false
+var _mission_notice_text: String = ""
 var opening_overlay
 var opening_sequence: Dictionary = {}
 var opening_index := 0
@@ -130,6 +131,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_advance_live_dialogue()
+	_advance_mission_notice()
 	if screen in ["city_exploration", "world_workshop"]:
 		return
 	if screen == "opening":
@@ -387,7 +389,7 @@ func _continue_game() -> void:
 
 
 func _resume() -> void:
-	if not _live_dialogue_screen.is_empty():
+	if not _live_dialogue_screen.is_empty() or not _mission_notice_text.is_empty():
 		_stop_opening_voice()
 	if screen == "opening":
 		_opening_set_paused(false)
@@ -415,7 +417,7 @@ func _resume() -> void:
 
 
 func _pause() -> void:
-	if not _live_dialogue_screen.is_empty():
+	if not _live_dialogue_screen.is_empty() or not _mission_notice_text.is_empty():
 		_stop_opening_voice()
 	if screen == "opening":
 		_opening_set_paused(true)
@@ -448,7 +450,7 @@ func _save(show_feedback: bool = true) -> Dictionary:
 
 
 func _request_menu() -> void:
-	if not _live_dialogue_screen.is_empty():
+	if not _live_dialogue_screen.is_empty() or not _mission_notice_text.is_empty():
 		_stop_opening_voice()
 	if not session_started:
 		_show_menu()
@@ -688,13 +690,16 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 			pending_opening = OpeningStory.adulthood(model.data)
 			_pause()
 	elif result.get("ok",false) and not previous_childhood_step.is_empty() and not _film_committing:
-		var transition := MissionCinematics.sequence_for(model.data,previous_childhood_step,Childhood.current_step(model.data))
+		var following: Dictionary = Childhood.current_step(model.data)
+		var transition := MissionCinematics.sequence_for(model.data,previous_childhood_step,following)
 		if not transition.is_empty():
 			if persisted:
 				_begin_opening(transition)
 			else:
 				pending_opening = transition
 				_pause()
+		elif persisted and screen == "playing":
+			_play_mission_notice(str(result.get("message","")),previous_childhood_step,following)
 	return result
 
 
@@ -893,7 +898,7 @@ func _append_political_choices(dialog: Dictionary, politics: Dictionary) -> void
 
 
 func _show_council_records() -> void:
-	if not _live_dialogue_screen.is_empty():
+	if not _live_dialogue_screen.is_empty() or not _mission_notice_text.is_empty():
 		_stop_opening_voice()
 	var politics: Dictionary = model.politics_view()
 	var recommendation: Dictionary = politics.get("recommendation", {})
@@ -1291,8 +1296,41 @@ func _advance_live_dialogue() -> void:
 	opening_voice.play(phrase, _live_dialogue_speaker)
 
 
+## A successful non-cinematic mission result can already have an exact
+## Chronik recording. Play that confirmed message only after persistence;
+## never replay a stale authored result instead of a branch's actual outcome.
+func _play_mission_notice(message: String, previous: Dictionary, following: Dictionary) -> void:
+	if screen != "playing" or message.is_empty() or previous.is_empty() or previous.get("id","") == following.get("id",""):
+		return
+	if not _mission_notice_text.is_empty():
+		_stop_opening_voice()
+	if opening_voice.is_active():
+		# Do not steal the established film or character conversation channel.
+		return
+	var entry: Dictionary = VoiceLines.find(message,"Chronik")
+	if entry.is_empty() or entry.get("speaker_id") != "narrator":
+		return
+	var stream: AudioStream = VoiceLines.stream_for(entry)
+	if stream == null:
+		return
+	_stop_opening_voice()
+	_mission_notice_text = message
+	# Existing notice is the subtitle, held for the complete original recording.
+	ui._show_notice(message,stream.get_length())
+	opening_voice.set_paused(false)
+	opening_voice.play(message,"Chronik")
+
+
+func _advance_mission_notice() -> void:
+	if _mission_notice_text.is_empty():
+		return
+	if screen != "playing" or not opening_voice.is_active() or not is_instance_valid(ui) or not is_instance_valid(ui._toast_label) or ui._toast_label.text != _mission_notice_text:
+		_stop_opening_voice()
+
+
 func _stop_opening_voice() -> void:
 	opening_voice.stop()
+	_mission_notice_text = ""
 	if is_instance_valid(opening_voice.face):
 		opening_voice.face.set_process(false)
 		opening_voice.face.queue_free()

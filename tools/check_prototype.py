@@ -155,6 +155,7 @@ def main():
             ("combat_sfx", ["--fixed-fps", "60", "--script", "res://tests/combat_sfx_test.gd"], "COMBAT_SFX_PASS"),
             ("opening_voice", ["--fixed-fps", "60", "--script", "res://tests/opening_voice_test.gd"], "OPENING_VOICE_PASS"),
             ("live_npc_voice", ["--fixed-fps", "60", "--script", "res://tests/live_npc_voice_test.gd"], "LIVE_NPC_VOICE_PASS"),
+            ("mission_result_voice", ["--fixed-fps", "60", "--script", "res://tests/mission_result_voice_test.gd"], "MISSION_RESULT_VOICE_PASS"),
             ("dialogue_lipsync", ["--fixed-fps", "60", "--script", "res://tests/dialogue_lipsync_test.gd"], "DIALOGUE_LIPSYNC_PASS"),
             ("i00_stage", ["--script", "res://tests/i00_stage_test.gd"], "I00_STAGE_PASS"),
             ("campaign_bible", ["--script", "res://tests/campaign_bible_test.gd"], "CAMPAIGN_BIBLE_TEST"),
