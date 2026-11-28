@@ -121,11 +121,15 @@ def refine_phrase_onsets(segments, wave, sr, threshold_db=-40.0, search=0.1):
         for k in range(lo, hi + 1):
             if loud[k] and (k == 0 or not loud[k - 1]):
                 new_start = k * hop / sr
-                if prev_end is None or new_start > prev_end:
-                    seg[0] = round(new_start, 3)
-                    if seg[1] <= seg[0]:
-                        seg[1] = round(seg[0] + 0.04, 3)
-                break
+                # Preserve the CTC phone end and the order of the next
+                # phone. A later unrelated energy burst is not evidence that
+                # this phone moved beyond its measured interval.
+                candidate = round(new_start, 3)
+                next_start = segments[i+1][0] if i+1 < len(segments) else float("inf")
+                if ((prev_end is None or candidate >= prev_end)
+                        and candidate < seg[1] and candidate <= next_start):
+                    seg[0] = candidate
+                    break
     return segments
 
 

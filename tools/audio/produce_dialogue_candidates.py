@@ -280,6 +280,7 @@ def main():
             report["accepted"].append(lid)
         except (ValueError, KeyError, OSError) as exc:
             report["rejected"].append({"line_id": lid, "reason": str(exc)})
+            print(f"GERMAN_CANDIDATE_REJECTION {lid}: {type(exc).__name__}: {exc}", flush=True)
     save(out / "manifest.fragment.json", {"language": "de", "lines": accepted})
     save(out / "report.json", report)
     print(f"GERMAN_CANDIDATE {a.speaker}: accepted={len(accepted)} requested={len(wanted)} rejected={len(report['rejected'])}")
