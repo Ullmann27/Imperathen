@@ -1,0 +1,10 @@
+{
+  "revision": "bd4af0b2b33cfcb6cb753386915ad4bf40596c0c",
+  "task": "N33 NEW production-parity residual armoured youth skin correction. Actual Godot run 46101989464, original and candidate each 692/692 existing checks; armoured LOD0 has 14 severe edge samples (run 5, side_kick 9); armoured LOD2 and civil LOD0/2 zero. Same worst edge MeshyYouthBody surface 0 vertex indices 26845,26850: rest length .0038287178613m, limit .0568010248244m under existing 7*rest+.03 criterion. Run phase .875 posed .0647120401263m (excess .00791101530194m); side_kick .25 posed .0581517927349m (excess .00135076791048m). A rest (-.028654,.559037,.128714), B (-.026529,.556183,.127301). A weights Shin_L .1335622221, Shin_R .1693446189, Thigh_L .2946669757, Thigh_R .4024109244; B Shin_L .1917143464, Shin_R .1208819747, Thigh_L .4306401014, Thigh_R .2567330301. This is measured production retarget, not pristine original; source GLBs are local owner assets not supplied to the model. Design ONE conservative local vertex-weight candidate experiment with exact source SHA/primitive/indices/weight validation, affected one-ring and seam checks, normalized four influences, preserve skeleton/geometry/UVs/materials/other vertices, independent full-clip severe-edge test and original foot/skin limits. Reject candidate if any new overstretch or seam gap or other regression; no blanket smoothing, no adjusting gate, no altering civil assets or animation clips to hide defects, no pretending repair was tested. Use existing supplied GLB parser and fixture; if exact patch cannot be supported, provide precise bounded algorithm with fail-closed requirements. Return only complete compact unified diff for NEW local helper + small synthetic regression OR a precise experiment, not both partial patches; max 1200 words plus compact code. No secrets, private file transmission, execution, or reasoning transcript.",
+  "files": [
+    "tools/art/youth_cap_binding.py",
+    "prototype/tests/motion_skin_measurement.gd",
+    "prototype/tests/youth_outfit_skin_test.gd"
+  ],
+  "max_tokens": 12288
+}
