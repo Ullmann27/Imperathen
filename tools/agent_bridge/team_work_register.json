@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 207,
+  "version": 208,
   "tasks": [
     {
       "id": "K101",
@@ -962,15 +962,15 @@
     {
       "id": "VIS-YOUTH-STUDIO-EVIDENCE",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "6723fbbded93f9b8f8012a7afa4ac3125c71d293",
-      "run_id": null,
+      "run_id": "46097598105",
       "scope": [
         "prototype/tests/youth_outfit_review.gd",
         ".github/workflows/aeterna-youth-cap-binding.yml"
       ],
       "access": "edit",
-      "note": "Independent controlled studio with original youth assets, exact LOD0 path, full body front/side/three-quarter, face, march and attack. Preserve gameplay captures and skin gates; prevent identical outfit frames. No runtime or asset modification; same isolated PR #198."
+      "note": "Independent controlled studio with original youth assets, exact LOD0 path, full body front/side/three-quarter, face, march and attack. Preserve gameplay captures and skin gates; prevent identical outfit frames. No runtime or asset modification; same isolated PR #198. Actual commit a67c4bc7629948d8b5c14a0cd708791e5fb03cc7, ahead 1/behind 0, two files +125/-0, exact expected HEAD 6723fbb. Same PR #198; actual push workflow 46097598105 in_progress; automatic QA 46097601677 and full candidate 46097601687 observed, no duplicate dispatch. Two 12-frame neutral passes supplement existing 20 gameplay frames. Not visual/device accepted."
     }
   ]
 }
