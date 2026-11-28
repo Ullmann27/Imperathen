@@ -291,6 +291,10 @@ func _test_wheel_keeps_places() -> void:
 	var u = agents.units.valley_spears
 	var owners: Array = u.owners.duplicate()
 	var seen := {"outer": 0.0, "turned": 0.0}
+	var counter_start := {}
+	for id: String in agents.units:
+		var unit = agents.units[id]
+		counter_start[id] = [unit.refiles, unit.rematches]
 	var start_facing: float = u.facing
 	var observe := func(_before: Dictionary, ticks: int) -> void:
 		seen.turned = maxf(seen.turned, absf(angle_difference(start_facing, u.facing)))
@@ -299,6 +303,12 @@ func _test_wheel_keeps_places() -> void:
 				seen.outer = maxf(seen.outer, agents.agents[uid].speed)
 	_drive(model, agents, 8.0, observe)
 	check(seen.turned > deg_to_rad(30.0), "The company front actually turned (%.0f deg)" % rad_to_deg(seen.turned))
+	var unit_deltas := {}
+	for id: String in agents.units:
+		var unit = agents.units[id]
+		if counter_start.has(id):
+			unit_deltas[id] = [int(unit.refiles) - int(counter_start[id][0]), int(unit.rematches) - int(counter_start[id][1])]
+	notes.wheel_counters = {"global_refiles": agents.counters.refiles - refiles, "global_rematches": agents.counters.rematches - rematches, "units": unit_deltas, "target": "valley_spears"}
 	check(agents.counters.refiles == refiles and agents.counters.rematches == rematches, "A front change below 75 deg wheels instead of re-filing")
 	check(u.owners == owners, "Wheeling keeps every man in his place in the rank")
 	check(seen.outer <= float(u.limits.charge) + 0.001 and seen.outer > 0.5, "Outer file speed during the wheel stays within limits: %.2f m/s" % seen.outer)
@@ -503,7 +513,10 @@ func _test_identity_across_switches(profile: String, large: bool) -> void:
 						"correction": a.correction.length(), "contact": a.contact, "pose": state.pose}
 				stats.max_step = maxf(stats.max_step, step)
 				if state.pose in Soldier.STRIDES and previous.pose in Soldier.STRIDES:
-					stats.max_phase_step = maxf(stats.max_phase_step, absf(wrapf(float(state.phase) - float(previous.phase), -0.5, 0.5)))
+					var phase_step := absf(wrapf(float(state.phase) - float(previous.phase), -0.5, 0.5))
+					if phase_step > stats.max_phase_step:
+						stats.worst_phase = {"uid": uid, "t": t, "family": state.visual_family, "pose": state.pose, "previous_pose": previous.pose, "phase": state.phase, "previous_phase": previous.phase, "detail": state.detail, "previous_detail": previous.detail, "level": state.level, "previous_level": previous.level}
+					stats.max_phase_step = maxf(stats.max_phase_step, phase_step)
 				if int(state.detail) != int(previous.detail):
 					stats.switches += 1
 					var jump := -1.0
@@ -513,6 +526,8 @@ func _test_identity_across_switches(profile: String, large: bool) -> void:
 						jump = _foot_jump(feet[state.visual_family], _sole_points(v.actors[uid]), v.formation_far_gait(uid))
 					if jump >= 0.0:
 						stats.measured += 1
+						if jump > stats.max_jump:
+							stats.worst_jump = {"uid": uid, "t": t, "family": state.visual_family, "pose": state.pose, "previous_pose": previous.pose, "phase": state.phase, "previous_phase": previous.phase, "detail": state.detail, "previous_detail": previous.detail, "level": state.level, "previous_level": previous.level}
 						stats.max_jump = maxf(stats.max_jump, jump)
 		last = states
 		if v.model.outcome != "ongoing":
