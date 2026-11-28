@@ -1,4 +1,6 @@
 import unittest
+from unittest.mock import patch
+from types import SimpleNamespace
 import numpy as np
 from youth_armour_local_weights import (REST, EXPECTED, EXPECTED_CODES, NAMES, locate, topology,
                                        candidate_weights, no_edge_regression, godot_import_weight_codes,
@@ -108,6 +110,15 @@ class LocalWeightTests(unittest.TestCase):
         coefficients = np.zeros((1, 3, 8))
         with self.assertRaises(ValueError):
             solve_affine_weights(original, offsets, coefficients, [1.])
+
+    def test_optimizer_success_flag_cannot_certify_invalid_binding(self):
+        original = np.full((2, 4), .25)
+        offsets = np.array([[2., 0., 0.]])
+        coefficients = np.zeros((1, 3, 8))
+        with patch("youth_armour_local_weights.minimize",
+                   return_value=SimpleNamespace(x=original.reshape(8), success=True, message="false success")):
+            with self.assertRaises(ValueError):
+                solve_affine_weights(original, offsets, coefficients, [1.])
 
     def test_constrained_solver_leaves_already_feasible_source_unchanged(self):
         original = np.full((2, 4), .25)

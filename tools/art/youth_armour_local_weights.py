@@ -193,16 +193,18 @@ def solve_affine_weights(original, offsets, coefficients, bounds):
 
     x = x0.copy()
     active = set()
+    certified_nonconverged_steps = 0
     for iteration in range(32):
         values = residual(x, offsets, coefficients)
-        if float(values.min()) >= -1e-10:
+        if float(values.min()) >= 0.0:
             if np.max(abs(equality @ x - 1)) > 1e-8 or np.any(x < 0) or np.any(x > 1):
                 raise ValueError("Constrained candidate outside weight simplex")
             return x.reshape(2, 4), {"constraints": len(bounds),
                     "active_constraints": len(active), "iterations": iteration,
+                    "certified_nonconverged_steps": certified_nonconverged_steps,
                     "minimum_normalized_slack": float(values.min()),
                     "binding_displacement_l2": float(np.linalg.norm(x-x0))}
-        worst = np.flatnonzero(values < -1e-10)
+        worst = np.flatnonzero(values < 0.0)
         worst = worst[np.argsort(values[worst], kind="stable")]
         added = [int(i) for i in worst if int(i) not in active][:32]
         if not added:
@@ -213,15 +215,25 @@ def solve_affine_weights(original, offsets, coefficients, bounds):
         constraints = [
             {"type": "eq", "fun": lambda w: equality @ w - 1,
              "jac": lambda w: equality},
-            {"type": "ineq", "fun": lambda w: residual(w, c, m),
+            {"type": "ineq", "fun": lambda w: residual(w, c, m)-2e-6,
              "jac": lambda w: -2*np.einsum("mi,mij->mj",
                          c + np.einsum("mij,j->mi", m, w), m)}]
         result = minimize(objective, x, jac=lambda w: w-x0, method="SLSQP",
                           bounds=[(0., 1.)]*8, constraints=constraints,
-                          options={"ftol": 1e-12, "maxiter": 300})
-        if not result.success or not np.isfinite(result.x).all():
+                          options={"ftol": 1e-10, "maxiter": 300})
+        # The optimizer status is not a feasibility certificate. SLSQP may
+        # report a linesearch failure at a feasible numerical boundary.
+        # The stricter internal margin above leaves room for arithmetic,
+        # but the independent acceptance test never increases a bound.
+        candidate = np.asarray(result.x, dtype=float)
+        if (candidate.shape != (8,) or not np.isfinite(candidate).all()
+                or np.any(candidate < 0) or np.any(candidate > 1)
+                or np.max(abs(equality @ candidate-1)) > 1e-8
+                or np.any(residual(candidate, c, m) < 0.0)):
             raise ValueError("No verified feasible local binding: " + str(result.message))
-        x = result.x
+        if not result.success:
+            certified_nonconverged_steps += 1
+        x = candidate
     raise ValueError("Constrained skin exceeded bounded active-set iterations")
 
 
