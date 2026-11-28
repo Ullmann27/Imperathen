@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 194,
+  "version": 198,
   "tasks": [
     {
       "id": "K101",
@@ -839,7 +839,7 @@
       "id": "N29",
       "owner": "Nemotron",
       "access": "read",
-      "status": "review_pending",
+      "status": "done",
       "revision": "6d1aad82174764751cb2e2d3c0f610804518d512",
       "run_id": "46075607650",
       "scope": [
@@ -848,7 +848,7 @@
         "prototype/scripts/world/mounted_rider_pose.gd",
         "prototype/tests/valley_muster_test.gd"
       ],
-      "note": "Actual N29 run 46075607650/job 140762615929 succeeded; complete NVIDIA response, finish_reason=stop, model nvidia/nemotron-3-ultra-550b-a55b. Artifact 15234214921 ZIP SHA256 deb29c5e194d5d54f484c4b92487003ab6da8815f00f0535977dcb11a242aa5d; answer hash verified after removing bridge-added newline, all four pinned input SHA256 hashes independently matched. Three-line patch proposes force_update_all_bone_transforms after manual seek. Not applied blindly: Godot docs mark this internal/deprecated; answer does not discriminate absent rig vs stale socket. Next actual diagnostic preserves 3cm gate and measures direct bone, attachment and pelvis at multiple gait phases and original UID availability."
+      "note": "Actual N29 run 46075607650/job 140762615929 succeeded; complete NVIDIA response, finish_reason=stop, model nvidia/nemotron-3-ultra-550b-a55b. Artifact 15234214921 ZIP SHA256 deb29c5e194d5d54f484c4b92487003ab6da8815f00f0535977dcb11a242aa5d; answer hash verified after removing bridge-added newline, all four pinned input SHA256 hashes independently matched. Three-line patch proposes force_update_all_bone_transforms after manual seek. Not applied blindly: Godot docs mark this internal/deprecated; answer does not discriminate absent rig vs stale socket. Next actual diagnostic preserves 3cm gate and measures direct bone, attachment and pelvis at multiple gait phases and original UID availability. Actual combined regression 46087073083 on #197 passes valley_muster; provider answer reviewed, own socket correction only, not a release."
     },
     {
       "id": "CONSOLIDATED-VISUAL-CANDIDATE",
@@ -903,7 +903,7 @@
     {
       "id": "VIS-MOUNTED-INTEGRATION",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "d5cdcf3edb14dce44a11f1beed1942c131f5339f",
       "run_id": "46087073083",
       "scope": [
@@ -913,7 +913,37 @@
         ".github/workflows/aeterna-visual-mounted-integration.yml"
       ],
       "access": "edit",
-      "note": "Integrate exact three disjoint source/test blobs from #196 head 32bedab into #195 on separate branch. Independent review of all source diffs, no rig/seat thresholds changed. Add read-only combined Godot workflow: all eleven prior groups plus valley_muster, formation_agents and formation_levels; retain known red formation gates. No main merge, visual/device pending. Actual commit 8a8256a30145918739312588d70c4585768fa568, draft PR #197, exactly 4 files +258/-3. Actual workflow 46087073083 on exact commit observed in_progress. No duplicate dispatch. Full prior ARM64 46081946815 on separate branch passed valley_muster but failed village_backdrop, render_bench_views, village_scenery and formation groups; combined result still pending."
+      "note": "Run 46087073083/job 140799028768 on 8a8256a30145918739312588d70c4585768fa568: 12/14 groups pass including valley_muster, village_backdrop, camera, night and all story groups. formation_agents 80/87, formation_levels 18/22 remain red. Full run 46087085346 failure (visual job success). Isolated QA run 46087085256 succeeds; artifact 15240501052, QA 237, 768374965-byte APK, V2/V3, ARM64. Not release, no Fold7 physical acceptance. No shared branch merge."
+    },
+    {
+      "id": "FORMATION-WHEEL-AUTHORITY",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "8a8256a30145918739312588d70c4585768fa568",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/battle/battle_model.gd",
+        "prototype/scripts/formation/formation_agents.gd",
+        "prototype/tests/formation_slot_authority_test.gd",
+        ".github/workflows/aeterna-formation-wheel-authority.yml"
+      ],
+      "access": "edit",
+      "note": "Independent isolated candidate from #197: #177 battle model and formation agents common-base blobs exactly equal to #197; actual #177 19/19 slot authority, 411/411 battle command, 146/146 battle rules; remaining wheel and LOD red. Investigate authoritative front change vs visual lag, add strict actual engine regression, keep original tests. No shared branch merge."
+    },
+    {
+      "id": "N30",
+      "owner": "Nemotron",
+      "status": "reserved",
+      "revision": "158e22df72a8fafb1ab690bd55011a16f27b801d",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/battle/battle_model.gd",
+        "prototype/scripts/formation/formation_agents.gd",
+        "prototype/tests/formation_agents_test.gd",
+        "prototype/tests/formation_slot_authority_test.gd"
+      ],
+      "access": "read",
+      "note": "New bounded review exclusively of residual wheel/refile failure on #177 after proven slot-order/casualty improvements. Separate from N21/N24 LOD continuity work; independent read-only review, no API dispatch until actual register and bridge HEAD verified."
     }
   ]
 }
