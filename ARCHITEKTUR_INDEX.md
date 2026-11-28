@@ -195,6 +195,13 @@
 - `static func scenario(base: Dictionary, contracts: Array) -> Dictionary`
 - `static func restore_plan(base: Dictionary, key: String) -> Dictionary`
 
+## prototype/scripts/character_core/armor_piece_resource.gd
+
+- `class_name ArmorPieceResource`
+- `extends Resource`
+- `static func from_catalog(id: String, tier: int, detail: int) -> ArmorPieceResource`
+- `func supports_place(place: String) -> bool`
+
 ## prototype/scripts/character_core/body_pose_modifier.gd
 
 - `extends SkeletonModifier3D`
@@ -230,6 +237,24 @@
 - `func get_pelvis_offset() -> float`
 - `func get_upper_filter_paths() -> Array[NodePath]`
 - `func get_bone_world_transform(bone_name: StringName) -> Transform3D`
+
+## prototype/scripts/character_core/equipment_component.gd
+
+- `class_name EquipmentComponent`
+- `extends Node`
+- `signal equipment_changed`
+- `signal equipment_rejected(reason: String)`
+- `signal socket_switched(slot: String, place: String)`
+- `signal switch_finished(slot: String, committed: bool)`
+- `func is_equipment_ready() -> bool`
+- `func get_attachment(slot: String) -> BoneAttachment3D`
+- `func get_place(slot: String) -> String`
+- `func is_switch_pending() -> bool`
+- `func sync_from_world(data: Dictionary, detail: int = 0) -> bool`
+- `func request_socket_switch(slot: String, place: String, clip: StringName, timeout_seconds: float = 1.5) -> bool`
+- `func commit_socket_switch() -> bool`
+- `func finish_socket_switch() -> void`
+- `func clear_equipment() -> void`
 
 ## prototype/scripts/character_core/foot_alignment_modifier.gd
 
