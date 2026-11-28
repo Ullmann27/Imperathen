@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 211,
+  "version": 212,
   "tasks": [
     {
       "id": "K101",
@@ -918,7 +918,7 @@
     {
       "id": "FORMATION-WHEEL-AUTHORITY",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "8a8256a30145918739312588d70c4585768fa568",
       "run_id": "46096417387",
       "scope": [
@@ -929,7 +929,7 @@
         "prototype/tests/formation_agents_test.gd"
       ],
       "access": "edit",
-      "note": "Own isolated branch fix/aeterna-formation-wheel-authority-20261128 commit 5153f8354595d9472cde45f3c056ad7761976d73 on #197. Verified #177 battle model and formation base blobs identical to shared candidate base; reuse prior independently green authority/casualty implementation only in isolated branch. New runtime distinguishes adjacent authoritative >75-degree discrete turn from visual wheel lag, per-unit counters, applies once; adds real face/reverse-move regressions preserving original 60/180 and valley_muster gates. Actual run 46092418232 in_progress. No integration/green claim; original global assertion and all motion budgets untouched. Actual 46092418232/job 140816137495 at 5153f83: focused slot authority 27/27, battle command 411/411, rules 146/146, valley muster 133/133. Original formation 82/87 and 18/22 remain red. Max lag 92.9093 deg vs max authoritative step 41.253 deg; reverse refile once. Original global wheel counter gate still fails. Next bounded diagnostic retains all gates, adds per-unit refile/rematch deltas and worst actual LOD transition details to formation_agents_test.gd on the same isolated branch. No shared integration. Diagnostic commit 842f995bdb2bd08f03b43ba77cc3a80a3e38893a pushed with exact expected SHA 5153f83; compare ahead 1 behind 0, only formation_agents_test.gd (+16/-1); original global wheel assertion and 40mm LOD, position and phase gates untouched. Actual focused workflow 46096417387 observed in_progress. No runtime patch or green claim."
+      "note": "Own isolated branch fix/aeterna-formation-wheel-authority-20261128 commit 5153f8354595d9472cde45f3c056ad7761976d73 on #197. Verified #177 battle model and formation base blobs identical to shared candidate base; reuse prior independently green authority/casualty implementation only in isolated branch. New runtime distinguishes adjacent authoritative >75-degree discrete turn from visual wheel lag, per-unit counters, applies once; adds real face/reverse-move regressions preserving original 60/180 and valley_muster gates. Actual run 46092418232 in_progress. No integration/green claim; original global assertion and all motion budgets untouched. Actual 46092418232/job 140816137495 at 5153f83: focused slot authority 27/27, battle command 411/411, rules 146/146, valley muster 133/133. Original formation 82/87 and 18/22 remain red. Max lag 92.9093 deg vs max authoritative step 41.253 deg; reverse refile once. Original global wheel counter gate still fails. Next bounded diagnostic retains all gates, adds per-unit refile/rematch deltas and worst actual LOD transition details to formation_agents_test.gd on the same isolated branch. No shared integration. Diagnostic commit 842f995bdb2bd08f03b43ba77cc3a80a3e38893a pushed with exact expected SHA 5153f83; compare ahead 1 behind 0, only formation_agents_test.gd (+16/-1); original global wheel assertion and 40mm LOD, position and phase gates untouched. Actual focused workflow 46096417387 observed in_progress. No runtime patch or green claim. Actual 46096417387/job 140828665531 failed, 82/87 and 18/22; target valley_spears per-unit refiles/rematches 0/0, sole global refile/rematch from ridge_bows 1/1. This proves unrelated company increments global counters; no claim its refile is invalid. Balanced/60 and very_high/60 worst foot 0.0927992m forest_spear block at 16s, balanced/180 same family block at 16.2s. Balanced/180 ridge_spears_04 at 25.45s C-detail-hidden(3)/B before and after: 0.692983m root jump and 0.376398 phase jump, correction debt 1.492725m, run, noncontact. No runtime patch; original tests retained. Existing coordinator edit scope unchanged pending independent review."
     },
     {
       "id": "N30",
@@ -984,6 +984,21 @@
       ],
       "access": "edit",
       "note": "PR #198 isolated follow-up. Match actual APK staging order, hash all armoured/civil LODs, capture source motion receipt; retain thresholds and collect exact worst edge endpoints, skin bindings and clip phase. Keep render evidence even if existing skin gate fails, then fail workflow. No runtime/model patch or visual acceptance. Actual commit bd4af0b2b33cfcb6cb753386915ad4bf40596c0c, exact lease a67c4bc, compare ahead 1 behind 0, two files +24/-8. Actual focused push run 46101989464 in_progress; automatic QA 46101992721 and full candidate 46101992690 in_progress; do not duplicate. Previous QA 239 run 46097601677 success, artifact 15244532056, signed v2/v3 ARM64, 768366773 APK bytes. Previous studio V1/V2 had 3380 LOD0 and 542 LOD2 severe edge samples for unretargeted armour, civil 0; existing 548/548 checks per pass do not gate armoured tears. No acceptance."
+    },
+    {
+      "id": "N31",
+      "owner": "Nemotron",
+      "access": "read",
+      "status": "submitted",
+      "revision": "842f995bdb2bd08f03b43ba77cc3a80a3e38893a",
+      "run_id": "46102852466",
+      "scope": [
+        "prototype/scripts/visuals/valley_tribal_soldier.gd",
+        "prototype/scripts/visuals/soldier_visual.gd",
+        "prototype/scripts/visuals/far_ranks.gd",
+        "prototype/tests/formation_agents_test.gd"
+      ],
+      "note": "Actual new bridge commit b9303ab8aaa52bab0f15a8acd96c035ca13513bc, exactly 2 manifest/request files, push workflow 46102852466 observed in_progress. N30 completed truncated, no retry. N31 is newly measured forest_spear static block asset/silhouette baseline contract, not prior N21/N24 locomotion debt or N30 wheel. Single request, 12288 completion tokens max, unchanged provider, no new billing or quota bypass; exact 40mm gate retained, no execution or completion claim."
     }
   ]
 }
