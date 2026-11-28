@@ -1,7 +1,7 @@
 name: IMPERATHEN native character core phase 1
 on:
   push:
-    branches: ['feature/aeterna-character-core-phase1-20261128', 'feature/aeterna-character-foundation-integration-20261128']
+    branches: ['feature/aeterna-character-core-phase1-20261128', 'feature/aeterna-character-foundation-integration-20261128', 'fix/aeterna-character-core-null-contract-20261128']
 permissions:
   contents: read
 concurrency:

@@ -62,9 +62,41 @@ func _check_feet(actor: CharacterCore, label: String) -> void:
 		_check(point.distance_to(desired)<0.04,label+": target reaches desired ground placement within 40 mm")
 		print("CHARACTER_PHASE1_CONTACT ",label," side=",side," error_m=",point.distance_to(solved)," normal=",receipt.normal," surface=",surface," animated=",receipt.animated_ankle," desired=",desired," target=",point," hip_offset=",actor.get_pelvis_offset())
 
+func _check_unbound_contract(actor: CharacterCore, label: String) -> void:
+	_check(not actor.is_character_ready(),label+": adapter not ready")
+	_check(actor.get_character_skeleton()==null and actor.get_animation_tree()==null,label+": no partially bound rig exposed")
+	_check(actor.get_foot_contact(0).is_empty() and actor.get_foot_contact(1).is_empty(),label+": no phantom foot contacts")
+	_check(is_zero_approx(actor.get_pelvis_offset()) and actor.get_upper_filter_paths().is_empty(),label+": neutral read receipts")
+	_check(not actor.get_bone_world_transform(&"Head").is_finite(),label+": unavailable bone remains explicit")
+	_check(not actor.set_upper_body_clip(&"block",1.0),label+": no upper clip on unbound graph")
+	actor.set_ik_enabled(false)
+	actor.set_look_target(Vector3(0,1,-1))
+	actor.clear_look_target()
+	actor.clear_upper_body()
+
 func _run() -> void:
 	stage = Node3D.new()
 	root.add_child(stage)
+	var bare: CharacterCore = CharacterCore.new()
+	_check_unbound_contract(bare,"Before ready")
+	var rejections: Array[String] = []
+	bare.command_rejected.connect(func(reason: String) -> void: rejections.append(reason))
+	stage.add_child(bare)
+	_check_unbound_contract(bare,"Missing core children")
+	_check(rejections.size()==1 and not bare.is_physics_processing(),"Missing core children reject once and stop physics")
+	bare.free()
+	var incomplete: CharacterCore = Scene.instantiate() as CharacterCore
+	incomplete.get_node("FootPlacement/LeftRay").free()
+	incomplete.command_rejected.connect(func(reason: String) -> void: rejections.append(reason))
+	stage.add_child(incomplete)
+	_check_unbound_contract(incomplete,"Missing required foot ray")
+	_check(rejections.size()==2 and not incomplete.is_physics_processing(),"Incomplete foot adapter rejects once and stops physics")
+	var inactive_tree: AnimationTree = incomplete.get_node("AnimationTree") as AnimationTree
+	_check(not inactive_tree.active,"Failed foot binding deactivates the graph")
+	var rejected_rig: Node = incomplete.get_node("RigRoot/OriginalRig")
+	var rejected_skeletons: Array[Node] = rejected_rig.find_children("*","Skeleton3D",true,false)
+	_check(rejected_skeletons.size()==1 and rejected_skeletons[0].get_node_or_null("LeftLegIK")==null,"No partial native IK nodes on rejected adapter")
+	incomplete.free()
 	_body_box(Vector3(0,-0.1,0),Vector3(80,0.2,80))
 	var actor: CharacterCore = _new_actor(Vector3(0,0.05,0))
 	if not _check(actor.is_character_ready(),"Actual original frontier rig and typed graph bind"):
