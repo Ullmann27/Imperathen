@@ -24,7 +24,7 @@ run() {
     resident_activity) marker=RESIDENT_ACTIVITY_PASS ;;
     city_ambient_people) marker=CITY_AMBIENT_PEOPLE_PASS ;;
   esac
-  if [[ -n "$marker" ]] && ! grep -Fxq "$marker" "$home/run.log"; then
+  if [[ -n "$marker" ]] && ! grep -Eq "^${marker}([[:space:]]|$)" "$home/run.log"; then
     echo "Missing success marker $marker in $name" >&2
     return 1
   fi
