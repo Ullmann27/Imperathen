@@ -28,7 +28,7 @@ FAILURE = re.compile(r"SCRIPT ERROR:|Parse Error:|^ERROR:|^USER ERROR:", re.MULT
 
 def run_check(engine, name, arguments, marker, environment, report):
     started = time.monotonic()
-    timeout = {"import": 600, "vegetation_safe": 360, "motion_measurement": 2400, "formation_agents": 600, "formation_levels": 600, "character_phase1": 420, "character_phase2": 420}.get(name, 120)
+    timeout = {"import": 600, "vegetation_safe": 360, "motion_measurement": 2400, "formation_agents": 600, "formation_levels": 600, "character_phase1": 420, "character_phase2": 420, "world_workshop_entry": 240, "world_expansion": 240}.get(name, 120)
     try:
         result = subprocess.run([engine, "--headless", "--path", str(PROJECT), *arguments],
                                 cwd=ROOT, env=environment, text=True, encoding="utf-8",
@@ -176,6 +176,8 @@ def main():
             ("opening_flow", ["--fixed-fps", "60", "--script", "res://tests/opening_flow_test.gd"], "OPENING_FLOW_PASS"),
             ("ui", ["--fixed-fps", "60", "--script", "res://scripts/ui/ui_smoke.gd"], "UI_SMOKE_PASS"),
             ("roman_menu", ["--fixed-fps", "60", "--script", "res://tests/roman_menu_test.gd"], "ROMAN_MENU_PASS"),
+            ("world_workshop_entry", ["--fixed-fps", "60", "--script", "res://tests/world_workshop_entry_test.gd"], "WORLD_WORKSHOP_ENTRY_PASS"),
+            ("world_expansion", ["--fixed-fps", "60", "--script", "res://tests/world_expansion_environment_test.gd"], "WORLD_EXPANSION_TESTS"),
             ("roman_hud", ["--fixed-fps", "60", "--script", "res://tests/roman_hud_test.gd"], "ROMAN_HUD_PASS"),
             ("camera_collision", ["--fixed-fps", "60", "--script", "res://tests/camera_collision_test.gd"], "CAMERA_COLLISION_PASS"),
             ("runtime_display_lifecycle", ["--fixed-fps", "60", "--script", "res://tests/runtime_display_lifecycle_test.gd"], "RUNTIME_DISPLAY_LIFECYCLE_PASS"),

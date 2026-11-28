@@ -25,6 +25,7 @@ const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const CityExploration = preload("res://scripts/world/city_exploration.gd")
+const WorldWorkshopScene = preload("res://scenes/world_expansion/preview.tscn")
 const I01 = preload("res://scripts/story/i01_three_cups.gd")
 const I01Film = preload("res://scripts/story/i01_film.gd")
 const I03 = preload("res://scripts/story/i03_shortcut.gd")
@@ -65,6 +66,8 @@ var village_tab := "overview"
 var gear_shop := "market"
 var simulation_elapsed := 0.0
 var city_exploration
+var _world_workshop: Node3D
+var _workshop_paused_for_focus := false
 var _campaign_market_visit := false
 ## True only while a film choice beat commits its childhood action.
 var _film_committing := false
@@ -116,7 +119,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if screen == "city_exploration":
+	if screen in ["city_exploration", "world_workshop"]:
 		return
 	if screen == "opening":
 		_opening_process(delta)
@@ -180,6 +183,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if screen == "opening":
 		return
 	if event.is_action_pressed("ui_cancel"):
+		if screen == "world_workshop":
+			_leave_world_workshop()
+			get_viewport().set_input_as_handled()
+			return
 		if screen == "atlas":
 			_leave_atlas()
 			get_viewport().set_input_as_handled()
@@ -199,6 +206,8 @@ func _on_go_back_requested() -> void:
 			city_exploration.market.close()
 		else:
 			city_exploration.set_paused(not city_exploration.paused)
+	elif screen == "world_workshop":
+		_leave_world_workshop()
 	elif screen == "opening" and is_instance_valid(opening_overlay):
 		opening_overlay.handle_back()
 	elif screen == "atlas":
@@ -210,6 +219,20 @@ func _on_go_back_requested() -> void:
 
 
 func _notification(what: int) -> void:
+	if screen == "world_workshop" and is_instance_valid(_world_workshop):
+		if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT]:
+			if not _world_workshop.controller.motion_paused:
+				_workshop_paused_for_focus = true
+				_world_workshop.controller.motion_paused = true
+		elif what in [NOTIFICATION_APPLICATION_RESUMED, NOTIFICATION_APPLICATION_FOCUS_IN]:
+			if _workshop_paused_for_focus:
+				_world_workshop.controller.motion_paused = false
+				_workshop_paused_for_focus = false
+		elif what == NOTIFICATION_WM_CLOSE_REQUEST:
+			# The workshop is a read-only preview entered from the menu.
+			# Do not create or alter a campaign save when closing it.
+			get_tree().quit()
+		return
 	if screen == "city_exploration" and is_instance_valid(city_exploration):
 		if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT]:
 			city_exploration.set_paused(true)
@@ -457,6 +480,7 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 				if defense_result.get("ok", false):
 					world.cue_village_defense(action)
 		"atlas_demo": _open_atlas(true)
+		"world_workshop": _open_world_workshop()
 		"city_exploration": _open_city_exploration(false, false, true)
 		"imperial_city_exploration": _open_city_exploration(false, false, true, true)
 		"campaign_market": _open_city_exploration(true)
@@ -1608,6 +1632,55 @@ func _can_visit_market() -> bool:
 	if TravelParty.protected(data) or not data.story.choices.is_empty():
 		return false
 	return not Childhood.enabled(data) or str(data.village.childhood.screenplay.get("i01", "")) in ["complete", "legacy"]
+
+
+## Open the existing real asset workshop without replacing the main scene or
+## starting a second campaign. Keep the parked world's lifecycle under Main.
+func _open_world_workshop() -> void:
+	if screen != "menu" or is_instance_valid(_world_workshop):
+		return
+	var candidate := WorldWorkshopScene.instantiate() as Node3D
+	if candidate == null:
+		ui.notify("Die Weltwerkstatt konnte nicht geöffnet werden.")
+		return
+	_world_workshop = candidate
+	_workshop_paused_for_focus = false
+	_world_workshop.return_requested.connect(_leave_world_workshop)
+	world.set_active(false)
+	world.hide()
+	# Keep the inactive world parented for deterministic teardown on quit.
+	# Its Camera and Environment must not compete with the workshop.
+	world.process_mode = Node.PROCESS_MODE_DISABLED
+	var old_camera := world.get_node("WorldCamera") as Camera3D
+	old_camera.current = false
+	ui.hide()
+	ui.process_mode = Node.PROCESS_MODE_DISABLED
+	screen = "world_workshop"
+	add_child(_world_workshop)
+	if not _world_workshop.load_error.is_empty():
+		var reason: String = _world_workshop.load_error
+		_leave_world_workshop()
+		ui.notify(reason)
+		return
+	_world_workshop.set_quality(ui.get_quality())
+
+
+func _leave_world_workshop() -> void:
+	if not is_instance_valid(_world_workshop):
+		return
+	_world_workshop.controller.motion_paused = true
+	_world_workshop.hide()
+	_world_workshop.set_controls_visible(false)
+	_world_workshop.process_mode = Node.PROCESS_MODE_DISABLED
+	_world_workshop.queue_free()
+	_world_workshop = null
+	_workshop_paused_for_focus = false
+	world.process_mode = Node.PROCESS_MODE_INHERIT
+	ui.process_mode = Node.PROCESS_MODE_INHERIT
+	world.show()
+	ui.show()
+	(world.get_node("WorldCamera") as Camera3D).current = true
+	_show_menu()
 
 
 func _open_city_exploration(campaign_visit := false, from_road := false, imperial_visit := false, monument_entry := false) -> void:

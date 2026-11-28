@@ -210,7 +210,7 @@ func _check_trailer_and_profiles() -> void:
 func _check_menu_buttons() -> void:
 	var expected := {
 		"Fortsetzen": "continue", "Neues Leben": "new_game", "Stadt frei erkunden": "city_exploration", "Rom 100 n. Chr. · Kolosseum": "imperial_city_exploration", "Talgefecht erproben": "valley_demo",
-		"Weltkugel erkunden": "atlas_demo", "Figuren": "@gallery", "Einstellungen": "@settings", "Spiel beenden": "@confirm",
+		"Weltkugel erkunden": "atlas_demo", "Weltwerkstatt": "world_workshop", "Figuren": "@gallery", "Einstellungen": "@settings", "Spiel beenden": "@confirm",
 	}
 	_ui.show_menu(true)
 	await _frames()
@@ -264,7 +264,7 @@ func _check_campaign_action_priority() -> void:
 				primary_count += 1
 				_check(button.text == primary_caption, button.text + " is the expected campaign primary action")
 		_check(primary_count == 1, "exactly one enabled primary campaign action")
-		for caption in ["Stadt frei erkunden", "Rom 100 n. Chr. · Kolosseum"]:
+		for caption in ["Stadt frei erkunden", "Rom 100 n. Chr. · Kolosseum", "Weltwerkstatt"]:
 			var demo := _find_button(screen, caption)
 			_check(demo != null and not demo.disabled, caption + " remains accessible")
 

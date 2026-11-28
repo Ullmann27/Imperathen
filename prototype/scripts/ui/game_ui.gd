@@ -374,6 +374,10 @@ func show_menu(can_continue: bool) -> void:
 	city_button.name = "FreeCityExploration"
 	city_button.tooltip_text = "Freie Erkundung der vollständigen Stadt um 100 n. Chr. mit Kolosseum und eigener Speicherung."
 	life.add_child(city_button)
+	var workshop_button := _roman_button("Weltwerkstatt", func(): _emit("world_workshop"), false, font_size, button_height)
+	workshop_button.name = "WorldWorkshopEntry"
+	workshop_button.tooltip_text = "Originalmodelle, Siedlungen, Vegetation und Handelsrouten ansehen; dein Lebensweg bleibt unverändert."
+	life.add_child(workshop_button)
 	var imperial_button := _roman_button("Rom 100 n. Chr. · Kolosseum", func(): _emit("imperial_city_exploration"), false, font_size, button_height)
 	imperial_button.name = "ImperialCityExploration"
 	imperial_button.tooltip_text = "Direkt am begehbaren Kolosseum beginnen; verändert deinen Kampagnenspielstand nicht."
