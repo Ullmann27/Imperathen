@@ -50,6 +50,24 @@ func _run() -> void:
 		printerr("No original full city GLB, framebuffer capture aborted.")
 		quit(1)
 		return
+	# Verify the actual imported patch, not a synthetic material or replacement mesh.
+	var patch := scene.find_child("Forum_Worn_Stonework", true, false) as MeshInstance3D
+	var mortar_surfaces := 0
+	if patch != null and patch.mesh != null:
+		for surface in patch.mesh.get_surface_count():
+			var original := patch.mesh.surface_get_material(surface) as BaseMaterial3D
+			var tuned := patch.get_surface_override_material(surface) as BaseMaterial3D
+			if original != null and original.resource_name == "Travertine":
+				if tuned == null or tuned == original:
+					failures.append("Forum mortar lacks an isolated material override")
+					continue
+				mortar_surfaces += 1
+				if not tuned.albedo_color.is_equal_approx(original.albedo_color * Color(0.52, 0.49, 0.45, 1.0)) or tuned.albedo_texture != original.albedo_texture or tuned.normal_texture != original.normal_texture or tuned.roughness < original.roughness:
+					failures.append("Forum mortar changed the texture contract")
+			elif tuned != null:
+				failures.append("Unrelated forum stone material overridden")
+	if mortar_surfaces != 1:
+		failures.append("Expected exactly one actual Travertine mortar surface, got " + str(mortar_surfaces))
 	scene.set_physics_process(false)
 	scene._touch_move=Vector2.ZERO
 	scene._running=false
@@ -89,7 +107,8 @@ func _run() -> void:
 		if length<50000:
 			failures.append(title+": PNG unexpectedly too small")
 		screenshots.append({"scene":title,"file":path.get_file(),"bytes":length,
-			"min_sampled_luma":min_luma,"max_sampled_luma":max_luma})
+			"min_sampled_luma":min_luma,"max_sampled_luma":max_luma,
+			"sha256":FileAccess.get_sha256(path)})
 	# Complete the actual scene and graphics-resource lifecycle while the
 	# rendering server is still alive. Never hide or reclassify GL errors.
 	# This runner owns the only city instance and its scene caches.
@@ -117,7 +136,8 @@ func _run() -> void:
 		await RenderingServer.frame_post_draw
 	print("ROMAN_CITY_VISUAL_TEARDOWN "+JSON.stringify({"scene_freed":scene_ref.get_ref()==null,"render_frames_drained":5}))
 	var output={"status":"pass" if failures.is_empty() and screenshots.size()==3 else "fail",
-		"quality_profile":profile,"renderer":RenderingServer.get_current_rendering_method(),
+		"quality_profile":profile,"mortar_surfaces_tuned":mortar_surfaces,
+		"source_revision":OS.get_environment("GITHUB_SHA"),"run_id":OS.get_environment("GITHUB_RUN_ID"),"renderer":RenderingServer.get_current_rendering_method(),
 		"real_rendered_frames":screenshots,
 		"failures":failures,"physical_fold7":false,
 		"source":"Godot 4.7.2 real GL Compatibility framebuffer using Xvfb, not an AI concept image",

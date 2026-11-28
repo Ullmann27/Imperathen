@@ -289,8 +289,10 @@ func _load_city() -> void:
 		is_instance_valid(city.find_child("Forum_Piazza",true,false))
 		and is_instance_valid(city.find_child("Forum_Worn_Stonework",true,false)))
 	if embedded_forum:
+		var mortar_surfaces := tune_forum_mortar(city)
 		print("IMPERATHEN_FORUM_SOURCE " + JSON.stringify({
-			"source":"original_roman_city_glb","duplicate_external_loaded":false}))
+			"source":"original_roman_city_glb","duplicate_external_loaded":false,
+			"mortar_surfaces_tuned":mortar_surfaces}))
 	else:
 		var forum_detail := _scene(FORUM_DETAIL)
 		if forum_detail!=null:
@@ -310,6 +312,25 @@ func _load_city() -> void:
 	print("IMPERATHEN_FACADE_DETAIL " + JSON.stringify(CitySurfaceMicrodetail.install(city, profile)))
 	# Use real already-exported close-up GLBs. No extra collision bodies or economy.
 	print("IMPERATHEN_VIVA_PROPS " + JSON.stringify(VivaCloseupProps.install(city, profile)))
+
+## The authored worn basalt patch has a Travertine bed below its slabs.
+## Tone only this bed as compacted weathered joint fill, not the plaza or stones.
+## Preserve imported shared materials, texture maps, geometry and physics.
+static func tune_forum_mortar(city: Node) -> int:
+	var patch := city.find_child("Forum_Worn_Stonework", true, false) as MeshInstance3D
+	if patch == null or patch.mesh == null:
+		return 0
+	var count := 0
+	for surface in patch.mesh.get_surface_count():
+		var original := patch.mesh.surface_get_material(surface) as BaseMaterial3D
+		if original == null or original.resource_name != "Travertine":
+			continue
+		var mortar := original.duplicate() as BaseMaterial3D
+		mortar.albedo_color = original.albedo_color * Color(0.52, 0.49, 0.45, 1.0)
+		mortar.roughness = maxf(original.roughness, 0.92)
+		patch.set_surface_override_material(surface, mortar)
+		count += 1
+	return count
 
 ## Remove both mesh and collision forms before installing the replacement.
 static func _remove_legacy_amphitheatre(root: Node) -> void:
