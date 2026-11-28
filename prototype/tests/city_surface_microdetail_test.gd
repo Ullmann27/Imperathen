@@ -2,6 +2,7 @@ extends SceneTree
 ## Actual Godot MultiMesh transforms/materials: facade variation without a
 ## fake second city or an additional collision/navmesh authority.
 const Detail = preload("res://scripts/rendering/city_surface_microdetail.gd")
+const FountainWater = preload("res://scripts/rendering/city_fountain_water.gd")
 var checks := 0
 var failures: Array[String] = []
 
@@ -70,7 +71,55 @@ func _snapshot(city: Node3D) -> Dictionary:
 	return original
 
 
+func _fountain_contract() -> void:
+	var city := Node3D.new()
+	city.name = "RomanCity"
+	root.add_child(city)
+	var original := StandardMaterial3D.new()
+	original.resource_name = "Water_Surface"
+	original.albedo_color = Color(0.035, 0.30, 0.30)
+	original.metallic = 0.1
+	original.roughness = 0.2
+	var shared := BoxMesh.new()
+	shared.material = original
+	var first := MeshInstance3D.new()
+	first.name = "Forum_Fountain"
+	first.mesh = shared
+	city.add_child(first)
+	var second := MeshInstance3D.new()
+	second.name = "Northern_Fountain"
+	second.mesh = shared
+	city.add_child(second)
+	var unrelated := MeshInstance3D.new()
+	unrelated.name = "Private_Bath"
+	unrelated.mesh = shared
+	city.add_child(unrelated)
+	var stone := StandardMaterial3D.new()
+	stone.resource_name = "Travertine"
+	var basin_mesh := BoxMesh.new()
+	basin_mesh.material = stone
+	var basin := MeshInstance3D.new()
+	basin.name = "Basin"
+	basin.mesh = basin_mesh
+	first.add_child(basin)
+	_check(FountainWater.apply(city)==2, "Exactly two authored fountains receive water material")
+	var water := first.get_surface_override_material(0) as BaseMaterial3D
+	_check(water != null and water != original, "Water uses isolated material resource")
+	if water != null:
+		_check(water.albedo_color.is_equal_approx(Color(0.20,0.34,0.36,1.0)) and is_zero_approx(water.metallic) and is_equal_approx(water.roughness,0.28) and not water.emission_enabled, "Water has muted dielectric surface")
+		_check(water.albedo_texture == original.albedo_texture and water.normal_texture == original.normal_texture, "Imported texture references preserved")
+		_check(second.get_surface_override_material(0)==water, "Both fountains share a single replacement resource")
+	_check(first.mesh==shared and second.mesh==shared and shared.material==original and original.albedo_color.is_equal_approx(Color(0.035,0.30,0.30)) and is_equal_approx(original.metallic,0.1), "Source mesh and shared source material unchanged")
+	_check(unrelated.get_surface_override_material(0)==null and basin.get_surface_override_material(0)==null, "Bath water and stone are untouched")
+	_check(FountainWater.apply(city)==2 and first.get_surface_override_material(0)==water, "Reapply is idempotent")
+	var foreign := StandardMaterial3D.new()
+	second.set_surface_override_material(0,foreign)
+	_check(FountainWater.apply(city)==1 and second.get_surface_override_material(0)==foreign, "Foreign author override preserved")
+	city.free()
+
+
 func _run() -> void:
+	_fountain_contract()
 	_check(not Detail.install(null).ok, "Invalid city is rejected without mutation")
 	var world := _fixture()
 	root.add_child(world)
