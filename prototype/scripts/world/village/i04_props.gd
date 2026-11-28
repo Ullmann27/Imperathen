@@ -23,8 +23,11 @@ var _armful: Node3D
 var _tongs: Node3D
 var _nail: Node3D
 var _note: Node3D
-var _hand_right: Node3D
-var _hand_left: Node3D
+var _skeleton: Skeleton3D
+var _right_bone := -1
+var _left_bone := -1
+var _right_rest := Basis.IDENTITY
+var _left_rest := Basis.IDENTITY
 var _figure_body: Node3D
 var _carrier: Node3D
 var _holding_wood := false
@@ -36,7 +39,9 @@ var _wood_cut: Material
 func _init() -> void:
 	name = "I04ForgeProps"
 	process_priority = 10
+	process_physics_priority = 10
 	set_process(false)
+	set_physics_process(false)
 
 
 ## Cinematic anchors in this node's space (the world root).
@@ -223,9 +228,13 @@ func sync_state(state: Dictionary, figure: Node3D, index: int, trial_index: int)
 	visible = enabled
 	_carrier = figure
 	if not enabled:
+		_carrier = null
 		_holding_wood = false
 		_holding_note = false
 		set_process(false)
+		set_physics_process(false)
+		_clear_hand_binding()
+		_refresh_carried()
 		return
 	_build()
 	if not is_instance_valid(_armful) or not is_instance_valid(_note):
@@ -249,23 +258,48 @@ func sync_state(state: Dictionary, figure: Node3D, index: int, trial_index: int)
 	_nail.visible = I04.nail_kept(state)
 	var held := Documents.held_documents(state)
 	var noted := not held.is_empty()
-	if noted and str(_note.get_meta("document_id","")) != held[0]:
+	if noted and (str(_note.get_meta("document_id","")) != held[0] or _note.get_child_count() == 0):
 		for old in _note.get_children():
 			old.free()
+		if _note.has_meta("document_id"):
+			_note.remove_meta("document_id")
 		var scene := load(Documents.ENTRIES[held[0]].model) as PackedScene
-		_note.add_child(scene.instantiate())
-		_note.set_meta("document_id", held[0])
+		var document: Node = scene.instantiate() if scene != null else null
+		if document != null:
+			_note.add_child(document)
+			_note.set_meta("document_id", held[0])
 	_holding_wood = in_hand
-	_holding_note = noted
-	set_process(in_hand or noted)
-	_process(0.0)
+	_holding_note = noted and _note.get_child_count() > 0
+	var carrying_any := _holding_wood or _holding_note
+	set_process(carrying_any)
+	set_physics_process(carrying_any)
+	_sync_carried()
 
 
 func _process(_delta: float) -> void:
+	_sync_carried()
+
+
+func _physics_process(_delta: float) -> void:
+	_sync_carried()
+
+
+func _sync_carried() -> void:
 	if _holding_wood or _holding_note:
-		_ensure_hands(_carrier)
-	_carry(_armful, _hand_left, _holding_wood, Vector3(0.0,-0.20,0.10))
-	_carry(_note, _hand_right, _holding_note, Vector3(0.0,-0.10,0.05))
+		_ensure_hands()
+	else:
+		_clear_hand_binding()
+	_refresh_carried()
+
+
+func _refresh_carried() -> void:
+	# A previous still-live actor may emit skeleton_updated during a carrier
+	# exchange. Never use a cached hand unless it belongs to the current body.
+	var body := _live_body()
+	var valid := is_instance_valid(body) and body == _figure_body and is_instance_valid(_skeleton) and _skeleton.is_inside_tree() and not _skeleton.is_queued_for_deletion()
+	valid = valid and (body == _skeleton or body.is_ancestor_of(_skeleton))
+	_carry(_armful, _left_bone if valid else -1, _left_rest, _holding_wood, Vector3(0.0,-0.20,0.10))
+	_carry(_note, _right_bone if valid else -1, _right_rest, _holding_note, Vector3(0.0,-0.10,0.05))
 
 
 static func _talk_open(s: Dictionary) -> bool:
@@ -300,49 +334,83 @@ func shows(what: String) -> bool:
 	return _built and visible and item.visible
 
 
-func _carry(item: Node3D, hand: Node3D, held: bool, offset: Vector3) -> void:
+func _carry(item: Node3D, bone: int, correction: Basis, held: bool, offset: Vector3) -> void:
 	if not is_instance_valid(item):
 		return
-	# Keep all quest objects under the world-owned prop container. A LOD
-	# deletion may destroy its attachment, but never the object itself.
-	if held and is_instance_valid(hand):
-		item.global_transform = Transform3D(hand.global_basis.orthonormalized(),hand.to_global(offset))
-		item.show()
-	else:
+	if not held or not is_instance_valid(_skeleton) or bone < 0 or bone >= _skeleton.get_bone_count():
 		item.hide()
-
-
-func _ensure_hands(figure: Node3D) -> void:
-	if not is_instance_valid(figure):
 		return
-	var body: Variant = figure.get("body")
-	if not body is Node3D or body == _figure_body and is_instance_valid(_hand_left) and is_instance_valid(_hand_right):
+	# Reproduce the original hand socket (pose * inverse rest basis) without
+	# adding disposable nodes to another actor's skeleton. get_bone_global_pose
+	# is skeleton-local, so apply the skeleton's actual world transform first.
+	var pose := _skeleton.global_transform * _skeleton.get_bone_global_pose(bone)
+	var hand := pose * Transform3D(correction, Vector3.ZERO)
+	if not hand.is_finite():
+		item.hide()
+		return
+	item.global_transform = Transform3D(hand.basis.orthonormalized(), hand * offset)
+	item.show()
+
+
+func _live_body() -> Node3D:
+	if not is_instance_valid(_carrier) or not _carrier.is_inside_tree() or _carrier.is_queued_for_deletion():
+		return null
+	var body: Variant = _carrier.get("body")
+	if typeof(body) != TYPE_OBJECT or not is_instance_valid(body) or not body is Node3D:
+		return null
+	var node := body as Node3D
+	if not node.is_inside_tree() or node.is_queued_for_deletion() or (node != _carrier and not _carrier.is_ancestor_of(node)):
+		return null
+	return node
+
+
+func _clear_hand_binding() -> void:
+	if is_instance_valid(_skeleton) and _skeleton.skeleton_updated.is_connected(_refresh_carried):
+		_skeleton.skeleton_updated.disconnect(_refresh_carried)
+	_skeleton = null
+	_figure_body = null
+	_left_bone = -1
+	_right_bone = -1
+	_left_rest = Basis.IDENTITY
+	_right_rest = Basis.IDENTITY
+
+
+func _ensure_hands() -> void:
+	var body := _live_body()
+	if is_instance_valid(body) and body == _figure_body and is_instance_valid(_skeleton) and _skeleton.is_inside_tree() and not _skeleton.is_queued_for_deletion() and (body == _skeleton or body.is_ancestor_of(_skeleton)):
+		return
+	_clear_hand_binding()
+	if not is_instance_valid(body):
 		return
 	_figure_body = body
-	_hand_left = null
-	_hand_right = null
-	var skeletons: Array[Node] = (body as Node3D).find_children("*", "Skeleton3D", true, false)
-	if skeletons.is_empty():
+	var rigs := body.find_children("*", "Skeleton3D", true, false)
+	if body is Skeleton3D:
+		rigs.push_front(body)
+	# Prefer the rig which owns both production hand bones. A decorative
+	# skeleton cannot steal a prop merely because it appears first.
+	for node: Node in rigs:
+		var rig := node as Skeleton3D
+		if not is_instance_valid(rig) or not rig.is_inside_tree() or rig.is_queued_for_deletion():
+			continue
+		var left := rig.find_bone("Hand_L")
+		var right := rig.find_bone("Hand_R")
+		if left >= 0 and right >= 0:
+			_skeleton = rig
+			break
+		if not is_instance_valid(_skeleton) and (left >= 0 or right >= 0):
+			_skeleton = rig
+	if not is_instance_valid(_skeleton):
 		return
-	var skeleton := skeletons[0] as Skeleton3D
-	_hand_left = _attachment(skeleton, "Hand_L", "I04CarryLeft")
-	_hand_right = _attachment(skeleton, "Hand_R", "I04CarryRight")
+	_left_bone = _skeleton.find_bone("Hand_L")
+	_right_bone = _skeleton.find_bone("Hand_R")
+	if _left_bone >= 0:
+		_left_rest = _skeleton.get_bone_global_rest(_left_bone).basis.inverse()
+	if _right_bone >= 0:
+		_right_rest = _skeleton.get_bone_global_rest(_right_bone).basis.inverse()
+	# Follow the actual completed animation pose, even when the animator
+	# evaluates after normal process. Disconnect whenever ownership changes.
+	_skeleton.skeleton_updated.connect(_refresh_carried)
 
 
-func _attachment(skeleton: Skeleton3D, bone: String, label: String) -> Node3D:
-	var index := skeleton.find_bone(bone)
-	if index < 0:
-		return null
-	var existing := skeleton.get_node_or_null(label)
-	if existing != null:
-		return existing.get_node("Props") as Node3D
-	var attachment := BoneAttachment3D.new()
-	attachment.name = label
-	attachment.bone_name = bone
-	attachment.override_pose = false
-	skeleton.add_child(attachment)
-	var props := Node3D.new()
-	props.name = "Props"
-	props.basis = skeleton.get_bone_global_rest(index).basis.inverse()
-	attachment.add_child(props)
-	return props
+func _exit_tree() -> void:
+	_clear_hand_binding()
