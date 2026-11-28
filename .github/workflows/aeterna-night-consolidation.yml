@@ -27,7 +27,7 @@ jobs:
           set -euo pipefail
           mkdir -p artifacts/night-consolidation "$RUNNER_TEMP/godot"
           git rev-parse HEAD > artifacts/night-consolidation/source.txt
-          for pair in 'prototype/scripts/world/village/i02_props.gd 1f7966a6ffd1d3e28aab6e4475c481ac94439d43' 'prototype/tests/i02_props_test.gd 98b9aaba3aba7e0584513a39fa434feb66fbbe16' 'prototype/scripts/visuals/facial_motion.gd ebe187496e37ddd4ba3281bad7ae4c934291e364' 'prototype/tests/facial_motion_lifecycle_test.gd d7d45bbdf33009c068830d9ad121e2db4f38c7e7' 'prototype/assets/legio/neighbour_basket.glb 0c9043c91be9727e2d6c9c2dbe41f0ed46946c60'; do
+          for pair in 'prototype/scripts/world/village/i02_props.gd 1f7966a6ffd1d3e28aab6e4475c481ac94439d43' 'prototype/tests/i02_props_test.gd 98b9aaba3aba7e0584513a39fa434feb66fbbe16' 'prototype/scripts/visuals/facial_motion.gd ebe187496e37ddd4ba3281bad7ae4c934291e364' 'prototype/tests/facial_motion_lifecycle_test.gd d7d45bbdf33009c068830d9ad121e2db4f38c7e7' 'prototype/assets/legio/neighbour_basket.glb 0c9043c91be9727e2d6c9c2dbe41f0ed46946c60' 'prototype/scripts/world/village/i04_props.gd 366aa3b143d1922b4b0e6976ec2f4083f0e61310' 'prototype/tests/i04_props_lifecycle_test.gd 72f1e37757980bf1198dfe3310a61d1007455836' 'prototype/scripts/domain/npc_social_memory.gd 92ccc29def33041aa1436070fe3539ee4fd48b53' 'prototype/tests/npc_social_memory_test.gd f30ec17e719c424ab10a9976bcc850f7a245b9e1'; do
             read -r file expected <<< "$pair"
             actual="$(git hash-object "$file")"
             printf '%s %s\n' "$file" "$actual" | tee -a artifacts/night-consolidation/blobs.txt
@@ -83,6 +83,13 @@ jobs:
           run_check city-microdetail CITY_SURFACE_MICRODETAIL_PASS xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --fixed-fps 60 --script res://tests/city_surface_microdetail_test.gd
           run_check city-signage CITY_MARKET_SIGNAGE_PASS "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/city_market_signage_test.gd
           run_check city-paving CITY_EXPLORATION_DETAIL_PASS "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/city_exploration_detail_adapter_test.gd
+          run_check i04-lifecycle 'I04_PROPS_LIFECYCLE_PASS' "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/i04_props_lifecycle_test.gd
+          run_check npc-memory 'NPC social memory:' "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/npc_social_memory_test.gd
+          run_check npc-behavior 'checks passed' "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/npc_behavior_test.gd
+          run_check npc-conversation 'NPC_PHYSICAL_CONVERSATION_PASS' "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/npc_physical_conversation_test.gd
+          run_check team-b 'TEAM_B_INTEGRATION_PASS' "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/team_b_integration_test.gd
+          run_check npc-world 'checks passed' "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/npc_behavior_world_test.gd
+          run_check npc-ui 'NPC_BEHAVIOR_UI_PASS' "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/npc_behavior_ui_test.gd
           exit "$status"
       - name: Retain evidence, not private assets or APKs
         if: always()
