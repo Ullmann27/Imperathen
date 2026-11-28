@@ -331,7 +331,7 @@ func _test_wheel_keeps_places() -> void:
 				var facing := float(model.squads[id].facing)
 				var delta := absf(angle_difference(float(authority.facings[id]), facing))
 				var layout := _wheel_rule_layout(model, id)
-				var changed := layout != authority.layouts[id]
+				var changed: bool = layout != authority.layouts[id]
 				if adjacent and delta > deg_to_rad(Agents.REFILE_DEG):
 					authority.refile_events[id][model.steps] = rad_to_deg(delta)
 					authority.match_events[id][model.steps] = "authoritative_refile"
