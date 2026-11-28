@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 231,
+  "version": 232,
   "tasks": [
     {
       "id": "K101",
@@ -1156,9 +1156,9 @@
       "id": "TRIBAL-SOLE-TOPOLOGY",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de",
-      "run_id": null,
+      "run_id": "46108009771",
       "scope": [
         "prototype/assets/germanic_warriors/forest_spear_far.glb",
         "tools/art/refine_tribal_sole_topology.mjs",
@@ -1166,7 +1166,7 @@
         "prototype/tests/formation_agents_test.gd",
         ".github/workflows/aeterna-tribal-sole-topology.yml"
       ],
-      "note": "Masterplan phase01, independent of discontinued USE AI. Actual pinned far GLB b370b05d, 885 triangles, one material. Raw static heel vertex distance 83.102mm but nearest true existing surface triangle 17.038mm. Geometry-only conforming transverse foot-edge midpoint splits (existing shader x-dependent deformation), not selected by test probes, all incident UV seam faces split, preserve original positions/material atlas/rest surface and 900-triangle cap. Simulated source geometry width-priority 899 triangles, neutral original proxy distances 17.687/20.107/8.004/15.712mm; no Godot pass claim. Isolated candidate from verified body-sweep, exact wheel test blob from b3cdf9 and static diagnostic from 2612b0; rerun original 40mm plus full motion gates. No preview/main or production APK."
+      "note": "Masterplan phase01, independent of discontinued USE AI. Actual pinned far GLB b370b05d, 885 triangles, one material. Raw static heel vertex distance 83.102mm but nearest true existing surface triangle 17.038mm. Geometry-only conforming transverse foot-edge midpoint splits (existing shader x-dependent deformation), not selected by test probes, all incident UV seam faces split, preserve original positions/material atlas/rest surface and 900-triangle cap. Simulated source geometry width-priority 899 triangles, neutral original proxy distances 17.687/20.107/8.004/15.712mm; no Godot pass claim. Isolated candidate from verified body-sweep, exact wheel test blob from b3cdf9 and static diagnostic from 2612b0; rerun original 40mm plus full motion gates. No preview/main or production APK. Actual commit 603e4354ddfcd1545d26e6d695239f9efe6876f0, new exact GLB blob c961a42abd5f1cc20c239baf4fa285bad0238a0e; five-file compare/readback verified. 885->899 triangles, 2655->2669 vertices, atlas identical, one material, max parent rest area deviation 1.57e-9m2, max transverse width 171.81->89.95mm. Exact wheel/static test blobs a974a711/7d52d118. Actual CI 46108009771 in_progress, no Godot/visual/device success claim."
     }
   ]
 }
