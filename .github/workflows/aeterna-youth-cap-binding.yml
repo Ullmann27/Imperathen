@@ -1,7 +1,7 @@
 name: AETERNA actual civilian youth cap binding audit
 on:
   push:
-    branches: ['fix/aeterna-youth-cap-binding-20261127']
+    branches: ['fix/aeterna-youth-cap-binding-20261127', 'fix/aeterna-youth-capture-on-demand-20261128']
 permissions:
   contents: read
 concurrency:
@@ -85,14 +85,31 @@ jobs:
             timeout --kill-after=10s 300s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/youth_outfit_skin_test.gd 2>&1 | tee "$out/$version/skin.log"
             grep -Fq YOUTH_OUTFIT_SKIN_PASS "$out/$version/skin.log"
             if grep -Eq 'SCRIPT ERROR:|^ERROR:' "$out/$version/skin.log"; then exit 1; fi
-            timeout --kill-after=10s 360s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --rendering-method gl_compatibility --audio-driver Dummy --resolution 1280x720 --script res://tests/youth_outfit_review.gd -- "$out/$version" 2>&1 | tee "$out/$version/render.log"
-            test -s "$out/$version/civil_front.png"
-            test -s "$out/$version/civil_walk.png"
+            timeout --kill-after=10s 360s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --rendering-method gl_compatibility --audio-driver Dummy --resolution 1280x720 --script res://tests/youth_outfit_review.gd -- "$out/$version" --capture-on-demand 2>&1 | tee "$out/$version/render.log"
+            for outfit in armoured civil; do
+              for view in front three_quarter side face walk; do
+                test -s "$out/$version/${outfit}_${view}.png"
+              done
+            done
+            test -s "$out/$version/youth-outfit-review.json"
+            grep -Fq 'YOUTH_OUTFIT_REVIEW []' "$out/$version/render.log"
             if grep -Eq 'SCRIPT ERROR:|^ERROR:' "$out/$version/render.log"; then exit 1; fi
           done
-          find "$out" -type f -name '*.png' -print0 | sort -z | xargs -0 -r sha256sum > "$out/FRAME_SHA256.txt"
+          if cmp -s "$out/V1_ASSET_SHA256.txt" "$out/V2_ASSET_SHA256.txt"; then
+            printf '%s\n' 'IDENTICAL_ASSETS: V2 is an independent control render, not an asset repair.' > "$out/CONTROL_ONLY.txt"
+          fi
           printf '%s\n' 'Independent visual review and device acceptance pending. No private GLB included.' > "$out/REVIEW_PENDING.txt"
           test "$AUDIT_EXIT" = 0
+      - name: Record actual frame hashes even for partial failure
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$GITHUB_WORKSPACE/artifacts/youth-cap"
+          mkdir -p "$out"
+          cd "$out"
+          find . -type f -name '*.png' -print0 | sort -z | xargs -0 -r sha256sum > FRAME_SHA256.txt
+          printf '%s\n' "$GITHUB_RUN_ID" > run-id.txt
       - name: Preserve reports and actual renders only
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
