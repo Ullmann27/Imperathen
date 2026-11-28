@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "audit_status": "coverage_incomplete_runtime_export_not_rerun",
+  "language": "de",
+  "audited_on_utc": "2026-11-28",
+  "source_snapshot": {
+    "repository": "Ullmann27/Imperathen",
+    "worktree_branch": "hoplite/kolophon-ac55f0d6--viva-imperium",
+    "head": "5cc3dba30c879a4ddc11188d376769a7a7e73525",
+    "integration_branch": "hoplite/kolophon-ac55f0d6--stand-zero",
+    "integration_remote_head": "4d14cd50e3b9e5c7faebcdeab04c6ef41ad961be"
+  },
+  "runtime_inventory_basis": {
+    "checked_in_reference_report": "docs/44_integration/evidence/prima/voice-coverage.json",
+    "reference_report_sha256": "0b546f12c8f9820a1fc8c8fb3f52e79f80573752a6cbb551a741192557de37a7",
+    "runtime_export_script": "prototype/tests/tools/export_dialogue_lines.gd",
+    "exporter_rerun_this_task": false,
+    "exporter_rerun_blocker": "Neither godot nor godot4 is available on PATH; this audit did not perform a Godot engine import.",
+    "scope_note": "The reference exporter covers opening/prologue and childhood lines, installed indexed mission files, village dialogue, and legacy opening lines. The 170-line result is not a newly verified reachability audit of all registered main/side missions."
+  },
+  "coverage": {
+    "authored": 170,
+    "accepted": 40,
+    "missing_or_invalid": 130,
+    "accepted_percent": 23.53,
+    "issue_reasons": {
+      "missing_recording": 130
+    },
+    "by_scope": [
+      {
+        "scope": "I-00",
+        "authored": 5,
+        "accepted": 5,
+        "missing_or_invalid": 0
+      },
+      {
+        "scope": "I-01",
+        "authored": 30,
+        "accepted": 27,
+        "missing_or_invalid": 3
+      },
+      {
+        "scope": "I-02",
+        "authored": 5,
+        "accepted": 4,
+        "missing_or_invalid": 1
+      },
+      {
+        "scope": "I-03",
+        "authored": 31,
+        "accepted": 4,
+        "missing_or_invalid": 27
+      },
+      {
+        "scope": "I-04",
+        "authored": 28,
+        "accepted": 0,
+        "missing_or_invalid": 28
+      },
+      {
+        "scope": "I-05",
+        "authored": 5,
+        "accepted": 0,
+        "missing_or_invalid": 5
+      },
+      {
+        "scope": "I-06",
+        "authored": 7,
+        "accepted": 0,
+        "missing_or_invalid": 7
+      },
+      {
+        "scope": "I-07",
+        "authored": 25,
+        "accepted": 0,
+        "missing_or_invalid": 25
+      },
+      {
+        "scope": "I-08",
+        "authored": 4,
+        "accepted": 0,
+        "missing_or_invalid": 4
+      },
+      {
+        "scope": "I-09",
+        "authored": 4,
+        "accepted": 0,
+        "missing_or_invalid": 4
+      },
+      {
+        "scope": "I-10",
+        "authored": 3,
+        "accepted": 0,
+        "missing_or_invalid": 3
+      },
+      {
+        "scope": "I-11",
+        "authored": 2,
+        "accepted": 0,
+        "missing_or_invalid": 2
+      },
+      {
+        "scope": "I-12",
+        "authored": 3,
+        "accepted": 0,
+        "missing_or_invalid": 3
+      },
+      {
+        "scope": "I-13",
+        "authored": 3,
+        "accepted": 0,
+        "missing_or_invalid": 3
+      },
+      {
+        "scope": "I-14",
+        "authored": 2,
+        "accepted": 0,
+        "missing_or_invalid": 2
+      },
+      {
+        "scope": "village",
+        "authored": 10,
+        "accepted": 0,
+        "missing_or_invalid": 10
+      },
+      {
+        "scope": "legacy_opening",
+        "authored": 3,
+        "accepted": 0,
+        "missing_or_invalid": 3
+      }
+    ],
+    "issue_details_reference": "docs/44_integration/evidence/prima/voice-coverage.json"
+  },
+  "named_cast": {
+    "speaker_count": 14,
+    "speaker_ids": [
+      "aelia",
+      "aurelia",
+      "caesar",
+      "cassia",
+      "decimus",
+      "fabius",
+      "julia",
+      "labienus",
+      "marcus",
+      "narrator",
+      "severus",
+      "sextus",
+      "silvanus",
+      "varro"
+    ],
+    "ids_match_voice_registry": true,
+    "ids_match_runtime_manifest_speakers": true,
+    "recorded_story_lines_by_speaker": {
+      "aelia": 0,
+      "aurelia": 1,
+      "caesar": 2,
+      "cassia": 2,
+      "decimus": 0,
+      "fabius": 0,
+      "julia": 16,
+      "labienus": 1,
+      "marcus": 0,
+      "narrator": 14,
+      "severus": 0,
+      "sextus": 0,
+      "silvanus": 9,
+      "varro": 0
+    },
+    "cast_definition": "tools/audio/voice_cast.json",
+    "runtime_voice_registry": "prototype/assets/audio/voice/voice_registry.json"
+  },
+  "configured_voice_pool": {
+    "hero_age_stages": [
+      {
+        "id": "hero",
+        "age": 12,
+        "voice_class": "child"
+      },
+      {
+        "id": "hero_youth",
+        "age": 16,
+        "voice_class": "youth_male"
+      },
+      {
+        "id": "hero_adult",
+        "age": 30,
+        "voice_class": "adult_male"
+      },
+      {
+        "id": "hero_old",
+        "age": 70,
+        "voice_class": "elder_male"
+      }
+    ],
+    "hero_barks": 4,
+    "npc_categories": {
+      "woman": 4,
+      "man": 4,
+      "girl": 4,
+      "boy": 4,
+      "old_woman": 4,
+      "old_man": 4
+    },
+    "npc_profile_count": 24,
+    "npc_barks": 4,
+    "runtime_json_reference_lines_in_prototype": 0,
+    "prototype_mention_locations": [
+      "prototype/tests/city_life_test.gd:324"
+    ],
+    "status": "configured_design_pool_not_runtime_integrated",
+    "pool_definition": "tools/audio/voice_pool.json"
+  },
+  "manifest_integrity": {
+    "manifest_lines": 45,
+    "story_lines": 45,
+    "ogg_files": 45,
+    "viseme_json_files": 45,
+    "unique_speaker_text_pairs": 45,
+    "duplicate_speaker_text_pairs": 0,
+    "unregistered_line_speakers": [],
+    "recording_contract_errors": 0,
+    "audio_file_hash_failures": 0,
+    "viseme_file_hash_failures": 0,
+    "text_key_failures": 0,
+    "invalid_lines": [],
+    "method": "Existing voice_contract.recording_errors/track_errors plus file existence and SHA-256 checks over every manifest row; no fresh ASR transcription or human listening."
+  },
+  "missing_cue_asset_match": {
+    "missing_cues_checked": 130,
+    "exact_speaker_and_text_matches": 0,
+    "same_text_other_speaker_matches": 0,
+    "action": "No existing clip is eligible to wire to the 130 missing cues."
+  },
+  "manifest_rows_not_consumed_by_accepted_cues": {
+    "count": 5,
+    "line_ids": null,
+    "note": "45 unique story manifest pairs exist versus 40 accepted cues. The checked-in aggregate report omits accepted line IDs, and the runtime exporter was not rerun, so identities of the 5 unmatched rows are not asserted."
+  },
+  "coordination_register_check": {
+    "branch": "feat/kimi-3d-special-operations-20261127",
+    "head": "afe20dcfff3012e3ae376cb3d12a60a0013b5f42",
+    "file": "tools/agent_bridge/team_work_register.json",
+    "related_audio_or_evidence_path_matches": 0
+  },
+  "verification": [
+    {
+      "command": "python3 tools/audio/test_voice_contract.py",
+      "result": "passed; 6 tests"
+    },
+    {
+      "check": "45 existing manifest rows with recording and viseme validators plus file checksums",
+      "result": "passed; no contract errors, missing files, or checksum mismatches"
+    },
+    {
+      "check": "manifest speaker/text keys against the 130 missing reference cues",
+      "result": "0 exact matches and 0 same-text/different-speaker matches"
+    }
+  ],
+  "limitations": [
+    "The 40/170 coverage is from the checked-in reference report; no fresh Godot runtime export was possible in this worktree.",
+    "No new audio transcription, human listening, device playback, or device lip-sync measurement was performed.",
+    "This evidence confirms asset and metadata integrity, not pronunciation quality or perceptual synchronization.",
+    "The configured hero/NPC pool is not runtime-integrated and its profiles/barks have no in-tree runtime recordings."
+  ],
+  "input_sha256": {
+    "docs/44_integration/evidence/prima/voice-coverage.json": "0b546f12c8f9820a1fc8c8fb3f52e79f80573752a6cbb551a741192557de37a7",
+    "prototype/tests/tools/export_dialogue_lines.gd": "0aa72ab70f2b32ba50491352c708f55c9b02285fd647dc874ce2265d35b54059",
+    "prototype/assets/audio/voice/manifest.json": "c08d3b0f428bfef9e01c1ecb041cfdd3ef2ada154d84019a36a677069c3e11fe",
+    "prototype/assets/audio/voice/voice_registry.json": "00e4c123c7f72244fb2b24ae45486fe1d14d95f0d920d8c54a545eb54e6bfb3c",
+    "tools/audio/voice_cast.json": "13db4030660e7909cd6105d933e86a128643e50fa1bdf1be69bae819c0ca8738",
+    "tools/audio/voice_pool.json": "82145ad64f6912dbe754133cceb4fcbbef8c972a2b04b95423b8d2bf3835a06a",
+    "tools/audio/audit_german_dialogue.py": "07bc5203d5abc00680bd5d53ea912203bce23f935aa13ba389042307f877dff6",
+    "tools/audio/voice_contract.py": "fe181fdd7b0873c958b4181859308d86a22e5df11d009fab243472b1b5f00751"
+  }
+}

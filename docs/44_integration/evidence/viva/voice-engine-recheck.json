@@ -1,0 +1,84 @@
+{
+  "audited_revision": "5cc3dba30c879a4ddc11188d376769a7a7e73525",
+  "engine": "Godot 4.7.2, actual local export (not a listening or device test)",
+  "exporter": "prototype/tests/tools/export_dialogue_lines.gd",
+  "audit": "tools/audio/audit_german_dialogue.py",
+  "language": "de",
+  "authored": 170,
+  "accepted": 40,
+  "missing_or_invalid": 130,
+  "scopes": {
+    "I-00": {
+      "authored": 5,
+      "accepted": 5
+    },
+    "I-01": {
+      "authored": 30,
+      "accepted": 27,
+      "missing_or_invalid": 3
+    },
+    "I-02": {
+      "authored": 5,
+      "accepted": 4,
+      "missing_or_invalid": 1
+    },
+    "I-03": {
+      "authored": 31,
+      "accepted": 4,
+      "missing_or_invalid": 27
+    },
+    "I-04": {
+      "authored": 28,
+      "missing_or_invalid": 28
+    },
+    "I-05": {
+      "authored": 5,
+      "missing_or_invalid": 5
+    },
+    "I-06": {
+      "authored": 7,
+      "missing_or_invalid": 7
+    },
+    "I-07": {
+      "authored": 25,
+      "missing_or_invalid": 25
+    },
+    "I-08": {
+      "authored": 4,
+      "missing_or_invalid": 4
+    },
+    "I-09": {
+      "authored": 4,
+      "missing_or_invalid": 4
+    },
+    "I-10": {
+      "authored": 3,
+      "missing_or_invalid": 3
+    },
+    "I-11": {
+      "authored": 2,
+      "missing_or_invalid": 2
+    },
+    "I-12": {
+      "authored": 3,
+      "missing_or_invalid": 3
+    },
+    "I-13": {
+      "authored": 3,
+      "missing_or_invalid": 3
+    },
+    "I-14": {
+      "authored": 2,
+      "missing_or_invalid": 2
+    },
+    "village": {
+      "authored": 10,
+      "missing_or_invalid": 10
+    },
+    "legacy_opening": {
+      "authored": 3,
+      "missing_or_invalid": 3
+    }
+  },
+  "limits": "Manifest, exact text, checksums, stored ASR and viseme metadata; not a new audio transcription or a device lip-sync measurement."
+}
