@@ -1,7 +1,7 @@
 name: GENESIS Stand 0 formation recovery (strict gates)
 on:
   push:
-    branches: ['fix/genesis-stand0-formation-recovery-20261128', 'hoplite/*--stand-zero', 'integration/astra-sol-stand-zero-20261128']
+    branches: ['fix/genesis-stand0-formation-recovery-20261128', 'hoplite/*--stand-zero', 'integration/astra-sol-stand-zero-20261128', 'fix/astra-sol-city-fixture-parity-20261128']
 permissions:
   contents: read
 jobs:
@@ -55,6 +55,38 @@ jobs:
           unzip -q "$file"
           chmod +x "${file%.zip}"
           echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Install public city export dependencies (same as Fold7 city build)
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends blender python3-numpy python3-scipy python3-pil ffmpeg
+          blender -b --python-expr "import numpy; print('BLENDER_NUMPY_OK',numpy.__version__)"
+      - name: Build original city, forum geometry and grounded NPC layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/city-export" prototype/assets/world artifacts/formation-contact-trace/city
+          # Preserve the input identities so stale checked-in fixtures can be distinguished from regenerated output.
+          sha256sum prototype/assets/world/roman_city_test.glb prototype/assets/world/roman_city_collision.glb prototype/assets/world/roman_city_manifest.json > artifacts/formation-contact-trace/city/checked-in-sha256.txt
+          # Blender-free layout regression of the same generator: closed wall
+          # at every gate, no prop/tree inside buildings or on main streets,
+          # unchanged market anchors, tiled ground surfaces, portico steps.
+          python3 -m unittest tests/roman_city_layout_test.py -v 2>&1 | tee artifacts/formation-contact-trace/city/layout-test.log
+          blender -b -t 2 --python-exit-code 1 --python tools/world/build_roman_test_city.py -- \
+            --output "$RUNNER_TEMP/city-export" --surface-style viva --texture-size 1024 \
+            > artifacts/formation-contact-trace/city/blender.log 2>&1
+          grep -q CITY_BUILD_COMPLETE artifacts/formation-contact-trace/city/blender.log
+          cp "$RUNNER_TEMP/city-export/imperathen_roman_test_city.glb" prototype/assets/world/roman_city_test.glb
+          cp "$RUNNER_TEMP/city-export/roman_city_collision.glb" prototype/assets/world/roman_city_collision.glb
+          cp "$RUNNER_TEMP/city-export/city_manifest.json" prototype/assets/world/roman_city_manifest.json
+          sha256sum prototype/assets/world/roman_city_test.glb prototype/assets/world/roman_city_collision.glb prototype/assets/world/roman_city_manifest.json > artifacts/formation-contact-trace/city/city-sha256.txt
+          # Check actual exported geometry against its collision mesh.
+          python3 tools/world/check_city_collision_match.py \
+            --city prototype/assets/world/roman_city_test.glb \
+            --collision prototype/assets/world/roman_city_collision.glb \
+            --output artifacts/formation-contact-trace/city/collision-match.json | tee artifacts/formation-contact-trace/city/collision-match.log
+          grep -q CITY_COLLISION_MATCH_PASS artifacts/formation-contact-trace/city/collision-match.log
       - name: Actual Godot 180-agent contact trace
         shell: bash
         run: |
