@@ -26,6 +26,7 @@ const Ground = preload("res://scripts/visuals/authored_ground.gd")
 @export var spine_name: StringName = &"Spine"
 @export var head_name: StringName = &"Head"
 @export var leg_names: Array[StringName] = [&"Thigh_L",&"Shin_L",&"Foot_L",&"Thigh_R",&"Shin_R",&"Foot_R"]
+@onready var _collider: CollisionShape3D = get_node_or_null("CollisionShape3D") as CollisionShape3D
 @onready var _rig_root: Node3D = get_node_or_null("RigRoot") as Node3D
 @onready var _tree: AnimationTree = get_node_or_null("AnimationTree") as AnimationTree
 @onready var _feet: FootPlacement = get_node_or_null("FootPlacement") as FootPlacement
@@ -60,8 +61,7 @@ func _ready() -> void:
 func _bind_rig() -> bool:
 	if not is_instance_valid(_rig_root) or not is_instance_valid(_tree) or not is_instance_valid(_feet):
 		return false
-	var collider: CollisionShape3D = get_node_or_null("CollisionShape3D") as CollisionShape3D
-	if collider == null or collider.disabled or not (collider.shape is CapsuleShape3D):
+	if not _has_live_capsule():
 		return false
 	if _rig_root.get_child_count() != 1 or not (walk_speed>0.0 and run_speed>walk_speed and sprint_speed>run_speed):
 		return false
@@ -88,8 +88,13 @@ func _bind_rig() -> bool:
 		return false
 	return true
 
+func _has_live_capsule() -> bool:
+	return is_instance_valid(_collider) and _collider.is_inside_tree() and not _collider.disabled and _collider.shape is CapsuleShape3D
+
 func is_character_ready() -> bool:
-	return _valid and is_instance_valid(_rig_root) and is_instance_valid(_tree) and is_instance_valid(_feet) and is_instance_valid(_skeleton) and is_instance_valid(_animator)
+	# A live wrapper is not sufficient after its actual dependencies have
+	# been removed. Keep this check allocation-free for the physics path.
+	return _valid and _has_live_capsule() and is_instance_valid(_rig_root) and _rig_root.is_inside_tree() and is_instance_valid(_tree) and _tree.is_inside_tree() and is_instance_valid(_feet) and _feet.is_inside_tree() and is_instance_valid(_skeleton) and _skeleton.is_inside_tree() and is_instance_valid(_animator) and _animator.is_inside_tree() and _feet._is_bound()
 
 func request_motion(world_direction: Vector3, amount: float, gait: int = Gait.WALK) -> bool:
 	if not world_direction.is_finite() or not is_finite(amount) or gait not in [Gait.WALK,Gait.RUN,Gait.SPRINT]:
@@ -193,10 +198,9 @@ func _gait_speed() -> float:
 ## lifted corridor and the walkable top ahead of the capsule; advance only
 ## the normal per-tick displacement, never the full look-ahead distance.
 func _step_probe_distance() -> float:
-	var collider: CollisionShape3D = get_node_or_null("CollisionShape3D") as CollisionShape3D
-	if collider != null and collider.shape is CapsuleShape3D:
-		var capsule: CapsuleShape3D = collider.shape as CapsuleShape3D
-		return capsule.radius * maxf(absf(collider.global_basis.x.length()),absf(collider.global_basis.z.length())) + 0.025
+	if _has_live_capsule():
+		var capsule: CapsuleShape3D = _collider.shape as CapsuleShape3D
+		return capsule.radius * maxf(absf(_collider.global_basis.x.length()),absf(_collider.global_basis.z.length())) + 0.025
 	return 0.0
 
 func _walkable_landing(from: Transform3D, distance: float, hit: KinematicCollision3D) -> bool:
@@ -284,6 +288,8 @@ func _physics_process(delta: float) -> void:
 		set_physics_process(false)
 		if is_instance_valid(_tree):
 			_tree.active = false
+		if is_instance_valid(_feet):
+			_feet._disable_bound_runtime()
 		command_rejected.emit("CharacterCore dependency removed")
 		push_warning("CharacterCore: dependency removed during movement")
 		return

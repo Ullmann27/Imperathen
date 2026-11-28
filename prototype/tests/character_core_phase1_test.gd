@@ -210,6 +210,46 @@ func _run() -> void:
 	_check_feet(falling,"After airborne landing")
 	falling.free()
 
+	# Removing one live dependency after successful binding must not leave
+	# active ground queries, native modifiers, or misleading public receipts.
+	var damaged: CharacterCore = _new_actor(Vector3(6,0.05,0))
+	await _frames(60)
+	_check(damaged.is_character_ready(),"Runtime-removal fixture initially ready")
+	var damaged_tree: AnimationTree = damaged.get_animation_tree()
+	var damaged_skeleton: Skeleton3D = damaged.get_character_skeleton()
+	var remaining_ray: RayCast3D = damaged.get_node("FootPlacement/RightRay") as RayCast3D
+	var remaining_solver: TwoBoneIK3D = damaged_skeleton.get_node("RightLegIK") as TwoBoneIK3D
+	var lost_ray: RayCast3D = damaged.get_node("FootPlacement/LeftRay") as RayCast3D
+	var lost_rejections: Array[String] = []
+	damaged.command_rejected.connect(func(reason: String) -> void: lost_rejections.append(reason))
+	lost_ray.free()
+	_check_unbound_contract(damaged,"Freed live ray")
+	await _frames(3)
+	_check(lost_rejections.size()==1 and not damaged.is_physics_processing(),"Dependency loss stops physics exactly once")
+	_check(not damaged_tree.active and not remaining_ray.enabled and is_zero_approx(remaining_solver.influence),"Dependency loss stops surviving graph, ray and solver")
+	damaged.free()
+
+	var detached: CharacterCore = _new_actor(Vector3(6,0.05,0))
+	await _frames(60)
+	_check(detached.is_character_ready(),"Detached-target fixture initially ready")
+	var target_node: Node = detached.get_node("FootPlacement/LeftTarget")
+	target_node.get_parent().remove_child(target_node)
+	_check_unbound_contract(detached,"Detached but not freed target")
+	await _frames(3)
+	_check(not detached.is_physics_processing(),"Detached target cannot continue physics")
+	target_node.free()
+	detached.free()
+
+	var disabled_body: CharacterCore = _new_actor(Vector3(6,0.05,0))
+	await _frames(60)
+	_check(disabled_body.is_character_ready(),"Disabled-capsule fixture initially ready")
+	var live_capsule: CollisionShape3D = disabled_body.get_node("CollisionShape3D") as CollisionShape3D
+	live_capsule.disabled = true
+	_check_unbound_contract(disabled_body,"Disabled live capsule")
+	await _frames(3)
+	_check(not disabled_body.is_physics_processing(),"Loss of collision authority stops physical movement")
+	disabled_body.free()
+
 	# One real step and a tall wall: only the swept small obstacle may be climbed.
 	_body_box(Vector3(0,0.09,2.0),Vector3(2.4,0.18,2.0))
 	_body_box(Vector3(0,1.0,-0.1),Vector3(3.0,2.0,0.2))
