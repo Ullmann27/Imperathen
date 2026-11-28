@@ -1,0 +1,65 @@
+name: Aeterna authoritative wheel counter attribution
+on:
+  push:
+    branches: ['fix/aeterna-formation-wheel-attribution-20261128']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Validate source-derived campaign registry
+        run: |
+          python3 tools/story/validate_campaign_arc.py
+          python3 -m unittest tests.android_campaign_bible_test
+      - name: Install checksum-verified Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Actual Godot wheel and unrelated company rule events
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$GITHUB_WORKSPACE/artifacts/formation-wheel-attribution"
+          mkdir -p "$out"
+          git rev-parse HEAD > "$out/source-commit.txt"
+          timeout --kill-after=10s 300s "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee "$out/import.log"
+          failed=0
+          run_check() {
+            local name="$1" label="$2" marker="$3" state
+            shift 3
+            state="$(mktemp -d "$RUNNER_TEMP/formation-wheel-attribution.XXXXXX")"
+            mkdir -p "$state"/{data,config,cache}
+            if ! XDG_DATA_HOME="$state/data" XDG_CONFIG_HOME="$state/config" XDG_CACHE_HOME="$state/cache" timeout --kill-after=10s 420s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script "res://tests/$name.gd" "$@" 2>&1 | tee "$out/$label.log"; then failed=1; fi
+            if ! grep -Eq "$marker" "$out/$label.log" || grep -Eq 'SCRIPT ERROR:|^ERROR:' "$out/$label.log"; then failed=1; fi
+          }
+          run_check formation_agents_test wheel-attribution FORMATION_AGENTS_PASS -- wheel-only
+          exit "$failed"
+      - name: Retain actual engine evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: aeterna-formation-wheel-attribution-${{ github.run_id }}
+          path: artifacts/formation-wheel-attribution/
+          if-no-files-found: warn
+          retention-days: 30
