@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "D001",
+  "phase": "probe_then_review",
+  "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+  "task": "WORLD-MAP / Regional Map: unabhängige Entwicklung für die echte Open World. Untersuche nur regional_map.gd und regional_map_test.gd. Prüfe insbesondere Auswahlzustand, Aktualisierung der Entfernungsanzeige bei neuer Spielerposition, unbekannte Ziel-IDs und die unveränderte Trennung zwischen geplanten und tatsächlich begehbaren Orten. Belege exakt einen reproduzierbaren Fehler oder Testmangel. Liefere einen vollständigen kleinen Unified Diff mit Regressionstest, oder begründe anhand des Codes, dass kein Patch nötig ist. Keine neue Stadt oder begehbare Route erfinden, kein Teleport, keine Änderung an Welt-/Save-Autorität oder fremden Agentenbereichen. Realistische und klare Karte auf Fold7; RQG gilt. Benenne einen sinnvollen nächsten Teilauftrag. Keine erfundenen Testresultate.",
+  "files": [
+    "prototype/scripts/ui/regional_map.gd",
+    "prototype/tests/regional_map_test.gd"
+  ],
+  "images": [],
+  "max_tokens": 8192
+}

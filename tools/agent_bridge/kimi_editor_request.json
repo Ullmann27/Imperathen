@@ -1,0 +1,14 @@
+{
+  "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
+  "task": "K61 — DIREKTE ENTWICKLUNG: Glaubwürdige bewohnte römische Dorfhäuser. Die vorhandene Umsetzung enthält bereits 21 individuelle Haushaltsprofile mit Möbeln und Berufsgegenständen. Nicht duplizieren. Lies die vorhandenen Dateien und finde eine konkrete bisher unbehandelte Lücke der häuslichen Einrichtung oder ihrer Validierung. Bevorzuge einen kleinen integrierten visuellen Gewinn mit einem vollständigen Regressionstest. Nutze nur existierende nachweisbare Kit-Props, wahre alle Maße, Türwege, Kollisionen, I-01-Storyobjekte, individuelle Haushalte und Performancebudgets. Keine bloßen Vorschläge: verwende replace_text oder create_file tatsächlich. Nutze list_files nur bei Bedarf, lies fokussierte Zeilenbereiche, bündele unabhängige Toolcalls, damit im begrenzten Rundenbudget die finale Antwort erreicht wird. Das Bild dient nur als allgemeine Architektur-/Umgebungsreferenz, nicht als Nachweis eines Innenraumfehlers. Melde tatsächliche Änderungen und die noch nötigen Godot-Tests.",
+  "files": [
+    "prototype/scripts/world/village/household_designs.gd",
+    "prototype/scripts/world/village/house_interiors.gd",
+    "prototype/scripts/world/village/interior_kit.gd",
+    "prototype/tests/house_interiors_test.gd"
+  ],
+  "images": [
+    "art/architecture/review/hof_after.png"
+  ],
+  "new_files": []
+}

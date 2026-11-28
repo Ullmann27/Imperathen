@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "catalog_sha256": "81296e4f0d1cf53e9a4c4abd960d46e0653bd9fb16ae713410c75dcaafb0d77d",
+  "work": {
+    "MENU": {
+      "phase": "blocked",
+      "iteration": 1,
+      "baseline": {
+        "source_revision": "2a286cec428940e4c7d09d0c12745e2cac5a30f8",
+        "published_revision": "8a2d2304d55bdd3adf78c8b6c45dc66889c594a7",
+        "run_id": "46012575656",
+        "engine_pass": true,
+        "images": [
+          {
+            "path": "art/review/campaign-start/menu.png",
+            "sha256": "8390daf18d2f0fe8e140e89fdb7975627bfae6e33ea23929eeb84478f620236e",
+            "bytes": 408281
+          }
+        ]
+      },
+      "findings": "Unabhängige Sichtprüfung V1: drei konkurrierende rote Hauptaktionen, obwohl Neues Leben der Kampagnenstart ist. Zwei Explorationsaktionen sekundär gestalten, Zugriff und Speicherverhalten erhalten. Eigener, nicht von Kimi erzeugter Kandidat PR #171, 4f109b9853f7fa1213ed2ed548d421dca3da39d4; identische Spiel- und Testdateien im V2-Review-Commit. Hintergrund weiterhin zu dunkel; kein Fold7-Nachweis.",
+      "patch_revision": "8807c03666683d564659f6f92dcd49b33a3dee99",
+      "reason": "K102 46016053212/job 140563627074 HTTP 504 after 62.2s, no accepted UUID/full MAX response; do not retry blindly. Both actual 1280x720 V1/V2 menu PNGs independently decoded and SHA256 verified against receipts (V1 8390daf…, V2 b9b3df1…), visually compared at identical layout. V2 has precisely one red primary Neues Leben; city exploration and Colosseum visibly secondary, text/layout intact. Remaining background very dark, vegetation/architecture indistinct, banner silhouette and torch light remain stylized. V2 technical menu improvement confirmed; RQG visual/device acceptance not granted. Both source/test blobs match #171, review publication and f1f3fb96 combined candidate. No chronological advancement or new Kimi POST until live MAX access repaired.",
+      "resume_phase": "compare",
+      "v2": {
+        "source_revision": "8807c03666683d564659f6f92dcd49b33a3dee99",
+        "published_revision": "b3f28fa11ed9de4ed03eb8495680d28ea55ba407",
+        "run_id": "46015164122",
+        "engine_pass": true,
+        "images": [
+          {
+            "path": "art/review/campaign-start/menu.png",
+            "sha256": "b9b3df173e85fda116e8bc3336b7006ddfb937d4da2a5c18fc9508b06a95b9c5",
+            "bytes": 410125
+          }
+        ]
+      }
+    }
+  },
+  "serial": 203
+}

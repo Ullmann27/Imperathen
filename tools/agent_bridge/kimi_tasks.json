@@ -1,0 +1,13 @@
+{
+  "K102": {
+    "revision": "4f109b9853f7fa1213ed2ed548d421dca3da39d4",
+    "task": "Neuer enger MAX-Auftrag (kein K101-Retry): Überprüfe ausschließlich den bereits überarbeiteten realen Hauptmenü-Test roman_menu_test.gd. Analysiere, ob die neue Prüfung genau einer primären Kampagnenaktion bei vorhandenem oder fehlendem Spielstand einen konkreten verbleibenden Testmangel hat. Liefere einen einzigen kleinen vollständigen Testpatch oder begründe anhand des tatsächlichen Codes, warum kein Patch erforderlich ist. Keine neue Architektur, kein zweiter Auftrag im selben Response, keine erfundenen Test-/Renderresultate. RQG und Story-Verträge gelten. Benenne einen sinnvollen nächsten Teilauftrag.",
+    "files": [
+      "prototype/tests/roman_menu_test.gd"
+    ],
+    "images": [],
+    "max_tokens": 16384,
+    "reasoning_effort": "max",
+    "response_mode": "json"
+  }
+}

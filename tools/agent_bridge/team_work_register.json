@@ -1,0 +1,1465 @@
+{
+  "schema": 1,
+  "version": 303,
+  "tasks": [
+    {
+      "id": "K101",
+      "owner": "Kimi",
+      "status": "blocked",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": "46013490508",
+      "scope": [
+        "prototype/scripts/ui/roman_hud/menu_kit.gd",
+        "prototype/tests/roman_menu_test.gd"
+      ],
+      "access": "read",
+      "note": "300.4s socket timeout; no answer or UUID; provider execution unknown."
+    },
+    {
+      "id": "K102",
+      "owner": "Kimi",
+      "status": "blocked",
+      "revision": "4f109b9853f7fa1213ed2ed548d421dca3da39d4",
+      "run_id": "46016053212",
+      "scope": [
+        "prototype/tests/roman_menu_test.gd"
+      ],
+      "access": "read",
+      "note": "Run 46016053212/job 140563627074: HTTP 504 after 62.2s, no complete answer or accepted UUID. Provider outcome unknown; do not blindly retry."
+    },
+    {
+      "id": "MENU-V2",
+      "owner": "Coordinator",
+      "status": "review_pending",
+      "revision": "8807c03666683d564659f6f92dcd49b33a3dee99",
+      "run_id": "46015164122",
+      "scope": [
+        "prototype/scripts/ui/roman_hud/menu_kit.gd",
+        "prototype/tests/roman_menu_test.gd"
+      ],
+      "access": "read",
+      "note": "Real engine capture run 46015164122 source 8807c03 and receipt published b3f28fa; menu_contract and I01 actual playthrough pass, identical game_ui/roman_menu_test blobs to #171. Visual/device acceptance explicitly false; source included for combined technical QA, no RQG advancement."
+    },
+    {
+      "id": "N17",
+      "owner": "Nemotron",
+      "status": "done",
+      "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
+      "run_id": "46008020658",
+      "scope": [
+        "prototype/scripts/rendering/route_fire_lights.gd"
+      ],
+      "access": "read",
+      "note": "Complete model answer independently reviewed; score-only sort rejected to preserve closest-player guarantee. Separate N17-FIX tracks actual code and focused CI 46019923875; no integration claim."
+    },
+    {
+      "id": "N18",
+      "owner": "Nemotron",
+      "status": "blocked",
+      "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
+      "run_id": "46008020658",
+      "scope": [
+        "prototype/scripts/domain/calendar_ageing_participant.gd"
+      ],
+      "access": "read",
+      "note": "Truncated answer."
+    },
+    {
+      "id": "N19",
+      "owner": "Nemotron",
+      "status": "done",
+      "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
+      "run_id": "46008020658",
+      "scope": [
+        "prototype/scripts/world/mounted_rider_pose.gd",
+        "prototype/scripts/world/mount_controller.gd"
+      ],
+      "access": "read",
+      "note": "Complete answer independently reviewed. Unsafe dismount and unintegrated serialization rejected; actual rider/gaze ownership and rollback implementation tracked as N19-FIX in CI 46020024550."
+    },
+    {
+      "id": "D001",
+      "owner": "DeepSeek",
+      "status": "blocked",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": "46018153691",
+      "scope": [
+        "prototype/scripts/ui/regional_map.gd",
+        "prototype/tests/regional_map_test.gd"
+      ],
+      "access": "read",
+      "note": "Verified workflow 46018153691/job 140570837683: preflight passed, authenticated probe returned HTTP 410 before engineering request. Specific NVIDIA model page labels Free Endpoint Deprecated: https://build.nvidia.com/deepseek-ai/deepseek-v4.1-flash . Do not retry retired hosted route. Keep independent map task open for verified alternative; no paid fallback."
+    },
+    {
+      "id": "G001",
+      "owner": "Gemini",
+      "status": "blocked",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": "46019720312",
+      "scope": [
+        "prototype/scripts/cinematic/opening_director.gd",
+        "prototype/tests/opening_director_test.gd"
+      ],
+      "access": "read",
+      "note": "Verified run 46019720312, job 140576304218: required authorized API key missing; no provider request submitted. Keep assignment for a new dispatch after key setup."
+    },
+    {
+      "id": "E001",
+      "owner": "ERNIE",
+      "status": "blocked",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": "46019720312",
+      "scope": [
+        "prototype/scripts/domain/npc_behavior.gd",
+        "prototype/tests/npc_behavior_test.gd"
+      ],
+      "access": "read",
+      "note": "Verified run 46019720312, job 140576304213: required authorized API key missing; no provider request submitted. Keep assignment for a new dispatch after key setup."
+    },
+    {
+      "id": "V001",
+      "owner": "SuperVL",
+      "status": "blocked",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": "46019720312",
+      "scope": [
+        "prototype/scripts/world/village/household_designs.gd",
+        "prototype/scripts/world/village/house_interiors.gd"
+      ],
+      "access": "read",
+      "note": "Verified run 46019720312, job 140576304093: required authorized API key missing; no provider request submitted. Keep assignment for a new dispatch after key setup."
+    },
+    {
+      "id": "O001",
+      "owner": "GPTOSS",
+      "status": "blocked",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": "46019720312",
+      "scope": [
+        "prototype/tests/companion_turn_motion_test.gd"
+      ],
+      "access": "read",
+      "note": "Verified run 46019720312, job 140576304279: required authorized API key missing; no provider request submitted. Keep assignment for a new dispatch after key setup."
+    },
+    {
+      "id": "N17-FIX",
+      "owner": "Coordinator",
+      "revision": "4e963457ea0d441702755d5d27b10b327d27870b",
+      "run_id": "46019923875",
+      "scope": [
+        "prototype/scripts/rendering/route_fire_lights.gd",
+        "prototype/tests/route_fire_test.gd"
+      ],
+      "access": "edit",
+      "note": "Run 46019923875 failed at parse lines 56–58: weakref return inferred as Variant with warnings treated as errors. Superseded only by N17-FIX-TYPE; no integration.",
+      "status": "blocked"
+    },
+    {
+      "id": "N19-FIX",
+      "owner": "Coordinator",
+      "revision": "9bf365aa62f8abadd42003a30e16f5d99d8c8a17",
+      "run_id": "46020024550",
+      "scope": [
+        "prototype/scripts/world/mounted_rider_pose.gd",
+        "prototype/scripts/world/mount_controller.gd",
+        "prototype/tests/mount_controller_test.gd"
+      ],
+      "access": "edit",
+      "note": "Verified isolated engine 34/34. Source unchanged. Combined candidate tracked by MAP-MOUNT-INTEGRATE; not merged into #162.",
+      "status": "done"
+    },
+    {
+      "id": "MAP-SCALE",
+      "owner": "Coordinator",
+      "revision": "ef965a4ea4a993a1413b0dd6a862fec54b6d78aa",
+      "run_id": "46020155432",
+      "scope": [
+        "prototype/scripts/ui/regional_map.gd",
+        "prototype/tests/regional_map_test.gd"
+      ],
+      "access": "edit",
+      "note": "Verified isolated actual Godot render test of five levels. Combined candidate tracked by MAP-MOUNT-INTEGRATE; not merged into #162.",
+      "status": "done"
+    },
+    {
+      "id": "I00-INTEGRATE",
+      "owner": "Coordinator",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": "46008231545",
+      "scope": [
+        "prototype/scripts/cinematic/i00_stage.gd",
+        "prototype/scripts/cinematic/i00_vexillum.gd",
+        "prototype/scripts/cinematic/i00_camp_scenery.gd",
+        "prototype/scripts/cinematic/opening_director.gd",
+        "prototype/tests/i00_stage_test.gd",
+        "prototype/assets/cinematic/i00_vexillum.glb",
+        "art/cinematic/i00"
+      ],
+      "access": "read",
+      "note": "Candidate #162 fast-forwarded from db4d663 to exact 9fa7b14 after verified original Blender render run 46003302682, strict import 46008231545 and story 46008252851 (I00 82, opening director 357 checks). Blob comparison: six original asset files byte-identical to 7558579; full failed-test names identical to baseline. Candidate only, visual device acceptance and release gates still open.",
+      "status": "done"
+    },
+    {
+      "id": "N20",
+      "owner": "Nemotron",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": "46020399670",
+      "scope": [
+        "prototype/tests/adult_path_test.gd",
+        "prototype/tests/combat_actions_test.gd",
+        "prototype/scripts/domain/combat_actions.gd",
+        "prototype/scripts/domain/melee/melee_tracks.gd",
+        "prototype/scripts/domain/melee/melee_geometry.gd",
+        "prototype/scripts/domain/melee/melee_track_data.gd"
+      ],
+      "access": "read",
+      "note": "Review complete: accept stale fixture finding; reject unscaled peak-time assertion. Independent scaled-geometry check plus negative controls and actual engine verification in N20-FIX/PR #174. No gameplay fix claimed until CI.",
+      "status": "done"
+    },
+    {
+      "id": "N21",
+      "owner": "Nemotron",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": "46020399670",
+      "scope": [
+        "prototype/scripts/formation/formation_agents.gd",
+        "prototype/scripts/formation/formation_levels.gd",
+        "prototype/scripts/formation/troop_motion.gd",
+        "prototype/scripts/battle/formation_slots.gd",
+        "prototype/scripts/tactics/valley_scene.gd",
+        "prototype/tests/formation_agents_test.gd",
+        "prototype/tests/formation_motion_measurement.gd"
+      ],
+      "access": "read",
+      "note": "Complete model answer reviewed; proposed removal of first zero-time rig sample not applied, insufficient evidence. #177 actual logs show remaining balanced position/phase and strict foot failures; N24 is a new bounded investigation of displacement debt/interpolation, not a resubmission.",
+      "status": "done"
+    },
+    {
+      "id": "N22",
+      "owner": "Nemotron",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "run_id": "46020399670",
+      "scope": [
+        "prototype/scripts/rendering/render_bench.gd",
+        "prototype/tests/render_bench_views_test.gd",
+        "prototype/scripts/rendering/village_look.gd",
+        "prototype/scripts/rendering/route_fire_lights.gd",
+        "prototype/assets/quality_profiles.json",
+        "prototype/tests/village_look_test.gd"
+      ],
+      "access": "read",
+      "note": "Run 46020399670/job 140578522079 completed failure in provider answer step; partial NVIDIA_ANSWER cannot be treated as finished patch. Preserve actual night light caps, no blind resubmission.",
+      "status": "blocked"
+    },
+    {
+      "id": "N17-FIX-TYPE",
+      "owner": "Coordinator",
+      "revision": "e5354465628fab36a69844d2b5c55013c54e7da2",
+      "run_id": "46021669947",
+      "scope": [
+        "prototype/scripts/rendering/route_fire_lights.gd",
+        "prototype/tests/route_fire_test.gd"
+      ],
+      "access": "edit",
+      "note": "Focused real Godot run 46021669947 completed success at e535446. Exact source/test blobs now included in isolated CAMPAIGN-CONTINUITY; final candidate CI/device gates remain open.",
+      "status": "done"
+    },
+    {
+      "id": "MAP-MOUNT-INTEGRATE",
+      "owner": "Coordinator",
+      "revision": "e113d4ded6b05a05106c34bb0e34e7eaf53df410",
+      "run_id": "46021766345",
+      "scope": [
+        "prototype/scripts/world/mounted_rider_pose.gd",
+        "prototype/scripts/world/mount_controller.gd",
+        "prototype/tests/mount_controller_test.gd",
+        "prototype/scripts/ui/regional_map.gd",
+        "prototype/tests/regional_map_test.gd"
+      ],
+      "access": "edit",
+      "note": "Combined map 46021766333 and mount 46021766345 completed success at e113d4d, exact code/test blobs. #173 remains isolated while ARM64 and Fold7 checks run; subsequent campaign branch descends from it.",
+      "status": "done"
+    },
+    {
+      "id": "HOUSE-INTERIOR-PARSE",
+      "owner": "Coordinator",
+      "revision": "1b87724a9fe62c751d02a04668f8c924b7c7c7a0",
+      "run_id": "46021975525",
+      "scope": [
+        "prototype/tests/house_interiors_test.gd"
+      ],
+      "access": "edit",
+      "note": "Run 46021975525 parsed and executed full fixture: 7989 checks, 3 failures (two south and one east visible wall opening). Repair scope now genuine geometry/ray evidence, not parser. Do not waive or mark green; separate branch 1b87724 remains outside campaign candidate.",
+      "status": "blocked"
+    },
+    {
+      "id": "CAMPAIGN-CONTINUITY",
+      "owner": "Coordinator",
+      "revision": "f1f3fb96e64c4e6bc49a458e656eabcf01eef1a5",
+      "run_id": "46023103096",
+      "scope": [
+        "prototype/scripts/main.gd",
+        "prototype/scripts/story/i04_film.gd",
+        "prototype/tests/i04_slice_test.gd",
+        "prototype/tests/campaign_forge_continuity_test.gd",
+        "prototype/scripts/rendering/route_fire_lights.gd",
+        "prototype/tests/route_fire_test.gd",
+        "prototype/scripts/ui/game_ui.gd",
+        "prototype/tests/roman_menu_test.gd"
+      ],
+      "access": "edit",
+      "note": "Verified real Godot integration run 46023103096 success on f1f3fb96; CAMPAIGN_FORGE_CONTINUITY_PASS and I03_FLOW_PASS checks=109 failures=0; isolated technical integration only. RQG visual and device acceptance not granted.",
+      "status": "review_pending"
+    },
+    {
+      "id": "N20-FIX",
+      "owner": "Coordinator",
+      "status": "done",
+      "revision": "f1f3fb96e64c4e6bc49a458e656eabcf01eef1a5",
+      "run_id": "46024129297",
+      "scope": [
+        "prototype/tests/adult_path_test.gd"
+      ],
+      "access": "edit",
+      "note": "46024129297 completed success: combat 314/314, adult path 228/228. Exact source blob unchanged in #176; fast-forwarded common campaign candidate to 2e761e5."
+    },
+    {
+      "id": "FORMATION-ORDER-CONTINUITY",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "6fce2e98f61958afea69359bcd587d462bb9b04e",
+      "run_id": "46025109203",
+      "scope": [
+        "prototype/scripts/battle/battle_model.gd",
+        "prototype/scripts/formation/formation_agents.gd",
+        "prototype/tests/formation_agents_test.gd",
+        "prototype/tests/formation_slot_authority_test.gd"
+      ],
+      "access": "edit",
+      "note": "Run 46025109203 completed failure on 553ceab: new slot-authority 13/13, battle rules 144/144, battle commands 411/412 (new front-gap closing failure), formation 60 82/87 and 180 18/22. Previous 60 had 7 failures, now 5; rank ownership and recorded matching improved, global wheel counter and strict LOD position/phase/foot gates remain red. Do not merge. Child branch repairs casualty rank fill without changing existing branch or other running tests."
+    },
+    {
+      "id": "MEASURED-COMBAT-TARGETS",
+      "owner": "Coordinator",
+      "status": "done",
+      "revision": "6fce2e98f61958afea69359bcd587d462bb9b04e",
+      "run_id": "46025782969",
+      "scope": [
+        "prototype/scripts/world/player_action_world.gd",
+        "prototype/tests/action_adapter_test.gd",
+        "prototype/tests/village_experience_test.gd",
+        "prototype/tests/gear_market_test.gd"
+      ],
+      "access": "edit",
+      "note": "46025782969 completed success on 2e761e5: combat 314, adapter 66, real world 56, adult 228, gear 445, village 249 checks, all zero failures (1358 total). Exact tested commit now on common campaign branch. No physical Fold7 or release claim."
+    },
+    {
+      "id": "FORMATION-CASUALTY-GAPS",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "553ceab39d7d9a4a9936f24c69ac4672a789edce",
+      "run_id": "46026104912",
+      "scope": [
+        "prototype/scripts/battle/battle_model.gd",
+        "prototype/tests/battle_command_test.gd",
+        "prototype/tests/formation_slot_authority_test.gd"
+      ],
+      "access": "edit",
+      "note": "Run 46026104912 completed failure: slot 19/19, battle command 411/411 (closing_up_steps=4), battle rules 146/146; original formation 60 82/87 and 180 18/22. Balanced/180 root step 0.6322m, phase 0.1408, foot jump 0.0858m, very_high foot 0.0928m. Do not integrate failed entire tree; preserve independent candidates. New read-only N24 review."
+    },
+    {
+      "id": "N23",
+      "revision": "2e761e544022d03b0a813ee7cbc0c3f095ce7329",
+      "scope": [
+        "prototype/scripts/visuals/character_motion.gd",
+        "prototype/scripts/visuals/village_person.gd",
+        "prototype/scripts/story/companion_follow.gd",
+        "prototype/tests/companion_turn_motion_test.gd",
+        "prototype/tests/motion_world_measurement.gd"
+      ],
+      "note": "New bounded investigation of real Marcus 60Hz negative turn strict 0.015m failure in ARM64 runs 46020295729/46021801237. No false support flags, no skelettlocal/world confusion; one reproducible targeted repair. Submitted via actual bridge commit 2830b97fc02514c871873f64fb4538875da03e44, run 46028465853, observed in_progress. No completion claim; review full answer before any implementation. Verified run 46028465853 ended with all four consult jobs failed and no uploaded artifacts; no usable response. No duplicate provider request.",
+      "owner": "Nemotron",
+      "status": "blocked",
+      "run_id": "46028465853",
+      "access": "read"
+    },
+    {
+      "id": "N24",
+      "revision": "158e22df72a8fafb1ab690bd55011a16f27b801d",
+      "scope": [
+        "prototype/scripts/formation/formation_agents.gd",
+        "prototype/scripts/tactics/valley_scene.gd",
+        "prototype/scripts/visuals/soldier_visual.gd",
+        "prototype/scripts/visuals/far_ranks.gd",
+        "prototype/tests/formation_agents_test.gd"
+      ],
+      "note": "New analysis after real PR #177 results; actual position/phase spikes balanced 180, not earlier N21 zero-time present guess. Read-only; no active edit conflict. Submitted via actual bridge commit 2830b97fc02514c871873f64fb4538875da03e44, run 46028465853, observed in_progress. No completion claim; review full answer before any implementation. Verified run 46028465853 ended with all four consult jobs failed and no uploaded artifacts; no usable response. No duplicate provider request.",
+      "owner": "Nemotron",
+      "status": "blocked",
+      "run_id": "46028465853",
+      "access": "read"
+    },
+    {
+      "id": "N25",
+      "revision": "2e761e544022d03b0a813ee7cbc0c3f095ce7329",
+      "scope": [
+        "prototype/scripts/domain/npc_behavior.gd",
+        "prototype/scripts/domain/village_economy.gd",
+        "prototype/scripts/story/village_life.gd",
+        "prototype/tests/commerce_transaction_test.gd"
+      ],
+      "note": "Five observed reassigned-guard production failures in 46020295723; distinguish deterministic rain/attendance and stale duty. Real economy/state contract, no artificial production. Submitted via actual bridge commit 2830b97fc02514c871873f64fb4538875da03e44, run 46028465853, observed in_progress. No completion claim; review full answer before any implementation. Verified run 46028465853 ended with all four consult jobs failed and no uploaded artifacts; no usable response. No duplicate provider request.",
+      "owner": "Nemotron",
+      "status": "blocked",
+      "run_id": "46028465853",
+      "access": "read"
+    },
+    {
+      "id": "N26",
+      "revision": "1b87724a9fe62c751d02a04668f8c924b7c7c7a0",
+      "scope": [
+        "prototype/scripts/world/village/house_interiors.gd",
+        "prototype/scripts/world/village/household_designs.gd",
+        "prototype/tests/house_interiors_test.gd"
+      ],
+      "note": "Real 7989-check interior run 46021975525: three drawn-shell window opening failures after parser repair. Diagnose geometry vs ray-test error using full pinned sources, preserve original physical/collision gate. Submitted via actual bridge commit 2830b97fc02514c871873f64fb4538875da03e44, run 46028465853, observed in_progress. No completion claim; review full answer before any implementation. Verified run 46028465853 ended with all four consult jobs failed and no uploaded artifacts; no usable response. No duplicate provider request.",
+      "owner": "Nemotron",
+      "status": "blocked",
+      "run_id": "46028465853",
+      "access": "read"
+    },
+    {
+      "id": "K103",
+      "owner": "Kimi",
+      "status": "blocked",
+      "revision": "2e761e544022d03b0a813ee7cbc0c3f095ce7329",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/ui/roman_hud/menu_kit.gd",
+        "prototype/scripts/world/game_world.gd",
+        "art/review/campaign-start/menu.png"
+      ],
+      "access": "read",
+      "note": "New prepared MENU V3 single MAX task, no K102 repeat. Official https://build.nvidia.com/moonshotai/kimi-k3_1-pro/build explicitly says no programmatic API access despite Free Endpoint label; K102 HTTP 504, no accepted UUID. Offline manifest tools/agent_bridge/kimi_prepared_k103.json, NOT active push-trigger manifest. Submit only after confirmed eligible live access; do not activate paid provider or advance Journey."
+    },
+    {
+      "id": "I01-RENDER-CHECKPOINT",
+      "owner": "Coordinator",
+      "status": "done",
+      "revision": "e1fde65250271592d6309a056d1c4d5e352a87bd",
+      "run_id": "46029016493",
+      "scope": [
+        "prototype/tests/i01_flow_test.gd"
+      ],
+      "access": "edit",
+      "note": "Independent I-01 software-render evidence timeout 46020295748/job 140577885552 (1500s after continued). Scoped opt-in checkpoint rasterization on isolated branch and matching CI invocation, preserve every simulation step, all existing asserts, required real 1280x720 captures, no FPS/temporal or physical claim; continuous mode remains available. Map formatting already corrected on campaign head. Actual isolated commit e1fde65250271592d6309a056d1c4d5e352a87bd, PR #178, CI 46029016493 (in_progress); all original capture checkpoints retained and CI PNG dimensions additionally verified. No integration before success. Actual run completed success: I01_FLOW_PASS 287/287, 19 logged 1280x720 captures, artifact 15214470708 (22,272,307 bytes). No visual/device acceptance. Verified actual story CI 46029016558 success, ARM64 and Fold7 full failure signatures match 2e761e5 baseline (commerce 5, backdrop 2, strict companion foot, render 8, formation 7/4, muster 1). Complete recursive tree comparison showed only i01_flow_test.gd and its visual workflow changed. Fast-forwarded campaign-continuity branch via expected-head lease to exact tested e1fde65; campaign CI 46037854829 in progress. #162 and main unchanged; no release or physical acceptance."
+    },
+    {
+      "id": "HOUSE-WINDOW-HIT-PROVENANCE",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "c1f0dfb7755c2fb86d6af40237f6f606ac6d3d1f",
+      "run_id": "46032488245",
+      "scope": [
+        "prototype/tests/house_interiors_test.gd"
+      ],
+      "access": "edit",
+      "note": "Independent diagnostic-only correction: identify exact rendered shell/item collider and every failed quarter-point ray instead of short-circuiting after first hit. Preserve all prior 7989 assertions, geometry, collision and quality limits. No fix or acceptance before new engine evidence. PR #179 exact head c1f0dfb7755c2fb86d6af40237f6f606ac6d3d1f; focused push CI observed in_progress. Workflow also preserves JSON on failed checks. All four N23–N26 outcomes already recorded. No geometry modification yet. Completed failure: 7989 checks, 3 original failures, twelve actual ray hits from weaver_home/valdora_t2_eave_detail (south z=2.364399 and east x=2.8644), not imaginary collider. Geometry asset/source regeneration needed on independent scope; no geometry changed."
+    },
+    {
+      "id": "GUARD-WEATHER-FIXTURE",
+      "owner": "Coordinator",
+      "status": "done",
+      "revision": "fde8360c5662e0ba3f3d94479ae54061368aef0d",
+      "run_id": "46038078352",
+      "scope": [
+        "prototype/tests/commerce_transaction_test.gd",
+        ".github/workflows/aeterna-guard-weather-fixture.yml"
+      ],
+      "access": "edit",
+      "note": "Focused run 46038078352 succeeded: commerce 263/263, weather 4403/4403, NPC 86/86. Full Fold7 run 46038086118 confirms commerce passed, prior other failing test names unchanged; ARM64 46038086086 still fails strict Marcus 60Hz turn. Recursive tree comparison e1fde65 -> fde8360 found only test and focused workflow, no runtime changes. Fast-forwarded campaign-continuity via expected HEAD to exact tested fde8360; campaign CI 46047114032 in progress. No release."
+    },
+    {
+      "id": "HOUSE-GRILLE-CONTRACT",
+      "owner": "Coordinator",
+      "status": "done",
+      "revision": "c1f0dfb7755c2fb86d6af40237f6f606ac6d3d1f",
+      "run_id": "46040062470",
+      "scope": [
+        "prototype/tests/house_interiors_test.gd"
+      ],
+      "access": "edit",
+      "note": "Focused run 46040062470 succeeded on exact 8de95763ec77c93307acf87d2fd60bae4a9fd39a: HOUSE_INTERIORS_RESULT checks=8037 failures=0. Physical shell rays remain; intentional bars and open gaps distinguished, no asset modifications. Full PR branches diverged and contain stale campaign files; do not merge entire branch. Reconciliation isolated under HOUSE-CAMPAIGN-RECONCILE; not integrated yet."
+    },
+    {
+      "id": "HOUSE-CAMPAIGN-RECONCILE",
+      "owner": "Coordinator",
+      "status": "done",
+      "revision": "ff781d006963ec71eb7e3be1a5f37d0708ff41ca",
+      "run_id": "46047153088",
+      "scope": [
+        "prototype/tests/house_interiors_test.gd",
+        "docs/44_integration/AETERNA_HOUSE_INTERIORS_PARSE_20261127.md"
+      ],
+      "access": "edit",
+      "note": "Exact tested house test blob 2824ce83 copied onto fde8360 with existing game/guard work preserved; isolated branch fix/aeterna-house-campaign-reconciliation-20261127. Workflow only adds isolated trigger. No integration before focused combined test. Actual focused CI observed in_progress at ff781d0. Completed success: actual Godot HOUSE_INTERIORS_RESULT checks=8037 failures=0, HOUSE_INTERIORS_PASS. Baseline campaign run 46047114032 also green (menu 298, mount 34, I04 271, I03 109; route/map pass). Compared campaign fde8360 -> ff781d0: ahead 1, behind 0, only house test, docs and isolated workflow; test blob 2824ce83 matches tested #183. Fast-forwarded campaign via expected-head lease to exact ff781d0 and verified identical. No runtime geometry change, combined post-update CI and physical/visual acceptance remain separate."
+    },
+    {
+      "id": "PREVIEW-MARCUS-TURN",
+      "owner": "Coordinator",
+      "status": "done",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": "46052536805",
+      "scope": [
+        "prototype/scripts/story/companion_follow.gd",
+        "prototype/tests/companion_turn_motion_test.gd",
+        ".github/workflows/aeterna-preview-companion-turn.yml"
+      ],
+      "access": "edit",
+      "note": "Preview APK #219 actual run 46049893315, job 140678327076, fails strict companion turn at 60 Hz sign -1 (65/66; 15 mm gate unchanged). Isolated candidate on fix/aeterna-preview-companion-turn-20261127: squared heading alignment eases lateral travel while retaining full requested speed and angular/acceleration limits. Six added physical assertions and compact per-case diagnostics. Focused actual Marcus build/Godot regression run 46052536805 observed in_progress. Hypothesis, not verified correction. No integration until successful relevant tests and current preview HEAD/blob comparison. Do not edit overlapping scopes or repeat full APK unchanged; preview branch only, no main/release. Actual focused CI 46052536805 succeeded on exact commit: 72/72 checks, maximum slip 30 Hz 0.001349 mm, 60 Hz 6.402415 mm, 120 Hz 12.429449 mm; real generated Marcus rig, all six directions/frequencies. Compared preview HEAD 26875fa to exact tested 1327bd6: ahead 1 behind 0, only the registered three files. Fast-forwarded preview via expected HEAD lease and read-back confirmed exact 1327bd6. Full QA APK export trigger configured; new run not yet observed at this checkpoint, no release/physical approval."
+    },
+    {
+      "id": "N27",
+      "owner": "Nemotron",
+      "status": "blocked",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": "46055347080",
+      "scope": [
+        "prototype/tests/village_backdrop_test.gd",
+        "prototype/scripts/world/village/backdrop_hills.gd",
+        "prototype/scripts/world/village/village_scenery.gd",
+        "prototype/scripts/world/village/valdora_land.gd",
+        "prototype/scripts/world/regional_terrain.gd"
+      ],
+      "access": "read",
+      "note": "AETERNA Schritt 01, unabhängiger Read-only-Review. Preview 1327bd623dc5a67ce1b3611a743b481addd8bf26 erneut bestätigt. Tatsächlicher Nemotron-Probe-Run 46055100225 vollständig erfolgreich, Offline 13/13, Probe-Artefakt 15226231715. Auftragsdateien in e814cbc14727ba4440e878b62d1f32a5e2d50317; Register-Kandidat e2fd0180 erfolgreich 46055184796, Validator- und Testblobs identisch mit aktueller gemeinsamer Basis. Alte Befunde nicht als aktuelle Reproduktion ausgeben. Kein Edit-Lease, keine Freigabe und kein Wiederholen N23–N26. Tatsächlicher NVIDIA-Bridge-Run 46055347080 auf e814cbc14727ba4440e878b62d1f32a5e2d50317 beobachtet: in_progress. Noch kein Anbieter-Ergebnis; nicht erneut dispatchen. Final GitHub job failure with NVIDIA_BRIDGE_RECEIPT status=truncated, exit 3; artifact 15226357193 contains partial answer. No complete accepted patch; do not retry unchanged automatically. Connectivity succeeded but completion token cap reached."
+    },
+    {
+      "id": "N28",
+      "owner": "Nemotron",
+      "status": "blocked",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": "46055347080",
+      "scope": [
+        "prototype/tests/valley_muster_test.gd",
+        "prototype/scripts/tactics/valley_scene.gd",
+        "prototype/scripts/visuals/valley_tribal_soldier.gd",
+        "prototype/scripts/battle/soldier_roster.gd"
+      ],
+      "access": "read",
+      "note": "AETERNA Schritt 01, unabhängiger Read-only-Review. Preview 1327bd623dc5a67ce1b3611a743b481addd8bf26 erneut bestätigt. Tatsächlicher Nemotron-Probe-Run 46055100225 vollständig erfolgreich, Offline 13/13, Probe-Artefakt 15226231715. Auftragsdateien in e814cbc14727ba4440e878b62d1f32a5e2d50317; Register-Kandidat e2fd0180 erfolgreich 46055184796, Validator- und Testblobs identisch mit aktueller gemeinsamer Basis. Alte Befunde nicht als aktuelle Reproduktion ausgeben. Kein Edit-Lease, keine Freigabe und kein Wiederholen N23–N26. Tatsächlicher NVIDIA-Bridge-Run 46055347080 auf e814cbc14727ba4440e878b62d1f32a5e2d50317 beobachtet: in_progress. Noch kein Anbieter-Ergebnis; nicht erneut dispatchen. Final GitHub job failure with NVIDIA_BRIDGE_RECEIPT status=truncated, exit 3; artifact 15225649174 contains partial answer. No complete accepted patch; do not retry unchanged automatically. Connectivity succeeded but completion token cap reached."
+    },
+    {
+      "id": "BACKDROP-RAY-PROVENANCE",
+      "owner": "Coordinator",
+      "status": "review_pending",
+      "revision": "ffbea5820907f8c517818235d435ffea9638ec48",
+      "run_id": "46061712090",
+      "scope": [
+        "prototype/tests/village_backdrop_test.gd",
+        ".github/workflows/aeterna-backdrop-ray-provenance.yml"
+      ],
+      "access": "edit",
+      "note": "Actual focused Godot run 46061712090/job 140717292534 passed import and village_backdrop, artifact 15228458606. Prior candidate ffbea582 reconciles vegetation collider provenance while preserving original measured terrain/walking gates; no runtime change or device/visual acceptance. Independent review remains required. Independent exact base comparison: ahead 2 behind 0 relative to Preview 1327bd6, only test and isolated workflow changed; all 23 original static _check lines identical plus 2 new checks. Verified physical trunk RID/shape source in vegetation_field.gd. Draft PR #192 records passing focused run and is ready for next consolidated integration; do not trigger duplicate full QA export for test-only patch. No runtime/game change or Fold7 acceptance."
+    },
+    {
+      "id": "PARALLEL-NIGHT-EVIDENCE",
+      "scope": [
+        "prototype/tests/render_bench_views_test.gd",
+        ".github/workflows/aeterna-parallel-stability.yml",
+        "docs/44_integration/AETERNA_PARALLEL_STABILITY_20261127.md"
+      ],
+      "note": "Actual job 140698245043 in 46055915040 failed authored light accounting in all four profiles (8 night_torch failures); visible door and route fires recorded. village_look passed. Separate actual render errors/timeout; no accepted night visual. Keep counts/shadow/profile limits; coordinate with CAMPAIGN-CONTINUITY before runtime changes.",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": "46055915040",
+      "access": "edit"
+    },
+    {
+      "id": "PARALLEL-WEATHER-FIXTURE",
+      "scope": [
+        "art/village/verify.gd"
+      ],
+      "note": "Roadmap 01.2. Old run 46038086118: autumn mud and drizzle fixture fails. Actual scenery uses continuous weather state and physically grounded rain rather than season alone. Preserve mesh, PBR, density and doorway tests; supply explicit dry/rain states, camera and real ground rays. Candidate fixture only, no claim of runtime repair. Candidate 0e996ed8cb2af81ef721572e223786c457cee253; observed four independent GitHub jobs in_progress. QA #221 is separately successful on 1327bd6, artifact 15226547072, no physical device acceptance. This candidate has no results yet. Actual job 140698244798 failed village_scenery. All four profiles had 360 physical supports and expected visible counts; all 48 original renderer-readback support checks failed. Need distinguish headless dummy readback from real surface/transform issue, not change rain threshold or hide failures.",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": "46055915040",
+      "access": "edit"
+    },
+    {
+      "id": "PARALLEL-FORMATION-EVIDENCE",
+      "scope": [
+        "prototype/tests/formation_agents_test.gd"
+      ],
+      "note": "Actual job 140698244797 in 46055915040 failed formation_agents 7/87 and formation_levels 4/22: missing matching, wheeling/rank placement, discontinuity 0.092799m vs 0.04m, phase 0.0892/0.0976, max position step 0.1207/0.3189m; no threshold changes, no runtime fix. Keep evidence for separate formation contract.",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": "46055915040",
+      "access": "edit"
+    },
+    {
+      "id": "PARALLEL-ATELIER-RUNTIME",
+      "scope": [
+        "prototype/tests/resident_catalog_bridge_test.gd",
+        "prototype/tests/soldier_visual_test.gd"
+      ],
+      "note": "Actual run 46055915040/job 140698244361 passed 7 checks: import, resident_catalog_bridge, troop_catalog, soldier_visuals, meshy_registry, meshy_characters, meshy_equipment. Artifact 15226552406; runtime catalog/equipment evidence only; no universal visual or device acceptance.",
+      "owner": "Coordinator",
+      "status": "review_pending",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": "46055915040",
+      "access": "edit"
+    },
+    {
+      "id": "VIS-CAMERA-EYE-REGRESSION",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": "46061403644",
+      "scope": [
+        "prototype/scripts/cinematic/opening_director.gd",
+        "prototype/tests/opening_director_test.gd",
+        "docs/44_integration/USER_VISUAL_REGRESSION_20261127.md",
+        ".github/workflows/aeterna-visual-camera-regression.yml"
+      ],
+      "access": "edit",
+      "note": "Engine camera test 368/368 retained. Separate candidate #186 blocked for visual/combined integration; successor copies exact camera changes into #190 and re-tests. No accepted visual/device status."
+    },
+    {
+      "id": "VIS-MARKET-JUG-GRIP",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": "46062934470",
+      "scope": [
+        "prototype/scripts/world/village/i03_props.gd",
+        "prototype/tests/i03_flow_test.gd",
+        ".github/workflows/aeterna-market-jug-regression.yml"
+      ],
+      "access": "edit",
+      "note": "PR #187 c9fe296: actual CI 46062934470/job 140721300780 completed failure: 74 checks, one failed. Before LOD handle-to-palm error 0.05444431304932 m vs 0.005 m; after LOD passes. Artifact 15228624744 logs; render skipped. Investigate physics/idle transform synchronization, not yet proven cause. Preserve limit; no visual acceptance."
+    },
+    {
+      "id": "VIS-FAMILY-JUG-GRIP",
+      "owner": "Coordinator",
+      "status": "review_pending",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": "46063412333",
+      "scope": [
+        "prototype/scripts/world/village/i01_props.gd",
+        "prototype/tests/i01_flow_test.gd",
+        ".github/workflows/aeterna-family-jug-regression.yml"
+      ],
+      "access": "edit",
+      "note": "PR #188 c48b0121: actual graphical CI 46063412333/job 140722857932 success, I01_FLOW_PASS 300/300, 20 1280x720 captures. Source receipt 8571e9bd1a67d031ab4636b1a43bf23d518e304c compare to PR head: zero changed files, exact two source blobs. Artifact 15229328974 SHA256 efde551fb9250c3ed9ff5033076d0f8f4a44dd39e084909570b31119ea055cce. Six images independently opened; father-delivery SHA256 fa99fc00de371f95f7307ec84223fa721b89ed75d91d4c951e8e713d4ae0a8fe shows huge player head obscures grip, pour camera also hides hands. Anchor contract passed, actual visible finger grip/real owner youth/visual/device not accepted. Focused push 46063390811 success."
+    },
+    {
+      "id": "VIS-MARKET-JUG-PHYSICS-SYNC",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "c9fe2960008cf52787fa51c4afe09c4528d236b1",
+      "run_id": "46063582273",
+      "scope": [
+        "prototype/scripts/world/village/i03_props.gd",
+        "prototype/tests/i03_flow_test.gd",
+        ".github/workflows/aeterna-market-jug-regression.yml"
+      ],
+      "access": "edit",
+      "note": "Run 46063582273: I03_FLOW_PASS 88/88, render timeout exit 124. Existing 5mm and consecutive-frame checks preserved; follow-up adopts proven I01 on-demand rendering, no visual acceptance."
+    },
+    {
+      "id": "VIS-I00-TERRAIN-CLEARANCE",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": "46064658673",
+      "scope": [
+        "prototype/scripts/cinematic/i00_stage.gd",
+        "prototype/scripts/cinematic/i00_camp_scenery.gd",
+        "prototype/tests/i00_stage_test.gd",
+        "prototype/tests/i00_terrain_capture_test.gd",
+        ".github/workflows/aeterna-i00-terrain-clearance.yml",
+        "docs/44_integration/AETERNA_VISUAL_30_MILESTONES_20261127.md"
+      ],
+      "access": "edit",
+      "note": "Run 46064658673: terrain 87/87; real capture 30 images with 140 checks, portrait last departure projected [0,0,0]. Artifact 15231060416 SHA256 23c90195ba17a11434369546536490ec1fd1925f1c80d89d3a045211b2c7c70c; independent contact sheet shows soldiers now present, overbright edges, plain camp and departure loss. Follow-up fixes framing, not full realism."
+    },
+    {
+      "id": "VIS-INDOOR-CAMERA-SPACING",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": "46065039724",
+      "scope": [
+        "prototype/scripts/world/camera_obstruction.gd",
+        "prototype/scripts/world/game_world.gd",
+        "prototype/tests/camera_collision_test.gd",
+        ".github/workflows/aeterna-indoor-camera-spacing.yml"
+      ],
+      "access": "edit",
+      "note": "Run 46065039724: actual script error at test line 167: argument 6 untyped Array rather than Array[RID]. Success marker was rejected by log gate. Follow-up uses typed array, no runtime gate changes."
+    },
+    {
+      "id": "VIS-YOUTH-CAP-BINDING",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": "46065635264",
+      "scope": [
+        "tools/art/youth_cap_binding.py",
+        "tools/art/test_youth_cap_binding.py",
+        ".github/workflows/aeterna-youth-cap-binding.yml",
+        "docs/44_integration/YOUTH_CAP_BINDING_20261127.md"
+      ],
+      "access": "edit",
+      "note": "PR #193 head 4d518cb8600a4a3636e10dd9c02d9b88b412e776. Actual run 46065635264/job 140730144100 failure exit 124; five synthetic controls passed; owner-derived four civilian LODs measured 105570 samples with zero cap binding mismatches/zero changed bindings; input and candidate hashes identical. YOUTH_OUTFIT_SKIN_PASS 548 checks; not proof of arm seam repair. Render timed out. Artifact 15230594556; investigate body deformation and seam beyond cap matching, no generated replacement or visual/device acceptance."
+    },
+    {
+      "id": "VALLEY-MUSTER-IDENTITY",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "a80af59fd222619f5bdd911f16e27130b820e7d6",
+      "run_id": "46065570928",
+      "scope": [
+        "prototype/tests/valley_muster_test.gd",
+        ".github/workflows/aeterna-valley-muster-identity.yml"
+      ],
+      "access": "edit",
+      "note": "Roadmap 01: N28 truncated (46055347080), old full regression failed authored Germanic swordsman assertion. Independent focused actual engine reproduction with identity, LOD and real scene provenance; retain original assertion and all budgets, no automatic model retry. No edits to formation runtime or concurrent visual tasks. Exact candidate a80af59f on fix/aeterna-valley-muster-identity-20261127, focused run 46065570928 observed in_progress. 46 lines added to test; original combat-camera assertion unchanged. Fresh production camera focused on enemy independently validates actual Germanic near/mid rig, per-UID family, scene path, LOD, frustum, pool deferrals at both contexts. No runtime changes; result pending. Actual 46065570928 failure, 49/50. Fresh enemy view: 12 authentic forest_swordsman rigs. Combat camera: 11 visible living enemy agents at 14.1–16m, all detail 2 far instances; 25 pool deferrals. Original assertion remains red. No runtime fix yet. Administrative schema repair only: legacy label 'Nemotron coordinator' normalized to Coordinator; no scope, status or run change."
+    },
+    {
+      "id": "VIS-I00-FRAMING-V2",
+      "revision": "9d3a08cc63758f4f6d8064c4c7347cc3aaaf4c81",
+      "scope": [
+        "prototype/scripts/cinematic/opening_director.gd",
+        "prototype/tests/opening_director_test.gd",
+        "docs/44_integration/USER_VISUAL_REGRESSION_20261127.md",
+        ".github/workflows/aeterna-visual-camera-regression.yml",
+        "prototype/scripts/cinematic/i00_stage.gd",
+        "prototype/scripts/cinematic/i00_camp_scenery.gd",
+        "prototype/tests/i00_stage_test.gd",
+        "prototype/tests/i00_terrain_capture_test.gd",
+        ".github/workflows/aeterna-i00-terrain-clearance.yml",
+        "docs/44_integration/AETERNA_VISUAL_30_MILESTONES_20261127.md"
+      ],
+      "note": "PR #190 head ce523afa28bd165699ab8f6b93d4348bb94227f8. Actual run 46065939951 terrain and capture success; 140/140 capture checks, 30 PNGs, both 1280x720 and 1180x1312. Independently downloaded and verified all 30 SHA256 entries, source receipt, 30 V1 hashes (V1 9d3a08cc, artifact 15231060416). V2 artifact 15231471041 ZIP SHA256 ae988d568be13f6f59a92be3c102f54c14e124b25c2ce773fa027240020dd679. Real A/B: last portrait departure now shows all three formations rather than empty terrain, 18/18/18 projected. Vexillum visible first shot. Remaining visual defects: overbright foliage/horizon, sunny appearance under rain, simple armor/silhouette, sparse camp, dialogue views show backs. Frame gate passed; RQG visual NOT accepted, physical DEVICE_PENDING; no main merge.",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "review_pending",
+      "run_id": "46065939951"
+    },
+    {
+      "id": "VIS-MARKET-JUG-CAPTURE",
+      "revision": "39e1a6ab124ecaedc4f0f1eccaad15613a4409b6",
+      "scope": [
+        "prototype/scripts/world/village/i03_props.gd",
+        "prototype/tests/i03_flow_test.gd",
+        ".github/workflows/aeterna-market-jug-regression.yml"
+      ],
+      "note": "PR #189 head 9f8504f5eb03188e64175f5e88d2c9eeb7a302fb. Actual run 46066036841: headless 88/88, real graphical 112/112, 12 PNGs. Independently verified all 12 SHA256 entries and source receipt; ZIP artifact 15231266949 SHA256 06704937dfebe332798c8bba740daf542632f41ba7a557bd50dbd5171e909a7a. Reviewed all images: market/well, coins/pot and transactions visible; reaction shot obstructed by huge foreground arm, hand/fingers not clearly seen, simplified character and overbright lighting. 5mm physics gate preserved; physical device and RQG visual still pending.",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "review_pending",
+      "run_id": "46066036841"
+    },
+    {
+      "id": "VIS-INDOOR-TYPED-FIXTURE",
+      "revision": "6d593cbbd2fc94247f6751a4f0b8f2a1a1005e04",
+      "scope": [
+        "prototype/scripts/world/camera_obstruction.gd",
+        "prototype/scripts/world/game_world.gd",
+        "prototype/tests/camera_collision_test.gd",
+        ".github/workflows/aeterna-indoor-camera-spacing.yml"
+      ],
+      "note": "PR #191 head 9d795174e8f71508d14c7bf58bcf3db889edbde6; actual run 46065957068/job 140731193724 success: CAMERA_COLLISION_RESULT checks=55 failures=0; artifact 15230359346. Corrected typed Array[RID] test invocation, not weakened collision thresholds. Independent visual and device review pending, no runtime integration claimed. | Independent actual log confirms 55/55; all three runtime/test blobs byte-identical between #191 head 9d795174 and shared 8a8256a. Technical scope complete, release edit lease for I02 wiring; separate visual/device review still open.",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "done",
+      "run_id": "46065957068"
+    },
+    {
+      "id": "VALLEY-MUSTER-RIG-FAIRNESS",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "6d1aad82174764751cb2e2d3c0f610804518d512",
+      "run_id": "46066402676",
+      "scope": [
+        "prototype/scripts/tactics/valley_scene.gd",
+        "prototype/tests/valley_muster_test.gd",
+        ".github/workflows/aeterna-valley-muster-identity.yml"
+      ],
+      "note": "Actual run 46066402676/job 140732645272 failure. Valley 52/53, 'Visible mounted soldier sits on moving skeletal socket' failed; original formation regressions remain 7/87 and 4/22 (0.0928m balanced foot jump vs 0.04m, high-detail 0.1514m at 60 case). Artifact 15231097047. No gate weakening or runtime integration; diagnose mounted socket and formation continuity independently."
+    },
+    {
+      "id": "RAIN-SURFACE-CONTRACT",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "d4dabb8f6890b0b3a2acc472dcb550dd141577e4",
+      "run_id": "46066632490",
+      "scope": [
+        "prototype/scripts/world/village/village_scenery.gd",
+        "art/village/verify.gd",
+        ".github/workflows/aeterna-rain-surface-contract.yml"
+      ],
+      "note": "Actual run 46066632490/job 140733410851 failed before physical test: check_prototype.py rejected unknown group local_weather, exit 2. Subsequent Compatibility run had no imported textures/GLBs, script compile errors and exit 124. Artifact 15231626290. No evidence that physical threshold or GPU readback failed; no acceptance. Follow-up fixes workflow only."
+    },
+    {
+      "id": "RAIN-SURFACE-IMPORT-GATE",
+      "owner": "Coordinator",
+      "status": "review_pending",
+      "revision": "6e15e33edaffe951bf3dc35529207953b58a148c",
+      "run_id": "46069363087",
+      "scope": [
+        "prototype/scripts/world/village/village_scenery.gd",
+        "art/village/verify.gd",
+        ".github/workflows/aeterna-rain-surface-contract.yml"
+      ],
+      "access": "edit",
+      "note": "PR #194, exact prior 46066632490 failure. Follow-up uses real village_look group, independent headless import before Compatibility, Dummy audio, source/run receipt provenance; no simulation/threshold changes. Commit compared to previous candidate: exactly one workflow file changed (+7/-4). Actual focused push run 46069363087 observed in_progress; no success or visual/device claim. Additional PR checks triggered by draft creation; do not duplicate. Actual completed success 46069363087/job 140742330382: import/village_scenery/village_look pass; physical surface error 0.0m all four profiles, headless readback invalid (13.5–15.1m), real Compatibility X11 readback 0.0m for all 450 sampled visible supports (36/80/135/199); artifact 15231798222. Exact candidate ahead 2 behind 0 relative to Preview 1327bd6, three changed files. Independent review confirms 1mm real renderer and 2cm surface tests, unchanged profile budgets; no device/visual acceptance or integration yet."
+    },
+    {
+      "id": "NIGHT-BENCH-LIGHT-ACCOUNTING",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "review_pending",
+      "revision": "4ebd7cb5eecd1d4d8d6d1919241ab97de83c8cf0",
+      "run_id": "46075409038",
+      "scope": [
+        "prototype/tests/render_bench_views_test.gd",
+        ".github/workflows/aeterna-night-light-accounting.yml"
+      ],
+      "note": "Actual run 46075409038/job 140761865457 success: import, render_bench_views, route_fire, village_look passed; 94/94 benchmark checks, previous 8 fixture failures resolved. Artifact 15234713033 ZIP SHA256 28126f24e83567ffb1cabeccd046c3d283fbebba0a003eca8dcfb5488e7268f9. Independent diff review: exact door and route identities, exact authored/harness/total omni counts, daylight cleanup, original shadow/atlas gates retained. Test-only correction, no runtime light change or visual/device acceptance."
+    },
+    {
+      "id": "N29",
+      "owner": "Nemotron",
+      "access": "read",
+      "status": "done",
+      "revision": "6d1aad82174764751cb2e2d3c0f610804518d512",
+      "run_id": "46075607650",
+      "scope": [
+        "prototype/scripts/tactics/valley_scene.gd",
+        "prototype/scripts/visuals/valley_rider.gd",
+        "prototype/scripts/world/mounted_rider_pose.gd",
+        "prototype/tests/valley_muster_test.gd"
+      ],
+      "note": "Actual N29 run 46075607650/job 140762615929 succeeded; complete NVIDIA response, finish_reason=stop, model nvidia/nemotron-3-ultra-550b-a55b. Artifact 15234214921 ZIP SHA256 deb29c5e194d5d54f484c4b92487003ab6da8815f00f0535977dcb11a242aa5d; answer hash verified after removing bridge-added newline, all four pinned input SHA256 hashes independently matched. Three-line patch proposes force_update_all_bone_transforms after manual seek. Not applied blindly: Godot docs mark this internal/deprecated; answer does not discriminate absent rig vs stale socket. Next actual diagnostic preserves 3cm gate and measures direct bone, attachment and pelvis at multiple gait phases and original UID availability. Actual combined regression 46087073083 on #197 passes valley_muster; provider answer reviewed, own socket correction only, not a release."
+    },
+    {
+      "id": "CONSOLIDATED-VISUAL-CANDIDATE",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": "46075904136",
+      "scope": [
+        ".github/workflows/aeterna-consolidated-visual.yml"
+      ],
+      "access": "edit",
+      "note": "Actual exact d5cdcf3edb14dce44a11f1beed1942c131f5339f #195: combined focused CI 46075904136, Story 46075919478, camera 46075919449, NPC 46075919412/46075919533, I01 image 46075919519, first play 46075919367 success. QA build 233 46075919336 verified arm64-v8a v2/v3 and separate package, artifact 15235563511, 768370869 APK bytes. Full Fold7 46075919397 failure: formation_agents 7/87, formation_levels 4/22, valley_muster 1/37 Germanic rig missing. No Preview integration, release or physical acceptance; retain real failures. QA artifact is isolated test-only."
+    },
+    {
+      "id": "N29-SOCKET-DIAGNOSTIC",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "6d1aad82174764751cb2e2d3c0f610804518d512",
+      "run_id": "46076143096",
+      "scope": [
+        "prototype/tests/valley_muster_test.gd",
+        ".github/workflows/aeterna-mounted-socket-diagnostic.yml"
+      ],
+      "note": "Actual run 46076143096 job 140764201920 failed: 67/78. Twelve authored gait samples expose delayed BoneAttachment update; five transitions exceed 3 cm (maximum 0.1144407317 m). Bone updates immediately, attachment catches up next frame, pelvis remains stale. Separate first cavalry UID detail=3, absent rig, 1 pool deferral; three other cavalry rigs present. Artifact 15235615747. No gate change. Separate synchronous socket candidate; allocation remains independent."
+    },
+    {
+      "id": "N29-SOCKET-SYNC",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "f79a2dc092ea7374fff7f94d7eff6c162fb60103",
+      "run_id": "46080747402",
+      "scope": [
+        "prototype/scripts/visuals/valley_rider.gd",
+        "prototype/tests/valley_muster_test.gd"
+      ],
+      "access": "edit",
+      "note": "Actual commit 9e8a0b26fe1e5aacfcd94df016f317675f6e39fe on PR #196, exact two files only, lease f79a2dc. Immediate local BoneAttachment transform sampled after seek; existing 3 cm gate and original battle UID test unchanged. Added direct bone/pelvis/saddle checks plus translated/yawed root gait samples. Focused Godot run 46080747402 observed in_progress; existing automatic PR checks 46080753788/46080753799 queued. No success yet, allocation independent; no duplicate dispatch. Actual 46080747402/job 140778892616: 125/126; 24 direct gait/root samples, maximum measured bone-to-pelvis 9.5367431640625e-7 m; original first UID still deferred (detail=3, absent rig), 3 others available. Socket sync technically passed; overall failure retained. Next test exercises real bounded materialization cadence without raising cap or contact limit."
+    },
+    {
+      "id": "N29-MUSTER-BOUNDED-PROMOTION",
+      "owner": "Coordinator",
+      "status": "done",
+      "revision": "9e8a0b26fe1e5aacfcd94df016f317675f6e39fe",
+      "run_id": "46081941328",
+      "scope": [
+        "prototype/tests/valley_muster_test.gd"
+      ],
+      "access": "edit",
+      "note": "Actual run 46081941328/job 140782676611, exact 32bedab0817b135ec7a6cd6a9e38845b8cb82847: 133/133 PASS. Four distinct mounted UIDs materialized after 16 simulated paused 60Hz frames (max 30), max 3 new rigs per pass, first pelvis-seat residual 0 m, no duplicate IDs or simulation advance. Original 3cm gate retained. Original combat camera has one authentic forest_swordsman mid rig, 10 far visible; original Germanic assertion passed. Artifact 15237427850 digest sha256:95edf123bad6557a626f54df78505263967646c277c038cd5bb42fc48ad97b57 (GitHub metadata). Separate full ARM64 run 46081946815 still fails other groups. Technical diagnostic only; not visual/device acceptance. Diagnostic test scope complete; runtime candidate remains subject to joint regression and RQG."
+    },
+    {
+      "id": "VIS-MOUNTED-INTEGRATION",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "d5cdcf3edb14dce44a11f1beed1942c131f5339f",
+      "run_id": "46087073083",
+      "scope": [
+        "prototype/scripts/tactics/valley_scene.gd",
+        "prototype/scripts/visuals/valley_rider.gd",
+        "prototype/tests/valley_muster_test.gd",
+        ".github/workflows/aeterna-visual-mounted-integration.yml"
+      ],
+      "access": "edit",
+      "note": "Run 46087073083/job 140799028768 on 8a8256a30145918739312588d70c4585768fa568: 12/14 groups pass including valley_muster, village_backdrop, camera, night and all story groups. formation_agents 80/87, formation_levels 18/22 remain red. Full run 46087085346 failure (visual job success). Isolated QA run 46087085256 succeeds; artifact 15240501052, QA 237, 768374965-byte APK, V2/V3, ARM64. Not release, no Fold7 physical acceptance. No shared branch merge."
+    },
+    {
+      "id": "FORMATION-WHEEL-AUTHORITY",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "8a8256a30145918739312588d70c4585768fa568",
+      "run_id": "46096417387",
+      "scope": [
+        "prototype/scripts/battle/battle_model.gd",
+        "prototype/scripts/formation/formation_agents.gd",
+        "prototype/tests/formation_slot_authority_test.gd",
+        ".github/workflows/aeterna-formation-wheel-authority.yml",
+        "prototype/tests/formation_agents_test.gd"
+      ],
+      "access": "edit",
+      "note": "Full original evidence retained in register version 242 at 76c1eecd4efec04f3a127b3a8513e40f0021e146. Isolated #197 branch fix/aeterna-formation-wheel-authority-20261128; 5153f8354595d9472cde45f3c056ad7761976d73 distinguished authoritative >75deg turn from visual wheel lag, per-unit counters, exact base blobs. Run 46092418232/job140816137495: slot27/27, commands411/411, rules146/146, muster133/133, formation82/87 and18/22 red; max lag92.9093deg vs authoritative41.253deg. Diagnostic 842f995bdb2bd08f03b43ba77cc3a80a3e38893a changed only formation_agents_test.gd +16/-1; all original gates retained. Actual run46096417387/job140828665531 failed 82/87 and18/22; target valley_spears refile/rematch0/0, sole global ridge_bows1/1; unrelated increment proven, not invalid refile. Worst balanced/60 and very_high/60 foot0.0927992m forest_spear block at16s; balanced/180 same family at16.2s. Balanced/180 ridge_spears_04 at25.45s C-detail-hidden(3)/B before/after: root0.692983m, phase0.376398, debt1.492725m, run/noncontact. No runtime patch in diagnostic or integration; status, revision, run, scope and gates unchanged."
+    },
+    {
+      "id": "N30",
+      "owner": "Nemotron",
+      "status": "blocked",
+      "revision": "158e22df72a8fafb1ab690bd55011a16f27b801d",
+      "run_id": "46092289505",
+      "scope": [
+        "prototype/scripts/battle/battle_model.gd",
+        "prototype/scripts/formation/formation_agents.gd",
+        "prototype/tests/formation_agents_test.gd",
+        "prototype/tests/formation_slot_authority_test.gd"
+      ],
+      "access": "read",
+      "note": "Actual bridge commit 925ff07bacb6da94d6537c97a2fea3551cf2c108, NVIDIA run 46092289505 observed in_progress; offline Foundation 46092293470 passed. N30 reads exact #177 only, residual wheel/refile failure, no duplicate LOD request. No completion or quota assertion. Completed failure 46092289505/job 140815876446; NVIDIA_BRIDGE_RECEIPT status=truncated, exit 3, artifact 15242225486. No complete unified diff, no model patch applied, no automatic retry."
+    },
+    {
+      "id": "VIS-YOUTH-CAPTURE-ON-DEMAND",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "4d518cb8600a4a3636e10dd9c02d9b88b412e776",
+      "run_id": "46092542037",
+      "scope": [
+        "prototype/tests/youth_outfit_review.gd",
+        ".github/workflows/aeterna-youth-cap-binding.yml"
+      ],
+      "access": "edit",
+      "note": "Run 46092542037/job 140816542849 success at 6723fbb: 20/20 image SHA256 and ZIP digest independently verified (artifact 15242451105, 59879123585802e4b71dcd7a36acf96ad8dd03d5f52f65f14cb73090417054dc). Both 548/548 skin checks pass; all 4 civilian asset hashes unchanged, zero cap changes. Actual visual inspection: both outfits' front views show identical wall, side blocked by NPC, table obscures lower body in 3/4 and walk. Face visible; V2 is control only. Armoured attack edge excess 0.42575m, not fixed. Capture execution succeeded but RQG rejected; studio follow-up required."
+    },
+    {
+      "id": "VIS-YOUTH-STUDIO-EVIDENCE",
+      "owner": "Coordinator",
+      "status": "blocked",
+      "revision": "6723fbbded93f9b8f8012a7afa4ac3125c71d293",
+      "run_id": "46097598105",
+      "scope": [
+        "prototype/tests/youth_outfit_review.gd",
+        ".github/workflows/aeterna-youth-cap-binding.yml"
+      ],
+      "access": "edit",
+      "note": "Actual run 46097598105/job 140832438642 success at a67c4bc7629948d8b5c14a0cd708791e5fb03cc7. Artifact 15244014444 ZIP SHA256 1069cd2340eeb3f8fa29bfae3ede1969e1cf21fa794550b202bd1316d4d73146 independently matched; all 44 PNG hashes verified, 24 neutral studio plus 20 gameplay. Both outfits visible, armoured attack has gross protruding geometry; civilian pose visibly cleaner. All 4 civil GLB hashes unchanged V1/V2, control only. Critical provenance gap: this workflow stages pristine armoured assets while both production APK workflows retarget ACCAD after civilian staging. Thus old armoured edge measurement not proven to represent packaged asset. RQG not accepted, DEVICE_PENDING. Follow-up stages exact production armoured retarget, captures hashes and per-clip worst edge with phase; no private GLB publication."
+    },
+    {
+      "id": "VIS-YOUTH-PRODUCTION-PARITY",
+      "owner": "Coordinator",
+      "status": "done",
+      "revision": "a67c4bc7629948d8b5c14a0cd708791e5fb03cc7",
+      "run_id": "46101989464",
+      "scope": [
+        "prototype/tests/youth_outfit_skin_test.gd",
+        ".github/workflows/aeterna-youth-cap-binding.yml"
+      ],
+      "access": "edit",
+      "note": "Actual run46101989464/job140846262020 success; exact commit bd4af0b2b33cfcb6cb753386915ad4bf40596c0c; source-staged V1/V2 actual 692/692 original skin checks each, detailed 19-clip edge evidence, artifact15245784668. Production parity/report tooling verified; armoured 14 residual LOD0 violations are independent unresolved gate, no visual/device/APK acceptance."
+    },
+    {
+      "id": "N31",
+      "owner": "Nemotron",
+      "access": "read",
+      "status": "done",
+      "revision": "842f995bdb2bd08f03b43ba77cc3a80a3e38893a",
+      "run_id": "46102852466",
+      "scope": [
+        "prototype/scripts/visuals/valley_tribal_soldier.gd",
+        "prototype/scripts/visuals/soldier_visual.gd",
+        "prototype/scripts/visuals/far_ranks.gd",
+        "prototype/tests/formation_agents_test.gd"
+      ],
+      "note": "Actual new bridge commit b9303ab8aaa52bab0f15a8acd96c035ca13513bc, exactly 2 manifest/request files, push workflow 46102852466 observed in_progress. N30 completed truncated, no retry. N31 is newly measured forest_spear static block asset/silhouette baseline contract, not prior N21/N24 locomotion debt or N30 wheel. Single request, 12288 completion tokens max, unchanged provider, no new billing or quota bypass; exact 40mm gate retained, no execution or completion claim. Actual run 46102852466/job 140849082505 completed success, answer status answered, artifact 15246183308. Review rejects raw patch: Python enumerate/comprehensions and two-value Dictionary loop syntax invalid GDScript; instantiation never enters SceneTree before global transform; comparison skips block and uses noncorresponding first far vertex vs bone origin, and tries to add an existing authored_ground.gd with weaker bone-height rather than actual skinned vertices. No patch applied. Independent static block diagnostic may follow separately; no retry."
+    },
+    {
+      "id": "FORMATION-CONTACT-TRACE",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "842f995bdb2bd08f03b43ba77cc3a80a3e38893a",
+      "run_id": "46102987956",
+      "scope": [
+        "prototype/tests/formation_contact_trace_test.gd",
+        ".github/workflows/aeterna-formation-contact-trace.yml"
+      ],
+      "note": "Independent actual 180-soldier replay to trace the same hidden B agent ridge_spears_04, root jump 0.692983m, phase 0.376398, correction 1.492725m at 25.45s from run 46096417387. New test and focused workflow only, no edit of existing formation/model/visual code, no overlap with N31 static block silhouette. Preserve original position/phase limits and original test files; trace raw tick, contact/rock proximity, correction and rendered root. Actual commit 7801b0cf1dfef7f1d1b544fe92025f1261b15cab created on fix/aeterna-formation-contact-trace-20261128 with exact expected SHA 842f995b; compare ahead 1 behind 0, exactly two newly added files (147-line standalone replay and 65-line workflow). Focused Godot run 46102987956 observed in_progress. No runtime changes, no new acceptance or build, existing tests untouched. New gate reproduces the original numeric position/phase limits for this UID and logs raw contact correction, nearby agents and rock clearance; not a new threshold. Actual 46102987956 failure, 2/4: root step 0.6929834485m > 0.0711667m and phase 0.376398 > 0.063205. At tick 763, rock 1 clearance before -1.385083m; no nearby agent; projected correction 1.492725m. Aggregate movement ignores obstacles while _resolve_contacts excludes C. This is a plausible upstream source, not yet proven by fix."
+    },
+    {
+      "id": "FORMATION-AGGREGATE-ROCK-ROUTE",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "c1bb82e924e8d936300851e72bfcb4aefb5918fa",
+      "run_id": "46103496405",
+      "scope": [
+        "prototype/scripts/formation/formation_agents.gd",
+        "prototype/tests/formation_contact_trace_test.gd",
+        ".github/workflows/aeterna-formation-contact-trace.yml"
+      ],
+      "note": "Masterplan 01.4. Isolated follow-up on contact trace branch: replace unconstrained level-C direct movement with bounded step verified against existing rock clearance and tangential obstacle route. Preserve authoritative slots, identities, caps, rules, existing 0.04 m LOD, root/phase gates; add direct two-direction rock crossing checks and actual 180 replay. No Preview integration before relevant green tests. N31 read-only and separate; no duplicate model calls. Actual commit c1bb82e924e8d936300851e72bfcb4aefb5918fa, exact compared 3 files only: formation_agents.gd, existing contact trace test and its workflow. Eight direct obstacle routes in both directions plus actual UID clearance, original root/phase thresholds, original 60/180 formation, battle command/rules, slot authority and muster tests. Actual run 46103496405 observed in_progress/job 140850982025. No successful test claim. No new APK or Preview write. N31 rejected as invalid, no duplicate provider dispatch. Actual 46103496405/job 140850982025 completed failure overall but targeted trace 21/21, root 0.063334m (was 0.692983m), phase 0.044872 (was 0.376398), minimum clearance -0.000000629m, prior 1.493m ejection eliminated. Slot authority 27/27, battle command 411/411, rules 146/146, muster 133/133. Full 82/87 and 18/22 remain red: residual correction/contact jumps (balanced/60 max 0.120020m, balanced/180 0.132392m); static tribal 0.092799m and unrelated wheel counter remain. Preserve tested candidate, no shared merge."
+    },
+    {
+      "id": "TRIBAL-LOD-STATIC-CONTRACT",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "2612b01b00951facf8ce77303325903b6189e77a",
+      "run_id": "46103635941",
+      "scope": [
+        "prototype/tests/tribal_lod_contract_test.gd",
+        ".github/workflows/aeterna-tribal-lod-contract.yml"
+      ],
+      "note": "Independent actual forest_spear production actor static LOD diagnosis following completed N31 rejected raw patch. Same existing 40mm sole-proxy test and CPU far shader mirror across idle and block exact phases; additionally measure actual skinned foot vertices through existing MotionSkinMeasurement. No changes to runtime/assets, no parallel edits to formation branch, no new numeric approval gates or automatic model retry. Capture actual source-bound results; no visual/device acceptance. Actual commit 2612b01b00951facf8ce77303325903b6189e77a on fix/aeterna-tribal-lod-contract-20261128. 32 real production actor/pose/phase samples, 2 LODs, translated/yawed root, actual imported skin clouds and existing nearest far-sole proxy comparison. Original 40mm limit retained; no geometry/runtime edits. Actual run 46103635941/job 140851418060 observed in_progress. No result or acceptance claim. Actual 46103635941/job 140851418060: 141/173, all 32 proxy cases fail; stable across phases idle 0.083102m and block 0.092799m both near/mid; actual left proxy-to-skin 0.129014m and right actual-to-far 0.128751m in block. Confirms static geometry/coordinate contract mismatch, not solely phase drift. No geometry change or gate relaxation."
+    },
+    {
+      "id": "MASTERPLAN-01-SOURCE-AUDIT-20261128",
+      "owner": "Coordinator",
+      "access": "read",
+      "status": "done",
+      "revision": "8a8256a30145918739312588d70c4585768fa568",
+      "run_id": "46087073083",
+      "scope": [
+        "prototype/scripts",
+        "prototype/assets",
+        "prototype/tests"
+      ],
+      "note": "Masterplan pp.9–10 source audit on exact combined QA237 tree: recursive tree complete 5411 entries; 166 open PRs enumerated (100+66 pages), prioritized 10 PR file-list SHA comparisons. #195 all 28/28 exact, #194 3/3, #192 2/2, #191 4/4, #190 10/10, #189 3/3, #188 3/3; #196 runtime valley_rider and valley_muster test 2/2 exact, isolated workflow not copied. #177 0/4 exact on combined base; successor wheel/rock candidate still red/in CI, no blind merge. #198 0/3 exact, only test/workflow files; newest QA240 run 46101992721 success artifact 15246562721, but branch diverges 8 ahead/2 behind combined QA237, not a consolidated replacement. QA237 artifact 15240501052 unexpired. Actual original atelier GLBs exact (woman 832153a77e6141b108a9370ef648e5a048e08368, legion a40e2a1e710dfb809fbecb48b77c640dcdfec6e7), runtime catalog/equipment prior green. Latest actual production youth parity run 46101989464 success, 692/692 each control/candidate, civil 0 edge violations at LOD0/2, armoured LOD0 14 residual run edge violations with max excess 0.007911m, LOD2 zero; not a repaired or visually accepted model. Full youth candidate run 46101992690 still in_progress. Combined 46087073083 failed formations; 46103496405 and 46103635941 in_progress. Remaining older PR file-level audit not claimed. No merge or APK production or device acceptance in audit."
+    },
+    {
+      "id": "FORMATION-BODY-SWEEP",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de",
+      "run_id": "46104088321",
+      "scope": [
+        "prototype/scripts/formation/formation_agents.gd",
+        "prototype/tests/formation_contact_trace_test.gd",
+        ".github/workflows/aeterna-formation-contact-trace.yml"
+      ],
+      "note": "Phase01 successor on separate branch. Keep successful rock candidate intact. Introduce bounded swept-circle root travel against actual nearby UID positions, including C agents before promotion, retaining existing steering and original contact resolver. Hard spacing constants unchanged; body sweep prevents new penetration rather than hiding root jumps. Keep original tests; add deterministic pair crossing, outward escape, and direct clear path assertions, and rerun full 60/180 plus trace/command/rules/muster. No changes to rules, assets, caps or main. Hypothesis pending tests. Actual commit 65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de, branch fix/aeterna-formation-body-sweep-20261128. Three-file isolated comparison: runtime swept-circle root travel for B/C, all-level occupancy in start grid, original steering scope preserved, original hard spacing and existing post-step contact resolver unchanged; seven new focused direct cases. Actual run 46104088321 observed in_progress. No full formation pass or integration claim. Previous rock candidate remains unchanged. Actual 46104088321 overall failure, but 28/28 focused, 27/27 slot authority, 411/411 commands, 146/146 battle rules, 133/133 muster, regular 84/87, large 20/22. All four root/phase gates pass; remaining static foot model transition and wheel attribution. No full approval; preserve candidate for verified integration after remaining issues."
+    },
+    {
+      "id": "FORMATION-WHEEL-ATTRIBUTION",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "done",
+      "revision": "b3cdf9fff354b612b20dc86a36086acec2c0f105",
+      "run_id": "46105279398",
+      "scope": [
+        "prototype/tests/formation_agents_test.gd",
+        ".github/workflows/aeterna-formation-wheel-attribution.yml"
+      ],
+      "note": "Actual run 46105279398/job 140856523437 passed 8/8 at b3cdf9fff354b612b20dc86a36086acec2c0f105. Exact target valley_spears 0/0 refile/rematch; unrelated ridge_bows one independently validated 81.792505deg refile at rule snapshot23, one actual roster/layout rematch, global1/1, invalid events empty. Focused test attribution done, not full formation or visual acceptance. Exact test blob may enter new isolated combined test after lease; all numeric motion/LOD gates unchanged."
+    },
+    {
+      "id": "N32",
+      "owner": "Nemotron",
+      "access": "read",
+      "status": "done",
+      "revision": "2612b01b00951facf8ce77303325903b6189e77a",
+      "run_id": "46104913449",
+      "scope": [
+        "prototype/tests/tribal_lod_contract_test.gd",
+        "prototype/scripts/visuals/valley_tribal_soldier.gd",
+        "prototype/scripts/visuals/soldier_visual.gd",
+        "prototype/scripts/visuals/far_ranks.gd",
+        "prototype/scripts/visuals/authored_ground.gd"
+      ],
+      "note": "New measured asset repair task, not repeat N31 diagnostic. Actual static trace 46103635941 failed all 32 cases, idle 83.102mm, block 92.799mm; actual right sole/far mismatch 128.751mm and left proxy/actual 129.014mm. Propose minimally authored family-specific geometry/skin calibration and reproducible export/validation preserving 40mm limit, real sole geometry and budgets. No provider writes, only approved public source; no private GLB. Do not mask failures or change existing gates. Actual bridge commit c62af999d25a3ed464c8eda92a619cd62c80eb59; run 46104913449 observed in_progress. Exactly two tasks, 12288 tokens each, max parallel 2, existing authorization and unchanged bridge limits. API responses and proposed patches not yet verified. Actual run 46104913449 completed success, response receipt answered, artifact 15246892638; independent review of logged response: Raw patch invalid: Skin has no get_skeleton, far unskinned mesh uses a skin-weight extraction with empty binds so returns no soles, bind indices not skeleton bone indices, partial weights renormalized incorrectly, 3*2*2*8*2 =192 not 96; proposal to preserve multiple far materials contradicts one-material budget. Useful actual-sole correspondence concept, not a repair. No raw code applied. Existing gates remain, no accepted runtime change, no retry."
+    },
+    {
+      "id": "N33",
+      "owner": "Nemotron",
+      "access": "read",
+      "status": "done",
+      "revision": "bd4af0b2b33cfcb6cb753386915ad4bf40596c0c",
+      "run_id": "46104913449",
+      "scope": [
+        "tools/art/youth_cap_binding.py",
+        "prototype/tests/motion_skin_measurement.gd",
+        "prototype/tests/youth_outfit_skin_test.gd"
+      ],
+      "note": "New production-parity youth residual deformation repair. Actual 46101989464 692/692 original checks; armoured LOD0 run 5 and side_kick 9 severe edge samples, worst same MeshyYouthBody surface0 edge 26845/26850, 7.911mm excess in run, 1.351mm in side_kick. Civil LOD0/2 and armour LOD2 zero. Propose isolated local asset-weight correction experiment with exact vertex/weights/source identity and full all-clip guard, no private asset transfer or editor lease; no whole-body smoothing, no gate relaxation. Actual bridge commit c62af999d25a3ed464c8eda92a619cd62c80eb59; run 46104913449 observed in_progress. Exactly two tasks, 12288 tokens each, max parallel 2, existing authorization and unchanged bridge limits. API responses and proposed patches not yet verified. Actual run 46104913449 completed success, response receipt answered, artifact 15246664901; independent review of logged response: Raw patch invalid/incomplete: assumes JOINTS_0 indices 0..3 instead of mapping named skin joints, no expected SHA check, undefined name in check_sole_heights, checks all vertices rather than actual sole, proximity not topological one-ring, seam measure not called, no exact edge-ID/new-violation tracking, wrong report semantics and invalid GDScript boolean fallback. Useful local two-vertex weight candidate concept only; no raw code applied. Existing gates remain, no accepted runtime change, no retry."
+    },
+    {
+      "id": "YOUTH-ARMOUR-LOCAL-WEIGHTS",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "458bb1d666d4f440d2459a78c76bed629d128c18",
+      "run_id": "46105418620",
+      "scope": [
+        "tools/art/youth_armour_local_weights.py",
+        "tools/art/test_youth_armour_local_weights.py",
+        ".github/workflows/aeterna-youth-armour-local-weights.yml"
+      ],
+      "note": "Actual run 46105418620/job 140856973614 failed at candidate build: ValueError Expected one measured connected edge, found 0. No asset was changed; no A/B result. Prior source identity checks and local guard retained. Next isolated candidate searches actual named four-influence signatures, connected invariant edge length and explicitly enumerated orthogonal coordinate conventions across all MeshyYouthBody primitives. No tolerance relaxation, no private GLB publication."
+    },
+    {
+      "id": "N34",
+      "owner": "Nemotron",
+      "access": "read",
+      "status": "done",
+      "revision": "65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de",
+      "run_id": "46105483466",
+      "scope": [
+        "prototype/scripts/formation/formation_agents.gd",
+        "prototype/tests/formation_contact_trace_test.gd",
+        "prototype/scripts/formation/formation_levels.gd"
+      ],
+      "note": "Actual run 46105483466/job 140857296121 complete, receipt answered at 65fd1e53. Raw diff rejected: attempts assignment to GDScript method, Python comprehension, wrong yaw axis, incorrect overlap fixture 0.8m described as below 0.58m, unrealistic pass-time requirement and invented troop caps. Useful independent progress/broadphase testing idea only; no code applied or repeat dispatch."
+    },
+    {
+      "id": "CITY-FORUM-MORTAR-REVIEW",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "review_pending",
+      "revision": "8a8256a30145918739312588d70c4585768fa568",
+      "run_id": "46106720404",
+      "scope": [
+        "prototype/scripts/world/city_exploration.gd",
+        "prototype/tests/roman_city_visual_capture.gd"
+      ],
+      "note": "Independent actual city visual defect from run 46101992690, artifact 15245677495 ZIP SHA256 verified; 6 real 1280x720 captures. Bright travertine mortar visibly dominates joints; builder explicitly intended dark mortar but uses STONE. Isolated runtime material override only for exact Forum_Worn_Stonework Travertine surface; copy source material, preserve texture/geometry/collision/LOD, verify targeted surface and capture hashes, no visual acceptance pending comparison. Base city builder, runtime and capture blobs match baseline. No external API or owner asset transfer. Actual commit 154a5ee4359d77b6552b6cecaee279c9b0adb995 on fix/aeterna-city-mortar-20261128, PR #199, compared exactly 2 files +44/-3. Actual graphical job 140861015179 and ARM64 candidate 140861014945 in progress, no engine/visual/device pass claim. Other CI runs are automatic, no manual duplicates. | Actual graphical job 140861015179 passed both profiles. Artifact 15247933942 digest verified; all 6 frame hashes matched. V1 ZIP 15245677495 matched prior digest; visible forum change 6.6351%, market .0279%, masonry unchanged. Material improvement confirmed locally, source merge SHA 0e19a5f, Android running, full city RQG pending."
+    },
+    {
+      "id": "TRIBAL-SOLE-TOPOLOGY",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de",
+      "run_id": "46108009771",
+      "scope": [
+        "prototype/assets/germanic_warriors/forest_spear_far.glb",
+        "tools/art/refine_tribal_sole_topology.mjs",
+        "prototype/tests/tribal_lod_contract_test.gd",
+        "prototype/tests/formation_agents_test.gd",
+        ".github/workflows/aeterna-tribal-sole-topology.yml"
+      ],
+      "note": "Actual run 46108009771/job 140865000420 failed only LOD foot gates. Committed forest_spear GLB reproduced byte-identically. Static idle 16/16 pass (max20.107mm); block 16/16 still fail (46.981mm, prior92.799mm). Full 87/89, large20/22; original root/phase gates, wheel attribution, contact28/28, authority27/27, commands411/411, rules146/146, muster133/133 pass. Worst remaining full cases all forest_swordsman 84.59–85.89mm. Source body pose block/wall/testudo actually bends left thigh -17deg and shin +27deg; far shader omitted both. Preserve candidate and 40mm limit; no full acceptance."
+    },
+    {
+      "id": "YOUTH-ARMOUR-SOURCE-MAPPING",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "458bb1d666d4f440d2459a78c76bed629d128c18",
+      "run_id": "46108139625",
+      "scope": [
+        "tools/art/youth_armour_local_weights.py",
+        "tools/art/test_youth_armour_local_weights.py",
+        ".github/workflows/aeterna-youth-armour-local-weights.yml"
+      ],
+      "note": "Actual run 46108139625/job 140865420267 failed before asset change; 9 unit tests pass. Staged source SHA256 dcb52efb544fd68be316ef59e6e835fc98f94485cf24d6609bb8a6fac7646605. Primitive0 33888 vertices, minimum named-weight L1 0.0000152589 and 0.0000305474; no exact signatures, primitive1 unrelated. Prior Godot reported weights correspond exactly to uint16 codes [8753,11098,19311,26372] and [12564,7922,28222,16825], totals65534/65533. Likely 16-bit import truncation, not tolerance relaxation. Next match exact encoded codes with actual source SHA, topology/rest position and unchanged tolerances. No geometry change or A/B pass."
+    },
+    {
+      "id": "CITY-FOUNTAIN-WATER-V2",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "review_pending",
+      "revision": "154a5ee4359d77b6552b6cecaee279c9b0adb995",
+      "run_id": "46108205504",
+      "scope": [
+        "prototype/scripts/rendering/city_fountain_water.gd",
+        "prototype/scripts/rendering/city_surface_microdetail.gd",
+        "prototype/tests/city_surface_microdetail_test.gd"
+      ],
+      "note": "Forum mortar V1/V2 render reviewed, fountain cyan defect addressed in exact authored Forum_Fountain/Northern_Fountain Water_Surface only; preserve geometry, texture, collision, LOD, lighting budgets. Draft #200 head 077075ed08e1e90ee4b865d10bb66437f187b4ac, three paths +103/-1. Independent exact blob match to tested merge d0e9c69ad9cc39eb4daef03a5c9c6704fb705d37: 1db053cbf1f41e2bbf7158d226f78323701cfc48, 3e398231e75565ffde1d57189b836d1d7a92cff0, 5b87ba10183013e042898c092e939424413f28c6. Actual focused 46108205504/job140865627711: microdetail188, signage80, exploration pass. Combined 46108205494 people27 plus same checks pass. Real render 46108205477/job140865627831 high and very_high, six frames passed; artifact15248591429. V2/V3 ZIP digests and all 12 frame hashes verified; forum change 0.45204%, market 0.00250%, masonry 0.00152%. Inspected actual fountain crop: turquoise muted, still flat water; local material improved, AAA unresolved. PR comment7234970209. Isolated ARM64 QA 46108205480 passed city asset19/walk30/crowd158/training18, not device or release gate. Full 46108205477/job140865628008 failed formation_agents7/87 and formation_levels4/22. Exact independent review persisted #200 comment7234953675. No integration/visual/device acceptance or release."
+    },
+    {
+      "id": "TRIBAL-GUARD-POSE",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "603e4354ddfcd1545d26e6d695239f9efe6876f0",
+      "run_id": "46108635420",
+      "scope": [
+        "prototype/scripts/visuals/far_ranks.gd",
+        "prototype/shaders/rank_stride.gdshader",
+        "prototype/tests/tribal_lod_contract_test.gd",
+        "prototype/assets/germanic_warriors/forest_swordsman_far.glb",
+        "prototype/assets/germanic_warriors/forest_skirmisher_far.glb",
+        ".github/workflows/aeterna-tribal-sole-topology.yml"
+      ],
+      "note": "Actual isolated head89e62f50d75a4a9cdc39efa0311cd9169b832670. Run46108635420/job140866957392 failed overall: actual static guard 205/205 max20.107mm; contact28/28, muster133/133, full formation60 87/89,180 20/22; walking LOD foot gate remains red. Retain guard and original asset topology, 900 triangle caps, unchanged 40mm limit; no full integration or release. Independent 798-sample moving diagnostics run46113829341:264 failures, max52.317mm. Source-keyframe gait successor reserved separately."
+    },
+    {
+      "id": "YOUTH-ARMOUR-IMPORT-WEIGHTS",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "aecdc9f730e1a7031767eaa2178dc8441ab15b0d",
+      "run_id": "46108744734",
+      "scope": [
+        "tools/art/youth_armour_local_weights.py",
+        "tools/art/test_youth_armour_local_weights.py",
+        ".github/workflows/aeterna-youth-armour-local-weights.yml"
+      ],
+      "note": "Actual run46108744734/job140867299205 failed after 11 unit checks passed and exact pinned source dcb52efb544fd68be316ef59e6e835fc98f94485cf24d6609bb8a6fac7646605 staged. Unique connected original edge located with exact Godot UINT16 codes, length error2.079e-10m and axis coordinate error6.505e-7m. Mean binding candidate rejected by unchanged local no-edge-regression at run frame0; no candidate GLB written or published. Preserve exact identity/strict full Godot A/B and local seam guard; constrained two-endpoint successor only."
+    },
+    {
+      "id": "KIMI-DUO-I02-BASKET",
+      "owner": "Kimi",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "b34adfdf014625828bf13ec47e60a220b9732da5",
+      "run_id": "46113029476",
+      "scope": [
+        "prototype/scripts/world/village/i02_props.gd",
+        "prototype/scripts/world/village/i02_props.gd.uid",
+        "prototype/tests/i02_props_test.gd",
+        "prototype/tests/i02_props_test.gd.uid"
+      ],
+      "note": "Full original handoff note retained in register v242 at 76c1eecd4efec04f3a127b3a8513e40f0021e146. GitLab !201/#206 source fb30624dd7a90cb0d3cd5724daa6fd68b01f02e8, exact base 8a8256a30145918739312588d70c4585768fa568, +349/-0 only two new files. GitHub candidate #201 b34adfdf014625828bf13ec47e60a220b9732da5 exact blobs 1f7966a6ffd1d3e28aab6e4475c481ac94439d43 / 074f1219df2b87058ac7ecff05374988b962b66e. Original GLB 0c9043c91be9727e2d6c9c2dbe41f0ed46946c60; pending alone does not grant item, correction retains, complete removes. Actual QA-only #202 a2d474b4d76ffa48057aa739b29bca5641128929 run46113029476 in_progress, coordinator test not provider run. Preserve lease; no runtime wiring, merge, pass, visual/device/APK acceptance or campaign progression. MENU remains blocked. | Actual run46113029476/job140880571638 failed after missing private youth staging, second GLB primitive height excluded and Vector2 passed to Vector3 player setter; timeout124. Original source retained. Separate successor required; no pass."
+    },
+    {
+      "id": "ARGON-M28-NPC-OPPORTUNITIES",
+      "owner": "Gemini",
+      "status": "reserved",
+      "revision": "8a8256a30145918739312588d70c4585768fa568",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/story/npc_opportunity_preview.gd",
+        "prototype/scripts/story/npc_opportunity_preview.gd.uid",
+        "prototype/tests/npc_opportunity_preview_test.gd",
+        "prototype/tests/npc_opportunity_preview_test.gd.uid"
+      ],
+      "access": "edit",
+      "note": "Gemini 4 Argon via user-mediated GitLab Duo. M28 preparatory read-only opportunity selector from existing authoritative NPC behavior, economy and village life state. One bounded existing-needs path, deterministic candidates, actual observed availability and safe gating, no invented rewards/quest progression/markers, no state writes. Isolated branch candidate/aeterna-m28-npc-opportunities-20261128 from exact common base; new module and independent regression test only (+optional exact UIDs); no existing files, CI, tracker, register, assets or main. Coordinator owns later QA and runtime wiring under separate lease. Recheck remote and active leases before writing; no claim of dispatch/test or M28 completion."
+    },
+    {
+      "id": "FORMATION-STRIDE-CONTACT-TRACE",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "89e62f50d75a4a9cdc39efa0311cd9169b832670",
+      "run_id": "46113829341",
+      "scope": [
+        "prototype/tests/formation_stride_contact_test.gd",
+        ".github/workflows/aeterna-formation-stride-contact.yml"
+      ],
+      "note": "Independent QA-only diagnostic after actual guard run 46108635420/job 140866957392. Original 40mm switch gate still fails four moving cases (49.0–52.3mm); no runtime/asset or gate edits. Sample every production Roman/tribal family at real near/mid rig, march/run/retreat phases including exact failing phases, compare canonical sole probes to actual far mesh CPU shader at identical phase, report side/heel/toe and actual imported skinned sole at worst phase. Existing static guard, formation and thresholds preserved; no integration claim. Isolated branch qa/aeterna-formation-stride-contact-20261128 from exact guard head. Do not merge QA-only workflow. Actual QA-only PR #203 head467d442aceee2a82a62346f3b18eadd351b4fd82, exact two new files +261/-0, real run46113829341 in_progress; no result yet. Actual run46113829341/job140883061151 completed: all 798 production samples, 3445 checks, 264 failures, max52.317mm. Four Roman families 54/114 fail each, forest_swordsman48/114; forest_spear/skirmisher114/114. 42 worst-case skin receipts. No runtime patch; original 40mm gate unchanged."
+    },
+    {
+      "id": "I02-PRODUCTION-FIXTURE",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "done",
+      "revision": "b34adfdf014625828bf13ec47e60a220b9732da5",
+      "run_id": "46114021072",
+      "scope": [
+        "prototype/tests/i02_props_test.gd",
+        ".github/workflows/aeterna-i02-basket-production.yml"
+      ],
+      "note": "Actual Kimi run 46113029476 failed: original youth not staged, GLB height assertion used only first primitive (0.3083849549 vs actual all primitive max 0.308640450239), actor_position Vector2 passed to set_player_position Vector3; timeout124. New isolated successor fix/aeterna-i02-basket-qa-20261128. Correct fixture, stage exact original civil youth via existing authorized scripts, check exact LODs, real Hand_L and all geometry, preserve 1mm/0.2mm thresholds and existing checks. No change to original Kimi module, original GitLab branch, main or runtime wiring. No private asset publication, new provider requests or costs. Actual test required. | Actual repair #204 head 5ee56ef700e0b17e4201cd8afa67bab3c24df467; exact original module/GLB unchanged, test +77/-11, one production CI workflow. Observed targeted run 46114021072 in_progress. No pass or integration claim. | Actual run46114021072/job140883655537 at 5ee56ef7: original civil youth staged, original module and GLB hashes verified, corrected test 98b9aaba3aba7e0584513a39fa434feb66fbbe16; I02_PROPS_RESULT checks=96 failures=0, artifact15251037994. Independent technical review completed; runtime not yet wired. | Technical fixture accepted for exact-blob transfer to separate consolidation branch; no visual/device acceptance."
+    },
+    {
+      "id": "FACIAL-LOD-NEUTRAL-LIFECYCLE",
+      "owner": "Coordinator",
+      "status": "done",
+      "revision": "8a8256a30145918739312588d70c4585768fa568",
+      "run_id": "46114087278",
+      "scope": [
+        "prototype/scripts/visuals/facial_motion.gd",
+        "prototype/tests/facial_motion_lifecycle_test.gd",
+        ".github/workflows/aeterna-facial-motion-lifecycle.yml"
+      ],
+      "access": "edit",
+      "note": "M15: facial_motion.advance currently returns at detail >=2 without neutralising previously uploaded shapes; same-identity rebinding retains values, root MeshInstance3D omitted. Implement one-shot LOD neutralisation, root mesh binding and Godot lifecycle regression (no lip-sync changes), isolated branch fix/aeterna-facial-lod-lifecycle-20261128. No release. | Actual draft #205 head 0bb3ed22ec0e90a3fd430a3d1cfa6d0b24cae715, module ebe187496e37ddd4ba3281bad7ae4c934291e364, test d7d45bbdf33009c068830d9ad121e2db4f38c7e7, workflow 650040b9df1b705cb661677ed6f7f8e1b956c047. Exact diff three paths +169/-5; mergeable. Actual targeted run 46114087278/job140883863178 success, exact head and source blobs in logs, Godot 4.7.2 FACIAL_LOD_RESULT checks=14 failures=0, FACIAL_LOD_PASS, artifact15250284819, existing automatic runs 46114087165/46114087252 observed (no duplicate dispatch). Test is engine ArrayMesh values, not original character/visual proof. No integration/device pass. | Independent actual 14/14 result and exact tested blobs reviewed; technical scope accepted for separate candidate transfer. Original character/visual/device review still open."
+    },
+    {
+      "id": "I04-CARRY-RIG-LIFECYCLE",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "done",
+      "revision": "8a8256a30145918739312588d70c4585768fa568",
+      "run_id": "46114403076",
+      "scope": [
+        "prototype/scripts/world/village/i04_props.gd",
+        "prototype/tests/i04_props_lifecycle_test.gd",
+        ".github/workflows/aeterna-i04-props-lifecycle.yml"
+      ],
+      "note": "Exact isolated draft #206, head 5e37472d69b97a5301897cd93e893cc13779f040. Actual run46114403076/job140884857090 success: 173/173 real production actor/forge lifecycle checks and unchanged I04 slice 271/271; artifact15250984034. Source366aa3b143d1922b4b0e6976ec2f4083f0e61310 test72f1e37757980bf1198dfe3310a61d1007455836. Current rig bone transforms and skeleton_updated binding; immediate cleanup/rebind on carrier/LOD change. No story/authority mutation; public actual production actor, not visual/private youth/device proof. Ready exact-blob consolidation."
+    },
+    {
+      "id": "NPC-MEMORY-OBSERVATION-OVERLAP",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "done",
+      "revision": "8a8256a30145918739312588d70c4585768fa568",
+      "run_id": "46114516718",
+      "scope": [
+        "prototype/scripts/domain/npc_social_memory.gd",
+        "prototype/tests/npc_social_memory_test.gd",
+        ".github/workflows/aeterna-npc-memory-overlap.yml"
+      ],
+      "note": "Exact isolated draft #207, head1f4143e4dfd331e562e27eeeda65b98e65ed8ce0. Actual run46114516718/job140885228102 success: import, npc_behavior, npc_social_memory 106 checks, npc_physical_conversation and team_b_integration all pass; artifact15250833187. Source92ccc29def33041aa1436070fe3539ee4fd48b53 testf30ec17e719c424ab10a9976bcc850f7a245b9e1. Only unobserved suffix credited, invalid/nonfinite geometry fails closed, persistence chronology validated; same schema/rewards/thresholds. Ready exact-blob consolidation."
+    },
+    {
+      "id": "NIGHT-CONSOLIDATION-I02-WORLD",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "done",
+      "revision": "077075ed08e1e90ee4b865d10bb66437f187b4ac",
+      "run_id": "46114746584",
+      "scope": [
+        "prototype/scripts/world/game_world.gd",
+        "prototype/scripts/world/village/i02_props.gd",
+        "prototype/tests/i02_props_test.gd",
+        "prototype/scripts/visuals/facial_motion.gd",
+        "prototype/tests/facial_motion_lifecycle_test.gd",
+        "prototype/tests/i02_world_props_test.gd",
+        ".github/workflows/aeterna-night-consolidation.yml"
+      ],
+      "note": "Actual consolidated head1b0b63034bd291451cd7f1a9e6786fc98bd6f992, run46114746584/job140885924311 SUCCESS; exact pinned source and original civil youth staged. Ten joint groups all pass: I02 props96, I02 real WorldModel78, facial14, camera55, I01 flow260, I03 flow88, I04 slice271, city microdetail188 (actual Xvfb), city signage80, city detail adapter PASS. Artifact15251501122. Independent source integration verified; no visual/device/full release acceptance. Advance same isolated branch only after run completed."
+    },
+    {
+      "id": "FORMATION-AUTHORED-KEYFRAME-GAIT",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "89e62f50d75a4a9cdc39efa0311cd9169b832670",
+      "run_id": "46115096757",
+      "scope": [
+        "prototype/scripts/visuals/far_ranks.gd",
+        "prototype/shaders/rank_stride.gdshader",
+        "prototype/tests/formation_stride_contact_test.gd",
+        ".github/workflows/aeterna-formation-authored-gait.yml"
+      ],
+      "note": "Mirror exact source company gait sagittal hinge keyframes (art/soldiers/build.py, 25/18/22 intervals) with shared CPU/GPU key table, retain static guard, source sole topology, existing stride helper and original strict 40mm/full tests. Preflight against 798 actual rig samples reproduces old distances within 3um; predicts 264->54 failures, not engine proof or full fix. New isolated push-only candidate; no arbitrary offsets, no budget/gate relaxation, no main/APK. Actual four-file head aacbcac802cc89cabcd9dba163400cfef68ff1eb, runtime29913a5f shaderbf175906, unchanged strict diagnostic3f1e24c4; push-only actual run46115096757 in progress, all original headless tests and 25 real compatibility-rendered frames requested. No engine result yet. | Verified failed engine run: 54/798 stride samples exceed original 40mm (previous 264), max 48.086mm. Formation agents 60/180 switches still exceed gate up to 50.518mm; contact trace28, slot27, battle411, rules146, muster133, tribal205 pass. Artifact15251611378. No integration; retain original gates."
+    },
+    {
+      "id": "YOUTH-ARMOUR-CONSTRAINED-WEIGHTS",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "8d915d6af14516ab2ff375a8599a313f54497e98",
+      "run_id": "46115227980",
+      "scope": [
+        "tools/art/youth_armour_local_weights.py",
+        "tools/art/test_youth_armour_local_weights.py",
+        ".github/workflows/aeterna-youth-armour-constrained.yml"
+      ],
+      "note": "Exact head d1d08c73f4d8a0e07e7eb3039bf780a9c80d1277, actual run46115227980/job140887431086 failed before owner staging: 13/14 Python controls pass, feasible affine toy SLSQP reported positive directional derivative. Local reproduction: candidate satisfied active edge to 1.8e-9 dimensionless squared residual, status not certified. No candidate asset written. Successor uses stricter internal margin and independent exact constraint certification, no physical threshold relaxation."
+    },
+    {
+      "id": "YOUTH-ARMOUR-CERTIFIED-SOLVER",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "blocked",
+      "revision": "d1d08c73f4d8a0e07e7eb3039bf780a9c80d1277",
+      "run_id": "46115352825",
+      "scope": [
+        "tools/art/youth_armour_local_weights.py",
+        "tools/art/test_youth_armour_local_weights.py"
+      ],
+      "note": "Preserve original physical constraints and tests. SLSQP can return status8 at numerically feasible point. Internally tighten active squared residual by 2e-6 dimensionless, require independently recomputed strict >=0 active/all residual, finite bounded weights and simplex. Accept feasible step even if optimizer convergence flag false, never accept infeasible result. Report such steps separately; full original float32 local + Godot A/B gates remain mandatory. Same isolated branch only after previous run completed. Actual commit3d765a385a3c7d25c002300f36f641f836076205, added false-success negative control, actual run46115352825 in progress. | Verified run failed on real source matching exactly one edge: solve_affine_weights line233 rejects no verified feasible local binding, positive directional derivative for linesearch; strict acceptance intact. Artifact15250809457; no revised asset accepted. Blocked pending later phase priority."
+    },
+    {
+      "id": "NIGHT-CONSOLIDATION-FORGE-NPC",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "done",
+      "revision": "1b0b63034bd291451cd7f1a9e6786fc98bd6f992",
+      "run_id": "46115416843",
+      "scope": [
+        "prototype/scripts/world/village/i04_props.gd",
+        "prototype/tests/i04_props_lifecycle_test.gd",
+        "prototype/scripts/domain/npc_social_memory.gd",
+        "prototype/tests/npc_social_memory_test.gd",
+        ".github/workflows/aeterna-night-consolidation.yml"
+      ],
+      "note": "On verified same consolidated branch, transfer exact source/test blobs from #206 and #207 only, old source blobs unchanged vs common baseline. Extend existing joint push CI to original I04 lifecycle, NPC memory/behavior/physical conversation/team B, keep all ten previous tests and original pin checks. No full APK/device approval. All source branches remain isolated. Actual atomic head7820c4c6d8f0cb9df550956c041ed08c53a0624e, five-file compare exact four source/test blobs; 17 joint groups including extra NPC world and UI. Previous ten-group run46114746584 success (artifact15251501122). Actual new run46115416843 in progress; wait before next branch advance. | Verified actual run46115416843 success, 17 joint groups; artifact15252205424. Exact head7820c4c6, all previous groups and 173 forge/106 memory pass; no final device/visual/APK."
+    },
+    {
+      "id": "CITY-RESIDENT-DEPARTURE-PROJECTION",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "done",
+      "revision": "7820c4c6d8f0cb9df550956c041ed08c53a0624e",
+      "run_id": "46115703248",
+      "scope": [
+        "prototype/scripts/world/city_resident_view.gd",
+        "prototype/tests/city_resident_departure_test.gd",
+        ".github/workflows/aeterna-city-resident-departure.yml"
+      ],
+      "note": "M28 actual city NPC movement: CityLife._haul_step explicitly waits 60s before departure, but resident view _target returns destination whenever is_walking=false, causing premature walking/retirement/respawn across walls during loading. Sample authoritative route origin until actual departure; maintain existing speed, bounded pool and six-metre catchup. Use consistent global distances and global physics ray/shape coordinates for translated city roots and observer in another hierarchy. Real CityLife anchor and imported resident fixture covers loading, departure, arrival, translated physical floor, bounded movement, no premature retirement, no mutation. Isolated push-only fix/aeterna-city-resident-departure-20261128; no integration until existing and focused Godot regressions pass. Actual three-file head527b5b4f71c0e4a70e16439c4ee43aa419dd20de; runtime049161c5 testdc73b709, +240/-13. Actual push-only run46115703248 in_progress, four focused Godot groups. No pass or integration claim. | Verified actual run46115703248 success: 38/38 new departure, city life119, resident activity and ambient27 pass; artifact15250809916. Keep ready for later exact-blob consolidation; no final visual or device claim."
+    },
+    {
+      "id": "CITY-MARKET-STAFF-AUTHORITY",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "7820c4c6d8f0cb9df550956c041ed08c53a0624e",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/domain/city_life.gd",
+        "prototype/tests/city_market_staff_test.gd",
+        ".github/workflows/aeterna-city-market-staff.yml"
+      ],
+      "note": "M28 authoritative city economy: current business_staffed/_vendor_of accepts an expired worker until its queued wake event is processed. Use half-open actual arrived duty interval consistently; during completion of a purchase retain original haggle participant only if still serving that business, otherwise select current staff (same pricing formula, conservation and real memory participant). Test actual business opening boundaries and shift handoff using existing CityLife roster, real transaction ledger, no fabricated staff. Preserve existing city simulation, trade and budget regressions; isolated push-only candidate, no APK. Interrupted by explicit phase-1 priority. Partial runtime commit d4a7477988f1fbaa6c92a0c7ecd2c8618f689844 retained in isolated branch; tests/CI not yet created, no acceptance. Resume separately after phase priority permits."
+    },
+    {
+      "id": "CHARACTER-CORE-PHASE1",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "submitted",
+      "revision": "7820c4c6d8f0cb9df550956c041ed08c53a0624e",
+      "run_id": "46117066995",
+      "scope": [
+        "prototype/scripts/character_core",
+        "prototype/scenes/character_core",
+        "prototype/tests/character_core_phase1_test.gd",
+        "docs/44_integration/CHARACTER_CORE_PHASE1.md",
+        ".github/workflows/aeterna-character-core-phase1.yml"
+      ],
+      "note": "Phase 1 native rig branch feature/aeterna-character-core-phase1-20261128 initial head d467b29e13253f58f98acc6d2b74acfe2bf4216a; run46116191468 compiled and executed 64 checks, 62 passed, 2 failed: physical 18cm step and distinct slope foot heights. Artifact15251767774. Flat and slope IK solver residual <0.001mm to requested target, not proof of actual sole placement. Rework swept stair edge/clearance and pelvis-before-reach clamp, instrument actual ray/target heights; preserve thresholds and add traversal and clearance assertions. Existing original rig unchanged. No main, campaign, APK or visual/device acceptance. | Draft #208. Correction head 7ad8e47ca5bd6b7f2fb9eef078c1c85173fdee9b; core a3096d15e17e7b69528d525c629cdc37f651083d, feet e852a6b86de34dcfd2c041eb87f5a1a275c922cb, test 94e2f3e7786e10b1be2b2db71ebdfce3cb372958. Run46117066995 in_progress; no pass claim."
+    },
+    {
+      "id": "ARCHITECTURE-FOUNDATION-SETUP",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "review_pending",
+      "revision": "7820c4c6d8f0cb9df550956c041ed08c53a0624e",
+      "run_id": "46117759380",
+      "scope": [
+        "AGENTS.md",
+        "ARCHITEKTUR_INDEX.md",
+        "tools/architecture/build_index.mjs",
+        "tools/architecture/test_index.mjs",
+        ".github/workflows/architecture-index.yml"
+      ],
+      "note": "Actual setup Draft #209, exact head fda9f38748a712d422fee8e526d642ce8d85f64e, base 7820c4c6. Five-file diff; AGENTS original prefix byte-identical; generated index from 264 actual runtime scripts, 39 class declarations, 47 signals, 1959 public funcs, 146428 bytes, exact blob62be0212acce5461d044129d3b3cb706e02e8303. Bootstrap run46117673991 success and strict final run46117759380 success: 14/14 fixtures and exact committed index verified. Temporary bootstrap removed; CI read-only. PR mergeable, no merge. No runtime, node, UID/cache or main changes. Phase1 separate #208 at 7ad8e47c with actual 79/79 run46117066995; no device/visual/APK approval. PR-level checks 46117787550/46117787536 dispatched automatically; review pending."
+    }
+  ]
+}

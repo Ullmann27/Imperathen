@@ -23,7 +23,23 @@ MAX_EVENT = 1_000_000
 MAX_SECONDS = 840
 EXACT = {"prototype/project.godot", "prototype/assets/quality_profiles.json",
          "tools/check_prototype.py", "tools/fold7_physical_qa.py",
-         "tools/android_graphics_benchmark.py", "prototype/assets/story/campaign_arc.json"}
+         "tools/android_graphics_benchmark.py", "prototype/assets/story/campaign_arc.json",
+         "prototype/assets/world/city_catalog.json",
+         "prototype/assets/story/mission_timeline.json",
+         "prototype/assets/story/missions/band1/I-01.json",
+         "prototype/assets/story/missions/band1/I-02.json",
+         "prototype/assets/story/missions/band1/I-03.json",
+         "prototype/assets/story/missions/band1/I-04.json",
+         "prototype/assets/story/missions/band1/I-05.json",
+         "prototype/assets/story/missions/band1/I-06.json",
+         "prototype/assets/story/missions/band1/I-07.json",
+         "prototype/assets/story/missions/band1/I-08.json",
+         "prototype/assets/story/missions/band1/I-09.json",
+         "prototype/assets/story/missions/band1/I-10.json",
+         "prototype/assets/story/missions/band1/I-11.json",
+         "prototype/assets/story/missions/band1/I-12.json",
+         "prototype/assets/story/missions/band1/I-13.json",
+         "prototype/assets/story/missions/band1/I-14.json"}
 PREFIXES = ("prototype/scripts/", "prototype/tests/", "tools/perf/", "tools/render/", "tools/art/")
 SUFFIXES = {".gd", ".gdshader", ".py", ".json", ".tscn", ".godot"}
 KEY_PATTERN = re.compile(r"nvapi-[A-Za-z0-9_-]{12,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}")
