@@ -97,6 +97,22 @@ func _run() -> void:
 	var rejected_skeletons: Array[Node] = rejected_rig.find_children("*","Skeleton3D",true,false)
 	_check(rejected_skeletons.size()==1 and rejected_skeletons[0].get_node_or_null("LeftLegIK")==null,"No partial native IK nodes on rejected adapter")
 	incomplete.free()
+	var missing_capsule: CharacterCore = Scene.instantiate() as CharacterCore
+	missing_capsule.get_node("CollisionShape3D").free()
+	stage.add_child(missing_capsule)
+	_check_unbound_contract(missing_capsule,"Missing collision capsule")
+	_check(not missing_capsule.is_physics_processing(),"Missing physical shape cannot enter locomotion")
+	missing_capsule.free()
+	var duplicate_chain: CharacterCore = Scene.instantiate() as CharacterCore
+	for index: int in range(3):
+		duplicate_chain.leg_names[index+3] = duplicate_chain.leg_names[index]
+	stage.add_child(duplicate_chain)
+	_check_unbound_contract(duplicate_chain,"Duplicate leg chain")
+	var duplicate_skeletons: Array[Node] = duplicate_chain.get_node("RigRoot/OriginalRig").find_children("*","Skeleton3D",true,false)
+	_check(duplicate_skeletons.size()==1 and duplicate_skeletons[0].get_node_or_null("LeftLegIK")==null,"Overlapping bone chains rejected before native solver creation")
+	var duplicate_ray: RayCast3D = duplicate_chain.get_node("FootPlacement/LeftRay") as RayCast3D
+	_check(not duplicate_ray.enabled,"Rejected adapter leaves automatic physics queries off")
+	duplicate_chain.free()
 	_body_box(Vector3(0,-0.1,0),Vector3(80,0.2,80))
 	var actor: CharacterCore = _new_actor(Vector3(0,0.05,0))
 	if not _check(actor.is_character_ready(),"Actual original frontier rig and typed graph bind"):
@@ -153,13 +169,86 @@ func _run() -> void:
 	actor.set_look_target(actor.global_position+Vector3(2,1.5,-1))
 	await _frames(30)
 	_check(actor.get_bone_world_transform(&"Head").is_finite(),"Native head tracking has a finite real pose")
+	var left_ray: RayCast3D = actor.get_node("FootPlacement/LeftRay") as RayCast3D
+	var right_ray: RayCast3D = actor.get_node("FootPlacement/RightRay") as RayCast3D
+	_check(left_ray.enabled and right_ray.enabled,"Active IK uses both actual ground rays")
 	actor.set_ik_enabled(false)
+	_check(not left_ray.enabled and not right_ray.enabled,"LOD disables both automatic physics ray updates immediately")
+	for side: int in [0,1]:
+		var receipt: Dictionary = actor.get_foot_contact(side)
+		_check(not bool(receipt.grounded) and not bool(receipt.locked) and not (receipt.surface_point as Vector3).is_finite(),"Disabled IK immediately invalidates the planted contact")
 	await _frames(30)
 	_check(float(actor.get_foot_contact(0).weight)<0.02 and float(actor.get_foot_contact(1).weight)<0.02,"IK can be switched off for later LOD budgeting")
+	var lod_before: Vector3 = actor.global_position
+	actor.request_motion(Vector3.RIGHT,1.0,CharacterCore.Gait.WALK)
+	await _frames(60)
+	_check(actor.get_planar_speed()>1.1 and actor.global_position.distance_to(lod_before)>0.5,"Disabled IK preserves actual locomotion")
+	_check(not left_ray.enabled and not right_ray.enabled,"No automatic ray queries while moving with IK disabled")
+	for side: int in [0,1]:
+		var receipt: Dictionary = actor.get_foot_contact(side)
+		_check(not bool(receipt.grounded) and not (receipt.surface_point as Vector3).is_finite(),"Moving disabled IK has no stale ground receipt")
+	actor.stop_motion()
+	await _frames(90)
 	actor.set_ik_enabled(true)
+	_check(left_ray.enabled and right_ray.enabled,"Re-enabled IK restores both actual ground rays")
 	await _frames(60)
 	_check_feet(actor,"Re-enabled IK")
 	actor.free()
+
+	# Real airborne interval above the actual floor, followed by landing.
+	var falling: CharacterCore = _new_actor(Vector3(6,3,0))
+	var air_left: RayCast3D = falling.get_node("FootPlacement/LeftRay") as RayCast3D
+	var air_right: RayCast3D = falling.get_node("FootPlacement/RightRay") as RayCast3D
+	await _frames(6)
+	_check(falling.is_character_ready() and not falling.is_on_floor(),"Actual character is airborne during fall")
+	_check(not air_left.enabled and not air_right.enabled,"Airborne actor disables both automatic ray updates")
+	falling.set_ik_enabled(false)
+	falling.set_ik_enabled(true)
+	_check(not air_left.enabled and not air_right.enabled,"Re-enabling IK in air does not start ray queries")
+	await _frames(120)
+	_check(falling.is_on_floor() and air_left.enabled and air_right.enabled,"Physical landing restores ray updates")
+	_check_feet(falling,"After airborne landing")
+	falling.free()
+
+	# Removing one live dependency after successful binding must not leave
+	# active ground queries, native modifiers, or misleading public receipts.
+	var damaged: CharacterCore = _new_actor(Vector3(6,0.05,0))
+	await _frames(60)
+	_check(damaged.is_character_ready(),"Runtime-removal fixture initially ready")
+	var damaged_tree: AnimationTree = damaged.get_animation_tree()
+	var damaged_skeleton: Skeleton3D = damaged.get_character_skeleton()
+	var remaining_ray: RayCast3D = damaged.get_node("FootPlacement/RightRay") as RayCast3D
+	var remaining_solver: TwoBoneIK3D = damaged_skeleton.get_node("RightLegIK") as TwoBoneIK3D
+	var lost_ray: RayCast3D = damaged.get_node("FootPlacement/LeftRay") as RayCast3D
+	var lost_rejections: Array[String] = []
+	damaged.command_rejected.connect(func(reason: String) -> void: lost_rejections.append(reason))
+	lost_ray.free()
+	_check_unbound_contract(damaged,"Freed live ray")
+	await _frames(3)
+	_check(lost_rejections.size()==1 and not damaged.is_physics_processing(),"Dependency loss stops physics exactly once")
+	_check(not damaged_tree.active and not remaining_ray.enabled and is_zero_approx(remaining_solver.influence),"Dependency loss stops surviving graph, ray and solver")
+	damaged.free()
+
+	var detached: CharacterCore = _new_actor(Vector3(6,0.05,0))
+	await _frames(60)
+	_check(detached.is_character_ready(),"Detached-target fixture initially ready")
+	var target_node: Node = detached.get_node("FootPlacement/LeftTarget")
+	target_node.get_parent().remove_child(target_node)
+	_check_unbound_contract(detached,"Detached but not freed target")
+	await _frames(3)
+	_check(not detached.is_physics_processing(),"Detached target cannot continue physics")
+	target_node.free()
+	detached.free()
+
+	var disabled_body: CharacterCore = _new_actor(Vector3(6,0.05,0))
+	await _frames(60)
+	_check(disabled_body.is_character_ready(),"Disabled-capsule fixture initially ready")
+	var live_capsule: CollisionShape3D = disabled_body.get_node("CollisionShape3D") as CollisionShape3D
+	live_capsule.disabled = true
+	_check_unbound_contract(disabled_body,"Disabled live capsule")
+	await _frames(3)
+	_check(not disabled_body.is_physics_processing(),"Loss of collision authority stops physical movement")
+	disabled_body.free()
 
 	# One real step and a tall wall: only the swept small obstacle may be climbed.
 	_body_box(Vector3(0,0.09,2.0),Vector3(2.4,0.18,2.0))

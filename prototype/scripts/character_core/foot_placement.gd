@@ -48,11 +48,19 @@ var _look_smoothed: Vector3 = Vector3.INF
 var _phase: float = 0.0
 var _hip: float = 0.0
 var _enabled: bool = true
+var _last_on_floor: bool = false
 
 func bind(body: CharacterBody3D, skeleton: Skeleton3D, pelvis: int, spine: int, head: int,
 		leg_names: Array[StringName]) -> bool:
 	if leg_names.size() != 6 or not is_instance_valid(body) or not is_instance_valid(skeleton):
 		return false
+	# Each leg needs its own independent chain. Two solvers writing the
+	# same bones make contact receipts ambiguous even on an otherwise valid rig.
+	var unique_bones: Dictionary[StringName, bool] = {}
+	for bone_name: StringName in leg_names:
+		if unique_bones.has(bone_name):
+			return false
+		unique_bones[bone_name] = true
 	# Check the adapter scene before creating native modifiers or dereferencing rays.
 	var left_ray: RayCast3D = get_node_or_null("LeftRay") as RayCast3D
 	var right_ray: RayCast3D = get_node_or_null("RightRay") as RayCast3D
@@ -160,20 +168,65 @@ func _make_leg(thigh: StringName, shin: StringName, foot: StringName,
 	leg.target = target
 	leg.pole = pole
 	ray.add_exception(_body)
-	ray.enabled = true
+	ray.enabled = false
 	ray.target_position = Vector3.DOWN*(probe_up+probe_down+leg.ankle_height)
 	target.global_position = ankle_position
 	pole.global_position = shin_position-_body.global_basis.z.normalized()*0.5
 	return leg
 
+# Internal adapter contract consumed by CharacterCore. A node reference
+# can survive remove_child(), so instance validity alone is insufficient.
+func _live(node: Variant) -> bool:
+	return is_instance_valid(node) and node.is_inside_tree()
+
+func _is_bound() -> bool:
+	if not _live(_body) or not _live(_skeleton) or not _live(_pose) or not _live(_head_look) or not _live(_head_target) or _legs.size() != 2:
+		return false
+	for leg: Leg in _legs:
+		if not _live(leg.ray) or not _live(leg.target) or not _live(leg.pole) or not _live(leg.solver) or not _live(leg.aligner):
+			return false
+	return true
+
+# Terminal shutdown for a broken adapter, not the reversible LOD switch.
+# Surviving native nodes and automatic queries must not keep running.
+func _disable_bound_runtime() -> void:
+	_enabled = false
+	_last_on_floor = false
+	_hip = 0.0
+	for leg: Leg in _legs:
+		leg.grounded = false
+		leg.locked = false
+		leg.lock_surface = null
+		leg.surface_point = Vector3.INF
+		leg.weight = 0.0
+		if is_instance_valid(leg.ray):
+			leg.ray.enabled = false
+		if is_instance_valid(leg.solver):
+			leg.solver.influence = 0.0
+		if is_instance_valid(leg.aligner):
+			leg.aligner.influence = 0.0
+	if is_instance_valid(_pose):
+		_pose.influence = 0.0
+	if is_instance_valid(_head_look):
+		_head_look.influence = 0.0
+
 func set_enabled(value: bool) -> void:
+	if not _is_bound():
+		_disable_bound_runtime()
+		return
 	_enabled = value
-	if not value:
-		for leg: Leg in _legs:
+	for leg: Leg in _legs:
+		# Disable the engine's automatic ray update as well as manual casts.
+		leg.ray.enabled = value and _last_on_floor
+		if not value:
+			leg.grounded = false
 			leg.locked = false
+			leg.lock_surface = null
+			leg.surface_point = Vector3.INF
 			leg.weight = 0.0
 			leg.solver.influence = 0.0
 			leg.aligner.influence = 0.0
+	if not value:
 		_hip = 0.0
 
 func set_look_target(world_point: Vector3) -> void:
@@ -183,8 +236,10 @@ func clear_look_target() -> void:
 	_look_world = Vector3.INF
 
 func update_pose(delta: float, on_floor: bool, speed: float, yaw_rate: float) -> void:
-	if not is_instance_valid(_skeleton) or _legs.size() != 2:
+	if not _is_bound():
+		_disable_bound_runtime()
 		return
+	_last_on_floor = on_floor
 	_skeleton.force_update_all_bone_transforms()
 	var forward: Vector3 = -_body.global_basis.z.normalized()
 	var moving_turn: bool = speed < 0.12 and absf(yaw_rate) > 0.22
@@ -206,9 +261,16 @@ func update_pose(delta: float, on_floor: bool, speed: float, yaw_rate: float) ->
 			stepping = cycle > 0.58
 			if stepping:
 				swing = maxf(swing,turn_step_height*sin(PI*(cycle-0.58)/0.42))
-		leg.ray.global_transform = Transform3D(Basis.IDENTITY,ankle+Vector3.UP*probe_up)
-		leg.ray.force_raycast_update()
-		var valid: bool = _enabled and on_floor and leg.ray.is_colliding()
+		var valid: bool = false
+		# A disabled or airborne character has no planted foot. Do not query
+		# physics for a contact that the adapter cannot consume this tick.
+		var query_ground: bool = _enabled and on_floor
+		if leg.ray.enabled != query_ground:
+			leg.ray.enabled = query_ground
+		if query_ground:
+			leg.ray.global_transform = Transform3D(Basis.IDENTITY,ankle+Vector3.UP*probe_up)
+			leg.ray.force_raycast_update()
+			valid = leg.ray.is_colliding()
 		var point: Vector3 = ankle
 		var normal: Vector3 = Vector3.UP
 		if valid:
@@ -285,11 +347,13 @@ func update_pose(delta: float, on_floor: bool, speed: float, yaw_rate: float) ->
 	_skeleton.advance(delta)
 
 func _capture_solved() -> void:
+	if not _is_bound():
+		return
 	for leg: Leg in _legs:
 		leg.solved_ankle = _skeleton.to_global(_skeleton.get_bone_global_pose(leg.foot).origin)
 
 func get_contact(side: int) -> Dictionary:
-	if side < 0 or side >= _legs.size():
+	if not _is_bound() or side < 0 or side >= _legs.size():
 		return {}
 	var leg: Leg = _legs[side]
 	return {"grounded":leg.grounded,"locked":leg.locked,"weight":leg.weight,
