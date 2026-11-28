@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 227,
+  "version": 228,
   "tasks": [
     {
       "id": "K101",
@@ -1129,15 +1129,15 @@
       "id": "N34",
       "owner": "Nemotron",
       "access": "read",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de",
-      "run_id": null,
+      "run_id": "46105483466",
       "scope": [
         "prototype/scripts/formation/formation_agents.gd",
         "prototype/tests/formation_contact_trace_test.gd",
         "prototype/scripts/formation/formation_levels.gd"
       ],
-      "note": "New review of post-fix swept body broadphase performance/progress, not re-diagnosing N21/N24/N30. Actual run 46104088321: 28/28 focused, original root/phase gates all green, static LOD/wheel separate. Check bounded candidate enumeration, deterministic update ordering, possible mutual blocking/starvation and dense formations. Propose independent new negative-control tests/measurements without modifying validated limits or active branches. Existing CI cost limits, no paid requests."
+      "note": "New review of post-fix swept body broadphase performance/progress, not re-diagnosing N21/N24/N30. Actual run 46104088321: 28/28 focused, original root/phase gates all green, static LOD/wheel separate. Check bounded candidate enumeration, deterministic update ordering, possible mutual blocking/starvation and dense formations. Propose independent new negative-control tests/measurements without modifying validated limits or active branches. Existing CI cost limits, no paid requests. Actual bridge commit 1949489ecabf3ef12651b68ce3c8cc7e0d1fcbce pushed with expected HEAD, one task 12288 tokens. Workflow 46105483466 observed in_progress."
     }
   ]
 }
