@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 224,
+  "version": 225,
   "tasks": [
     {
       "id": "K101",
@@ -1058,7 +1058,7 @@
       "id": "FORMATION-BODY-SWEEP",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de",
       "run_id": "46104088321",
       "scope": [
@@ -1066,26 +1066,26 @@
         "prototype/tests/formation_contact_trace_test.gd",
         ".github/workflows/aeterna-formation-contact-trace.yml"
       ],
-      "note": "Phase01 successor on separate branch. Keep successful rock candidate intact. Introduce bounded swept-circle root travel against actual nearby UID positions, including C agents before promotion, retaining existing steering and original contact resolver. Hard spacing constants unchanged; body sweep prevents new penetration rather than hiding root jumps. Keep original tests; add deterministic pair crossing, outward escape, and direct clear path assertions, and rerun full 60/180 plus trace/command/rules/muster. No changes to rules, assets, caps or main. Hypothesis pending tests. Actual commit 65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de, branch fix/aeterna-formation-body-sweep-20261128. Three-file isolated comparison: runtime swept-circle root travel for B/C, all-level occupancy in start grid, original steering scope preserved, original hard spacing and existing post-step contact resolver unchanged; seven new focused direct cases. Actual run 46104088321 observed in_progress. No full formation pass or integration claim. Previous rock candidate remains unchanged."
+      "note": "Phase01 successor on separate branch. Keep successful rock candidate intact. Introduce bounded swept-circle root travel against actual nearby UID positions, including C agents before promotion, retaining existing steering and original contact resolver. Hard spacing constants unchanged; body sweep prevents new penetration rather than hiding root jumps. Keep original tests; add deterministic pair crossing, outward escape, and direct clear path assertions, and rerun full 60/180 plus trace/command/rules/muster. No changes to rules, assets, caps or main. Hypothesis pending tests. Actual commit 65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de, branch fix/aeterna-formation-body-sweep-20261128. Three-file isolated comparison: runtime swept-circle root travel for B/C, all-level occupancy in start grid, original steering scope preserved, original hard spacing and existing post-step contact resolver unchanged; seven new focused direct cases. Actual run 46104088321 observed in_progress. No full formation pass or integration claim. Previous rock candidate remains unchanged. Actual 46104088321 overall failure, but 28/28 focused, 27/27 slot authority, 411/411 commands, 146/146 battle rules, 133/133 muster, regular 84/87, large 20/22. All four root/phase gates pass; remaining static foot model transition and wheel attribution. No full approval; preserve candidate for verified integration after remaining issues."
     },
     {
       "id": "FORMATION-WHEEL-ATTRIBUTION",
       "owner": "Coordinator",
       "access": "edit",
       "status": "submitted",
-      "revision": "e84d7a0e22433db87898eabaa228786d39b51b75",
-      "run_id": "46104212413",
+      "revision": "b3cdf9fff354b612b20dc86a36086acec2c0f105",
+      "run_id": "46105279398",
       "scope": [
         "prototype/tests/formation_agents_test.gd",
         ".github/workflows/aeterna-formation-wheel-attribution.yml"
       ],
-      "note": "Independent correction of proven cross-company test attribution, not runtime fix. Keep target zero refile/rematch requirement, same rank owners, outer-file speed, arrival and all numerical limits. Independently validate every other refile/rematch against adjacent authoritative model snapshots and exact global/per-company accounting; global zero remains required absent valid unrelated events. Existing full formation test remains default; focused wheel-only mode adds no bypass to full CI. No integration before actual focused/full tests and blob comparison. Actual commit e84d7a0e22433db87898eabaa228786d39b51b75 on fix/aeterna-formation-wheel-attribution-20261128. Two-file diff verified. Original targeted zero refile/rematch, same owners, speed, arrival and all motion thresholds preserved; independently tracks consecutive authoritative rule-facing and roster/layout snapshots, consumes each counter event at most once, requires exact global count accounting and no invalid events. Default full suite unchanged except corrected attribution. Focused Godot run 46104212413 observed queued, no pass or integration claim. Existing body sweep CI continues on disjoint branch."
+      "note": "Independent correction of proven cross-company test attribution, not runtime fix. Keep target zero refile/rematch requirement, same rank owners, outer-file speed, arrival and all numerical limits. Independently validate every other refile/rematch against adjacent authoritative model snapshots and exact global/per-company accounting; global zero remains required absent valid unrelated events. Existing full formation test remains default; focused wheel-only mode adds no bypass to full CI. No integration before actual focused/full tests and blob comparison. Actual commit e84d7a0e22433db87898eabaa228786d39b51b75 on fix/aeterna-formation-wheel-attribution-20261128. Two-file diff verified. Original targeted zero refile/rematch, same owners, speed, arrival and all motion thresholds preserved; independently tracks consecutive authoritative rule-facing and roster/layout snapshots, consumes each counter event at most once, requires exact global count accounting and no invalid events. Default full suite unchanged except corrected attribution. Focused Godot run 46104212413 observed queued, no pass or integration claim. Existing body sweep CI continues on disjoint branch. Actual 46104212413 failed at parse line 334 (cannot infer changed bool). New one-line explicit bool annotation, exact compare one added/removed line; commit b3cdf9fff354b612b20dc86a36086acec2c0f105. Run 46105279398 observed in_progress. No test threshold changes, no success claim."
     },
     {
       "id": "N32",
       "owner": "Nemotron",
       "access": "read",
-      "status": "submitted",
+      "status": "done",
       "revision": "2612b01b00951facf8ce77303325903b6189e77a",
       "run_id": "46104913449",
       "scope": [
@@ -1095,13 +1095,13 @@
         "prototype/scripts/visuals/far_ranks.gd",
         "prototype/scripts/visuals/authored_ground.gd"
       ],
-      "note": "New measured asset repair task, not repeat N31 diagnostic. Actual static trace 46103635941 failed all 32 cases, idle 83.102mm, block 92.799mm; actual right sole/far mismatch 128.751mm and left proxy/actual 129.014mm. Propose minimally authored family-specific geometry/skin calibration and reproducible export/validation preserving 40mm limit, real sole geometry and budgets. No provider writes, only approved public source; no private GLB. Do not mask failures or change existing gates. Actual bridge commit c62af999d25a3ed464c8eda92a619cd62c80eb59; run 46104913449 observed in_progress. Exactly two tasks, 12288 tokens each, max parallel 2, existing authorization and unchanged bridge limits. API responses and proposed patches not yet verified."
+      "note": "New measured asset repair task, not repeat N31 diagnostic. Actual static trace 46103635941 failed all 32 cases, idle 83.102mm, block 92.799mm; actual right sole/far mismatch 128.751mm and left proxy/actual 129.014mm. Propose minimally authored family-specific geometry/skin calibration and reproducible export/validation preserving 40mm limit, real sole geometry and budgets. No provider writes, only approved public source; no private GLB. Do not mask failures or change existing gates. Actual bridge commit c62af999d25a3ed464c8eda92a619cd62c80eb59; run 46104913449 observed in_progress. Exactly two tasks, 12288 tokens each, max parallel 2, existing authorization and unchanged bridge limits. API responses and proposed patches not yet verified. Actual run 46104913449 completed success, response receipt answered, artifact 15246892638; independent review of logged response: Raw patch invalid: Skin has no get_skeleton, far unskinned mesh uses a skin-weight extraction with empty binds so returns no soles, bind indices not skeleton bone indices, partial weights renormalized incorrectly, 3*2*2*8*2 =192 not 96; proposal to preserve multiple far materials contradicts one-material budget. Useful actual-sole correspondence concept, not a repair. No raw code applied. Existing gates remain, no accepted runtime change, no retry."
     },
     {
       "id": "N33",
       "owner": "Nemotron",
       "access": "read",
-      "status": "submitted",
+      "status": "done",
       "revision": "bd4af0b2b33cfcb6cb753386915ad4bf40596c0c",
       "run_id": "46104913449",
       "scope": [
@@ -1109,7 +1109,7 @@
         "prototype/tests/motion_skin_measurement.gd",
         "prototype/tests/youth_outfit_skin_test.gd"
       ],
-      "note": "New production-parity youth residual deformation repair. Actual 46101989464 692/692 original checks; armoured LOD0 run 5 and side_kick 9 severe edge samples, worst same MeshyYouthBody surface0 edge 26845/26850, 7.911mm excess in run, 1.351mm in side_kick. Civil LOD0/2 and armour LOD2 zero. Propose isolated local asset-weight correction experiment with exact vertex/weights/source identity and full all-clip guard, no private asset transfer or editor lease; no whole-body smoothing, no gate relaxation. Actual bridge commit c62af999d25a3ed464c8eda92a619cd62c80eb59; run 46104913449 observed in_progress. Exactly two tasks, 12288 tokens each, max parallel 2, existing authorization and unchanged bridge limits. API responses and proposed patches not yet verified."
+      "note": "New production-parity youth residual deformation repair. Actual 46101989464 692/692 original checks; armoured LOD0 run 5 and side_kick 9 severe edge samples, worst same MeshyYouthBody surface0 edge 26845/26850, 7.911mm excess in run, 1.351mm in side_kick. Civil LOD0/2 and armour LOD2 zero. Propose isolated local asset-weight correction experiment with exact vertex/weights/source identity and full all-clip guard, no private asset transfer or editor lease; no whole-body smoothing, no gate relaxation. Actual bridge commit c62af999d25a3ed464c8eda92a619cd62c80eb59; run 46104913449 observed in_progress. Exactly two tasks, 12288 tokens each, max parallel 2, existing authorization and unchanged bridge limits. API responses and proposed patches not yet verified. Actual run 46104913449 completed success, response receipt answered, artifact 15246664901; independent review of logged response: Raw patch invalid/incomplete: assumes JOINTS_0 indices 0..3 instead of mapping named skin joints, no expected SHA check, undefined name in check_sole_heights, checks all vertices rather than actual sole, proximity not topological one-ring, seam measure not called, no exact edge-ID/new-violation tracking, wrong report semantics and invalid GDScript boolean fallback. Useful local two-vertex weight candidate concept only; no raw code applied. Existing gates remain, no accepted runtime change, no retry."
     }
   ]
 }
