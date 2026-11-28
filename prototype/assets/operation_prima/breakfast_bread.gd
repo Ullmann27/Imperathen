@@ -143,10 +143,10 @@ static func _platter_point(angle: float, radius: float, y: float) -> Vector3:
 static func _triangle(tool: SurfaceTool, a: Vector3, b: Vector3, c: Vector3) -> void:
 	tool.set_uv(_uv(a))
 	tool.add_vertex(a)
-	tool.set_uv(_uv(b))
-	tool.add_vertex(b)
 	tool.set_uv(_uv(c))
 	tool.add_vertex(c)
+	tool.set_uv(_uv(b))
+	tool.add_vertex(b)
 
 
 static func _uv(point: Vector3) -> Vector2:
