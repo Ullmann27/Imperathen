@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 241,
+  "version": 242,
   "tasks": [
     {
       "id": "K101",
@@ -1231,16 +1231,16 @@
       "id": "KIMI-DUO-I02-BASKET",
       "owner": "Kimi",
       "access": "edit",
-      "status": "reserved",
-      "revision": "8a8256a30145918739312588d70c4585768fa568",
-      "run_id": null,
+      "status": "submitted",
+      "revision": "b34adfdf014625828bf13ec47e60a220b9732da5",
+      "run_id": "46113029476",
       "scope": [
         "prototype/scripts/world/village/i02_props.gd",
         "prototype/scripts/world/village/i02_props.gd.uid",
         "prototype/tests/i02_props_test.gd",
         "prototype/tests/i02_props_test.gd.uid"
       ],
-      "note": "GitLab Duo Kimi K3.1 Pro proposed M21/VIS-003 isolated I02 presentation. Exact GitHub/GitLab integration SHA 8a8256a verified, M21 queued, new paths absent and no active overlap. Use candidate/aeterna-i02-basket-20261128 on GitLab project 89577832; original neighbour_basket.glb blob 0c9043c91be9727e2d6c9c2dbe41f0ed46946c60, authoritative village_childhood carried neighbor_basket plus screenplay i02; pending alone does not grant item, correction retains, complete removes. Only new module/test and optional Godot UID files; no existing source/state/save/CI changes. Require actual hand/anchor transforms, LOD rebind, duplicate-free lifecycle, save/load/read-only state checks, no fabricated asset or test result. Coordinator transfers exact reviewed blobs and owns subsequent CI/runtime wiring with separate lease. Preparatory isolated work only; MENU remains blocked and no journey advancement. Reserved, not submitted/run/accepted; GitLab Duo user-mediated, no direct API dispatch."
+      "note": "GitLab Duo Kimi K3.1 Pro proposed M21/VIS-003 isolated I02 presentation. Exact GitHub/GitLab integration SHA 8a8256a verified, M21 queued, new paths absent and no active overlap. Use candidate/aeterna-i02-basket-20261128 on GitLab project 89577832; original neighbour_basket.glb blob 0c9043c91be9727e2d6c9c2dbe41f0ed46946c60, authoritative village_childhood carried neighbor_basket plus screenplay i02; pending alone does not grant item, correction retains, complete removes. Only new module/test and optional Godot UID files; no existing source/state/save/CI changes. Require actual hand/anchor transforms, LOD rebind, duplicate-free lifecycle, save/load/read-only state checks, no fabricated asset or test result. Coordinator transfers exact reviewed blobs and owns subsequent CI/runtime wiring with separate lease. Preparatory isolated work only; MENU remains blocked and no journey advancement. Reserved, not submitted/run/accepted; GitLab Duo user-mediated, no direct API dispatch. | Actual GitLab Duo user-mediated handoff !201/#206 source fb30624dd7a90cb0d3cd5724daa6fd68b01f02e8, exact two new files +349/-0 and correct base. GitHub candidate #201 b34adfdf014625828bf13ec47e60a220b9732da5 contains identical blobs 1f7966a6ffd1d3e28aab6e4475c481ac94439d43 / 074f1219df2b87058ac7ecff05374988b962b66e. Coordinator's isolated QA-only PR #202 at a2d474b4d76ffa48057aa739b29bca5641128929 verifies those hashes before actual Godot import and focused test. Observed real run 46113029476 in_progress, not Kimi provider run. No pass, runtime integration, merge, visual/device or APK claim. Preserve reservation pending independent QA."
     }
   ]
 }
