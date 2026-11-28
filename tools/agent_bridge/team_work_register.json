@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 250,
+  "version": 251,
   "tasks": [
     {
       "id": "K101",
@@ -1186,7 +1186,7 @@
       "id": "CITY-FOUNTAIN-WATER-V2",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "review_pending",
       "revision": "154a5ee4359d77b6552b6cecaee279c9b0adb995",
       "run_id": "46108205504",
       "scope": [
@@ -1194,7 +1194,7 @@
         "prototype/scripts/rendering/city_surface_microdetail.gd",
         "prototype/tests/city_surface_microdetail_test.gd"
       ],
-      "note": "Actual forum render review V1/V2: candidate 46106720404 success; ZIP digests verified against GitHub and all six new image hashes matched. Forum joint correction visible; fountain remains artificial saturated cyan. Isolated follow-up on #199, exact authored Forum_Fountain/Northern_Fountain and Water_Surface only; preserve geometry, texture references and all collision/LOD. Nonmetal muted water, no new draw calls or lighting budgets. Existing microdetail fixture extended for shared mesh, targeted override, unchanged stone and reapplication; existing real city capture and focused CI via draft PR. No new provider request, no device or RQG approval. Actual commit 077075ed08e1e90ee4b865d10bb66437f187b4ac, three-file compare +103/-1, draft PR #200 targeting #199 branch. Actual focused job 140865627711 in_progress, render job 140865627831 on run 46108205477 in_progress, combined details 46108205494 and isolated QA 46108205480 observed. Real water target count and V2/V3 image difference still to verify; no tests or device pass yet."
+      "note": "Forum mortar V1/V2 render reviewed, fountain cyan defect addressed in exact authored Forum_Fountain/Northern_Fountain Water_Surface only; preserve geometry, texture, collision, LOD, lighting budgets. Draft #200 head 077075ed08e1e90ee4b865d10bb66437f187b4ac, three paths +103/-1. Independent exact blob match to tested merge d0e9c69ad9cc39eb4daef03a5c9c6704fb705d37: 1db053cbf1f41e2bbf7158d226f78323701cfc48, 3e398231e75565ffde1d57189b836d1d7a92cff0, 5b87ba10183013e042898c092e939424413f28c6. Actual focused 46108205504/job140865627711: microdetail188, signage80, exploration pass. Combined 46108205494 people27 plus same checks pass. Real render 46108205477/job140865627831 high and very_high, six frames passed; artifact15248591429. Report counts mortar only, fountain visual comparison pending. Isolated ARM64 QA 46108205480 passed city asset19/walk30/crowd158/training18, not device or release gate. Full 46108205477/job140865628008 failed formation_agents7/87 and formation_levels4/22. Exact independent review persisted #200 comment7234953675. No integration/visual/device acceptance or release."
     },
     {
       "id": "TRIBAL-GUARD-POSE",
