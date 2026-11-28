@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 236,
+  "version": 237,
   "tasks": [
     {
       "id": "K101",
@@ -1186,15 +1186,15 @@
       "id": "CITY-FOUNTAIN-WATER-V2",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "154a5ee4359d77b6552b6cecaee279c9b0adb995",
-      "run_id": null,
+      "run_id": "46108205504",
       "scope": [
         "prototype/scripts/rendering/city_fountain_water.gd",
         "prototype/scripts/rendering/city_surface_microdetail.gd",
         "prototype/tests/city_surface_microdetail_test.gd"
       ],
-      "note": "Actual forum render review V1/V2: candidate 46106720404 success; ZIP digests verified against GitHub and all six new image hashes matched. Forum joint correction visible; fountain remains artificial saturated cyan. Isolated follow-up on #199, exact authored Forum_Fountain/Northern_Fountain and Water_Surface only; preserve geometry, texture references and all collision/LOD. Nonmetal muted water, no new draw calls or lighting budgets. Existing microdetail fixture extended for shared mesh, targeted override, unchanged stone and reapplication; existing real city capture and focused CI via draft PR. No new provider request, no device or RQG approval."
+      "note": "Actual forum render review V1/V2: candidate 46106720404 success; ZIP digests verified against GitHub and all six new image hashes matched. Forum joint correction visible; fountain remains artificial saturated cyan. Isolated follow-up on #199, exact authored Forum_Fountain/Northern_Fountain and Water_Surface only; preserve geometry, texture references and all collision/LOD. Nonmetal muted water, no new draw calls or lighting budgets. Existing microdetail fixture extended for shared mesh, targeted override, unchanged stone and reapplication; existing real city capture and focused CI via draft PR. No new provider request, no device or RQG approval. Actual commit 077075ed08e1e90ee4b865d10bb66437f187b4ac, three-file compare +103/-1, draft PR #200 targeting #199 branch. Actual focused job 140865627711 in_progress, render job 140865627831 on run 46108205477 in_progress, combined details 46108205494 and isolated QA 46108205480 observed. Real water target count and V2/V3 image difference still to verify; no tests or device pass yet."
     }
   ]
 }
