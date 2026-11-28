@@ -1,7 +1,7 @@
 name: GENESIS Stand 0 formation recovery (strict gates)
 on:
   push:
-    branches: ['fix/genesis-stand0-formation-recovery-20261128', 'hoplite/*--stand-zero', 'integration/astra-sol-stand-zero-20261128', 'fix/astra-sol-city-fixture-parity-20261128', 'fix/astra-sol-city-runtime-parity-20261128', 'integration/astra-sol-complete-20261128', 'fix/astra-sol-city-kerb-traversal-20261128']
+    branches: ['fix/genesis-stand0-formation-recovery-20261128', 'hoplite/*--stand-zero', 'integration/astra-sol-stand-zero-20261128', 'fix/astra-sol-city-fixture-parity-20261128', 'fix/astra-sol-city-runtime-parity-20261128', 'integration/astra-sol-complete-20261128', 'fix/astra-sol-city-kerb-traversal-20261128', 'fix/astra-sol-city-seam-continuity-20261128']
 permissions:
   contents: read
 jobs:
@@ -110,6 +110,8 @@ jobs:
           run_check roman_city_surface_visibility_test city-chronology ROMAN_CITY_SURFACE_VISIBILITY_PASS
           run_check city_exploration_detail_adapter_test city-detail CITY_EXPLORATION_DETAIL_PASS
           run_check roman_city_routes_test city-routes ROMAN_CITY_ROUTES_PASS
+          run_check quarter_street_walk_test quarter-walk QUARTER_STREET_WALK_PASS
+          run_check roman_quarter_test quarter-buildings ROMAN_QUARTER_PASS
           run_check formation_far_ground_test far-ground FORMATION_FAR_GROUND_PASS
           run_check tribal_lod_contract_test tribal-lod TRIBAL_LOD_PASS
           run_check formation_stride_contact_test stride-798 FORMATION_STRIDE_PASS

@@ -457,14 +457,32 @@ class RomanCityLayoutTest(unittest.TestCase):
 
         physical_top = upward(solid)
         visual_top = upward(visual)
-        crowns = []
+        crowns = defaultdict(list)
         for face in solid:
             if all(abs(p[2]-.16)<1e-9 for p in face) and max(p[1] for p in face)-min(p[1] for p in face)>.24:
-                if max(p[0] for p in face)-min(p[0] for p in face)>100:
-                    crowns.append((min(p[0] for p in face),max(p[0] for p in face),
-                                   round(sum(p[1] for p in face)/len(face),6)))
-        self.assertEqual(sorted(crowns),sorted((a,b,y) for a,b in ((-407.5,-106.5),(-93.5,407.5))
-                                               for y in (-72.4,-57.6)))
+                x0,x1=min(p[0] for p in face),max(p[0] for p in face)
+                self.assertGreater(x1-x0,0.0)
+                self.assertLessEqual(x1-x0,2.0+1e-8,"oversized kerb collision facet")
+                centre=round(sum(p[1] for p in face)/len(face),6)
+                crowns[centre].append((x0,x1))
+            # The vertical road/kerb interfaces must not exist inside the
+            # joined solid. Check actual recorded collision faces, not a flag.
+            for boundary in (-72.0,-58.0):
+                if all(abs(p[1]-boundary)<1e-9 for p in face):
+                    x0,x1=min(p[0] for p in face),max(p[0] for p in face)
+                    if max(p[2] for p in face)-min(p[2] for p in face)>1e-8:
+                        for a,b in ((-407.5,-106.5),(-93.5,407.5)):
+                            self.assertLessEqual(min(x1,b)-max(x0,a),1e-8,
+                                                 "buried road/kerb interface exported")
+        self.assertEqual(set(crowns),{-72.4,-57.6})
+        for centre,intervals in crowns.items():
+            merged=[]
+            for a,b in sorted(intervals):
+                if merged and abs(a-merged[-1][1])<1e-8:
+                    merged[-1]=(merged[-1][0],b)
+                else:
+                    merged.append((a,b))
+            self.assertEqual(merged,[(-407.5,-106.5),(-93.5,407.5)],centre)
         self.assertLessEqual(.16,PLAYER_STEP-.02)
         self.assertGreater(.16,.11)
         # Actual rendered and collision triangles preserve exactly the same

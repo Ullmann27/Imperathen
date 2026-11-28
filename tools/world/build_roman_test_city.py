@@ -141,17 +141,28 @@ class Mesh:
         for f in [(0,3,2,1),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7),(4,5,6,7)]:
             self.face([p[i] for i in f],mat)
 
-    def strip_x(self,x0,x1,section,mat):
-        """Closed prism along X; section is a counter-clockwise Y/Z polygon."""
-        if x1<=x0 or len(section)<3:
+    def strip_x(self,x0,x1,section,mat,*,skip_edges=(),start_cap=True,end_cap=True,max_span=None):
+        """Extrude a CCW Y/Z polygon, omitting only faces shared by adjoining solids.
+
+        Subdivision generates exterior quads, not independent closed boxes:
+        there are no new vertical collision walls at the subdivision boundaries.
+        """
+        if x1<=x0 or len(section)<3 or (max_span is not None and max_span<=0):
             raise ValueError("Invalid street strip")
-        a=[(x0,y,z) for y,z in section]
-        b=[(x1,y,z) for y,z in section]
-        self.face(list(reversed(a)),mat)
-        self.face(b,mat)
-        for i in range(len(section)):
-            j=(i+1)%len(section)
-            self.face([a[i],a[j],b[j],b[i]],mat)
+        count=1 if max_span is None else math.ceil((x1-x0)/max_span)
+        ring=lambda x:[(x,y,z) for y,z in section]
+        if start_cap:
+            self.face(list(reversed(ring(x0))),mat)
+        if end_cap:
+            self.face(ring(x1),mat)
+        for part in range(count):
+            a=ring(x0+(x1-x0)*part/count)
+            b=ring(x1 if part+1==count else x0+(x1-x0)*(part+1)/count)
+            for i in range(len(section)):
+                if i in skip_edges:
+                    continue
+                j=(i+1)%len(section)
+                self.face([a[i],a[j],b[j],b[i]],mat)
 
     def solid_box(self,center,size,angle=0):
         """Collider-only box: one simple body for a group of small visible parts."""
@@ -491,7 +502,9 @@ class SurfaceTiles:
         if sign<0:
             section.reverse()
         if self.physical:
-            self.collider.strip_x(x0,x1,section,mat)
+            # Edge 4 is the shared vertical interface with the paving.
+            # Both outward surfaces are retained; neither buried interface is.
+            self.collider.strip_x(x0,x1,section,mat,skip_edges=(4,),max_span=2.0)
         ymin=min(p[0] for p in section); ymax=max(p[0] for p in section)
         rows=[j for j in range(len(TILE_Y)-1) if TILE_Y[j]<=ymin and ymax<=TILE_Y[j+1]]
         if len(rows)!=1:
@@ -1047,10 +1060,22 @@ def ground():
     m=Mesh('Forum_Piazza');m.box((-13,10,.045),(140,108,.09),MARBLE)
     install('forum',m);put('forum','Forum_Piazza',0,0,category='public_space')
     m=SurfaceTiles('Main_Streets','Main_Streets')
+    # The visual road is unchanged. The physical road and kerbs share
+    # their exterior shell instead of exporting coincident, buried side faces.
+    m.physical=False
     m.box((0,-65,.055),(835,14,.11),PAVING)
+    m.physical=True
+    road=[(-72.0,0.0),(-58.0,0.0),(-58.0,.11),(-72.0,.11)]
+    segments=[(-417.5,-407.5,False),(-407.5,-106.5,True),
+              (-106.5,-93.5,False),(-93.5,407.5,True),(407.5,417.5,False)]
+    for index,(x0,x1,has_kerb) in enumerate(segments):
+        m.collider.strip_x(x0,x1,road,PAVING,
+                           skip_edges=(1,3) if has_kerb else (),
+                           start_cap=index==0,end_cap=index==len(segments)-1,
+                           max_span=2.0)
     m.box((-100,0,.055),(13,655,.11),PAVING)
-    # Solid bevels connect the 0.16 m kerb crown to both ground and road.
-    # No vertical 7.5 cm gap, no new collision layer and no changed street opening.
+    # Same crown, slope, road level and crossing opening. Short exterior
+    # facets avoid very thin 301/501 m collision triangles on the kerb.
     for y in (-72.4,-57.6):
         for x0,x1 in ((-407.5,-106.5),(-93.5,407.5)):
             m.kerb(x0,x1,y,STONE)

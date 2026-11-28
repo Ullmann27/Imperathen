@@ -357,6 +357,16 @@ func _walk(scene: Node3D, start: Vector3, axis: Vector2, frames: int, stop: Call
 			highest_floor = maxf(highest_floor, floor_y)
 		if stop.call(position):
 			break
+	if not stop.call(scene.player.global_position):
+		var motion := Vector3(axis.x, 0.0, axis.y).normalized()*0.08
+		var hit := KinematicCollision3D.new()
+		if scene.player.test_move(scene.player.global_transform, motion, hit, scene.player.safe_margin, false):
+			var collider := hit.get_collider() as Node
+			print("ROMAN_CITY_BLOCKING_CONTACT ", JSON.stringify({
+				"collider": String(collider.name) if is_instance_valid(collider) else "",
+				"body_position": str(scene.player.global_position), "position": str(hit.get_position()),
+				"normal": str(hit.get_normal()), "travel": str(hit.get_travel()),
+				"remainder": str(hit.get_remainder())}))
 	scene._touch_move = Vector2.ZERO
 	await _frames(30)
 	return {"end":scene.player.global_position, "highest_floor":highest_floor, "largest_lift":largest_lift}

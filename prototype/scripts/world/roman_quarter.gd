@@ -41,8 +41,8 @@ func install(profile: String, add_imported_colliders: Callable) -> void:
 			"high": pebbles.visibility_range_end = 29.0
 
 	_road_surface()
-	for side: float in [-1.0, 1.0]:
-		_floor_box(Vector3(side * 3.91, 0.159, 0.0), Vector3(1.18, 0.15, 26.0))
+	# The main sidewalks are part of the continuous road surface below.
+	# Keep the separate fountain forecourt and crossing stones.
 	_floor_box(Vector3(-5.42, 0.159, -4.275), Vector3(1.86, 0.15, 3.75))
 	for x: float in [-2.55, -1.85, -0.13, 1.62, 2.39]:
 		_floor_box(Vector3(x, 0.159, 6.2), Vector3(0.52, 0.15, 0.69))
@@ -139,20 +139,27 @@ func _model(path: String, node_name: String, at: Vector3) -> Node3D:
 func _road_surface() -> void:
 	# The worn curb is represented by a short, walkable bevel. Paving chips
 	# and wheel ruts preserve their visual depth without catching the capsule.
+	# Previously each sidewalk box began 2 cm inside its bevel and
+	# exposed a buried vertical face at the Domus approach. Build both
+	# flat sidewalks and their bevels from the same shared top edges.
 	var cross_section := [
-		Vector2(-3.34, 0.159), Vector2(-3.06, 0.0), Vector2(-1.18, 0.047),
+		Vector2(-4.5, 0.159), Vector2(-3.34, 0.159),
+		Vector2(-3.06, 0.0), Vector2(-1.18, 0.047),
 		Vector2(0.0, 0.076), Vector2(1.18, 0.047),
-		Vector2(3.06, 0.0), Vector2(3.34, 0.159),
+		Vector2(3.06, 0.0), Vector2(3.34, 0.159), Vector2(4.5, 0.159),
 	]
 	var triangles := PackedVector3Array()
-	for index in range(cross_section.size() - 1):
-		var left: Vector2 = cross_section[index]
-		var right: Vector2 = cross_section[index + 1]
-		var a := Vector3(left.x, left.y, -13.0)
-		var b := Vector3(right.x, right.y, -13.0)
-		var c := Vector3(right.x, right.y, 13.0)
-		var d := Vector3(left.x, left.y, 13.0)
-		triangles.append_array(PackedVector3Array([a, b, c, a, c, d]))
+	for segment in 13:
+		var z0 := -13.0 + float(segment) * 2.0
+		var z1 := z0 + 2.0
+		for index in range(cross_section.size() - 1):
+			var left: Vector2 = cross_section[index]
+			var right: Vector2 = cross_section[index + 1]
+			var a := Vector3(left.x, left.y, z0)
+			var b := Vector3(right.x, right.y, z0)
+			var c := Vector3(right.x, right.y, z1)
+			var d := Vector3(left.x, left.y, z1)
+			triangles.append_array(PackedVector3Array([a, b, c, a, c, d]))
 	var shape := ConcavePolygonShape3D.new()
 	shape.set_faces(triangles)
 	_collider(shape, Vector3.ZERO)

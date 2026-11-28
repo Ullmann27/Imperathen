@@ -81,6 +81,7 @@ func _run() -> void:
 
 			if not reached:
 				printerr("QUARTER_STREET_WALK_FAIL route ", id, " segment ", at, " -> ", target, " blocked at ", city.player.position)
+				_trace_contact(city.player, target)
 				city.free()
 				quit(1)
 				return
@@ -96,3 +97,15 @@ func _run() -> void:
 	city.free()
 	await process_frame
 	quit(0 if ok else 1)
+
+
+func _trace_contact(body: CharacterBody3D, target: Vector3) -> void:
+	var direction := Vector3(target.x-body.position.x, 0.0, target.z-body.position.z).normalized()
+	var hit := KinematicCollision3D.new()
+	if body.test_move(body.global_transform, direction*0.08, hit, body.safe_margin, false):
+		var collider := hit.get_collider() as Node
+		print("QUARTER_BLOCKING_CONTACT ", JSON.stringify({
+			"collider": String(collider.name) if is_instance_valid(collider) else "",
+			"position": str(hit.get_position()), "normal": str(hit.get_normal()),
+			"travel": str(hit.get_travel()), "remainder": str(hit.get_remainder()),
+			"on_floor": body.is_on_floor(), "velocity": str(body.velocity)}))
