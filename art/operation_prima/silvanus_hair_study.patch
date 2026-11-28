@@ -1,0 +1,9 @@
+--- a/prototype/scripts/visuals/roman_faces.gd
++++ b/prototype/scripts/visuals/roman_faces.gd
+@@ -14,0 +15,2 @@
++	var legacy_silvanus := parent and str(look.get("id", "")) == "silvanus" \
++		and model.scene_file_path.get_file().begins_with("frontier_civilian_man_")
+@@ -57,0 +60,3 @@
++					if legacy_silvanus:
++						finish = finish.duplicate() as ShaderMaterial
++						finish.set_shader_parameter("scalp", 1.0)
