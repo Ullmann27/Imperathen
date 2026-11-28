@@ -891,13 +891,18 @@ func _open_shop(person: int, resident: Dictionary, t: int) -> void:
 		_order(number, t)
 
 
+## A scheduled worker is actually serving only in the half-open duty
+## interval. A wake event at this same second may not yet have been processed.
+## Neither an expired vendor nor a commuter may open a business or sell goods.
+func _staff_member_present(business: Dictionary, member: int, t: int) -> bool:
+	if member < 0 or member >= state.residents.size():
+		return false
+	var resident: Dictionary = state.residents[member]
+	return resident.at == business.anchor and resident.act in ["vend", "work"] and int(resident.arr) <= t and t < int(resident.until)
+
+
 func business_staffed(number: int, t: int) -> bool:
-	var business: Dictionary = state.businesses[number]
-	for member: int in business.staff:
-		var resident: Dictionary = state.residents[member]
-		if resident.at == business.anchor and resident.act in ["vend", "work"] and int(resident.arr) <= t:
-			return true
-	return false
+	return _vendor_of(number, t) >= 0
 
 
 func business_open(number: int, t: int) -> bool:
@@ -1204,16 +1209,21 @@ func _shop_arrive(person: int, resident: Dictionary, t: int) -> bool:
 		_event(t, "haggle", {"a": person, "b": vendor, "business": number, "at": business.queue, "good": good, "ask": int(business.price[good]), "seconds": haggle})
 		_schedule(person, t + haggle)
 		return true
-	# Step 2: the deal.
+	# Step 2: the deal. The staff member who haggled may have gone home
+	# while the customer was waiting. Keep that identity only if the
+	# person still serves this business; never award trade memories to an
+	# absent employee. A real replacement can complete the purchase.
 	var household: Dictionary = state.households[int(resident.hh)]
 	var item: Array = errand.list[0]
 	var vendor := int(resident.with)
+	if not business.staff.has(vendor) or not _staff_member_present(business, vendor, t):
+		vendor = _vendor_of(number, t)
 	var quantity := mini(int(item[1]), int(business.stock.get(good, 0)))
 	var regular := Population.trust(state, vendor, person) if vendor >= 0 else 0.0
 	var discount := clampi(int(resident.traits[3]) / 12 + int(regular / 10.0), 0, 12)
 	var unit := maxi(1, int(business.price[good]) * (100 - discount) / 100)
 	quantity = mini(quantity, int(household.funds) / unit)
-	if quantity > 0 and business_open(number, t) and _pay("hh", int(resident.hh), "biz", number, quantity * unit, "retail"):
+	if quantity > 0 and vendor >= 0 and business_open(number, t) and _pay("hh", int(resident.hh), "biz", number, quantity * unit, "retail"):
 		_goods(business, good, quantity, "sold")
 		business.sold[good] = int(business.sold.get(good, 0)) + quantity
 		resident.bag[good] = int(resident.bag.get(good, 0)) + quantity
@@ -1245,8 +1255,7 @@ func _shop_arrive(person: int, resident: Dictionary, t: int) -> bool:
 func _vendor_of(number: int, t: int) -> int:
 	var business: Dictionary = state.businesses[number]
 	for member: int in business.staff:
-		var resident: Dictionary = state.residents[member]
-		if resident.at == business.anchor and resident.act in ["vend", "work"] and int(resident.arr) <= t:
+		if _staff_member_present(business, member, t):
 			return member
 	return -1
 
