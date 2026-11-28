@@ -94,6 +94,16 @@ jobs:
             test -s "$out/$version/youth-outfit-review.json"
             grep -Fq 'YOUTH_OUTFIT_REVIEW []' "$out/$version/render.log"
             if grep -Eq 'SCRIPT ERROR:|^ERROR:' "$out/$version/render.log"; then exit 1; fi
+            mkdir -p "$out/$version/studio"
+            timeout --kill-after=10s 360s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --rendering-method gl_compatibility --audio-driver Dummy --resolution 1280x720 --script res://tests/youth_outfit_review.gd -- "$out/$version/studio" --capture-on-demand --studio 2>&1 | tee "$out/$version/studio/render.log"
+            for outfit in armoured civil; do
+              for view in front three_quarter side face walk attack; do
+                test -s "$out/$version/studio/${outfit}_${view}.png"
+              done
+            done
+            test -s "$out/$version/studio/youth-studio-review.json"
+            grep -Fq 'YOUTH_STUDIO_REVIEW []' "$out/$version/studio/render.log"
+            if grep -Eq 'SCRIPT ERROR:|^ERROR:' "$out/$version/studio/render.log"; then exit 1; fi
           done
           if cmp -s "$out/V1_ASSET_SHA256.txt" "$out/V2_ASSET_SHA256.txt"; then
             printf '%s\n' 'IDENTICAL_ASSETS: V2 is an independent control render, not an asset repair.' > "$out/CONTROL_ONLY.txt"
