@@ -346,6 +346,11 @@ func _live_person_clip(actor: Person, action: String, skin: RefCounted) -> Dicti
 	# contact must observe the production driver, including its transition and
 	# world-foot solver, instead of the sample_pose preview shortcut.
 	actor.position = Vector3(0,.9,0)
+	# This fixture measures actual skin vertices against the explicit y=0
+	# plane. Feed the original youth the same known support that both live
+	# world controllers provide; otherwise it only measures its uncorrected
+	# visual pose, not the actual production grounding path.
+	actor.youth_ground_floor_y = 0.0 if actor._uses_youth_mocap() else INF
 	actor.reset_motion()
 	# Every authored travelling cycle is observed with actual root travel. The
 	# company retreat advances 1.48 m per cycle; the battle fixture drives the
@@ -440,6 +445,9 @@ func _person_family(family: Dictionary) -> void:
 				var duration: float = Motion.TIMING[action].z
 				var sampler := func(phase: float) -> void:
 					actor.position = Vector3(0,.9,0)
+					actor.youth_ground_floor_y = 0.0 if actor._uses_youth_mocap() else INF
+					# Advance the existing blend clock just as the real actor does.
+					# This is a fixed-step sampler, not a second animation owner.
 					actor.sample_combat(action,phase)
 				var clip := _sample(rig,sampler,"unarmed:"+action,duration,false,true,skin,{"gait":false})
 				_record_clip(measured,path,clip)

@@ -86,6 +86,22 @@ func _run() -> void:
 		await physics_frame
 		world._move_player(1.0/60.0)
 	_check(absf(player.position.y-.9-Layout.HOUSE_FLOOR)<.025,"The production boy's foot origin rests on the raised family floor")
+	var family_floor: float = world._player_support_floor()
+	_check(is_finite(family_floor) and absf(family_floor-Layout.HOUSE_FLOOR)<.01,"Youth grounding uses the actual raised family floor, not the global zero plane")
+	var figure: Node3D = world._figure
+	if figure._uses_youth_mocap():
+		_check(is_equal_approx(figure.youth_ground_floor_y,family_floor),"Original youth receives the real floor during production movement")
+		var before: Vector3 = player.global_position
+		figure._process(1.0/60.0)
+		_check(is_equal_approx(figure._youth_soles.last_target_y,family_floor+.003),"The existing sole solver receives the measured family support")
+		_check(player.global_position.is_equal_approx(before),"Sole correction cannot move the collision body")
+	else:
+		_check(not is_finite(figure.youth_ground_floor_y),"Legacy fallback cannot receive source-specific original youth correction")
+	player.position = Vector3(-12,4.0,11.7)
+	player.velocity = Vector3.ZERO
+	await physics_frame
+	world._move_player(1.0/60.0)
+	_check(not player.is_on_floor() and not is_finite(world._player_support_floor()) and not is_finite(figure.youth_ground_floor_y),"Airborne body has no stale floor correction")
 	_check((player.collision_mask & Layout.CITIZEN_LAYER) != 0,"The production player observes citizen collisions")
 	var mother: Node3D = world.village_life_world.actors.julia
 	player.position = mother.position+Vector3(-1.5,.9,0)
@@ -113,6 +129,10 @@ func _run() -> void:
 		player.velocity = Vector3(0,-.3 if player.is_on_floor() else player.velocity.y-19.6/60.0,0)
 		player.move_and_slide()
 	_check(absf(player.position.y-.9-.14)<.025,"The buildable hut also supports feet on its visible threshold floor")
+	var hut_floor: float = world._player_support_floor()
+	_check(is_finite(hut_floor) and absf(hut_floor-.14)<.01,"New support is measured from the real hut collider")
+	world.set_active(false)
+	_check(not is_finite(figure.youth_ground_floor_y),"Paused/cinematic world cannot retain a gameplay floor sample")
 	world.free()
 	await process_frame
 	print("VILLAGE_COLLISION_RESULT checks=%d failures=%d" % [checks,failures.size()])

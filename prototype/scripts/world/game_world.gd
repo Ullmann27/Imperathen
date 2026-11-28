@@ -180,6 +180,8 @@ func setup(state: Dictionary) -> void:
 	else:
 		_player.position = Vector3(0, 1, 8)
 	_player.velocity = Vector3.ZERO
+	# A loaded/teleported body must not inherit the previous location's floor.
+	_figure.youth_ground_floor_y = INF
 	_running = false
 	_actions.reset()
 	_camera_yaw = START_YAW
@@ -330,6 +332,9 @@ func is_menu_flight() -> bool:
 func set_active(active: bool) -> void:
 	if not active:
 		_impact_remaining = 0.0
+		if is_instance_valid(_figure):
+			# Scripted film poses and suspended worlds own their presentation.
+			_figure.youth_ground_floor_y = INF
 	regional.set_active(active)
 	_active = active
 	if active:
@@ -1431,6 +1436,42 @@ func _move_player(delta: float) -> void:
 	_player.move_and_slide()
 	_player.position.x = clampf(_player.position.x, -15999.0, 15999.0)
 	_player.position.z = clampf(_player.position.z, -15999.0, 15999.0)
+	# The original rig uses the existing calibrated visual-only sole solver.
+	# Supply the real support after this completed physics move, as the city
+	# already does; never drag a falling body or alter collision/quest state.
+	_figure.youth_ground_floor_y = _player_support_floor() if _figure._uses_youth_mocap() else INF
+
+
+func _player_support_floor() -> float:
+	if not is_instance_valid(_player) or not _player.is_inside_tree() or not _player.is_on_floor():
+		return INF
+	var at: Vector3 = _player.global_position
+	if not at.is_finite():
+		return INF
+	var shape: CollisionShape3D = _player.get_node_or_null("CollisionShape3D") as CollisionShape3D
+	# The production capsule has a generated child, not a persistent node name.
+	if shape == null:
+		for child: Node in _player.get_children():
+			if child is CollisionShape3D and not child.disabled and child.shape is CapsuleShape3D:
+				shape = child as CollisionShape3D
+				break
+	if not is_instance_valid(shape) or shape.disabled or not shape.shape is CapsuleShape3D:
+		return INF
+	var capsule: CapsuleShape3D = shape.shape as CapsuleShape3D
+	var centre: Vector3 = shape.global_position
+	var half_height: float = capsule.height * 0.5 * shape.global_basis.y.length()
+	var nominal: float = centre.y - half_height
+	# Layer 1 is authored static world geometry. Do not ground the boy on a
+	# resident, enemy, carried prop or the capsule itself.
+	var query := PhysicsRayQueryParameters3D.create(centre,Vector3(centre.x,nominal-0.18,centre.z),1,[_player.get_rid()])
+	var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return INF
+	var normal: Vector3 = hit.normal
+	var point: Vector3 = hit.position
+	if not point.is_finite() or not normal.is_finite() or normal.dot(Vector3.UP) < cos(_player.floor_max_angle) or absf(point.y-nominal)>0.15:
+		return INF
+	return point.y
 
 
 func _pan_city_camera(delta: float) -> void:
