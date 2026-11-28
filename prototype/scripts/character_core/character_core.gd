@@ -44,6 +44,8 @@ var _explicit_facing: bool = false
 var _planar_speed: float = 0.0
 var _yaw_rate: float = 0.0
 var _speed_multiplier: float = 1.0
+var _step_remaining: float = 0.0
+var _step_direction: Vector3 = Vector3.ZERO
 
 func _ready() -> void:
 	_valid = _bind_rig()
@@ -175,10 +177,55 @@ func _gait_speed() -> float:
 		Gait.SPRINT: return sprint_speed
 		_: return walk_speed
 
-## Only take a step when all three body-volume sweeps succeed and the
-## landing normal is walkable. This cannot teleport through a tall wall.
+## A capsule first meets a stair on its curved lower edge. A downward
+## sweep at that same x/z hits the edge, not the top. Validate the complete
+## lifted corridor and the walkable top ahead of the capsule; advance only
+## the normal per-tick displacement, never the full look-ahead distance.
+func _step_probe_distance() -> float:
+	var collider: CollisionShape3D = get_node_or_null("CollisionShape3D") as CollisionShape3D
+	if collider != null and collider.shape is CapsuleShape3D:
+		var capsule: CapsuleShape3D = collider.shape as CapsuleShape3D
+		return capsule.radius * maxf(absf(collider.global_basis.x.length()),absf(collider.global_basis.z.length())) + 0.025
+	return 0.0
+
+func _walkable_landing(from: Transform3D, distance: float, hit: KinematicCollision3D) -> bool:
+	return test_move(from,Vector3.DOWN*distance,hit,safe_margin,false) and hit.get_normal().dot(Vector3.UP)>=cos(floor_max_angle)
+
+func _continue_step(horizontal: Vector3) -> bool:
+	if horizontal.length_squared()<0.000001 or horizontal.normalized().dot(_step_direction)<0.95:
+		_step_remaining = 0.0
+		return false
+	var origin: Transform3D = global_transform
+	if test_move(origin,horizontal,null,safe_margin,false):
+		_step_remaining = 0.0
+		return false
+	var next: Transform3D = origin
+	next.origin += horizontal
+	var landing: KinematicCollision3D = KinematicCollision3D.new()
+	if _walkable_landing(next,0.045,landing):
+		next.origin += landing.get_travel()
+		global_position = next.origin
+		_step_remaining = 0.0
+		return true
+	# The body is still entering the verified stair. Revalidate the top
+	# and entire forward corridor each tick, including dynamic obstacles.
+	var look: Vector3 = horizontal.normalized()*_step_remaining
+	var ahead: Transform3D = next
+	if _step_remaining<=0.0 or test_move(next,look,null,safe_margin,false):
+		_step_remaining = 0.0
+		return false
+	ahead.origin += look
+	if not _walkable_landing(ahead,0.045,landing):
+		_step_remaining = 0.0
+		return false
+	global_position = next.origin
+	_step_remaining = maxf(0.0,_step_remaining-horizontal.length())
+	return true
+
 func _try_step_up(horizontal: Vector3) -> bool:
-	if not is_on_floor() or step_height <= 0.0 or horizontal.length_squared()<0.000001:
+	if _step_remaining>0.0:
+		return _continue_step(horizontal)
+	if not _grounded or step_height<=0.0 or horizontal.length_squared()<0.000001:
 		return false
 	var origin: Transform3D = global_transform
 	var obstruction: KinematicCollision3D = KinematicCollision3D.new()
@@ -186,24 +233,36 @@ func _try_step_up(horizontal: Vector3) -> bool:
 		return false
 	if obstruction.get_normal().dot(Vector3.UP)>=cos(floor_max_angle):
 		return false
-	var raise_motion: Vector3 = Vector3.UP*step_height
-	if test_move(origin,raise_motion,null,safe_margin,false):
+	var probe: float = _step_probe_distance()
+	if probe<=0.0:
+		return false
+	var lift: Vector3 = Vector3.UP*(step_height+safe_margin*3.0)
+	if test_move(origin,lift,null,safe_margin,false):
 		return false
 	var raised: Transform3D = origin
-	raised.origin += raise_motion
-	if test_move(raised,horizontal,null,safe_margin,false):
+	raised.origin += lift
+	var look: Vector3 = horizontal+horizontal.normalized()*probe
+	if test_move(raised,look,null,safe_margin,false):
 		return false
-	raised.origin += horizontal
+	var ahead: Transform3D = raised
+	ahead.origin += look
 	var landing: KinematicCollision3D = KinematicCollision3D.new()
-	if not test_move(raised,Vector3.DOWN*(step_height+floor_snap_length),landing,safe_margin,false):
+	if not _walkable_landing(ahead,step_height+floor_snap_length,landing):
 		return false
-	if landing.get_normal().dot(Vector3.UP)<cos(floor_max_angle):
-		return false
-	var end: Vector3 = raised.origin+landing.get_travel()
+	var end: Vector3 = ahead.origin+landing.get_travel()
 	var rise: float = end.y-origin.origin.y
-	if rise < 0.015 or rise > step_height+0.002:
+	if rise<0.015 or rise>step_height+0.002:
 		return false
-	global_position = end
+	var actual_lift: Vector3 = Vector3.UP*(rise+safe_margin*3.0)
+	if test_move(origin,actual_lift,null,safe_margin,false):
+		return false
+	var entry: Transform3D = origin
+	entry.origin += actual_lift
+	if test_move(entry,horizontal,null,safe_margin,false):
+		return false
+	global_position = entry.origin+horizontal
+	_step_remaining = probe
+	_step_direction = horizontal.normalized()
 	return true
 
 func _physics_process(delta: float) -> void:
@@ -227,19 +286,18 @@ func _physics_process(delta: float) -> void:
 	_yaw_rate = wrapf(global_rotation.y-old_yaw,-PI,PI)/delta
 	velocity.x = current.x
 	velocity.z = current.z
-	velocity.y = -0.5 if is_on_floor() else velocity.y-gravity*delta
+	velocity.y = -0.5 if _grounded else velocity.y-gravity*delta
 	var before: Vector3 = global_position
 	var stepped: bool = _try_step_up(current*delta)
 	if stepped:
-		velocity.x = 0.0
-		velocity.z = 0.0
-	move_and_slide()
-	if stepped:
-		velocity.x = current.x
-		velocity.z = current.z
+		# The validated volume sweeps already resolved this tick's motion.
+		# A second move_and_slide would pull the capsule back off the edge.
+		velocity.y = 0.0
+	else:
+		move_and_slide()
 	var real: Vector3 = (global_position-before)/delta
 	_planar_speed = Vector2(real.x,real.z).length()
-	var grounded: bool = is_on_floor()
+	var grounded: bool = stepped or is_on_floor()
 	if grounded != _grounded:
 		_grounded = grounded
 		grounded_changed.emit(grounded)

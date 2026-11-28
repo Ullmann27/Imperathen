@@ -25,6 +25,10 @@ class Leg extends RefCounted:
 	var weight: float = 0.0
 	var normal: Vector3 = Vector3.UP
 	var solved_ankle: Vector3 = Vector3.INF
+	var surface_point: Vector3 = Vector3.INF
+	var animated_ankle: Vector3 = Vector3.INF
+	var desired_target: Vector3 = Vector3.INF
+	var animated_hip: Vector3 = Vector3.INF
 
 @export_range(0.05,0.5,0.01) var probe_up: float = 0.32
 @export_range(0.1,1.0,0.01) var probe_down: float = 0.48
@@ -177,6 +181,7 @@ func update_pose(delta: float, on_floor: bool, speed: float, yaw_rate: float) ->
 	else:
 		_phase = 0.0
 	var drop: float = 0.0
+	var alpha: float = 1.0-exp(-18.0*delta)
 	for index: int in range(_legs.size()):
 		var leg: Leg = _legs[index]
 		var ankle: Vector3 = _skeleton.to_global(_skeleton.get_bone_global_pose(leg.foot).origin)
@@ -199,6 +204,8 @@ func update_pose(delta: float, on_floor: bool, speed: float, yaw_rate: float) ->
 			normal = leg.ray.get_collision_normal().normalized()
 			valid = point.is_finite() and normal.is_finite() and normal.dot(Vector3.UP) >= cos(deg_to_rad(48.0))
 		leg.grounded = valid
+		leg.surface_point = point if valid else Vector3.INF
+		leg.animated_ankle = ankle
 		var target_weight: float = 0.0
 		var target: Vector3 = ankle
 		if valid:
@@ -228,17 +235,31 @@ func update_pose(delta: float, on_floor: bool, speed: float, yaw_rate: float) ->
 		else:
 			leg.locked = false
 			leg.lock_surface = null
-		var hip_world: Vector3 = _skeleton.to_global(_skeleton.get_bone_global_pose(leg.thigh).origin)
-		var reach: Vector3 = target-hip_world
-		target = hip_world+reach.limit_length(maxf(0.05,leg.max_reach-0.005))
-		var alpha: float = 1.0-exp(-18.0*delta)
-		leg.target.global_position = leg.target.global_position.lerp(target,alpha) if leg.weight > 0.01 else target
+		leg.animated_hip = _skeleton.to_global(_skeleton.get_bone_global_pose(leg.thigh).origin)
+		leg.desired_target = target
+		if valid and leg.locked:
+			# Solve vertical reach before clamping either ankle. On a slope
+			# the lower foot otherwise gets clamped to the higher one.
+			var separation: Vector3 = target-leg.animated_hip
+			var reach_limit: float = maxf(0.05,leg.max_reach-0.005)
+			var lateral_sq: float = separation.x*separation.x+separation.z*separation.z
+			var vertical_reach: float = sqrt(maxf(0.0,reach_limit*reach_limit-lateral_sq))
+			drop = minf(drop,separation.y+vertical_reach)
 		leg.normal = leg.normal.lerp(normal,alpha).normalized()
 		leg.weight = lerpf(leg.weight,target_weight,alpha)
+	_hip = lerpf(_hip,clampf(drop,-maximum_pelvis_drop,0.0) if _enabled and on_floor else 0.0,1.0-exp(-12.0*delta))
+	# Both native leg chains receive the SAME already computed pelvis offset.
+	# Clamp against the hip that the BodyPoseModifier will actually produce.
+	for leg: Leg in _legs:
+		var hip_world: Vector3 = leg.animated_hip+Vector3.UP*_hip
+		var reach_limit: float = maxf(0.05,leg.max_reach-0.005)
+		var desired: Vector3 = leg.desired_target
+		var target: Vector3 = hip_world+(desired-hip_world).limit_length(reach_limit)
+		var smooth: Vector3 = leg.target.global_position.lerp(target,alpha) if leg.weight>0.01 else target
+		leg.target.global_position = hip_world+(smooth-hip_world).limit_length(reach_limit)
 		leg.solver.influence = leg.weight
 		leg.aligner.set("surface_normal",leg.normal)
 		leg.aligner.influence = leg.weight if leg.locked else 0.0
-	_hip = lerpf(_hip,clampf(drop,-maximum_pelvis_drop,0.0) if _enabled and on_floor else 0.0,1.0-exp(-12.0*delta))
 	_pose.set("pelvis_offset_m",_hip)
 	_pose.set("bank_angle_rad",clampf(-yaw_rate*speed*0.035,-deg_to_rad(12.0),deg_to_rad(12.0)))
 	_pose.set("forward_world",forward)
@@ -261,7 +282,9 @@ func get_contact(side: int) -> Dictionary:
 	var leg: Leg = _legs[side]
 	return {"grounded":leg.grounded,"locked":leg.locked,"weight":leg.weight,
 		"normal":leg.normal,"target":leg.target.global_position,"solved_ankle":leg.solved_ankle,
-		"ankle_height":leg.ankle_height,"max_reach":leg.max_reach}
+		"ankle_height":leg.ankle_height,"max_reach":leg.max_reach,
+		"surface_point":leg.surface_point,"animated_ankle":leg.animated_ankle,
+		"desired_target":leg.desired_target}
 
 func get_pelvis_offset() -> float:
 	return _hip

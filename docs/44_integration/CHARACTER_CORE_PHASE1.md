@@ -92,3 +92,7 @@ Run the isolated CI workflow or:
 IMPERATHEN_ISOLATED_TEST=1 godot --headless --path prototype --fixed-fps 60 --script res://tests/character_core_phase1_test.gd
 ```
 The test checks the actual original imported rig, graph, upper layer filters, finite native foot IK, speeds, stopping, turning, swept stair and wall contact, slope and LOD toggle. A source commit is not an engine PASS. No final campaign integration, image quality, private youth, physical Fold7 or APK approval is implied.
+
+## First real engine failure and correction candidate
+
+Run 46116191468 at d467b29e13253f58f98acc6d2b74acfe2bf4216a compiled and executed 64 checks (62 passed). Actual 18 cm step and distinct foot heights on a lateral slope failed. The revised step path verifies the raised capsule corridor and landing beyond its curved edge, moves only the requested per-tick distance, and revalidates the top during entry. Foot placement computes the shared pelvis offset before clamping either ankle to reachable length. Added raw ground/desired target diagnostics, unchanged 40 mm and 15 mm thresholds, and traversal/speed assertions. Correction requires a new passing real engine run; not a visual or device acceptance.

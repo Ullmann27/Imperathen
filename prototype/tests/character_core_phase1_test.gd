@@ -56,7 +56,11 @@ func _check_feet(actor: CharacterCore, label: String) -> void:
 		_check(bool(receipt.grounded) and bool(receipt.locked) and float(receipt.weight)>0.90,label+": real ray and planted native IK")
 		_check(point.is_finite() and solved.is_finite(),label+": finite actual ankle and target")
 		_check(point.distance_to(solved)<0.04,label+": actual final ankle within 40 mm of target (%.6f)" % point.distance_to(solved))
-		print("CHARACTER_PHASE1_CONTACT ",label," side=",side," error_m=",point.distance_to(solved)," normal=",receipt.normal)
+		var surface: Vector3 = receipt.surface_point
+		var desired: Vector3 = receipt.desired_target
+		_check(surface.is_finite() and desired.is_finite(),label+": real ground sample and unclamped target")
+		_check(point.distance_to(desired)<0.04,label+": target reaches desired ground placement within 40 mm")
+		print("CHARACTER_PHASE1_CONTACT ",label," side=",side," error_m=",point.distance_to(solved)," normal=",receipt.normal," surface=",surface," animated=",receipt.animated_ankle," desired=",desired," target=",point," hip_offset=",actor.get_pelvis_offset())
 
 func _run() -> void:
 	stage = Node3D.new()
@@ -132,11 +136,16 @@ func _run() -> void:
 	await _frames(60)
 	walker.request_motion(Vector3.FORWARD,1.0,CharacterCore.Gait.WALK)
 	var max_y: float = walker.global_position.y
+	var max_planar: float = 0.0
 	for frame: int in range(240):
 		await physics_frame
 		await process_frame
 		max_y = maxf(max_y,walker.global_position.y)
+		max_planar = maxf(max_planar,walker.get_planar_speed())
+	print("CHARACTER_PHASE1_STAIR max_y=",max_y," final=",walker.global_position," max_speed=",max_planar)
 	_check(max_y>0.13,"Physical body climbs an actual 18 cm step using volume sweeps")
+	_check(walker.global_position.z<0.6,"Character crosses the step and reaches the wall, not just stands at the step")
+	_check(max_planar<=1.50,"Swept step does not teleport the capsule forward")
 	_check(walker.global_position.z>0.15,"Tall wall is not bypassed")
 	_check(walker.get_planar_speed()<0.12,"Blocked motion cannot fake running animation")
 	walker.free()
@@ -152,6 +161,7 @@ func _run() -> void:
 	if not left.is_empty() and not right.is_empty():
 		var normal: Vector3 = left.normal
 		_check(normal.dot(Vector3.UP)>0.95 and normal.dot(Vector3.UP)<0.995,"Ray samples actual non-horizontal ground normal")
+		_check(absf((left.surface_point as Vector3).y-(right.surface_point as Vector3).y)>0.015,"Distinct independently measured ray heights on slope")
 		_check(absf((left.target as Vector3).y-(right.target as Vector3).y)>0.015,"Distinct foot heights on slope")
 	_check(slope_actor.get_pelvis_offset()<=0.001 and slope_actor.get_pelvis_offset()>=-0.181,"Hip offset remains bounded")
 	slope_actor.free()
