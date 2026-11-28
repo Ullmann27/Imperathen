@@ -7,12 +7,18 @@ extends SceneTree
 ## A surface counts as visible only when even the farthest third-person camera
 ## (8 m zoom) stays inside end-margin. Headless geometry check, not a render.
 const City = preload("res://scripts/world/city_exploration.gd")
+const Calendar := preload("res://scripts/domain/world_calendar.gd")
+# The actual city generator dates these four Aurelian-style gate models
+# and the associated wall modules to 271 CE, not the campaign start.
+const GATE_ERA := 271
+const GATE_NAMES := ["Porta_east", "Porta_north", "Porta_south", "Porta_west"]
 const SURFACES := ["City_Ground", "Main_Streets", "Residential_Roads"]
 const CAMERA_REACH := 8.4  # maximum zoom distance 8.0 m plus 0.4 m camera anchor
 const FRONT_OFFSET := 1.0
 var checks := 0
 var failures: Array[String] = []
 var results := {}
+var campaign_results := {}
 
 
 func _initialize() -> void:
@@ -31,21 +37,42 @@ func _check(ok: bool, label: String) -> void:
 
 
 func _run() -> void:
-	for profile in ["low", "balanced", "high", "very_high"]:
-		var scene := City.new()
-		scene.persist = false
-		scene.profile = profile
-		root.add_child(scene)
-		for i in 4:
-			await physics_frame
+	# Two real production CityExploration instances per profile. Never
+	# disable chronological pruning merely to make the gate fixture pass.
+	for profile: String in ["low", "balanced", "high", "very_high"]:
+		for gates_expected: bool in [false, true]:
+			var scene := City.new()
+			scene.persist = false
+			scene.profile = profile
+			scene.world_jdn = Calendar.first_day_of_year(GATE_ERA) if gates_expected else Calendar.campaign_start_jdn()
+			var year: int = Calendar.year_of(scene.world_jdn)
+			var label := "%s/%d" % [profile, year]
+			root.add_child(scene)
+			for i in 4:
+				await physics_frame
+				await process_frame
+			_check(scene.city_available, label+": actual RomanCity GLB is loaded")
+			if scene.city_available:
+				var city := scene.get_node("RomanCity") as Node3D
+				if not gates_expected:
+					_check(city.find_children("Wall_*", "MeshInstance3D", true, false).is_empty(),
+						label+": future city walls are absent from campaign visuals")
+					_check(scene.find_children("CityCollision_Porta_*", "StaticBody3D", true, false).is_empty()
+						and scene.find_children("CityCollision_Wall_*", "StaticBody3D", true, false).is_empty(),
+						label+": future gates and walls leave no imported campaign collision bodies")
+				else:
+					_check(not city.find_children("Wall_*", "MeshInstance3D", true, false).is_empty(),
+						label+": the dated city walls are actually loaded")
+				var measured: Dictionary = _measure(city, label, gates_expected)
+				if gates_expected:
+					results[profile] = measured
+				else:
+					campaign_results[profile] = measured
+			scene.free()
 			await process_frame
-		_check(scene.city_available, profile+": actual RomanCity GLB is loaded")
-		if scene.city_available:
-			results[profile] = _measure(scene.get_node("RomanCity") as Node3D, profile)
-		scene.free()
-		await process_frame
 	print("ROMAN_CITY_SURFACE_VISIBILITY_RESULT "+JSON.stringify({"checks":checks,"failures":failures.slice(0,12),
-		"failure_count":failures.size(),"profiles":results,"passed":failures.is_empty(),
+		"failure_count":failures.size(),"profiles":results,"campaign_start_profiles":campaign_results,
+		"gate_era":GATE_ERA,"campaign_start_year":-58,"passed":failures.is_empty(),
 		"renderer_note":"headless geometry of real imported meshes; Xvfb renders are separate evidence"}))
 	print("ROMAN_CITY_SURFACE_VISIBILITY_PASS" if failures.is_empty() else "ROMAN_CITY_SURFACE_VISIBILITY_FAIL")
 	quit(0 if failures.is_empty() else 1)
@@ -62,25 +89,40 @@ func _surface_meshes(city: Node3D, family: String) -> Array[MeshInstance3D]:
 	return found
 
 
-func _measure(city: Node3D, profile: String) -> Dictionary:
+func _measure(city: Node3D, profile: String, gates_expected: bool) -> Dictionary:
 	var surfaces := {}
 	for family: String in SURFACES:
 		var meshes := _surface_meshes(city, family)
 		_check(not meshes.is_empty(), profile+": "+family+" surface meshes exist in the GLB")
 		surfaces[family] = meshes
 	var probes: Array[Dictionary] = []
+	var house_ids: Dictionary = {}
+	var gate_names: Array[String] = []
 	for node: Node in city.find_children("Residential_*", "MeshInstance3D", true, false):
 		var parts := str(node.name).split("_")
 		if parts.size() != 3 or parts[1].length() != 3 or not parts[1].is_valid_int():
 			continue
 		var house := node as MeshInstance3D
+		var house_id := int(parts[1])
+		if house_id < 1 or house_id > 240 or house_ids.has(house_id):
+			_check(false, profile+": invalid or duplicate authored house identity "+str(house.name))
+		house_ids[house_id] = true
 		var local := house.get_aabb()
 		# Blender local -Y (the doorway side) is Godot local +Z.
 		var front := house.global_transform * Vector3(local.get_center().x, 0.0, local.end.z + FRONT_OFFSET)
 		probes.append({"name":str(house.name), "point":front, "host":house, "needs":["City_Ground", "Residential_Roads"]})
+	_check(probes.size() == 240 and house_ids.size() == 240,
+		profile+": all 240 distinct authored house fronts are probed")
 	for gate: Node in city.find_children("Porta_*", "MeshInstance3D", true, false):
+		gate_names.append(str(gate.name))
 		probes.append({"name":str(gate.name), "point":(gate as Node3D).global_position, "host":gate, "needs":["City_Ground", "Main_Streets"]})
-	_check(probes.size() == 244, profile+": 240 house fronts and 4 gates are probed")
+	gate_names.sort()
+	if gates_expected:
+		_check(gate_names == GATE_NAMES and probes.size() == 244,
+			profile+": 240 house fronts and all four named historical gates are probed")
+	else:
+		_check(gate_names.is_empty() and probes.size() == 240,
+			profile+": campaign date contains 240 house fronts and no future gates")
 	var violations := 0
 	var hidden_even_when_seen := 0
 	var worst := -1.0e9
@@ -124,7 +166,7 @@ func _measure(city: Node3D, profile: String) -> Dictionary:
 					probes_failed[probe.name] = true
 					_check(false, "%s: %s at %s is %.1f m from its AABB centre; range %.0f-%.0f m" % [
 						profile, mesh.name, probe.name, distance, mesh.visibility_range_end, mesh.visibility_range_end_margin])
-	return {"probes":probes.size(), "violations":violations, "probes_with_violation":probes_failed.size(),
+	return {"probes":probes.size(), "house_probes":house_ids.size(), "gate_names":gate_names, "violations":violations, "probes_with_violation":probes_failed.size(),
 		"building_drawn_while_surface_culled":drawn_without_surface,
 		"probes_with_surface_beyond_end_plus_margin":probes_hidden.size(),
 		"hidden_beyond_end_plus_margin":hidden_even_when_seen,

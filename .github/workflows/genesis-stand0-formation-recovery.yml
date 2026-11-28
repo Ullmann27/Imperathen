@@ -1,7 +1,7 @@
 name: GENESIS Stand 0 formation recovery (strict gates)
 on:
   push:
-    branches: ['fix/genesis-stand0-formation-recovery-20261128', 'hoplite/*--stand-zero']
+    branches: ['fix/genesis-stand0-formation-recovery-20261128', 'hoplite/*--stand-zero', 'integration/astra-sol-stand-zero-20261128']
 permissions:
   contents: read
 jobs:
@@ -72,6 +72,11 @@ jobs:
             if ! XDG_DATA_HOME="$state/data" XDG_CONFIG_HOME="$state/config" XDG_CACHE_HOME="$state/cache" timeout --kill-after=10s 420s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script "res://tests/$name.gd" "$@" 2>&1 | tee "$out/$label.log"; then failed=1; fi
             if ! grep -Eq "$marker" "$out/$label.log" || grep -Eq 'SCRIPT ERROR:|^ERROR:' "$out/$label.log"; then failed=1; fi
           }
+          # Exercise the inherited VIVA asset and era fixtures before long formation tests.
+          run_check operation_prima_art_test viva-breakfast OPERATION_PRIMA_ART_PASS
+          run_check genesis_mission_event_batch_test genesis-receipts GENESIS_MISSION_BATCH_PASS
+          run_check roman_city_surface_visibility_test city-chronology ROMAN_CITY_SURFACE_VISIBILITY_PASS
+          run_check roman_city_routes_test city-routes ROMAN_CITY_ROUTES_PASS
           run_check formation_far_ground_test far-ground FORMATION_FAR_GROUND_PASS
           run_check tribal_lod_contract_test tribal-lod TRIBAL_LOD_PASS
           run_check formation_stride_contact_test stride-798 FORMATION_STRIDE_PASS

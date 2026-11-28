@@ -110,6 +110,7 @@ func _run() -> void:
 	_check(collision_matches_manifest, "The existing footprint collider remains generated from the unchanged manifest")
 	if failures.is_empty():
 		print("OPERATION_PRIMA_ART_RESULT checks=%d failures=0 triangles=%d" % [checks, triangle_count])
+		print("OPERATION_PRIMA_ART_PASS")
 		quit(0)
 	else:
 		printerr("OPERATION_PRIMA_ART_RESULT checks=%d failures=%d" % [checks, failures.size()])

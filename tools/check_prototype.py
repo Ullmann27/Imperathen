@@ -143,6 +143,8 @@ def main():
             ("village_collision", ["--fixed-fps", "60", "--script", "res://tests/village_collision_test.gd"], "VILLAGE_COLLISION_PASS"),
             ("village_backdrop", ["--fixed-fps", "60", "--script", "res://tests/village_backdrop_test.gd"], "VILLAGE_BACKDROP_PASS"),
             ("house_interiors", ["--fixed-fps", "60", "--script", "res://tests/house_interiors_test.gd"], "HOUSE_INTERIORS_PASS"),
+            ("operation_prima_art", ["--fixed-fps", "60", "--script", "res://tests/operation_prima_art_test.gd"], "OPERATION_PRIMA_ART_PASS"),
+            ("genesis_mission_event_batch", ["--script", "res://tests/genesis_mission_event_batch_test.gd"], "GENESIS_MISSION_BATCH_PASS"),
             ("frontier_integration", ["--fixed-fps", "60", "--script", "res://tests/frontier_integration_test.gd"], "FRONTIER_INTEGRATION_PASS"),
             ("village_experience", ["--fixed-fps", "60", "--script", "res://tests/village_experience_test.gd"], "VILLAGE_EXPERIENCE_PASS"),
             ("village_panels", ["--fixed-fps", "60", "--script", "res://tests/village_panel_test.gd"], "VILLAGE_PANEL_PASS"),

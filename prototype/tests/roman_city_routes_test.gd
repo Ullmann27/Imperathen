@@ -11,6 +11,10 @@ extends SceneTree
 ##   stopped by a market counter and by a tree trunk.
 ## Headless physics on real imported assets. Not an FPS or device measurement.
 const City = preload("res://scripts/world/city_exploration.gd")
+const Calendar := preload("res://scripts/domain/world_calendar.gd")
+# Test the actual dated walled city, not the Republican campaign start.
+# Campaign-era absence is independently checked by surface_visibility.
+const GATE_ERA := 271
 const PROFILES := ["low", "balanced", "high", "very_high"]
 const BODY_RADIUS := 0.24
 # The sweep body spans 0.30-1.50 m above the ground: everything the player
@@ -118,6 +122,8 @@ func _run() -> void:
 		var scene := City.new()
 		scene.persist = false
 		scene.profile = profile
+		scene.world_jdn = Calendar.first_day_of_year(GATE_ERA)
+		_check(Calendar.year_of(scene.world_jdn) == GATE_ERA, profile+": dated full-city route fixture")
 		root.add_child(scene)
 		await _frames(8)
 		_check(scene.city_available, profile+": actual RomanCity GLB and collision are loaded")
@@ -140,7 +146,7 @@ func _run() -> void:
 				identical = false
 	_check(identical, "routes, wall, obstacles and kerbs are identical in all tested profiles")
 	print("ROMAN_CITY_ROUTES_RESULT "+JSON.stringify({"checks":checks, "failures":failures.slice(0, 20),
-		"failure_count":failures.size(), "passed":failures.is_empty(), "profiles_tested":profiles, "profiles":report,
+		"failure_count":failures.size(), "passed":failures.is_empty(), "profiles_tested":profiles, "profiles":report, "fixture_year":GATE_ERA,
 		"sweep_body_m":{"radius":BODY_RADIUS, "from":SWEEP_LOW, "to":SWEEP_HIGH}, "android_device":false, "fps_measured":false}))
 	print("ROMAN_CITY_ROUTES_PASS" if failures.is_empty() else "ROMAN_CITY_ROUTES_FAIL")
 	quit(0 if failures.is_empty() else 1)
