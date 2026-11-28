@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 284,
+  "version": 285,
   "tasks": [
     {
       "id": "K101",
@@ -1405,15 +1405,15 @@
       "id": "CITY-RESIDENT-DEPARTURE-PROJECTION",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "7820c4c6d8f0cb9df550956c041ed08c53a0624e",
-      "run_id": null,
+      "run_id": "46115703248",
       "scope": [
         "prototype/scripts/world/city_resident_view.gd",
         "prototype/tests/city_resident_departure_test.gd",
         ".github/workflows/aeterna-city-resident-departure.yml"
       ],
-      "note": "M28 actual city NPC movement: CityLife._haul_step explicitly waits 60s before departure, but resident view _target returns destination whenever is_walking=false, causing premature walking/retirement/respawn across walls during loading. Sample authoritative route origin until actual departure; maintain existing speed, bounded pool and six-metre catchup. Use consistent global distances and global physics ray/shape coordinates for translated city roots and observer in another hierarchy. Real CityLife anchor and imported resident fixture covers loading, departure, arrival, translated physical floor, bounded movement, no premature retirement, no mutation. Isolated push-only fix/aeterna-city-resident-departure-20261128; no integration until existing and focused Godot regressions pass."
+      "note": "M28 actual city NPC movement: CityLife._haul_step explicitly waits 60s before departure, but resident view _target returns destination whenever is_walking=false, causing premature walking/retirement/respawn across walls during loading. Sample authoritative route origin until actual departure; maintain existing speed, bounded pool and six-metre catchup. Use consistent global distances and global physics ray/shape coordinates for translated city roots and observer in another hierarchy. Real CityLife anchor and imported resident fixture covers loading, departure, arrival, translated physical floor, bounded movement, no premature retirement, no mutation. Isolated push-only fix/aeterna-city-resident-departure-20261128; no integration until existing and focused Godot regressions pass. Actual three-file head527b5b4f71c0e4a70e16439c4ee43aa419dd20de; runtime049161c5 testdc73b709, +240/-13. Actual push-only run46115703248 in_progress, four focused Godot groups. No pass or integration claim."
     }
   ]
 }
