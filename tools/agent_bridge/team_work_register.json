@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 235,
+  "version": 236,
   "tasks": [
     {
       "id": "K101",
@@ -1172,15 +1172,15 @@
       "id": "YOUTH-ARMOUR-SOURCE-MAPPING",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "458bb1d666d4f440d2459a78c76bed629d128c18",
-      "run_id": null,
+      "run_id": "46108139625",
       "scope": [
         "tools/art/youth_armour_local_weights.py",
         "tools/art/test_youth_armour_local_weights.py",
         ".github/workflows/aeterna-youth-armour-local-weights.yml"
       ],
-      "note": "Independent repair of source lookup failure. Same exact named weights, measured edge length, position tolerances and local no-regression guard. Search all real body primitives, only accept one connected pair with matching signed-axis transformation, reject ambiguous/missing matches with bounded evidence; correct primitive index in writer. Require negative controls and original production-parity full Godot A/B, no other outfit or LOD changes. New isolated branch, no change to active youth parity test or original private assets."
+      "note": "Independent repair of source lookup failure. Same exact named weights, measured edge length, position tolerances and local no-regression guard. Search all real body primitives, only accept one connected pair with matching signed-axis transformation, reject ambiguous/missing matches with bounded evidence; correct primitive index in writer. Require negative controls and original production-parity full Godot A/B, no other outfit or LOD changes. New isolated branch, no change to active youth parity test or original private assets. Actual commit aecdc9f730e1a7031767eaa2178dc8441ab15b0d; isolated three-file comparison. Match exact named bindings across source primitives, connected edge/rest length and explicit signed axis permutations, original tolerance and ambiguity rejection. Five new negative/coordinate controls, unchanged no-regression guard and 692-check full A/B gate. Actual run 46108139625 in_progress; no successful mapping, repaired asset or integration claim."
     },
     {
       "id": "CITY-FOUNTAIN-WATER-V2",
