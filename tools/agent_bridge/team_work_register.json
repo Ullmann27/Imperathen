@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 220,
+  "version": 221,
   "tasks": [
     {
       "id": "K101",
@@ -1067,6 +1067,19 @@
         ".github/workflows/aeterna-formation-contact-trace.yml"
       ],
       "note": "Phase01 successor on separate branch. Keep successful rock candidate intact. Introduce bounded swept-circle root travel against actual nearby UID positions, including C agents before promotion, retaining existing steering and original contact resolver. Hard spacing constants unchanged; body sweep prevents new penetration rather than hiding root jumps. Keep original tests; add deterministic pair crossing, outward escape, and direct clear path assertions, and rerun full 60/180 plus trace/command/rules/muster. No changes to rules, assets, caps or main. Hypothesis pending tests. Actual commit 65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de, branch fix/aeterna-formation-body-sweep-20261128. Three-file isolated comparison: runtime swept-circle root travel for B/C, all-level occupancy in start grid, original steering scope preserved, original hard spacing and existing post-step contact resolver unchanged; seven new focused direct cases. Actual run 46104088321 observed in_progress. No full formation pass or integration claim. Previous rock candidate remains unchanged."
+    },
+    {
+      "id": "FORMATION-WHEEL-ATTRIBUTION",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "c1bb82e924e8d936300851e72bfcb4aefb5918fa",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/formation_agents_test.gd",
+        ".github/workflows/aeterna-formation-wheel-attribution.yml"
+      ],
+      "note": "Independent correction of proven cross-company test attribution, not runtime fix. Keep target zero refile/rematch requirement, same rank owners, outer-file speed, arrival and all numerical limits. Independently validate every other refile/rematch against adjacent authoritative model snapshots and exact global/per-company accounting; global zero remains required absent valid unrelated events. Existing full formation test remains default; focused wheel-only mode adds no bypass to full CI. No integration before actual focused/full tests and blob comparison."
     }
   ]
 }
