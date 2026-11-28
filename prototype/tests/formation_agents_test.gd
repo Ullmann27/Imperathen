@@ -50,6 +50,13 @@ func check(ok: bool, message: String) -> void:
 ## ++ large: only the 180-soldier identity runs (a separate check group so
 ## each group stays well inside the runner's per-group timeout).
 func _run() -> void:
+	if "wheel-only" in OS.get_cmdline_user_args():
+		_test_wheel_keeps_places()
+		print("FORMATION_AGENTS_RESULT checks=%d failures=%d %s" % [checks, failures, JSON.stringify(notes)])
+		if failures == 0:
+			print("FORMATION_AGENTS_PASS")
+		quit(1 if failures else 0)
+		return
 	var large_only := "large" in OS.get_cmdline_user_args()
 	if not large_only:
 		_test_budgets_match_profiles()
@@ -279,6 +286,16 @@ func _test_reform_without_crossing() -> void:
 	notes.reform = {"matched_m": matched, "index_m": by_index, "walked_m": total}
 
 
+## Independent rule-side layout fingerprint. Camera and presentation slots
+## are not used to justify any global refile or rematch counter change.
+func _wheel_rule_layout(model, id: String) -> Array:
+	var squad: Dictionary = model.squads[id]
+	var roster: Array[String] = []
+	for man: Dictionary in model.soldiers(id):
+		roster.append(str(man.id))
+	return [str(squad.formation), int(squad.strength), float(squad.width), roster]
+
+
 func _test_wheel_keeps_places() -> void:
 	var model := Battle.new()
 	var agents = Agents.new()
@@ -292,11 +309,57 @@ func _test_wheel_keeps_places() -> void:
 	var owners: Array = u.owners.duplicate()
 	var seen := {"outer": 0.0, "turned": 0.0}
 	var counter_start := {}
+	var authority := {"step": model.steps, "facings": {}, "layouts": {}, "refile_events": {}, "match_events": {}, "last_counts": {}, "validated_refiles": [], "validated_matches": [], "invalid": [], "gaps": 0}
 	for id: String in agents.units:
 		var unit = agents.units[id]
 		counter_start[id] = [unit.refiles, unit.rematches]
+		authority.last_counts[id] = counter_start[id].duplicate()
+		authority.facings[id] = float(model.squads[id].facing)
+		authority.layouts[id] = _wheel_rule_layout(model, id)
+		authority.refile_events[id] = {}
+		authority.match_events[id] = {}
 	var start_facing: float = u.facing
 	var observe := func(_before: Dictionary, ticks: int) -> void:
+		# Every consumed refile must be supported by a consecutive, actual
+		# rule snapshot over the original threshold. Unrelated AI companies
+		# cannot invalidate a perfectly continuous wheel in the target unit.
+		if model.steps != int(authority.step):
+			var adjacent: bool = model.steps == int(authority.step) + 1
+			if not adjacent:
+				authority.gaps += 1
+			for id: String in counter_start:
+				var facing := float(model.squads[id].facing)
+				var delta := absf(angle_difference(float(authority.facings[id]), facing))
+				var layout := _wheel_rule_layout(model, id)
+				var changed: bool = layout != authority.layouts[id]
+				if adjacent and delta > deg_to_rad(Agents.REFILE_DEG):
+					authority.refile_events[id][model.steps] = rad_to_deg(delta)
+					authority.match_events[id][model.steps] = "authoritative_refile"
+				if adjacent and changed:
+					authority.match_events[id][model.steps] = "authoritative_layout_or_roster"
+				authority.facings[id] = facing
+				authority.layouts[id] = layout
+			authority.step = model.steps
+		for id: String in counter_start:
+			var unit = agents.units[id]
+			var last: Array = authority.last_counts[id]
+			var r := int(unit.refiles) - int(last[0])
+			var m := int(unit.rematches) - int(last[1])
+			if r != 0:
+				var snapshot := int(unit.applied_refile_snapshot)
+				if r == 1 and authority.refile_events[id].has(snapshot):
+					authority.validated_refiles.append({"unit": id, "snapshot": snapshot, "degrees": authority.refile_events[id][snapshot]})
+					authority.refile_events[id].erase(snapshot)
+				else:
+					authority.invalid.append({"unit": id, "snapshot": snapshot, "refiles": r})
+			if m != 0:
+				var snapshot := int(agents.snapshot_step)
+				if m == 1 and authority.match_events[id].has(snapshot):
+					authority.validated_matches.append({"unit": id, "snapshot": snapshot, "cause": authority.match_events[id][snapshot]})
+					authority.match_events[id].erase(snapshot)
+				else:
+					authority.invalid.append({"unit": id, "snapshot": snapshot, "rematches": m})
+			authority.last_counts[id] = [unit.refiles, unit.rematches]
 		seen.turned = maxf(seen.turned, absf(angle_difference(start_facing, u.facing)))
 		if ticks == 1:
 			for uid: String in u.members:
@@ -309,7 +372,12 @@ func _test_wheel_keeps_places() -> void:
 		if counter_start.has(id):
 			unit_deltas[id] = [int(unit.refiles) - int(counter_start[id][0]), int(unit.rematches) - int(counter_start[id][1])]
 	notes.wheel_counters = {"global_refiles": agents.counters.refiles - refiles, "global_rematches": agents.counters.rematches - rematches, "units": unit_deltas, "target": "valley_spears"}
-	check(agents.counters.refiles == refiles and agents.counters.rematches == rematches, "A front change below 75 deg wheels instead of re-filing")
+	check(unit_deltas.get("valley_spears", []) == [0, 0], "A front change below 75 deg wheels instead of re-filing in the commanded company")
+	check(int(authority.gaps) == 0 and authority.invalid.is_empty(), "Every other counter change has a unique consecutive authoritative rule event: %s" % str(authority.invalid))
+	check(agents.counters.refiles - refiles == authority.validated_refiles.size() and agents.counters.rematches - rematches == authority.validated_matches.size(), "Global counters exactly equal independently validated company events (zero when no such events)")
+	notes.wheel_counters["validated_refiles"] = authority.validated_refiles
+	notes.wheel_counters["validated_rematches"] = authority.validated_matches
+	notes.wheel_counters["invalid_events"] = authority.invalid
 	check(u.owners == owners, "Wheeling keeps every man in his place in the rank")
 	check(seen.outer <= float(u.limits.charge) + 0.001 and seen.outer > 0.5, "Outer file speed during the wheel stays within limits: %.2f m/s" % seen.outer)
 	var ready := 0
