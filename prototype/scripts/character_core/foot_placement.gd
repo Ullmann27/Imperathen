@@ -48,11 +48,19 @@ var _look_smoothed: Vector3 = Vector3.INF
 var _phase: float = 0.0
 var _hip: float = 0.0
 var _enabled: bool = true
+var _last_on_floor: bool = false
 
 func bind(body: CharacterBody3D, skeleton: Skeleton3D, pelvis: int, spine: int, head: int,
 		leg_names: Array[StringName]) -> bool:
 	if leg_names.size() != 6 or not is_instance_valid(body) or not is_instance_valid(skeleton):
 		return false
+	# Each leg needs its own independent chain. Two solvers writing the
+	# same bones make contact receipts ambiguous even on an otherwise valid rig.
+	var unique_bones: Dictionary[StringName, bool] = {}
+	for bone_name: StringName in leg_names:
+		if unique_bones.has(bone_name):
+			return false
+		unique_bones[bone_name] = true
 	# Check the adapter scene before creating native modifiers or dereferencing rays.
 	var left_ray: RayCast3D = get_node_or_null("LeftRay") as RayCast3D
 	var right_ray: RayCast3D = get_node_or_null("RightRay") as RayCast3D
@@ -160,7 +168,7 @@ func _make_leg(thigh: StringName, shin: StringName, foot: StringName,
 	leg.target = target
 	leg.pole = pole
 	ray.add_exception(_body)
-	ray.enabled = true
+	ray.enabled = false
 	ray.target_position = Vector3.DOWN*(probe_up+probe_down+leg.ankle_height)
 	target.global_position = ankle_position
 	pole.global_position = shin_position-_body.global_basis.z.normalized()*0.5
@@ -170,7 +178,7 @@ func set_enabled(value: bool) -> void:
 	_enabled = value
 	for leg: Leg in _legs:
 		# Disable the engine's automatic ray update as well as manual casts.
-		leg.ray.enabled = value
+		leg.ray.enabled = value and _last_on_floor
 		if not value:
 			leg.grounded = false
 			leg.locked = false
@@ -191,6 +199,7 @@ func clear_look_target() -> void:
 func update_pose(delta: float, on_floor: bool, speed: float, yaw_rate: float) -> void:
 	if not is_instance_valid(_skeleton) or _legs.size() != 2:
 		return
+	_last_on_floor = on_floor
 	_skeleton.force_update_all_bone_transforms()
 	var forward: Vector3 = -_body.global_basis.z.normalized()
 	var moving_turn: bool = speed < 0.12 and absf(yaw_rate) > 0.22
@@ -215,7 +224,10 @@ func update_pose(delta: float, on_floor: bool, speed: float, yaw_rate: float) ->
 		var valid: bool = false
 		# A disabled or airborne character has no planted foot. Do not query
 		# physics for a contact that the adapter cannot consume this tick.
-		if _enabled and on_floor:
+		var query_ground: bool = _enabled and on_floor
+		if leg.ray.enabled != query_ground:
+			leg.ray.enabled = query_ground
+		if query_ground:
 			leg.ray.global_transform = Transform3D(Basis.IDENTITY,ankle+Vector3.UP*probe_up)
 			leg.ray.force_raycast_update()
 			valid = leg.ray.is_colliding()

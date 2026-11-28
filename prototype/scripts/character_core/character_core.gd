@@ -60,6 +60,9 @@ func _ready() -> void:
 func _bind_rig() -> bool:
 	if not is_instance_valid(_rig_root) or not is_instance_valid(_tree) or not is_instance_valid(_feet):
 		return false
+	var collider: CollisionShape3D = get_node_or_null("CollisionShape3D") as CollisionShape3D
+	if collider == null or collider.disabled or not (collider.shape is CapsuleShape3D):
+		return false
 	if _rig_root.get_child_count() != 1 or not (walk_speed>0.0 and run_speed>walk_speed and sprint_speed>run_speed):
 		return false
 	var model: Node3D = _rig_root.get_child(0) as Node3D
