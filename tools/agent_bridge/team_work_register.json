@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 282,
+  "version": 283,
   "tasks": [
     {
       "id": "K101",
@@ -1389,9 +1389,9 @@
       "id": "NIGHT-CONSOLIDATION-FORGE-NPC",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "1b0b63034bd291451cd7f1a9e6786fc98bd6f992",
-      "run_id": null,
+      "run_id": "46115416843",
       "scope": [
         "prototype/scripts/world/village/i04_props.gd",
         "prototype/tests/i04_props_lifecycle_test.gd",
@@ -1399,7 +1399,7 @@
         "prototype/tests/npc_social_memory_test.gd",
         ".github/workflows/aeterna-night-consolidation.yml"
       ],
-      "note": "On verified same consolidated branch, transfer exact source/test blobs from #206 and #207 only, old source blobs unchanged vs common baseline. Extend existing joint push CI to original I04 lifecycle, NPC memory/behavior/physical conversation/team B, keep all ten previous tests and original pin checks. No full APK/device approval. All source branches remain isolated."
+      "note": "On verified same consolidated branch, transfer exact source/test blobs from #206 and #207 only, old source blobs unchanged vs common baseline. Extend existing joint push CI to original I04 lifecycle, NPC memory/behavior/physical conversation/team B, keep all ten previous tests and original pin checks. No full APK/device approval. All source branches remain isolated. Actual atomic head7820c4c6d8f0cb9df550956c041ed08c53a0624e, five-file compare exact four source/test blobs; 17 joint groups including extra NPC world and UI. Previous ten-group run46114746584 success (artifact15251501122). Actual new run46115416843 in progress; wait before next branch advance."
     }
   ]
 }
