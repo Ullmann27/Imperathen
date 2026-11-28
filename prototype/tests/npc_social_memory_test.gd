@@ -22,6 +22,8 @@ func _run() -> void:
 	_test_companion_perception()
 	_test_preferences_and_order()
 	_test_replay_and_cooldown()
+	_test_overlapping_observations()
+	_test_invalid_observations()
 	_test_bounded_memory()
 	_test_contract()
 	_test_legacy()
@@ -283,6 +285,60 @@ func _test_replay_and_cooldown() -> void:
 	for index in 16:
 		Social.advance(tiny,people,available,10.0+index*0.5,0.5)
 	_check(Social.relationship(tiny,"flavia","bassa").encounters == 1,"Rapid leave-and-return cannot bypass the encounter cooldown")
+
+
+func _test_overlapping_observations() -> void:
+	var people := _people("flavia","bassa")
+	var available := {"flavia":true,"bassa":true}
+	var social := Social.initial_state()
+	var key := Social.pair_key("flavia","bassa")
+	Social.advance(social,people,available,0.5,0.5)
+	Social.advance(social,people,available,0.75,0.5)
+	Social.advance(social,people,available,1.0,0.5)
+	_check(is_equal_approx(float(social.pairs[key].shared_seconds),1.0),"Overlapping observations only earn previously unobserved seconds")
+	_check(is_equal_approx(float(social.pairs[key].session_seconds),1.0),"Overlapping intervals cannot accelerate the encounter threshold")
+	_check(Social.validate(social,["flavia","bassa"],1.0).is_empty(),"Overlapping observations still satisfy elapsed-time validation")
+	var before: Dictionary = social.duplicate(true)
+	Social.advance(social,people,available,0.75,0.5)
+	Social.advance(social,people,available,1.0,0.5)
+	_check(social == before,"Older and identical timestamps leave the complete ledger unchanged")
+	for index in range(5,32):
+		Social.advance(social,people,available,float(index)*0.25,0.5)
+	_check(is_equal_approx(float(social.pairs[key].shared_seconds),7.75),"Dense overlapping observations cannot create extra time")
+	_check(int(social.pairs[key].encounters)==0,"No encounter before eight actual elapsed seconds")
+	Social.advance(social,people,available,8.0,0.5)
+	_check(is_equal_approx(float(social.pairs[key].shared_seconds),8.0) and int(social.pairs[key].encounters)==1,"The first actual eight-second encounter is retained")
+	var restored: Dictionary = JSON.parse_string(JSON.stringify(social,"",true,true))
+	for state: Dictionary in [social,restored]:
+		Social.advance(state,people,available,8.25,0.5)
+		Social.advance(state,people,available,12.0,0.5)
+	_check(_same(social,restored),"Serialized contact watermark prevents overlapping credit after restart")
+	_check(is_equal_approx(float(social.pairs[key].shared_seconds),8.75) and is_equal_approx(float(social.pairs[key].session_seconds),0.5),"A gap opens a new session and never credits unobserved time")
+	_check(int(social.pairs[key].encounters)==1 and Social.validate(social,["flavia","bassa"],12.0).is_empty(),"Encounter cooldown and valid bounded memory are preserved")
+
+
+func _test_invalid_observations() -> void:
+	var people := _people("flavia","bassa")
+	var invalid: Array = [[],[0.0,0.0],[0.0,0.0,1.0,2.0],[NAN,0.0,0.0],[0.0,INF,0.0],[0.0,0.0,"0"],[true,0.0,0.0],null,"missing"]
+	for value: Variant in invalid:
+		people.flavia.position = value
+		var cache := {}
+		sight_calls = 0
+		_check(not Social.close_conversation(people.flavia,people.bassa,_counted_clear_sight,cache),"Malformed observation cannot establish an encounter")
+		_check(sight_calls == 0 and cache.is_empty(),"Malformed observation cannot reach or populate geometry cache")
+	people = _people("flavia","bassa")
+	people.flavia.observed = "true"
+	_check(not Social.close_conversation(people.flavia,people.bassa),"A string cannot masquerade as an observed NPC")
+	people.flavia.observed = true
+	_check(Social.close_conversation(people.flavia,people.bassa),"Valid domain-only observations remain compatible")
+	sight_calls = 0
+	var cache := {}
+	_check(not Social.clear_sight([0.0,0.0],[0.0,0.0,1.0],_counted_clear_sight,cache),"Invalid direct sight input fails closed")
+	_check(not Social.clear_sight([0.0,0.0,NAN],[0.0,0.0,1.0]),"Invalid direct sight input fails closed without physics")
+	_check(sight_calls == 0 and cache.is_empty(),"Invalid direct endpoints never invoke the sight adapter")
+	var forged := Social.initial_state()
+	forged.pairs[Social.pair_key("flavia","bassa")] = {"shared_seconds":2.0,"encounters":0,"last_contact":1.0,"session_seconds":1.0,"session_counted":false,"last_encounter":-1.0}
+	_check(not Social.validate(forged,["flavia","bassa"],100.0).is_empty(),"Claimed shared time cannot exceed the last real contact timestamp")
 
 
 func _test_bounded_memory() -> void:
