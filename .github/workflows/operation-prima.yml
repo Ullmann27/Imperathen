@@ -1,0 +1,42 @@
+name: Operation Prima – Menü bis I-02
+on:
+  pull_request:
+    branches: ['feature/aeterna-character-equipment-phase2-20261128']
+    paths: ['prototype/**', 'tools/ci/operation_prima.sh', '.github/workflows/operation-prima.yml', 'ARCHITEKTUR_INDEX.md']
+permissions:
+  contents: read
+concurrency:
+  group: operation-prima-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  production-route:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Install checksum-verified Godot 4.7.2
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          base=https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable
+          file=Godot_v4.7.2-stable_linux.x86_64.zip
+          curl -fsSL --retry 3 "$base/SHA512-SUMS.txt" -o sums.txt
+          curl -fsSL --retry 3 "$base/$file" -o "$file"
+          awk -v name="$file" '$NF == name || $NF == "*" name' sums.txt | sha512sum -c -
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Exercise the production scene, choices, checkpoint and handoff
+        env:
+          PRIMA_RESULTS: ${{ runner.temp }}/prima
+        run: tools/ci/operation_prima.sh
+      - name: Keep engine logs (no saves, models or APK)
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: operation-prima-engine
+          path: ${{ runner.temp }}/prima/*/run.log
