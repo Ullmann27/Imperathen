@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 299,
+  "version": 300,
   "tasks": [
     {
       "id": "K101",
@@ -1444,6 +1444,21 @@
         ".github/workflows/aeterna-character-core-phase1.yml"
       ],
       "note": "Phase 1 native rig branch feature/aeterna-character-core-phase1-20261128 initial head d467b29e13253f58f98acc6d2b74acfe2bf4216a; run46116191468 compiled and executed 64 checks, 62 passed, 2 failed: physical 18cm step and distinct slope foot heights. Artifact15251767774. Flat and slope IK solver residual <0.001mm to requested target, not proof of actual sole placement. Rework swept stair edge/clearance and pelvis-before-reach clamp, instrument actual ray/target heights; preserve thresholds and add traversal and clearance assertions. Existing original rig unchanged. No main, campaign, APK or visual/device acceptance. | Draft #208. Correction head 7ad8e47ca5bd6b7f2fb9eef078c1c85173fdee9b; core a3096d15e17e7b69528d525c629cdc37f651083d, feet e852a6b86de34dcfd2c041eb87f5a1a275c922cb, test 94e2f3e7786e10b1be2b2db71ebdfce3cb372958. Run46117066995 in_progress; no pass claim."
+    },
+    {
+      "id": "ARCHITECTURE-FOUNDATION-SETUP",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "7820c4c6d8f0cb9df550956c041ed08c53a0624e",
+      "run_id": null,
+      "scope": [
+        "AGENTS.md",
+        "ARCHITEKTUR_INDEX.md",
+        "tools/architecture/build_index.mjs",
+        "tools/architecture/test_index.mjs"
+      ],
+      "note": "User requests root AGENTS/index setup, one documentation/tooling module only. Preserve existing AGENTS and append new hygiene rules; deterministic index of actual tracked production script declarations and autoloads; generator and independent fixtures; no runtime/UID/cache/project.godot changes or main merge. Setup branch setup/architecture-foundation targets current consolidated integration, not main. Phase1 exists separately #208 at 7ad8e47ca5bd6b7f2fb9eef078c1c85173fdee9b; focused run46117066995 success, no automatic merge. No new workflow or external costs."
     }
   ]
 }
