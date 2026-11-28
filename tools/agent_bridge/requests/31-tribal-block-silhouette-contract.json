@@ -1,0 +1,11 @@
+{
+  "revision": "842f995bdb2bd08f03b43ba77cc3a80a3e38893a",
+  "task": "N31 NEW narrow asset/presentation contract, not N21 or N24 motion/phase/position diagnosis and not N30 wheel. Exact Godot run 46096417387: forest_spear block pose near/mid <-> far jump 0.0927992 m at t=16.0 (ridge_spears_01 B2->1, previous pose block phase .15277777, phase .16666666) and t=16.2 (ridge_spears_09 B2->1 phase .29166666 -> .30555554). Gate 0.04 m. Far shader nonlocomotion only bends upper body; tribal far mesh is exported frozen idle, rigged LODs from separate authored assets. Existing _sole_points uses common rest-space heel/toe points and _foot_jump nearest far sole vertex. Design ONE standalone Godot experiment to distinguish baseline bind/mesh geometry mismatch vs block pose deformation vs stale sampling; measure real forest_spear LOD0/1 and far mesh, idle/block phases 0,.15,.1667,.29,.3056,.5,.75,1, root-local transforms (bone global pose skeleton-local), report both legs actual skinned vertices where possible and original probe. Preserve existing 40mm gate, no new caps, no replacement of old test, no artificial foot offsets, no runtime patch unless evidence is sufficient. CPU mirror not GPU proof. Return only complete small unified diff for new focused test and concise interpretation, max 1000 words, no reasoning transcript. No execution claims. Do not edit the existing formation controller/test or suggest changing global counter.",
+  "files": [
+    "prototype/scripts/visuals/valley_tribal_soldier.gd",
+    "prototype/scripts/visuals/soldier_visual.gd",
+    "prototype/scripts/visuals/far_ranks.gd",
+    "prototype/tests/formation_agents_test.gd"
+  ],
+  "max_tokens": 12288
+}
