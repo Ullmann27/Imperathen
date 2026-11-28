@@ -22,6 +22,9 @@ const ONSET_DB := -40.0
 var checks := 0
 var failures: Array[String] = []
 var _report: Array = []
+var _authored_count: int = 0
+var _authored_missing: Array[String] = []
+var _authored_present: int = 0
 
 
 func _initialize() -> void:
@@ -156,13 +159,53 @@ func _run() -> void:
 	var lines := _i01_lines()
 	var seen := {}
 	for line: Dictionary in lines:
-		seen[VoiceLines.text_key(str(line.text))] = true
+		seen[VoiceLines.speaker_id(str(line.speaker)) + ":" + VoiceLines.text_key(str(line.text))] = true
 	for line_id: String in I01.slice().get("lines", {}):
 		var authored: Dictionary = I01.line(line_id)
-		var text_key := VoiceLines.text_key(str(authored.text))
+		var text_key := VoiceLines.speaker_id(str(authored.speaker_id)) + ":" + VoiceLines.text_key(str(authored.text))
 		if not seen.has(text_key):
 			lines.append({"speaker":str(authored.speaker_id), "text":str(authored.text)})
 			seen[text_key] = true
+	# Optional exact inventory: use the same actual decoder, DialoguePlayer,
+	# one-frame audio/mouth/subtitle bounds and face driver for every authored
+	# recording, not just the original I-01 subset. Release mode never skips
+	# an unavailable recording; diagnostic mode records missing lines explicitly.
+	var args := OS.get_cmdline_user_args()
+	var inventory_path := ""
+	var diagnostic := "--allow-missing-authored" in args
+	for arg: String in args:
+		if arg.begins_with("--authored="):
+			inventory_path = arg.trim_prefix("--authored=")
+	if not inventory_path.is_empty():
+		var inventory: Variant = JSON.parse_string(FileAccess.get_file_as_string(inventory_path))
+		_check(inventory is Dictionary and inventory.get("lines") is Array and not inventory.lines.is_empty(), "Exact authored inventory exists")
+		if inventory is Dictionary and inventory.get("lines") is Array:
+			var identities: Dictionary = {}
+			for item: Variant in inventory.lines:
+				if not item is Dictionary:
+					_check(false, "Malformed authored inventory line")
+					continue
+				var row: Dictionary = item
+				var text: String = str(row.get("text", ""))
+				var speaker: String = str(row.get("speaker_id", ""))
+				var key: String = speaker + ":" + VoiceLines.text_key(text)
+				var valid: bool = not text.is_empty() and not speaker.is_empty() and row.get("text_key") == VoiceLines.text_key(text) and not identities.has(key)
+				_check(valid, "Unique exact authored speaker/text identity: " + str(row.get("line_id", "")))
+				if not valid:
+					continue
+				identities[key] = true
+				_authored_count += 1
+				var record: Dictionary = VoiceLines.find(text, speaker)
+				if record.is_empty():
+					_authored_missing.append(str(row.get("line_id", "")))
+					if not diagnostic:
+						_check(false, "Missing authored recording: " + str(row.get("line_id", "")))
+					continue
+				_authored_present += 1
+				if not seen.has(key):
+					lines.append({"speaker":speaker, "text":text})
+					seen[key] = true
+			_check(_authored_count > 0 and _authored_present + _authored_missing.size() == _authored_count, "All authored identities are accounted for")
 	_check(lines.size() >= 6, "I-01 has at least six spoken lines (found %d)" % lines.size())
 	var world := Node3D.new()
 	root.add_child(world)
@@ -259,6 +302,8 @@ func _run() -> void:
 	world.queue_free()
 	await process_frame
 	await MixerTeardown.drain(self)
+	if not inventory_path.is_empty():
+		print("DIALOGUE_AUTHORED_COVERAGE " + JSON.stringify({"authored":_authored_count,"present":_authored_present,"missing":_authored_missing,"diagnostic_only":diagnostic}))
 	print("DIALOGUE_LIPSYNC_REPORT " + JSON.stringify(_report))
 	print("DIALOGUE_LIPSYNC_RESULT checks=%d failures=%d" % [checks, failures.size()])
 	for failure in failures:

@@ -1,0 +1,62 @@
+name: IMPERATHEN all authored German dialogue runtime verification
+on:
+  push:
+    branches: ['feature/astra-sol-voice-runtime-integration-20261128']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: german-dialogue-*-46131134266
+          path: artifacts/voice-candidates
+          run-id: 46131134266
+          github-token: ${{ github.token }}
+      - name: Verify engine and stage exact previous audio
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends ffmpeg libgl1-mesa-dri
+          mkdir -p "$RUNNER_TEMP/godot" artifacts/voice
+          git rev-parse HEAD > artifacts/voice/source.txt
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Decode and check every available authored line at 60 Hz
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/audio/test_voice_contract.py
+          "$GODOT_BIN" --headless --path prototype --import --quit
+          "$GODOT_BIN" --headless --path prototype --script res://tests/tools/export_dialogue_lines.gd -- "$GITHUB_WORKSPACE/artifacts/voice/authored.json"
+          python3 tools/audio/stage_verified_dialogue.py --authored artifacts/voice/authored.json --candidates artifacts/voice-candidates --report artifacts/voice/staged.json --missing artifacts/voice/missing.json
+          python3 tools/audio/audit_german_dialogue.py artifacts/voice/authored.json --report artifacts/voice/coverage.json
+          "$GODOT_BIN" --headless --path prototype --import --quit
+          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/dialogue_lipsync_test.gd -- "--authored=$GITHUB_WORKSPACE/artifacts/voice/authored.json" --allow-missing-authored 2>&1 | tee artifacts/voice/full-lipsync.log
+          grep -q DIALOGUE_LIPSYNC_PASS artifacts/voice/full-lipsync.log
+          ! grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/voice/full-lipsync.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: imperathen-voice-runtime-${{ github.run_id }}
+          path: artifacts/voice/
+          retention-days: 30

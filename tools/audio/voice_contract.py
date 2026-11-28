@@ -1,6 +1,8 @@
 """Shared validation of the actual forced-alignment format used by Godot."""
 import math
 
+VISEMES = ["sil", "PP", "FF", "TH", "DD", "kk", "CH", "SS", "nn", "RR", "aa", "E", "ih", "oh", "ou"]
+
 def number(x):
     return type(x) in (int, float) and math.isfinite(x)
 
@@ -14,7 +16,7 @@ def track_errors(track, line):
     if not number(expected) or abs(duration - expected) > .002:
         return ["viseme_duration_mismatch"]
     names, segments = track.get("visemes"), track.get("segments")
-    if not isinstance(names, list) or len(names) != 15 or len(set(names)) != 15 or not isinstance(segments, list) or not segments:
+    if names != VISEMES or not isinstance(segments, list) or not segments:
         return ["viseme_segments_missing"]
     last = -1.0
     for item in segments:
@@ -26,7 +28,7 @@ def track_errors(track, line):
             return ["viseme_segment_invalid"]
         last = start
     onset, first = track.get("audio_onset_s"), track.get("first_phoneme_s")
-    if not number(onset) or not number(first) or abs(onset-first) > .0167:
+    if not number(onset) or not number(first) or not 0 <= onset <= duration or not 0 <= first <= duration or abs(onset-first) > .0167:
         return ["viseme_onset_mismatch"]
     return []
 

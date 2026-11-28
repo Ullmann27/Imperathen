@@ -24,6 +24,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: fold7-city-apk-${{ github.ref }}
@@ -192,6 +193,30 @@ jobs:
         run: |
           set -euo pipefail
           python3 tools/rebake_melee_kicks.py --godot "$GODOT_BIN" --report artifacts/kick-rebake --apply
+      - name: Recover exact German dialogue artifacts for the combined source
+        uses: actions/download-artifact@v4
+        with:
+          pattern: german-dialogue-*-46131134266
+          path: artifacts/voice-candidates
+          run-id: 46131134266
+          github-token: ${{ github.token }}
+      - name: Recover the seven-line retry results (no paid generation)
+        uses: actions/download-artifact@v4
+        with:
+          pattern: german-dialogue-recovery-*-46147196180
+          path: artifacts/voice-candidates
+          run-id: 46147196180
+          github-token: ${{ github.token }}
+      - name: Stage accepted German speech before source fingerprint and export
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/voice
+          "$GODOT_BIN" --headless --path prototype --import --quit
+          "$GODOT_BIN" --headless --path prototype --script res://tests/tools/export_dialogue_lines.gd -- "$GITHUB_WORKSPACE/artifacts/voice/authored.json"
+          python3 tools/audio/test_voice_contract.py
+          python3 tools/audio/stage_verified_dialogue.py --authored artifacts/voice/authored.json --candidates artifacts/voice-candidates --report artifacts/voice/staged.json --missing artifacts/voice/missing.json
+          python3 tools/audio/audit_german_dialogue.py artifacts/voice/authored.json --report artifacts/voice/coverage.json
       - name: Real Godot world, full movement regressions and built assets
         shell: bash
         run: |
@@ -232,6 +257,12 @@ jobs:
             --script res://tests/roman_city_routes_test.gd \
             2>&1 | tee artifacts/city/routes.log
           grep -q ROMAN_CITY_ROUTES_PASS artifacts/city/routes.log
+          # Preserve the independent release checks. No unvoiced authored
+          # line or failed real audio/viseme timing is accepted by the exporter.
+          python3 tools/audio/audit_german_dialogue.py artifacts/voice/authored.json --report artifacts/voice/coverage.json --strict
+          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/dialogue_lipsync_test.gd -- "--authored=$GITHUB_WORKSPACE/artifacts/voice/authored.json" 2>&1 | tee artifacts/voice/full-lipsync.log
+          grep -q DIALOGUE_LIPSYNC_PASS artifacts/voice/full-lipsync.log
+          ! grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/voice/full-lipsync.log
           # Release acceptance remains mandatory; source-specific proofs above are
           # collected first so a known global motion failure cannot hide them.
           python3 tools/motion_quality_gate.py --evidence artifacts/engine-checks
@@ -330,6 +361,7 @@ jobs:
             artifacts/engine-checks/
             artifacts/marcus/
             artifacts/kick-rebake/
+            artifacts/voice/
           if-no-files-found: warn
           retention-days: 30
 

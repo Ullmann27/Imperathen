@@ -1,10 +1,10 @@
 import unittest
-from voice_contract import recording_errors, track_errors
+from voice_contract import recording_errors, track_errors, VISEMES
 
 class Contract(unittest.TestCase):
     def setUp(self):
         self.line = {"line_id":"A", "speaker_id":"julia", "text_key":"abc", "duration_s":2.0}
-        self.track = {**self.line, "schema_version":1, "visemes":[str(i) for i in range(15)], "segments":[[0.1,0.2,4],[1.9,2.06,0]], "audio_onset_s":.1,"first_phoneme_s":.1}
+        self.track = {**self.line, "schema_version":1, "visemes":VISEMES.copy(), "segments":[[0.1,0.2,4],[1.9,2.06,0]], "audio_onset_s":.1,"first_phoneme_s":.1}
     def test_actual_segments(self):
         self.assertEqual(track_errors(self.track,self.line), [])
     def test_wrong_identity(self):
@@ -20,6 +20,14 @@ class Contract(unittest.TestCase):
     def test_wrong_onset(self):
         self.track["first_phoneme_s"]=.2
         self.assertIn("viseme_onset_mismatch",track_errors(self.track,self.line))
+    def test_wrong_viseme_order(self):
+        self.track["visemes"][1], self.track["visemes"][2] = self.track["visemes"][2], self.track["visemes"][1]
+        self.assertIn("viseme_segments_missing",track_errors(self.track,self.line))
+    def test_onset_outside_audio(self):
+        for value in (-.01,2.1):
+            with self.subTest(value=value):
+                self.track["audio_onset_s"]=self.track["first_phoneme_s"]=value
+                self.assertIn("viseme_onset_mismatch",track_errors(self.track,self.line))
 
 class RecordingContract(unittest.TestCase):
     def test_only_registered_speaker_and_measured_transcription_pass(self):
