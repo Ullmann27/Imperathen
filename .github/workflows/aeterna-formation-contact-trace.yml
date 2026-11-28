@@ -54,6 +54,12 @@ jobs:
             if ! grep -Eq "$marker" "$out/$label.log" || grep -Eq 'SCRIPT ERROR:|^ERROR:' "$out/$label.log"; then failed=1; fi
           }
           run_check formation_contact_trace_test contact-trace 'FORMATION_CONTACT_TRACE_RESULT checks=[1-9][0-9]* failures=0'
+          run_check formation_slot_authority_test slot-authority FORMATION_SLOT_AUTHORITY_PASS
+          run_check battle_command_test battle-command 'BATTLE_COMMAND_RESULT checks=[1-9][0-9]* failures=0'
+          run_check battle_rules_test battle-rules 'BATTLE_RULES_RESULT checks=[1-9][0-9]* failures=0'
+          run_check valley_muster_test valley-muster VALLEY_MUSTER_PASS
+          run_check formation_agents_test formation-60 FORMATION_AGENTS_PASS
+          run_check formation_agents_test formation-180 FORMATION_AGENTS_PASS -- large
           exit "$failed"
       - name: Retain actual engine evidence
         if: always()

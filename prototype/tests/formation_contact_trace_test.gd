@@ -63,7 +63,32 @@ func _capture(v, a: Agents.Agent) -> Dictionary:
 		"friend_m": nearest_friend if is_finite(nearest_friend) else -1.0,
 		"enemy_m": nearest_enemy if is_finite(nearest_enemy) else -1.0}
 
+## Cross each real obstacle in both directions at ordinary C travel speed.
+## No path-grid setup or fixture teleport can bypass the production helper.
+func _aggregate_routes() -> void:
+	var agents := Agents.new()
+	var stride := float(Troop.KINDS.infantry.run) * Agents.DT
+	for i in Field.ROCKS.size():
+		var rock: Dictionary = Field.ROCKS[i]
+		var centre := Vector2(rock.x, rock.z)
+		var radius := float(rock.radius) + Field.MARGIN + 0.12
+		for sign: float in [-1.0, 1.0]:
+			var at := centre + Vector2(radius * sign, 0.0)
+			var goal := centre - Vector2(radius * sign, 0.0)
+			var legal := true
+			var longest := 0.0
+			for step in 480:
+				if at.distance_to(goal) <= 0.002:
+					break
+				var next := agents._aggregate_step(at, goal, stride)
+				longest = maxf(longest, next.distance_to(at))
+				legal = legal and Field.clear_segment(at, next) and agents._aggregate_segment_clear(at, next)
+				at = next
+			check(legal, "Rock %d side %+.0f: every actual aggregate segment clears the original obstacle" % [i, sign])
+			check(longest <= stride + 0.00001 and at.distance_to(goal) <= 0.002, "Rock %d side %+.0f: bounded route reaches its opposite endpoint" % [i, sign])
+
 func _run() -> void:
+	_aggregate_routes()
 	var v = Valley.new()
 	for s: Dictionary in v.model.squads.values().duplicate():
 		v.model._add_squad(s.id, s.name, s.side, s.kind, s.formation, Vector2(s.x, s.z), s.strength * 3)
@@ -81,6 +106,7 @@ func _run() -> void:
 	var max_step := 0.0
 	var max_phase := 0.0
 	var max_correction := 0.0
+	var minimum_rock_clearance := INF
 	var worst_step: Dictionary = {}
 	var worst_phase: Dictionary = {}
 	var worst_correction: Dictionary = {}
@@ -107,6 +133,7 @@ func _run() -> void:
 		if states.has(UID):
 			var state: Dictionary = states[UID]
 			var after := _capture(v, v.agents.agents[UID])
+			minimum_rock_clearance = minf(minimum_rock_clearance, float(after.rock_after.clearance_m))
 			samples += 1
 			var evidence := {"uid": UID, "time_s": t, "before": before, "after": after,
 				"rendered_detail": state.detail, "rendered_level": state.level, "represented": state.represented}
@@ -138,8 +165,9 @@ func _run() -> void:
 	check(samples > 100 and phase_samples > 10, "Target is actually sampled during locomotion")
 	check(max_step <= step_limit, "Original rendered root-step limit (%.6f <= %.6f)" % [max_step, step_limit])
 	check(max_phase <= phase_limit, "Original wrapped gait-phase limit (%.6f <= %.6f)" % [max_phase, phase_limit])
+	check(minimum_rock_clearance >= -0.0001, "Replayed UID never penetrates the original rock clearance (%.6f m)" % minimum_rock_clearance)
 	print("FORMATION_CONTACT_TRACE ", JSON.stringify({"samples": samples, "phase_samples": phase_samples,
-		"max_step_m": max_step, "max_phase": max_phase, "max_correction_m": max_correction,
+		"max_step_m": max_step, "max_phase": max_phase, "max_correction_m": max_correction, "minimum_rock_clearance_m": minimum_rock_clearance,
 		"step_limit_m": step_limit, "phase_limit": phase_limit, "worst_step": worst_step,
 		"worst_phase": worst_phase, "worst_correction": worst_correction}))
 	v.free()

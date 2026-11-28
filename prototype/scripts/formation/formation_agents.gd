@@ -702,7 +702,7 @@ func _aggregate_member(a: Agent) -> void:
 	var goal: Vector2 = u.slot_world[a.slot]
 	if a.leaving:
 		goal = a.pos + Vector2(-sin(u.facing), -cos(u.facing)) * 3.0
-	a.pos = a.pos.move_toward(Field.project(goal), a.l_run * DT)
+	a.pos = _aggregate_step(a.pos, Field.project(goal), a.l_run * DT)
 	a.vel = (a.pos - a.prev_pos) / DT
 	a.speed = a.vel.length()
 	a.yaw = rotate_toward(a.yaw, atan2(a.vel.x, a.vel.y) if a.speed > 0.1 else u.facing + PI, a.l_turn * DT)
@@ -710,6 +710,60 @@ func _aggregate_member(a: Agent) -> void:
 	a.contact = false
 	a.crowded = false
 	a.correction = Vector2.ZERO
+
+
+## The cheap aggregate movement still owns a physical root. A projected goal
+## alone does not make the intervening segment safe: crossing a rock while C
+## caused the later B contact solver to eject the soldier by over a metre.
+## Use the same clearance as the existing individual contact solver, and
+## choose a bounded tangent step if the immediate segment is obstructed.
+func _aggregate_segment_clear(from: Vector2, to: Vector2) -> bool:
+	if not from.is_finite() or not to.is_finite():
+		return false
+	if from != from.clamp(-Field.LIMIT, Field.LIMIT) or to != to.clamp(-Field.LIMIT, Field.LIMIT):
+		return false
+	var length := from.distance_to(to)
+	for r in _rock_centres.size():
+		var radius := float(_rock_radii[r])
+		var centre := _rock_centres[r]
+		if from.distance_squared_to(centre) > (radius + length) * (radius + length):
+			continue
+		var nearest := from if from == to else Geometry2D.get_closest_point_to_segment(centre, from, to)
+		if nearest.distance_squared_to(centre) < (radius - 0.00001) * (radius - 0.00001):
+			return false
+	return true
+
+
+func _aggregate_step(at: Vector2, goal: Vector2, stride: float) -> Vector2:
+	if stride <= 0.0 or not at.is_finite() or not goal.is_finite():
+		return at
+	# A legacy/external invalid position is recovered at ordinary travel speed;
+	# this is not a licence to teleport the agent or move its roster slot.
+	if not _aggregate_segment_clear(at, at):
+		return at.move_toward(Field.project(at), stride)
+	var direct := at.move_toward(goal, stride)
+	if _aggregate_segment_clear(at, direct):
+		return direct
+	var best := at
+	var best_distance := INF
+	for r in _rock_centres.size():
+		var offset := at - _rock_centres[r]
+		var radius := float(_rock_radii[r])
+		if offset.length_squared() > (radius + stride + 0.002) * (radius + stride + 0.002):
+			continue
+		var normal := offset.normalized()
+		for side: float in [-1.0, 1.0]:
+			# A small outward bias gives the tangent a safe chord around the
+			# existing clearance circle. Never increase the step length.
+			var direction := (normal.orthogonal() * side + normal * 0.05).normalized()
+			var candidate := (at + direction * stride).clamp(-Field.LIMIT, Field.LIMIT)
+			if not _aggregate_segment_clear(at, candidate):
+				continue
+			var score := candidate.distance_squared_to(goal)
+			if score < best_distance:
+				best_distance = score
+				best = candidate
+	return best
 
 
 ## Steering decision: where this man wants to go and how fast (slot, surge,
