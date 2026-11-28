@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 193,
+  "version": 194,
   "tasks": [
     {
       "id": "K101",
@@ -903,9 +903,9 @@
     {
       "id": "VIS-MOUNTED-INTEGRATION",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "d5cdcf3edb14dce44a11f1beed1942c131f5339f",
-      "run_id": null,
+      "run_id": "46087073083",
       "scope": [
         "prototype/scripts/tactics/valley_scene.gd",
         "prototype/scripts/visuals/valley_rider.gd",
@@ -913,7 +913,7 @@
         ".github/workflows/aeterna-visual-mounted-integration.yml"
       ],
       "access": "edit",
-      "note": "Integrate exact three disjoint source/test blobs from #196 head 32bedab into #195 on separate branch. Independent review of all source diffs, no rig/seat thresholds changed. Add read-only combined Godot workflow: all eleven prior groups plus valley_muster, formation_agents and formation_levels; retain known red formation gates. No main merge, visual/device pending."
+      "note": "Integrate exact three disjoint source/test blobs from #196 head 32bedab into #195 on separate branch. Independent review of all source diffs, no rig/seat thresholds changed. Add read-only combined Godot workflow: all eleven prior groups plus valley_muster, formation_agents and formation_levels; retain known red formation gates. No main merge, visual/device pending. Actual commit 8a8256a30145918739312588d70c4585768fa568, draft PR #197, exactly 4 files +258/-3. Actual workflow 46087073083 on exact commit observed in_progress. No duplicate dispatch. Full prior ARM64 46081946815 on separate branch passed valley_muster but failed village_backdrop, render_bench_views, village_scenery and formation groups; combined result still pending."
     }
   ]
 }
