@@ -19,6 +19,7 @@ run() {
   if grep -Eq '^(SCRIPT ERROR|ERROR):|Parse Error:' "$home/run.log"; then return 1; fi
   local marker=''
   case "$name" in
+    genesis_mission_event_batch) marker=GENESIS_MISSION_BATCH_PASS ;;
     city_resident_departure) marker=CITY_RESIDENT_DEPARTURE_PASS ;;
     city_life) marker=CITY_LIFE_PASS ;;
     resident_activity) marker=RESIDENT_ACTIVITY_PASS ;;
