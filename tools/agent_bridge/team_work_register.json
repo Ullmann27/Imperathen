@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 271,
+  "version": 275,
   "tasks": [
     {
       "id": "K101",
@@ -975,7 +975,7 @@
     {
       "id": "VIS-YOUTH-PRODUCTION-PARITY",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "done",
       "revision": "a67c4bc7629948d8b5c14a0cd708791e5fb03cc7",
       "run_id": "46101989464",
       "scope": [
@@ -983,7 +983,7 @@
         ".github/workflows/aeterna-youth-cap-binding.yml"
       ],
       "access": "edit",
-      "note": "PR #198 isolated follow-up. Match actual APK staging order, hash all armoured/civil LODs, capture source motion receipt; retain thresholds and collect exact worst edge endpoints, skin bindings and clip phase. Keep render evidence even if existing skin gate fails, then fail workflow. No runtime/model patch or visual acceptance. Actual commit bd4af0b2b33cfcb6cb753386915ad4bf40596c0c, exact lease a67c4bc, compare ahead 1 behind 0, two files +24/-8. Actual focused push run 46101989464 in_progress; automatic QA 46101992721 and full candidate 46101992690 in_progress; do not duplicate. Previous QA 239 run 46097601677 success, artifact 15244532056, signed v2/v3 ARM64, 768366773 APK bytes. Previous studio V1/V2 had 3380 LOD0 and 542 LOD2 severe edge samples for unretargeted armour, civil 0; existing 548/548 checks per pass do not gate armoured tears. No acceptance."
+      "note": "Actual run46101989464/job140846262020 success; exact commit bd4af0b2b33cfcb6cb753386915ad4bf40596c0c; source-staged V1/V2 actual 692/692 original skin checks each, detailed 19-clip edge evidence, artifact15245784668. Production parity/report tooling verified; armoured 14 residual LOD0 violations are independent unresolved gate, no visual/device/APK acceptance."
     },
     {
       "id": "N31",
@@ -1217,7 +1217,7 @@
       "id": "YOUTH-ARMOUR-IMPORT-WEIGHTS",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "aecdc9f730e1a7031767eaa2178dc8441ab15b0d",
       "run_id": "46108744734",
       "scope": [
@@ -1225,7 +1225,7 @@
         "tools/art/test_youth_armour_local_weights.py",
         ".github/workflows/aeterna-youth-armour-local-weights.yml"
       ],
-      "note": "Actual source lookup evidence: engine reported uint16 weight codes, raw L1 differences exact one/two quantization steps. Match raw float weights via explicit engine-equivalent UINT16 encoding with exact code equality, strict source hash, named binding/connected edge and original coordinate/length tolerances; retain all local regression, seam, full Godot A/B and unchanged unrelated assets. If no exact unique candidate, stop with bounded evidence; no blanket tolerance widening. New isolated branch. Actual commit 8d915d6af14516ab2ff375a8599a313f54497e98; three-file compare. Verified Godot 4.7.2 tag ed1daf0bf001b61586d9930840f2f1394092c079: gltf_document.cpp:1661-1682 normalizes float32; rendering_server.cpp:839-854 truncates w*65535. Match exact integer codes, pin source hash dcb52e..., two additional tests, no tolerance widening. Actual CI 46108744734 in_progress, no repair/acceptance claim."
+      "note": "Actual run46108744734/job140867299205 failed after 11 unit checks passed and exact pinned source dcb52efb544fd68be316ef59e6e835fc98f94485cf24d6609bb8a6fac7646605 staged. Unique connected original edge located with exact Godot UINT16 codes, length error2.079e-10m and axis coordinate error6.505e-7m. Mean binding candidate rejected by unchanged local no-edge-regression at run frame0; no candidate GLB written or published. Preserve exact identity/strict full Godot A/B and local seam guard; constrained two-endpoint successor only."
     },
     {
       "id": "KIMI-DUO-I02-BASKET",
@@ -1357,6 +1357,20 @@
         ".github/workflows/aeterna-formation-authored-gait.yml"
       ],
       "note": "Mirror exact source company gait sagittal hinge keyframes (art/soldiers/build.py, 25/18/22 intervals) with shared CPU/GPU key table, retain static guard, source sole topology, existing stride helper and original strict 40mm/full tests. Preflight against 798 actual rig samples reproduces old distances within 3um; predicts 264->54 failures, not engine proof or full fix. New isolated push-only candidate; no arbitrary offsets, no budget/gate relaxation, no main/APK. Actual four-file head aacbcac802cc89cabcd9dba163400cfef68ff1eb, runtime29913a5f shaderbf175906, unchanged strict diagnostic3f1e24c4; push-only actual run46115096757 in progress, all original headless tests and 25 real compatibility-rendered frames requested. No engine result yet."
+    },
+    {
+      "id": "YOUTH-ARMOUR-CONSTRAINED-WEIGHTS",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "8d915d6af14516ab2ff375a8599a313f54497e98",
+      "run_id": null,
+      "scope": [
+        "tools/art/youth_armour_local_weights.py",
+        "tools/art/test_youth_armour_local_weights.py",
+        ".github/workflows/aeterna-youth-armour-constrained.yml"
+      ],
+      "note": "Actual average endpoint binding rejected by original no-regression check. Solve independent two-endpoint normalized named weights (same four joints, coincident seams locked) using source skin affine transforms over all actual clip frames; convex length constraints preserve every incident edge's original allowance and strict target limit with quantization margin, seam constraints preserved. Deterministic bounded active-set optimizer, independent existing offline and original full Godot V1/V2 validation, negative infeasible control, fail closed if no feasible solution. Original staged source hash pinned, no owner GLB publication or threshold relaxation."
     }
   ]
 }
