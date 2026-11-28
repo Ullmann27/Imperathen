@@ -48,8 +48,19 @@ func _run() -> void:
 		_check(Kit.material_for(mesh.surface_get_material(2)) == Kit.materials["prima_bread_cut"],
 			"Scoring uses its dedicated toasted-crust material")
 		for name: String in ["prima_bread_board", "prima_bread_loaf", "prima_bread_cut"]:
-			_check((Kit.materials[name] as StandardMaterial3D).albedo_texture == null,
-				"%s avoids sampling unrelated packed material atlases" % name)
+			var paint := Kit.materials[name] as StandardMaterial3D
+			var atlas := mesh.surface_get_material(0) as StandardMaterial3D
+			_check(paint.albedo_texture != null and paint.albedo_texture == atlas.albedo_texture
+				and paint.albedo_texture.get_size() == Vector2(1024,512),
+				"%s uses the loaf and board atlas, not the unrelated interior atlas" % name)
+			_check(paint.normal_texture != null and paint.roughness_texture != null
+				and paint.normal_texture == atlas.normal_texture and paint.roughness_texture == atlas.roughness_texture,
+				"%s preserves authored relief and roughness in the merged room" % name)
+		for profile: String in ["low", "balanced", "high", "very_high"]:
+			Kit.set_profile(profile)
+			_check(Kit.materials["prima_bread_loaf"].normal_enabled == (profile != "low"),
+				"The authored relief respects the %s profile" % profile)
+		Kit.set_profile("balanced")
 		_check(_mean_normal_y(mesh, 0) > 0.35, "Serving board faces have outward lit normals")
 		_check(_mean_normal_y(mesh, 2) > 0.80, "Scored crust faces point toward the camera and lights")
 		triangle_count = _triangle_count(mesh)

@@ -1,5 +1,25 @@
 # I-01: Frühstücksbrot
 
-Der Eintrag `table_bread` steht bereits einmal in `HouseholdDesigns.items("baker_home")`. Nicht zusätzlich instanziieren. `prototype/assets/operation_prima/breakfast_bread.gd` baut das Brett, den Laib und drei Einschnitte als ein Mesh beim Laden des Einrichtungskits, nicht pro Bild. Die drei Oberflächen erhalten eigene raue Materialien durch `interior_kit.gd`; ihre lokalen UVs passen nicht zum gepackten Atlas der importierten Requisiten. Die Produktivansicht zeigte mit dem falschen Material ein fast schwarzes Brett.
+Der vorhandene Eintrag `table_bread` bleibt genau einmal auf dem Tisch des
+Familienhauses. Ursprung, Stellfläche, Collider und Spielstand bleiben im
+Einrichtungskit. Nur das sichtbare Modell wurde ersetzt.
 
-Kein externer Asset-Import. Ursprung, Weltplatzierung, Spielstand und Manifest-Kollider bleiben gleich; 1.140 Dreiecke bei einem vorhandenen Budget von 1.184. Prüfung: `operation_prima_art_test.gd`. Die echte erste Tischeinstellung kann mit `operation_prima_table_capture.gd` wiederholt werden; Beispiel und Grenzen im [Produktionsbericht](../../docs/44_integration/OPERATION_PRIMA.md).
+`build_breakfast_bread.py` erzeugt in Blender 4.0.2 die editierbare
+`breakfast_bread.blend` und die Spielressource
+`prototype/assets/operation_prima/table_bread.glb`. Im Blender-Dokument
+sind Brett und eingeschnittener Laib zwei eigene, metrische Objekte;
+Studiokamera und Beleuchtung liegen in einer getrennten Collection. Im Export
+bleiben ein Mesh, drei Materialien und 1.148 Dreiecke (Manifestgrenze 1.184).
+Farbe, Normalen und Rauheit stammen aus einem eigenen, reproduzierbar
+erzeugten 1.024 × 512-Atlas, nicht aus dem allgemeinen Möbelatlas.
+Keine externen Modelle, Texturen oder Sprachquellen.
+
+Aus der Repository-Wurzel:
+
+    blender -b -t 2 --python-exit-code 1 -P art/operation_prima/build_breakfast_bread.py -- --studio-dir artifacts/viva-bread-review
+    godot --headless --path prototype --import --quit
+    godot --headless --path prototype --script res://tests/operation_prima_art_test.gd
+
+Die Blender-Ansichten prüfen die Requisite. Erst
+`operation_prima_table_capture.gd` zeigt sie in der echten ersten
+Tischeinstellung von I-01. Dies ist keine Android- oder Geräteabnahme.
