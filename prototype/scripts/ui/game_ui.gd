@@ -259,9 +259,12 @@ func show_menu(can_continue: bool) -> void:
 	# with the title above two columns, so nothing needs scrolling at 1280 x 720.
 	var k := clampf(area.x / 560.0, 1.0, 2.4) if portrait else 1.0
 	var px := func(value: float) -> int: return roundi(value * k * _ui_scale)
+	# Compress only ornamental vertical space, not text or action targets.
+	# The extra workshop action must fit all existing no-scroll phone tests.
+	var compact := area.y / maxf(k * _ui_scale, 0.01) < (1130.0 if portrait else 790.0)
 	var button_height: int = px.call(52 if (_touch_enabled or portrait) else 48)
 	var stage := _menu_stage(area)
-	var margin := _margin(px.call(20), px.call(30), px.call(20), px.call(30))
+	var margin := _margin(px.call(20), px.call(12 if compact else 30), px.call(20), px.call(12 if compact else 30))
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_screen.add_child(margin)
 	var scroll := ScrollContainer.new()
@@ -285,11 +288,11 @@ func show_menu(can_continue: bool) -> void:
 	frame.frame_width = px.call(7)
 	frame.content_margin_left = px.call(26)
 	frame.content_margin_right = px.call(26)
-	frame.content_margin_top = px.call(14)
-	frame.content_margin_bottom = px.call(18)
+	frame.content_margin_top = px.call(9 if compact else 14)
+	frame.content_margin_bottom = px.call(10 if compact else 18)
 	panel.add_theme_stylebox_override("panel", frame)
 	holder.add_child(panel)
-	var layout := _column(px.call(6))
+	var layout := _column(px.call(3 if compact else 6))
 	layout.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	panel.add_child(layout)
 	var inner_width: float = panel_width - px.call(52)
@@ -298,7 +301,7 @@ func show_menu(can_continue: bool) -> void:
 	crest.alignment = BoxContainer.ALIGNMENT_CENTER
 	crest.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	layout.add_child(crest)
-	var crest_height: int = px.call(78)
+	var crest_height: int = px.call(44 if compact else 78)
 	var laurel_left := RomanStyle.LaurelSpray.new()
 	laurel_left.custom_minimum_size = Vector2(crest_height * 1.1, crest_height)
 	crest.add_child(laurel_left)
@@ -344,21 +347,21 @@ func show_menu(can_continue: bool) -> void:
 	RomanStyle.style_caps(motto, px.call(14), RomanStyle.PARCHMENT, px.call(5))
 	layout.add_child(motto)
 	var meander := RomanStyle.MeanderBand.new()
-	meander.custom_minimum_size = Vector2(0, px.call(13))
+	meander.custom_minimum_size = Vector2(0, px.call(9 if compact else 13))
 	layout.add_child(meander)
 	var pitch := _label("Dein Anfang ist klein. Was daraus wird, entscheidest du.", 15, MUTED)
 	pitch.add_theme_font_size_override("font_size", px.call(15))
 	pitch.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pitch.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	layout.add_child(pitch)
-	_spacer(layout, px.call(4))
+	_spacer(layout, px.call(0 if compact else 4))
 	var columns: BoxContainer = VBoxContainer.new() if portrait else HBoxContainer.new()
-	columns.add_theme_constant_override("separation", px.call(10 if portrait else 22))
+	columns.add_theme_constant_override("separation", px.call((5 if compact else 10) if portrait else 22))
 	layout.add_child(columns)
-	var life := _column(px.call(7))
+	var life := _column(px.call(4 if compact else 7))
 	life.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	columns.add_child(life)
-	var more := _column(px.call(7))
+	var more := _column(px.call(4 if compact else 7))
 	more.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	columns.add_child(more)
 	var font_size: int = px.call(17)
