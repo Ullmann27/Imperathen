@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 278,
+  "version": 282,
   "tasks": [
     {
       "id": "K101",
@@ -1329,7 +1329,7 @@
       "id": "NIGHT-CONSOLIDATION-I02-WORLD",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "done",
       "revision": "077075ed08e1e90ee4b865d10bb66437f187b4ac",
       "run_id": "46114746584",
       "scope": [
@@ -1341,7 +1341,7 @@
         "prototype/tests/i02_world_props_test.gd",
         ".github/workflows/aeterna-night-consolidation.yml"
       ],
-      "note": "Single isolated accumulation candidate integration/aeterna-night-consolidated-20261128 from exact #200 head (both city corrections, technical focused and real render checks passed, full formation/device gates open). Include exact tested I02 module/test blobs from #204 (96/96 actual original civil youth) and facial module/test from #205 (14/14 actual). Wire I02 world-owned node, authoritative sync and finite moving world-space cinematic anchors in GameWorld; existing camera/other prop logic preserved. Actual GameWorld test both completion paths, root translation, LOD, ownership, no phantom, save/load; combined Godot/city verification before further integration. No CI-only source branches merged, no private assets published, main unchanged, no final APK. No duplicate full-build dispatch. Actual seven-file atomic head1b0b63034bd291451cd7f1a9e6786fc98bd6f992, CI46114746584 in progress; wait for joint results before advancing branch (no cancellation)."
+      "note": "Actual consolidated head1b0b63034bd291451cd7f1a9e6786fc98bd6f992, run46114746584/job140885924311 SUCCESS; exact pinned source and original civil youth staged. Ten joint groups all pass: I02 props96, I02 real WorldModel78, facial14, camera55, I01 flow260, I03 flow88, I04 slice271, city microdetail188 (actual Xvfb), city signage80, city detail adapter PASS. Artifact15251501122. Independent source integration verified; no visual/device/full release acceptance. Advance same isolated branch only after run completed."
     },
     {
       "id": "FORMATION-AUTHORED-KEYFRAME-GAIT",
@@ -1376,14 +1376,30 @@
       "id": "YOUTH-ARMOUR-CERTIFIED-SOLVER",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "d1d08c73f4d8a0e07e7eb3039bf780a9c80d1277",
-      "run_id": null,
+      "run_id": "46115352825",
       "scope": [
         "tools/art/youth_armour_local_weights.py",
         "tools/art/test_youth_armour_local_weights.py"
       ],
-      "note": "Preserve original physical constraints and tests. SLSQP can return status8 at numerically feasible point. Internally tighten active squared residual by 2e-6 dimensionless, require independently recomputed strict >=0 active/all residual, finite bounded weights and simplex. Accept feasible step even if optimizer convergence flag false, never accept infeasible result. Report such steps separately; full original float32 local + Godot A/B gates remain mandatory. Same isolated branch only after previous run completed."
+      "note": "Preserve original physical constraints and tests. SLSQP can return status8 at numerically feasible point. Internally tighten active squared residual by 2e-6 dimensionless, require independently recomputed strict >=0 active/all residual, finite bounded weights and simplex. Accept feasible step even if optimizer convergence flag false, never accept infeasible result. Report such steps separately; full original float32 local + Godot A/B gates remain mandatory. Same isolated branch only after previous run completed. Actual commit3d765a385a3c7d25c002300f36f641f836076205, added false-success negative control, actual run46115352825 in progress."
+    },
+    {
+      "id": "NIGHT-CONSOLIDATION-FORGE-NPC",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "1b0b63034bd291451cd7f1a9e6786fc98bd6f992",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/world/village/i04_props.gd",
+        "prototype/tests/i04_props_lifecycle_test.gd",
+        "prototype/scripts/domain/npc_social_memory.gd",
+        "prototype/tests/npc_social_memory_test.gd",
+        ".github/workflows/aeterna-night-consolidation.yml"
+      ],
+      "note": "On verified same consolidated branch, transfer exact source/test blobs from #206 and #207 only, old source blobs unchanged vs common baseline. Extend existing joint push CI to original I04 lifecycle, NPC memory/behavior/physical conversation/team B, keep all ten previous tests and original pin checks. No full APK/device approval. All source branches remain isolated."
     }
   ]
 }
