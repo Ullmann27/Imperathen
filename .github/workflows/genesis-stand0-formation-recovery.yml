@@ -75,6 +75,7 @@ jobs:
           run_check formation_far_ground_test far-ground FORMATION_FAR_GROUND_PASS
           run_check tribal_lod_contract_test tribal-lod TRIBAL_LOD_PASS
           run_check formation_stride_contact_test stride-798 FORMATION_STRIDE_PASS
+          run_check soldier_gait_test soldier-gait 'SOLDIER_GAIT_RESULT checks=[1-9][0-9]* failures=0'
           run_check formation_contact_trace_test contact-trace 'FORMATION_CONTACT_TRACE_RESULT checks=[1-9][0-9]* failures=0'
           run_check formation_slot_authority_test slot-authority FORMATION_SLOT_AUTHORITY_PASS
           run_check battle_command_test battle-command 'BATTLE_COMMAND_RESULT checks=[1-9][0-9]* failures=0'

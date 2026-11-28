@@ -58,16 +58,19 @@ vec4 sample_authored_gait(int mode, float phase, bool left) {
 	return mix(authored_gait_keys[base+index],authored_gait_keys[base+index+1],clamp(frame-float(index),0.0,1.0));
 }
 
-vec3 gait_vertex(vec3 p, int mode, float phase) {
+vec3 gait_vertex(vec3 p, int mode, float phase, float stride) {
 	float side = p.x < 0.0 ? -1.0 : 1.0;
+	float cycle = fract(phase + (side > 0.0 ? 0.5 : 0.0));
+	float support = stance[mode-1];
+	float u = clamp((cycle-support)/(1.0-support),0.0,1.0);
+	float pitch = radians(14.0)*sin(TAU*u)*sin(PI*u);
 	vec4 key = sample_authored_gait(mode,phase,side>0.0);
 	vec3 hip = vec3(side*.105,.89,0.0);
 	vec3 knee = vec3(side*.119,.49,.012);
 	vec3 ankle = vec3(side*.126,.12,0.0);
 	vec3 upper = hip + rotate_guard_x(p-hip,key.x);
 	vec3 lower = hip + rotate_guard_x(knee+rotate_guard_x(p-knee,key.y)-hip,key.x);
-	vec3 foot = ankle + rotate_guard_x(p-ankle,key.z);
-	foot = hip + rotate_guard_x(knee+rotate_guard_x(foot-knee,key.y)-hip,key.x);
+	vec3 foot = ankle + rotate_guard_x(p-ankle,pitch) + foot_offset(cycle,stride,support,clearance[mode-1]) - vec3(0.0,key.w,0.0);
 	float ankle_weight = 1.0-smoothstep(.10,.19,p.y);
 	float shin_weight = 1.0-smoothstep(.40,.58,p.y);
 	float leg_weight = (1.0-smoothstep(.205,.27,abs(p.x)))*(1.0-smoothstep(.75,.95,p.y));
@@ -78,7 +81,7 @@ void vertex() {
 	float phase = INSTANCE_CUSTOM.r + step_fraction*INSTANCE_CUSTOM.g;
 	int mode = int(round(INSTANCE_CUSTOM.a));
 	if (mode >= 1 && mode <= 3) {
-		VERTEX = gait_vertex(VERTEX,mode,phase);
+		VERTEX = gait_vertex(VERTEX,mode,phase,INSTANCE_CUSTOM.b);
 	} else {
 		if (mode >= 6 && mode <= 8) { VERTEX = guard_vertex(VERTEX); }
 		float lean = upper_lean(phase, mode);

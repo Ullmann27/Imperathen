@@ -108,19 +108,23 @@ static func _sample_authored_gait(mode: int, phase: float, left: bool) -> Vector
 
 static func _gait_vertex(vertex: Vector3, mode: int, phase: float) -> Vector3:
 	var side := -1.0 if vertex.x < 0.0 else 1.0
+	var name: String = GAIT_NAMES[mode-1]
+	var cycle := fposmod(phase+(.5 if side>0.0 else 0.0),1.0)
+	var support: float = STANCE[name]
+	var u := clampf((cycle-support)/(1.0-support),0.0,1.0)
+	var pitch := deg_to_rad(14.0)*sin(TAU*u)*sin(PI*u)
 	var key := _sample_authored_gait(mode,phase,side>0.0)
-	# Blender (x,y,z) -> Godot (x,z,-y). Foot vertices follow the full
-	# ankle/knee/hip hierarchy; blend through the actual leg and skirt.
+	# Blender (x,y,z) -> Godot (x,z,-y). Blend the authored leg joints into the skirt.
 	var hip := Vector3(side*.105,.89,0.0)
 	var knee := Vector3(side*.119,.49,.012)
 	var ankle := Vector3(side*.126,.12,0.0)
 	var thigh_rotation := Basis(Vector3.RIGHT,key.x)
 	var shin_rotation := Basis(Vector3.RIGHT,key.y)
-	var foot_rotation := Basis(Vector3.RIGHT,key.z)
 	var upper := hip+thigh_rotation*(vertex-hip)
 	var lower := hip+thigh_rotation*(knee+shin_rotation*(vertex-knee)-hip)
-	var foot := ankle+foot_rotation*(vertex-ankle)
-	foot = hip+thigh_rotation*(knee+shin_rotation*(foot-knee)-hip)
+	# Use the continuous authored contact path at the sole; interpolation
+	# of the upper joints alone causes the planted foot to slide.
+	var foot := ankle+Basis(Vector3.RIGHT,pitch)*(vertex-ankle)+foot_offset(cycle,name)-Vector3.UP*key.w
 	var ankle_weight := 1.0-smoothstep(.10,.19,vertex.y)
 	var shin_weight := 1.0-smoothstep(.40,.58,vertex.y)
 	var leg_weight := (1.0-smoothstep(.205,.27,absf(vertex.x)))*(1.0-smoothstep(.75,.95,vertex.y))
