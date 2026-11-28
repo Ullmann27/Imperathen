@@ -1631,6 +1631,12 @@
 - `static func held(world: Dictionary) -> Array[String]`
 - `static func held_documents(world: Dictionary) -> Array[String]`
 
+## prototype/scripts/story/mission_event_batch.gd
+
+- `extends RefCounted`
+- `static func stage(screenplay: Dictionary, fields: Array) -> Dictionary`
+- `static func commit(screenplay: Dictionary, fields: Array, draft: Dictionary, ledger: String, events: Array[String]) -> bool`
+
 ## prototype/scripts/story/opening_story.gd
 
 - `extends RefCounted`

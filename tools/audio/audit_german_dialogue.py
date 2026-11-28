@@ -5,7 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 from collections import Counter
-from voice_contract import track_errors
+from voice_contract import recording_errors, track_errors
 
 def digest(data):
     return hashlib.sha256(data).hexdigest()
@@ -43,8 +43,7 @@ def main():
             row = rows[0]
             if row["text"] != line["text"]:
                 reasons.append("subtitle_mismatch")
-            if not isinstance(row.get("asr_wer"), (int, float)) or row["asr_wer"] > 0.12 or not row.get("asr_text"):
-                reasons.append("unaccepted_transcription")
+            reasons.extend(recording_errors(row, manifest["speakers"]))
             for field, checksum in (("file", "sha256"), ("visemes", "visemes_sha256")):
                 relative = row.get(field, "")
                 path = args.audio / relative

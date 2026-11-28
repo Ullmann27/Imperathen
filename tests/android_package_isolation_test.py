@@ -36,6 +36,11 @@ class TestQAIdentifierIsolation(unittest.TestCase):
         self.assertEqual(json.loads(modified.get(opts,"package/name")), "IMPERATHEN QA")
         self.assertEqual(export.PACKAGE,"at.heinz.imperathen")
         self.assertNotEqual(export.PACKAGE,export.QA_PACKAGE)
+        original_filters = json.loads(export.read_config(
+            Path(export.__file__).resolve().parents[1] / "prototype/export_presets.cfg"
+        ).get("preset.0", "exclude_filter")).split(",")
+        actual = json.loads(modified.get("preset.0", "exclude_filter")).split(",")
+        self.assertEqual(actual, [*original_filters, "scripts/tests/*"])
 
     def test_default_keeps_installed_app_identifier(self):
         export.configure_copy(self.folder,self.toolchain)

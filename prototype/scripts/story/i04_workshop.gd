@@ -10,6 +10,7 @@ extends RefCounted
 ## the craft, the horses or his father. Nothing here hands out wood, money or
 ## a weapon; the delivered bundle is never rewarded a second time.
 
+const EventBatch := preload("res://scripts/story/mission_event_batch.gd")
 const SOURCE := "res://assets/story/missions/band1/I-04.json"
 const WORKS := ["stack", "message", "watch"]
 const TOPICS := ["craft", "riding", "father"]
@@ -165,21 +166,16 @@ static func reason(data: Dictionary, action: String, ctx: Dictionary) -> String:
 	return ""
 
 
-static func _event(data: Dictionary, event_id: String) -> bool:
-	var events: Array = _screenplay(data).i04_events
-	if events.has(event_id):
-		return false
-	events.append(event_id)
-	return true
-
-
 ## Applies one checked I-04 action on a candidate copy. The caller owns the
 ## carried-item list (see result fields).
 static func apply(data: Dictionary, action: String, ctx: Dictionary) -> Dictionary:
 	var why := reason(data, action, ctx)
 	if not why.is_empty():
 		return {"ok":false, "message":why}
-	var s := _screenplay(data)
+	var current := _screenplay(data)
+	var s: Dictionary = EventBatch.stage(current, KEYS)
+	if s.is_empty():
+		return {"ok":false, "message":"Ungültiger Missionszustand."}
 	var written: Array[String] = []
 	var message := str(slice().get("results", {}).get(action, ""))
 	var result := {"ok":true, "carry_add":[], "carry_remove":[]}
@@ -206,10 +202,10 @@ static func apply(data: Dictionary, action: String, ctx: Dictionary) -> Dictiona
 		s.i04_topic = TOPIC_ACTIONS[action]
 		s.i04s = "complete"
 		written.append("I-04.topic." + str(s.i04_topic))
+	if not EventBatch.commit(current, KEYS, s, "i04_events", written):
+		return {"ok":false, "message":"Ungültige oder bereits gespeicherte Handlung."}
+	if TOPIC_ACTIONS.has(action):
 		message = str(topic_line(data).get("text", ""))
-	for event_id: String in written:
-		if not _event(data, event_id):
-			return {"ok":false, "message":"Dieses Ereignis ist bereits gespeichert."}
 	result["message"] = message
 	result["events"] = written
 	result["event_id"] = written[0] if not written.is_empty() else ""

@@ -1,0 +1,118 @@
+{
+  "scope": "Blender source anatomy and material review; not Godot shaders or actual runtime pose",
+  "blender": "4.0.2",
+  "roster_count": 43,
+  "rows": [
+    {
+      "id": "julia",
+      "role": "Mutter des Jungen (Bäuerin)",
+      "look_age": 36,
+      "source": "frontier_civilian_woman_0.glb",
+      "model_family": "civilian_woman",
+      "source_sha256": "a3c673fc0ebeeabda862b0ac277c7b2afab82c432f3c6eb200523836390f588e",
+      "armatures": 1,
+      "triangles": 20475,
+      "visible_parts": [
+        "FrontierBoundLocks",
+        "FrontierBoundLocks",
+        "FrontierHairBun",
+        "HeroBelt",
+        "HeroBody",
+        "HeroCollarSeam",
+        "HeroEyes",
+        "HeroHair",
+        "HeroSandal_L",
+        "HeroSandal_R",
+        "HeroSandalStrap_L",
+        "HeroSandalStrap_L",
+        "HeroSandalStrap_R",
+        "HeroSandalStrap_R",
+        "HeroTunic",
+        "HeroTunicSkirt",
+        "Icosphere"
+      ],
+      "applied_shape_controls": [
+        "HAIR_Volume",
+        "ID_Cheeks",
+        "ID_JawWidth",
+        "ID_NoseBridge"
+      ],
+      "unsupported_authored_face_controls": [
+        "ID_Brow",
+        "ID_Cheekbones",
+        "ID_Chin",
+        "ID_EyeDepth",
+        "ID_FaceLength",
+        "ID_Lips",
+        "ID_NoseLength",
+        "ID_NoseWidth"
+      ],
+      "captures": {
+        "full": {
+          "file": "julia-full.jpg",
+          "sha256": "d2593c66ecdc8868a8ace1bebd20360a529a56f9b34c1144c893ca1833f35da3"
+        },
+        "face": {
+          "file": "julia-face.jpg",
+          "sha256": "5b166191c40696ed4fd999c7bc2306286b70ae9f81540293b8e12c2bd349abfa"
+        },
+        "profile": {
+          "file": "julia-profile.jpg",
+          "sha256": "bfb12928f499959e104eda3c158dfe4d91705a35dda6fd08d908274cb10505a2"
+        }
+      }
+    },
+    {
+      "id": "silvanus",
+      "role": "Vater des Jungen (Lastenträger)",
+      "look_age": 40,
+      "source": "frontier_civilian_man_0.glb",
+      "model_family": "civilian_man",
+      "source_sha256": "6e5c1f3372741fb1613ba5a484e1c014a04b1726a33df61f2dd8bce8b84b29f2",
+      "armatures": 1,
+      "triangles": 19799,
+      "visible_parts": [
+        "HeroBelt",
+        "HeroBody",
+        "HeroCollarSeam",
+        "HeroEyes",
+        "HeroHair",
+        "HeroSandal_L",
+        "HeroSandal_R",
+        "HeroSandalStrap_L",
+        "HeroSandalStrap_L",
+        "HeroSandalStrap_R",
+        "HeroSandalStrap_R",
+        "HeroTunic",
+        "HeroTunicSkirt",
+        "Icosphere"
+      ],
+      "applied_shape_controls": [
+        "ID_Cheeks",
+        "ID_JawWidth",
+        "ID_NoseBridge"
+      ],
+      "unsupported_authored_face_controls": [
+        "ID_Brow",
+        "ID_Chin",
+        "ID_EyeDepth",
+        "ID_FaceLength",
+        "ID_NoseLength"
+      ],
+      "captures": {
+        "full": {
+          "file": "silvanus-full.jpg",
+          "sha256": "9ac3ab2c728173041daf02f5542f195a0bb34bea6cc9a8127560962037ef65f4"
+        },
+        "face": {
+          "file": "silvanus-face.jpg",
+          "sha256": "7909582f388161cfc6c0bfc6b51cf4c102be91ecd798fbcb1d573b2187453446"
+        },
+        "profile": {
+          "file": "silvanus-profile.jpg",
+          "sha256": "1a0b75f564a3b1d0d531a8dc7756dfecfc92b1f34daafb89417247053c89e468"
+        }
+      }
+    }
+  ]
+}

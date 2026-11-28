@@ -29,3 +29,15 @@ def track_errors(track, line):
     if not number(onset) or not number(first) or abs(onset-first) > .0167:
         return ["viseme_onset_mismatch"]
     return []
+
+
+def recording_errors(row, speaker_ids):
+    """Validate manifest ownership and the stored transcription receipt."""
+    errors = []
+    if row.get("speaker_id") not in speaker_ids:
+        errors.append("unregistered_speaker")
+    wer = row.get("asr_wer")
+    text = row.get("asr_text")
+    if type(wer) not in (int, float) or not 0 <= wer <= 0.12 or not isinstance(text, str) or not text.strip():
+        errors.append("unaccepted_transcription")
+    return errors

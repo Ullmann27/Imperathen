@@ -1,5 +1,5 @@
 import unittest
-from voice_contract import track_errors
+from voice_contract import recording_errors, track_errors
 
 class Contract(unittest.TestCase):
     def setUp(self):
@@ -20,6 +20,17 @@ class Contract(unittest.TestCase):
     def test_wrong_onset(self):
         self.track["first_phoneme_s"]=.2
         self.assertIn("viseme_onset_mismatch",track_errors(self.track,self.line))
+
+class RecordingContract(unittest.TestCase):
+    def test_only_registered_speaker_and_measured_transcription_pass(self):
+        row = {"speaker_id": "julia", "asr_wer": 0.12, "asr_text": "Guten Morgen"}
+        self.assertEqual(recording_errors(row, {"julia"}), [])
+        self.assertIn("unregistered_speaker", recording_errors(row, {"cassia"}))
+        for value in (float("nan"), float("inf"), -0.1, True, None, 0.12001):
+            with self.subTest(value=value):
+                self.assertIn("unaccepted_transcription", recording_errors({**row, "asr_wer": value}, {"julia"}))
+        self.assertIn("unaccepted_transcription", recording_errors({**row, "asr_text": " "}, {"julia"}))
+
 
 if __name__ == "__main__":
     unittest.main()
