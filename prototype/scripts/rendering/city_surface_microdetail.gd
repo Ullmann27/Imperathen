@@ -3,6 +3,7 @@ extends RefCounted
 ## Procedural Roman facade and street microgeometry on existing *real* city meshes.
 ## Visual only: never replaces houses, roads, pedestrians, physics or campaign data.
 
+const FountainWater := preload("res://scripts/rendering/city_fountain_water.gd")
 const GROUP := "ImperathenFacadeMicrodetail"
 const OWNER_META := "imperathen_city_facade_microdetail_v1"
 const PROFILES := {
@@ -32,7 +33,7 @@ static func install(city: Node3D, profile: String = "balanced") -> Dictionary:
 	var report := {"ok":false,"status":"unsupported_city","houses":0,
 		"brick_instances":0,"plaster_instances":0,"wood_instances":0,
 		"street_instances":0,"added_colliders":0,"replaced_original_meshes":0,
-		"materials":3,"profile":profile}
+		"materials":3,"profile":profile,"fountain_water_surfaces":0}
 	if not is_instance_valid(city) or city.name != "RomanCity":
 		return report
 	if not PROFILES.has(profile):
@@ -47,6 +48,7 @@ static func install(city: Node3D, profile: String = "balanced") -> Dictionary:
 			city.remove_child(prior)
 			prior.free()
 		report.status = "disabled_for_low"
+		report.fountain_water_surfaces = FountainWater.apply(city)
 		report.ok = true
 		return report
 	var existing_road: Node3D = city.find_child("Main_Streets",true,false) as Node3D
@@ -138,6 +140,7 @@ static func install(city: Node3D, profile: String = "balanced") -> Dictionary:
 		city.remove_child(prior)
 		prior.free()
 	city.add_child(group)
+	report.fountain_water_surfaces = FountainWater.apply(city)
 	report.brick_instances = brick.size()
 	report.plaster_instances = plaster.size()
 	report.wood_instances = wood.size()
