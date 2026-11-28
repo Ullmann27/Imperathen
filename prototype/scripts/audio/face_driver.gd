@@ -215,5 +215,5 @@ func _shape_weight(name: String) -> float:
 		"lip_tuck", "mouthRollLower":
 			return float(params.lip_tuck)
 		"blink", "eyeBlinkLeft", "eyeBlinkRight", "eyes_closed", "Blink_L", "Blink_R":
-			return blink_weight() if blink_enabled else 0.0
+			return blink_weight() if blink_enabled else -1.0
 	return -1.0
