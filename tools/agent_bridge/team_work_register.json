@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 296,
+  "version": 297,
   "tasks": [
     {
       "id": "K101",
@@ -1433,9 +1433,9 @@
       "id": "CHARACTER-CORE-PHASE1",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "7820c4c6d8f0cb9df550956c041ed08c53a0624e",
-      "run_id": null,
+      "run_id": "46117066995",
       "scope": [
         "prototype/scripts/character_core",
         "prototype/scenes/character_core",
@@ -1443,7 +1443,7 @@
         "docs/44_integration/CHARACTER_CORE_PHASE1.md",
         ".github/workflows/aeterna-character-core-phase1.yml"
       ],
-      "note": "Phase 1 native rig branch feature/aeterna-character-core-phase1-20261128 initial head d467b29e13253f58f98acc6d2b74acfe2bf4216a; run46116191468 compiled and executed 64 checks, 62 passed, 2 failed: physical 18cm step and distinct slope foot heights. Artifact15251767774. Flat and slope IK solver residual <0.001mm to requested target, not proof of actual sole placement. Rework swept stair edge/clearance and pelvis-before-reach clamp, instrument actual ray/target heights; preserve thresholds and add traversal and clearance assertions. Existing original rig unchanged. No main, campaign, APK or visual/device acceptance."
+      "note": "Phase 1 native rig branch feature/aeterna-character-core-phase1-20261128 initial head d467b29e13253f58f98acc6d2b74acfe2bf4216a; run46116191468 compiled and executed 64 checks, 62 passed, 2 failed: physical 18cm step and distinct slope foot heights. Artifact15251767774. Flat and slope IK solver residual <0.001mm to requested target, not proof of actual sole placement. Rework swept stair edge/clearance and pelvis-before-reach clamp, instrument actual ray/target heights; preserve thresholds and add traversal and clearance assertions. Existing original rig unchanged. No main, campaign, APK or visual/device acceptance. | Draft #208. Correction head 7ad8e47ca5bd6b7f2fb9eef078c1c85173fdee9b; core a3096d15e17e7b69528d525c629cdc37f651083d, feet e852a6b86de34dcfd2c041eb87f5a1a275c922cb, test 94e2f3e7786e10b1be2b2db71ebdfce3cb372958. Run46117066995 in_progress; no pass claim."
     }
   ]
 }
