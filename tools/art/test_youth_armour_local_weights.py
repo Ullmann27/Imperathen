@@ -1,7 +1,8 @@
 import unittest
 import numpy as np
 from youth_armour_local_weights import (REST, EXPECTED, EXPECTED_CODES, NAMES, locate, topology,
-                                       candidate_weights, no_edge_regression, godot_import_weight_codes)
+                                       candidate_weights, no_edge_regression, godot_import_weight_codes,
+                                       solve_affine_weights)
 
 
 class LocalWeightTests(unittest.TestCase):
@@ -84,6 +85,37 @@ class LocalWeightTests(unittest.TestCase):
         self.pos[2] = self.pos[0]
         with self.assertRaises(ValueError):
             candidate_weights(self.pos, self.joints, self.weights, (0, 1), [2, 4, 1, 3])
+
+    def test_constrained_solver_keeps_both_normalized_bindings(self):
+        original = np.array([[.8, .1, .05, .05], [.2, .4, .2, .2]])
+        offsets = np.zeros((2, 3))
+        coefficients = np.zeros((2, 3, 8))
+        coefficients[0, 0, 0] = 1
+        coefficients[0, 0, 4] = -1
+        # A neighboring edge limits the first binding's displacement.
+        offsets[1, 0] = -.8
+        coefficients[1, 0, 0] = 1
+        solved, report = solve_affine_weights(original, offsets, coefficients, [.1, .15])
+        np.testing.assert_allclose(solved.sum(axis=1), [1, 1], atol=1e-8)
+        self.assertTrue(np.all(solved >= 0))
+        self.assertLessEqual(abs(solved[0, 0]-solved[1, 0]), .100000001)
+        self.assertLessEqual(abs(solved[0, 0]-.8), .150000001)
+        self.assertEqual(report["constraints"], 2)
+
+    def test_constrained_solver_rejects_infeasible_geometry(self):
+        original = np.full((2, 4), .25)
+        offsets = np.array([[2., 0., 0.]])
+        coefficients = np.zeros((1, 3, 8))
+        with self.assertRaises(ValueError):
+            solve_affine_weights(original, offsets, coefficients, [1.])
+
+    def test_constrained_solver_leaves_already_feasible_source_unchanged(self):
+        original = np.full((2, 4), .25)
+        offsets = np.zeros((1, 3))
+        coefficients = np.zeros((1, 3, 8))
+        solved, report = solve_affine_weights(original, offsets, coefficients, [1.])
+        np.testing.assert_array_equal(solved, original)
+        self.assertEqual(report["active_constraints"], 0)
 
     def test_regression_guard(self):
         limit = np.array([.05, .05])

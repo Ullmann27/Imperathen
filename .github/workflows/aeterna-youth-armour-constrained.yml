@@ -1,0 +1,102 @@
+name: Aeterna constrained youth armour skin repair
+on:
+  push:
+    branches: ['fix/aeterna-youth-armour-constrained-20261128']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      OPENBLAS_NUM_THREADS: '2'
+      OMP_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Dependencies and independent negative controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/youth-cap
+          git rev-parse HEAD > artifacts/youth-cap/source.txt
+          timeout 300s sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 update -q
+          timeout 600s sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 install -y --no-install-recommends python3-numpy python3-scipy python3-pil
+          /usr/bin/python3 -m unittest discover -s tools/art -p test_youth_armour_local_weights.py -v 2>&1 | tee artifacts/youth-cap/unit.log
+      - name: Stage actual owner-derived youth using existing checksum contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 tools/characters/stage_original_youth.py --archive "$RUNNER_TEMP/youth-source.zip" --report artifacts/youth-cap/original-stage.json
+          curl -fLsS --retry 3 --connect-timeout 15 --max-time 120 'https://accad.ohio-state.edu/sites/accad.osu.edu/files/Male2_bvh.zip' -o "$RUNNER_TEMP/accad-male2.zip"
+          timeout --kill-after=15s 1200s /usr/bin/python3 tools/characters/stage_youth_civil.py --source prototype/assets/characters --accad-archive "$RUNNER_TEMP/accad-male2.zip" --work "$RUNNER_TEMP/youth-work" 2>&1 | tee artifacts/youth-cap/staging.log
+          for i in 0 1 2 3; do test -s "prototype/assets/characters/hero_meshy_italia_civil_$i.glb"; done
+          test -s prototype/assets/animations/accad_youth_civil_motion.json
+          # Match fold7-unreleased-qa.yml: civilian variant must be built first.
+          mkdir -p "$RUNNER_TEMP/youth-mocap"
+          timeout --kill-after=15s 1200s /usr/bin/python3 tools/characters/retarget_accad_youth.py --archive "$RUNNER_TEMP/accad-male2.zip" --input prototype/assets/characters --output "$RUNNER_TEMP/youth-mocap" --report artifacts/youth-cap/youth-mocap-report.json
+          for i in 0 1 2 3; do test -s "$RUNNER_TEMP/youth-mocap/hero_meshy_italia_$i.glb"; done
+          cp "$RUNNER_TEMP"/youth-mocap/hero_meshy_italia_{0,1,2,3}.glb prototype/assets/characters/
+          cp artifacts/youth-cap/youth-mocap-report.json prototype/assets/animations/accad_youth_motion.json
+          sha256sum prototype/assets/characters/hero_meshy_italia_{0,1,2,3}.glb prototype/assets/characters/hero_meshy_italia_civil_{0,1,2,3}.glb > artifacts/youth-cap/V1_ASSET_SHA256.txt
+          sha256sum prototype/assets/animations/accad_youth{,_civil}_motion.json > artifacts/youth-cap/MOTION_SHA256.txt
+      - name: Build isolated candidate from verified staged source
+        shell: bash
+        run: |
+          set -euo pipefail
+          src=prototype/assets/characters/hero_meshy_italia_0.glb
+          expected="$(awk '$2 == "prototype/assets/characters/hero_meshy_italia_0.glb" {print $1}' artifacts/youth-cap/V1_ASSET_SHA256.txt)"
+          test "$expected" = dcb52efb544fd68be316ef59e6e835fc98f94485cf24d6609bb8a6fac7646605
+          mkdir -p "$RUNNER_TEMP/armour-candidate"
+          timeout --kill-after=10s 420s /usr/bin/python3 tools/art/youth_armour_local_weights.py build "$src" "$RUNNER_TEMP/armour-candidate/hero_meshy_italia_0.glb" --expected-sha "$expected" 2>&1 | tee artifacts/youth-cap/candidate.log
+      - name: Install checksum-verified Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 --connect-timeout 15 --max-time 120 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 --connect-timeout 15 --max-time 300 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Full original Godot skin gate on both actual asset versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$GITHUB_WORKSPACE/artifacts/youth-cap"
+          for version in V1 V2; do
+            if [[ "$version" == V2 ]]; then
+              cp "$RUNNER_TEMP/armour-candidate/hero_meshy_italia_0.glb" prototype/assets/characters/
+              sha256sum prototype/assets/characters/hero_meshy_italia_{0,1,2,3}.glb prototype/assets/characters/hero_meshy_italia_civil_{0,1,2,3}.glb > "$out/V2_ASSET_SHA256.txt"
+              diff -u <(tail -n +2 "$out/V1_ASSET_SHA256.txt") <(tail -n +2 "$out/V2_ASSET_SHA256.txt")
+            fi
+            mkdir -p "$out/$version" "$RUNNER_TEMP/armour-$version"/{data,config,cache}
+            export XDG_DATA_HOME="$RUNNER_TEMP/armour-$version/data"
+            export XDG_CONFIG_HOME="$RUNNER_TEMP/armour-$version/config"
+            export XDG_CACHE_HOME="$RUNNER_TEMP/armour-$version/cache"
+            timeout --kill-after=10s 420s "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee "$out/$version/import.log"
+            timeout --kill-after=10s 300s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/youth_outfit_skin_test.gd 2>&1 | tee "$out/$version/skin.log"
+            grep -Fq YOUTH_OUTFIT_SKIN_PASS "$out/$version/skin.log"
+            if grep -Eq 'SCRIPT ERROR:|^ERROR:' "$out/$version/skin.log"; then exit 1; fi
+          done
+          /usr/bin/python3 tools/art/youth_armour_local_weights.py compare "$out/V1/skin.log" "$out/V2/skin.log" | tee "$out/comparison.log"
+      - name: Preserve numerical evidence only, never owner GLB
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: youth-armour-local-${{ github.run_id }}
+          path: |
+            artifacts/youth-cap/**/*.json
+            artifacts/youth-cap/**/*.log
+            artifacts/youth-cap/**/*.txt
+          if-no-files-found: warn
+          retention-days: 14

@@ -12,6 +12,7 @@ from pathlib import Path
 
 import numpy as np
 from scipy.spatial import cKDTree
+from scipy.optimize import minimize
 from youth_cap_binding import pose_subset, weight_signature, weight_delta
 
 CHARACTERS = Path(__file__).resolve().parents[1] / "characters"
@@ -155,6 +156,153 @@ def candidate_weights(position, joints, weights, pair, named):
     return revised, sorted(changed), seams
 
 
+def solve_affine_weights(original, offsets, coefficients, bounds):
+    """Minimize binding displacement under convex posed-edge constraints.
+
+    Each edge is a 3D affine function of eight weights, four per endpoint.
+    Add only currently violated constraints to the bounded active set, then
+    independently re-evaluate every original sample. No relaxed constraints.
+    """
+    x0 = np.asarray(original, dtype=float).reshape(8)
+    offsets = np.asarray(offsets, dtype=float)
+    coefficients = np.asarray(coefficients, dtype=float)
+    bounds = np.asarray(bounds, dtype=float)
+    if (offsets.shape != (len(bounds), 3) or coefficients.shape != (len(bounds), 3, 8)
+            or not len(bounds) or not np.isfinite(x0).all() or np.any(x0 < 0)
+            or not np.isfinite(offsets).all() or not np.isfinite(coefficients).all()
+            or not np.isfinite(bounds).all() or np.any(bounds <= 0)):
+        raise ValueError("Invalid constrained skin problem")
+    totals = x0.reshape(2, 4).sum(axis=1)
+    if np.any(totals <= 0):
+        raise ValueError("Empty source binding")
+    x0 = (x0.reshape(2, 4) / totals[:, None]).reshape(8)
+    # Dimensionless residuals keep short seam edges and metre-scale skin
+    # edges comparably conditioned for the optimizer.
+    offsets = offsets / bounds[:, None]
+    coefficients = coefficients / bounds[:, None, None]
+    equality = np.zeros((2, 8))
+    equality[0, :4] = 1
+    equality[1, 4:] = 1
+
+    def residual(x, c, m):
+        posed = c + np.einsum("mij,j->mi", m, x)
+        return 1 - np.einsum("mi,mi->m", posed, posed)
+
+    def objective(x):
+        return .5 * float(np.dot(x-x0, x-x0))
+
+    x = x0.copy()
+    active = set()
+    for iteration in range(32):
+        values = residual(x, offsets, coefficients)
+        if float(values.min()) >= -1e-10:
+            if np.max(abs(equality @ x - 1)) > 1e-8 or np.any(x < 0) or np.any(x > 1):
+                raise ValueError("Constrained candidate outside weight simplex")
+            return x.reshape(2, 4), {"constraints": len(bounds),
+                    "active_constraints": len(active), "iterations": iteration,
+                    "minimum_normalized_slack": float(values.min()),
+                    "binding_displacement_l2": float(np.linalg.norm(x-x0))}
+        worst = np.flatnonzero(values < -1e-10)
+        worst = worst[np.argsort(values[worst], kind="stable")]
+        added = [int(i) for i in worst if int(i) not in active][:32]
+        if not added:
+            raise ValueError(f"Constrained skin did not satisfy active edges: slack {values.min():.9g}")
+        active.update(added)
+        ids = np.array(sorted(active), dtype=int)
+        c, m = offsets[ids], coefficients[ids]
+        constraints = [
+            {"type": "eq", "fun": lambda w: equality @ w - 1,
+             "jac": lambda w: equality},
+            {"type": "ineq", "fun": lambda w: residual(w, c, m),
+             "jac": lambda w: -2*np.einsum("mi,mij->mj",
+                         c + np.einsum("mij,j->mi", m, w), m)}]
+        result = minimize(objective, x, jac=lambda w: w-x0, method="SLSQP",
+                          bounds=[(0., 1.)]*8, constraints=constraints,
+                          options={"ftol": 1e-12, "maxiter": 300})
+        if not result.success or not np.isfinite(result.x).all():
+            raise ValueError("No verified feasible local binding: " + str(result.message))
+        x = result.x
+    raise ValueError("Constrained skin exceeded bounded active-set iterations")
+
+
+def constrained_candidate(rig, prim, edges, pair, named):
+    """Keep both original endpoint identities and coincident seams locked."""
+    _, changed, seams = candidate_weights(prim["position"], prim["joint_index"],
+                                           prim["weight"], pair, named)
+    groups = {pair[0]: 0, pair[1]: 1}
+    for endpoint, vertex in seams:
+        group = groups[endpoint]
+        if vertex in groups and groups[vertex] != group:
+            raise ValueError("Overlapping independent seam groups")
+        groups[vertex] = group
+    if set(groups) != set(changed):
+        raise ValueError("Incomplete local seam mapping")
+    affected = edges[np.isin(edges, changed).any(axis=1)]
+    if not len(affected):
+        raise ValueError("No actual affected triangles")
+    ids = np.unique(affected)
+    local = np.searchsorted(ids, affected)
+    if any(v not in ids for v in changed):
+        raise ValueError("Unused seam vertex")
+    limits = 7*np.linalg.norm(prim["position"][affected[:, 0]] -
+                             prim["position"][affected[:, 1]], axis=1)+.03
+    # Every actual connecting edge between the two coincident endpoint
+    # groups must meet the original threshold, not merely the worst frame.
+    target = np.array([groups.get(int(a), -1) >= 0 and
+                       groups.get(int(b), -1) >= 0 and groups[int(a)] != groups[int(b)]
+                       for a, b in affected], dtype=bool)
+    if not target.any():
+        raise ValueError("Measured edge absent from affected topology")
+    seam_local = np.searchsorted(ids, np.array(seams, dtype=int).reshape(-1, 2))
+    original = np.array([[weight_signature(prim["joint_index"][v], prim["weight"][v])[j]
+                          for j in named] for v in pair], dtype=float)
+    offsets, coefficients, bounds = [], [], []
+    positions = np.c_[prim["position"][ids], np.ones(len(ids))]
+    for clip in rig.glb.document.get("animations", []):
+        animation = rig.animation(clip["name"])
+        count = max(1, math.ceil(animation["duration"]*60))
+        for frame in range(count+1):
+            world = rig.globals(animation, animation["duration"]*frame/count)
+            baseline = pose_subset(prim, ids, world)
+            constant = baseline.copy()
+            affine = np.zeros((len(ids), 3, 8))
+            matrices = np.stack([world[prim["joints"][j]] @ prim["ibm"][j] for j in named])
+            for i, v in enumerate(ids):
+                if int(v) not in groups:
+                    continue
+                group = groups[int(v)]
+                constant[i] = 0
+                affine[i, :, group*4:group*4+4] = (matrices @ positions[i])[:, :3].T
+            before = np.linalg.norm(baseline[local[:, 0]]-baseline[local[:, 1]], axis=1)
+            allowance = np.maximum(before, limits)
+            # Strict target threshold plus a 0.15 mm numerical safety
+            # margin for float32/UINT16 import, never increased tolerance.
+            allowance[target] = limits[target]-.00015
+            offsets.append(constant[local[:, 0]]-constant[local[:, 1]])
+            coefficients.append(affine[local[:, 0]]-affine[local[:, 1]])
+            bounds.append(allowance)
+            if len(seams):
+                gap = np.linalg.norm(baseline[seam_local[:, 0]]-baseline[seam_local[:, 1]], axis=1)
+                offsets.append(constant[seam_local[:, 0]]-constant[seam_local[:, 1]])
+                coefficients.append(affine[seam_local[:, 0]]-affine[seam_local[:, 1]])
+                bounds.append(gap+SEAM_EPS*.5)
+    solved, report = solve_affine_weights(original, np.concatenate(offsets),
+                                          np.concatenate(coefficients), np.concatenate(bounds))
+    revised = prim["weight"].copy()
+    for v in changed:
+        by_joint = dict(zip(named, solved[groups[v]]))
+        revised[v] = [by_joint[j] for j in prim["joint_index"][v]]
+    # Validate exactly the candidate that will be written, including
+    # float32 conversion. The original Godot A/B remains mandatory.
+    revised[changed] = revised[changed].astype(np.float32).astype(float)
+    if not np.isfinite(revised).all() or np.any(revised < 0) or np.max(abs(revised.sum(1)-1)) > .002:
+        raise ValueError("Invalid constrained weights")
+    report["target_edges"] = int(target.sum())
+    report["solved_named_weights"] = solved.tolist()
+    print("YOUTH_ARMOUR_CONSTRAINTS " + json.dumps(report, allow_nan=False), flush=True)
+    return revised, changed, seams, report
+
+
 def no_edge_regression(before, after, limits):
     if not np.isfinite(before).all() or not np.isfinite(after).all():
         return False
@@ -240,7 +388,7 @@ def build(source, destination, expected_sha):
     if len(matches) != 1:
         raise ValueError(f"Expected one measured connected edge across original body primitives, found {len(matches)}")
     primitive_index, prim, edges, pair, named, transforms = matches[0]
-    revised, changed, seams = candidate_weights(prim["position"], prim["joint_index"], prim["weight"], pair, named)
+    revised, changed, seams, optimizer = constrained_candidate(rig, prim, edges, pair, named)
     for other in rig.primitives:
         if other is prim:
             continue
@@ -266,7 +414,7 @@ def build(source, destination, expected_sha):
     return {"source_sha256": expected_sha, "candidate_sha256": sha(destination),
             "source_primitive": primitive_index, "source_indices": list(pair), "source_axes": transforms,
             "changed_rows": changed, "split_seams": seams,
-            "offline": measured, "status": "GODOT_REVIEW_REQUIRED"}
+            "offline": measured, "optimizer": optimizer, "status": "GODOT_REVIEW_REQUIRED"}
 
 
 def read_result(path):
