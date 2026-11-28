@@ -13,6 +13,19 @@ var _blink_at := -1.0
 var _blink_duration := 0.18
 var _next_blink := 2.0
 var _distant := false
+# The recorded dialogue clock owns JawOpen while a voice is bound. Other
+# expressions (including both eyelids) continue to use this actor's motion.
+var _audio_jaw_owned: bool = false
+
+
+func _set_audio_jaw_owner(owned: bool) -> void:
+	if owned == _audio_jaw_owned:
+		return
+	# Clear the old expressive jaw before transfer, and reset it on release.
+	_audio_jaw_owned = false
+	_values[2] = 0.0
+	_apply()
+	_audio_jaw_owned = owned
 
 
 func bind(model: Node3D, actor_identity: String) -> void:
@@ -132,5 +145,5 @@ func _apply() -> void:
 			continue
 		var slots: PackedInt32Array = target.slots
 		for i in SHAPES.size():
-			if slots[i] >= 0:
+			if slots[i] >= 0 and not (i == 2 and _audio_jaw_owned):
 				mesh.set_blend_shape_value(slots[i], clampf(_values[i], 0.0, 1.0))

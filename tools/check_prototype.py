@@ -214,6 +214,7 @@ def main():
             ("cc0_runtime_gestures", ["--fixed-fps", "60", "--script", "res://tests/cc0_runtime_gestures_test.gd"], "CC0_GESTURES_PASS"),
             ("village_static_art", ["--script", "res://tests/village_static_art_test.gd"], "checks, 0 failed"),
             ("hero_faces", ["--fixed-fps", "60", "--script", "res://tests/hero_face_test.gd"], "checks, 0 failed"),
+            ("facial_lifecycle", ["--fixed-fps", "60", "--script", "res://tests/facial_motion_lifecycle_test.gd"], "FACIAL_LOD_PASS"),
             ("hero_cloth_grounding", ["--fixed-fps", "60", "--script", "res://tests/hero_cloth_grounding_test.gd"], "checks; 0 failed"),
             ("village_scenery", ["--script", str(ROOT / "art/village/verify.gd")], "VILLAGE_SCENERY errors []"),
             ("village_look", ["--script", "res://tests/village_look_test.gd"], "VILLAGE_LOOK_PASS"),

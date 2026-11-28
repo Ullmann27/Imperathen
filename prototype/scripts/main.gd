@@ -60,6 +60,8 @@ var _live_dialogue_queue: Array[String] = []
 var _live_dialogue_figure: Node3D
 var _live_dialogue_body: Node3D
 var _live_dialogue_paused: bool = false
+var _speech_face_figure: Node3D
+var _speech_forced_detail: bool = false
 var opening_overlay
 var opening_sequence: Dictionary = {}
 var opening_index := 0
@@ -1154,13 +1156,18 @@ func _update_opening_voice(beat: Dictionary) -> void:
 	if stream == null:
 		return
 	var speaker_figure: Node3D = world.get_cinematic_figure(str(line.speaker_id))
-	if speaker_figure != null:
+	if is_instance_valid(speaker_figure):
 		var face := FaceDriver.new()
 		face.blink_enabled = false
 		face.process_priority = 20
 		opening_voice.add_child(face)
-		face.bind(speaker_figure)
-		opening_voice.face = face
+		var bound: Dictionary = face.bind(speaker_figure)
+		if bool(bound.mouth_output_bound):
+			_claim_speech_face(speaker_figure, false)
+			opening_voice.face = face
+		else:
+			face.set_process(false)
+			face.queue_free()
 	opening_voice.play(phrase, speaker)
 	opening_voice.set_paused(opening_paused)
 	opening_voice_duration = stream.get_length()
@@ -1196,8 +1203,32 @@ func _play_live_dialogue(text: String, speaker: String, figure: Node3D) -> void:
 	_live_dialogue_speaker = sid
 	_live_dialogue_figure = figure
 	_live_dialogue_queue.assign(phrases)
+	# Keep exactly this speaking original actor at its authored near tier.
+	# The film's pre-existing LOD ownership is never taken away.
+	_claim_speech_face(figure, true)
 	opening_voice.set_paused(false)
 	_advance_live_dialogue()
+
+
+func _claim_speech_face(figure: Node3D, near_detail: bool) -> void:
+	if not is_instance_valid(figure):
+		return
+	_speech_face_figure = figure
+	if near_detail and figure.has_method("set_cinematic_detail") and not bool(figure.get("_cinematic_detail")):
+		_speech_forced_detail = true
+		figure.set_cinematic_detail(true)
+	if figure.has_method("_set_speech_mouth_authority"):
+		figure._set_speech_mouth_authority(true)
+
+
+func _release_speech_face() -> void:
+	if is_instance_valid(_speech_face_figure):
+		if _speech_face_figure.has_method("_set_speech_mouth_authority"):
+			_speech_face_figure._set_speech_mouth_authority(false)
+		if _speech_forced_detail and _speech_face_figure.has_method("set_cinematic_detail"):
+			_speech_face_figure.set_cinematic_detail(false)
+	_speech_face_figure = null
+	_speech_forced_detail = false
 
 
 func _bind_live_voice_face() -> void:
@@ -1221,7 +1252,11 @@ func _bind_live_voice_face() -> void:
 	face.process_priority = 20
 	opening_voice.add_child(face)
 	var bound: Dictionary = face.bind(body)
-	if not bool(bound.jaw_bone) and int(bound.blend_shapes) == 0:
+	if not bool(bound.mouth_output_bound):
+		# A blinking or cloth-only model is not a speaking face. Preserve the
+		# audio/subtitles and explicitly report that facial output is missing.
+		if opening_voice.is_active():
+			opening_voice.current["mouth_output_bound"] = false
 		face.set_process(false)
 		face.queue_free()
 		return
@@ -1229,6 +1264,7 @@ func _bind_live_voice_face() -> void:
 	if opening_voice.is_active():
 		var entry: Dictionary = VoiceLines.find_line_id(str(opening_voice.current.get("line_id","")))
 		face.set_track(VoiceLines.viseme_track(entry), opening_voice.clock)
+		opening_voice.current["mouth_output_bound"] = face._has_mouth_outputs()
 
 
 func _advance_live_dialogue() -> void:
@@ -1261,6 +1297,7 @@ func _stop_opening_voice() -> void:
 		opening_voice.face.set_process(false)
 		opening_voice.face.queue_free()
 		opening_voice.face = null
+	_release_speech_face()
 	opening_voice_duration = 0.0
 	_live_dialogue_screen = ""
 	_live_dialogue_key = ""

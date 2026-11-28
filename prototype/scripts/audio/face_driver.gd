@@ -62,6 +62,8 @@ var _skeleton: Skeleton3D
 var _jaw := -1
 var _jaw_rest := Quaternion.IDENTITY
 var _meshes: Array[MeshInstance3D] = []
+var _mouth_meshes: Array[MeshInstance3D] = []
+var _mouth_shape_count: int = 0
 var _rng := RandomNumberGenerator.new()
 var _blink_t := 0.5
 var _next_blink := 3.0
@@ -75,13 +77,43 @@ func _init() -> void:
 ## the outputs found, which tests use to prove what was actually driven.
 func bind(root: Node) -> Dictionary:
 	_meshes.clear()
+	_mouth_meshes.clear()
+	_mouth_shape_count = 0
 	_skeleton = null
 	_jaw = -1
 	_collect(root)
 	var shapes := 0
-	for mesh in _meshes:
-		shapes += mesh.mesh.get_blend_shape_count() if mesh.mesh is ArrayMesh else 0
-	return {"jaw_bone": _jaw != -1, "meshes": _meshes.size(), "blend_shapes": shapes}
+	for mesh: MeshInstance3D in _meshes:
+		var array_mesh: ArrayMesh = mesh.mesh as ArrayMesh
+		if array_mesh == null:
+			continue
+		shapes += array_mesh.get_blend_shape_count()
+		var has_mouth: bool = false
+		for index: int in array_mesh.get_blend_shape_count():
+			if _is_mouth_shape(String(array_mesh.get_blend_shape_name(index))):
+				_mouth_shape_count += 1
+				has_mouth = true
+		if has_mouth:
+			_mouth_meshes.append(mesh)
+	return {"jaw_bone": _jaw != -1, "meshes": _meshes.size(), "blend_shapes": shapes,
+		"mouth_shapes": _mouth_shape_count, "mouth_output_bound": _has_mouth_outputs()}
+
+
+func _is_mouth_shape(name: String) -> bool:
+	if name.begins_with("viseme_"):
+		return VISEMES.find(name.trim_prefix("viseme_")) > 0
+	return name in ["jaw_open", "jawOpen", "JawOpen", "lip_round", "mouthFunnel", "mouthPucker",
+		"lip_wide", "mouthStretchLeft", "mouthStretchRight", "lip_close", "mouthClose",
+		"mouthPressLeft", "mouthPressRight", "lip_tuck", "mouthRollLower"]
+
+
+func _has_mouth_outputs() -> bool:
+	if is_instance_valid(_skeleton) and _jaw >= 0 and _jaw < _skeleton.get_bone_count():
+		return true
+	for mesh: MeshInstance3D in _mouth_meshes:
+		if is_instance_valid(mesh) and mesh.mesh is ArrayMesh:
+			return true
+	return false
 
 
 func _collect(node: Node) -> void:
@@ -175,11 +207,11 @@ func blink_weight() -> float:
 
 
 func _apply() -> void:
-	if is_instance_valid(_skeleton) and _jaw != -1:
+	if is_instance_valid(_skeleton) and _jaw >= 0 and _jaw < _skeleton.get_bone_count():
 		var q := Quaternion(jaw_axis.normalized(), jaw_max_angle * float(params.jaw_open))
 		_skeleton.set_bone_pose_rotation(_jaw, _jaw_rest * q)
 	for mesh in _meshes:
-		if is_instance_valid(mesh):
+		if is_instance_valid(mesh) and mesh.mesh is ArrayMesh:
 			_apply_mesh(mesh)
 
 

@@ -48,6 +48,29 @@ func _run() -> void:
 		_check(game.opening_voice.is_active() and game.opening_voice.current.line_id == first.line_id, "Exact recorded paragraph plays, not generated status or greeting")
 		_check(game._live_dialogue_queue.size() == 1, "Second exact paragraph queued")
 		_check(game.opening_voice.current.lip_sync_valid, "Actual imported viseme track is connected")
+		_check(figure.detail == 0 and figure._cinematic_detail, "Speaking named figure uses its original near LOD")
+		_check(game.opening_voice.current.mouth_output_bound and is_instance_valid(game.opening_voice.face), "Real mother has an actual mouth output, not merely a valid track")
+		var real_body: MeshInstance3D = figure.body.find_child("HeroBody", true, false) as MeshInstance3D
+		var jaw_slot: int = real_body.find_blend_shape_by_name("JawOpen") if is_instance_valid(real_body) else -1
+		_check(jaw_slot >= 0 and figure._face._audio_jaw_owned, "Real imported mother morph is owned by recorded speech")
+		if jaw_slot >= 0 and is_instance_valid(game.opening_voice.face):
+			var speech = game.opening_voice.face
+			var track: Dictionary = Voice.viseme_track(first)
+			var strongest: float = 0.0
+			var peak: float = 0.0
+			for segment: Array in track.segments:
+				var t: float = (float(segment[0])+float(segment[1]))*0.5
+				speech.sample(t)
+				if float(speech.params.jaw_open) > peak:
+					peak = float(speech.params.jaw_open)
+					strongest = t
+			speech.sample(strongest)
+			speech._apply()
+			var jaw_before: float = real_body.get_blend_shape_value(jaw_slot)
+			figure._face.pose("talk",0.32,0)
+			_check(peak > 0.1 and jaw_before > 0.1 and is_equal_approx(real_body.get_blend_shape_value(jaw_slot),jaw_before), "Audio morph visibly opens on actual imported mesh and cannot be overwritten by expressive talk")
+			# Restore the live audio clock after the deterministic morph sample.
+			speech._process(0.0)
 		var player: Node = game.opening_voice._player
 		game._play_live_dialogue(text,"julia",figure)
 		_check(game.opening_voice._player == player, "Same dialogue refresh cannot restart audio")
@@ -61,6 +84,7 @@ func _run() -> void:
 		_check(JSON.stringify(game.model.data) == before, "Audio changes no story or domain state")
 		game._resume()
 		_check(not game.opening_voice.is_active() and game._live_dialogue_queue.is_empty() and game.opening_voice.face == null, "Closing dialog removes all audio and face ownership")
+		_check(not figure._face._audio_jaw_owned and not figure._cinematic_detail, "Closing restores the actor's usual expression and LOD ownership")
 		game.screen = "village_dialog"
 		game._play_live_dialogue(str(first.text),"silvanus",figure)
 		_check(not game.opening_voice.is_active(), "Text cannot play as wrong speaker")

@@ -1133,6 +1133,12 @@ func _distance_lod(distance: float) -> int:
 	return level
 
 
+# Private ownership transfer from Main's single dialogue player. Preserve
+# facial expressions, body locomotion and the existing imported model.
+func _set_speech_mouth_authority(enabled: bool) -> void:
+	_face._set_audio_jaw_owner(enabled)
+
+
 func set_cinematic_detail(enabled: bool) -> void:
 	if _cinematic_detail == enabled:
 		return

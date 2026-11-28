@@ -1,7 +1,7 @@
 name: IMPERATHEN live NPC dialogue and film ownership
 on:
   push:
-    branches: ['feature/astra-sol-live-npc-dialogue-20261128']
+    branches: ['feature/astra-sol-live-npc-dialogue-20261128', 'fix/astra-sol-speech-face-authority-20261128']
 permissions:
   contents: read
 jobs:
@@ -38,7 +38,7 @@ jobs:
           set -euo pipefail
           node tools/architecture/test_index.mjs
           node tools/architecture/build_index.mjs --check
-          python3 tools/check_prototype.py --godot "$GODOT_BIN" --only import opening_voice dialogue_lipsync live_npc_voice npc_behavior_ui i01_flow --keep-going --report artifacts/live-npc-voice/engine
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --only import opening_voice dialogue_lipsync live_npc_voice npc_behavior_ui i01_flow hero_faces facial_lifecycle --keep-going --report artifacts/live-npc-voice/engine
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
