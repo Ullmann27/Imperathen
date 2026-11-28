@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 247,
+  "version": 248,
   "tasks": [
     {
       "id": "K101",
@@ -1282,6 +1282,20 @@
         ".github/workflows/aeterna-i02-basket-production.yml"
       ],
       "note": "Actual Kimi run 46113029476 failed: original youth not staged, GLB height assertion used only first primitive (0.3083849549 vs actual all primitive max 0.308640450239), actor_position Vector2 passed to set_player_position Vector3; timeout124. New isolated successor fix/aeterna-i02-basket-qa-20261128. Correct fixture, stage exact original civil youth via existing authorized scripts, check exact LODs, real Hand_L and all geometry, preserve 1mm/0.2mm thresholds and existing checks. No change to original Kimi module, original GitLab branch, main or runtime wiring. No private asset publication, new provider requests or costs. Actual test required."
+    },
+    {
+      "id": "FACIAL-LOD-NEUTRAL-LIFECYCLE",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "8a8256a30145918739312588d70c4585768fa568",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/visuals/facial_motion.gd",
+        "prototype/tests/facial_motion_lifecycle_test.gd",
+        ".github/workflows/aeterna-facial-motion-lifecycle.yml"
+      ],
+      "access": "edit",
+      "note": "M15: facial_motion.advance currently returns at detail >=2 without neutralising previously uploaded shapes; same-identity rebinding retains values, root MeshInstance3D omitted. Implement one-shot LOD neutralisation, root mesh binding and Godot lifecycle regression (no lip-sync changes), isolated branch fix/aeterna-facial-lod-lifecycle-20261128. No release."
     }
   ]
 }
