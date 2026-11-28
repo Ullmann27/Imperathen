@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 237,
+  "version": 238,
   "tasks": [
     {
       "id": "K101",
@@ -1156,7 +1156,7 @@
       "id": "TRIBAL-SOLE-TOPOLOGY",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de",
       "run_id": "46108009771",
       "scope": [
@@ -1166,7 +1166,7 @@
         "prototype/tests/formation_agents_test.gd",
         ".github/workflows/aeterna-tribal-sole-topology.yml"
       ],
-      "note": "Masterplan phase01, independent of discontinued USE AI. Actual pinned far GLB b370b05d, 885 triangles, one material. Raw static heel vertex distance 83.102mm but nearest true existing surface triangle 17.038mm. Geometry-only conforming transverse foot-edge midpoint splits (existing shader x-dependent deformation), not selected by test probes, all incident UV seam faces split, preserve original positions/material atlas/rest surface and 900-triangle cap. Simulated source geometry width-priority 899 triangles, neutral original proxy distances 17.687/20.107/8.004/15.712mm; no Godot pass claim. Isolated candidate from verified body-sweep, exact wheel test blob from b3cdf9 and static diagnostic from 2612b0; rerun original 40mm plus full motion gates. No preview/main or production APK. Actual commit 603e4354ddfcd1545d26e6d695239f9efe6876f0, new exact GLB blob c961a42abd5f1cc20c239baf4fa285bad0238a0e; five-file compare/readback verified. 885->899 triangles, 2655->2669 vertices, atlas identical, one material, max parent rest area deviation 1.57e-9m2, max transverse width 171.81->89.95mm. Exact wheel/static test blobs a974a711/7d52d118. Actual CI 46108009771 in_progress, no Godot/visual/device success claim."
+      "note": "Actual run 46108009771/job 140865000420 failed only LOD foot gates. Committed forest_spear GLB reproduced byte-identically. Static idle 16/16 pass (max20.107mm); block 16/16 still fail (46.981mm, prior92.799mm). Full 87/89, large20/22; original root/phase gates, wheel attribution, contact28/28, authority27/27, commands411/411, rules146/146, muster133/133 pass. Worst remaining full cases all forest_swordsman 84.59–85.89mm. Source body pose block/wall/testudo actually bends left thigh -17deg and shin +27deg; far shader omitted both. Preserve candidate and 40mm limit; no full acceptance."
     },
     {
       "id": "YOUTH-ARMOUR-SOURCE-MAPPING",
@@ -1195,6 +1195,23 @@
         "prototype/tests/city_surface_microdetail_test.gd"
       ],
       "note": "Actual forum render review V1/V2: candidate 46106720404 success; ZIP digests verified against GitHub and all six new image hashes matched. Forum joint correction visible; fountain remains artificial saturated cyan. Isolated follow-up on #199, exact authored Forum_Fountain/Northern_Fountain and Water_Surface only; preserve geometry, texture references and all collision/LOD. Nonmetal muted water, no new draw calls or lighting budgets. Existing microdetail fixture extended for shared mesh, targeted override, unchanged stone and reapplication; existing real city capture and focused CI via draft PR. No new provider request, no device or RQG approval. Actual commit 077075ed08e1e90ee4b865d10bb66437f187b4ac, three-file compare +103/-1, draft PR #200 targeting #199 branch. Actual focused job 140865627711 in_progress, render job 140865627831 on run 46108205477 in_progress, combined details 46108205494 and isolated QA 46108205480 observed. Real water target count and V2/V3 image difference still to verify; no tests or device pass yet."
+    },
+    {
+      "id": "TRIBAL-GUARD-POSE",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "603e4354ddfcd1545d26e6d695239f9efe6876f0",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/visuals/far_ranks.gd",
+        "prototype/shaders/rank_stride.gdshader",
+        "prototype/tests/tribal_lod_contract_test.gd",
+        "prototype/assets/germanic_warriors/forest_swordsman_far.glb",
+        "prototype/assets/germanic_warriors/forest_skirmisher_far.glb",
+        ".github/workflows/aeterna-tribal-sole-topology.yml"
+      ],
+      "note": "Independent actual game patch on new branch from 603e435. Mirror the canonical company authoring guard pose (block/wall/testudo) using left thigh/shin pivot rotations with lower-leg/hip spatial blending in both CPU and shader; exact source-derived ground lift, not arbitrary probe tuning. Add direct actual rig comparison for guard and existing static gate. Apply same proven conforming transverse midpoint topology refinement to other two original tribal far GLBs, keep 900 triangles/one material/atlas. Reproduce all three binaries, retain every original 40mm and full formation check. No main/Preview/APK until green. GitLab read-only connected, no IMPERATHEN project; do not touch unrelated projects or bypass quotas."
     }
   ]
 }
