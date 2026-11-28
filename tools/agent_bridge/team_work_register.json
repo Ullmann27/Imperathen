@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 215,
+  "version": 216,
   "tasks": [
     {
       "id": "K101",
@@ -1017,15 +1017,15 @@
       "id": "FORMATION-AGGREGATE-ROCK-ROUTE",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
-      "revision": "7801b0cf1dfef7f1d1b544fe92025f1261b15cab",
-      "run_id": null,
+      "status": "submitted",
+      "revision": "c1bb82e924e8d936300851e72bfcb4aefb5918fa",
+      "run_id": "46103496405",
       "scope": [
         "prototype/scripts/formation/formation_agents.gd",
         "prototype/tests/formation_contact_trace_test.gd",
         ".github/workflows/aeterna-formation-contact-trace.yml"
       ],
-      "note": "Masterplan 01.4. Isolated follow-up on contact trace branch: replace unconstrained level-C direct movement with bounded step verified against existing rock clearance and tangential obstacle route. Preserve authoritative slots, identities, caps, rules, existing 0.04 m LOD, root/phase gates; add direct two-direction rock crossing checks and actual 180 replay. No Preview integration before relevant green tests. N31 read-only and separate; no duplicate model calls."
+      "note": "Masterplan 01.4. Isolated follow-up on contact trace branch: replace unconstrained level-C direct movement with bounded step verified against existing rock clearance and tangential obstacle route. Preserve authoritative slots, identities, caps, rules, existing 0.04 m LOD, root/phase gates; add direct two-direction rock crossing checks and actual 180 replay. No Preview integration before relevant green tests. N31 read-only and separate; no duplicate model calls. Actual commit c1bb82e924e8d936300851e72bfcb4aefb5918fa, exact compared 3 files only: formation_agents.gd, existing contact trace test and its workflow. Eight direct obstacle routes in both directions plus actual UID clearance, original root/phase thresholds, original 60/180 formation, battle command/rules, slot authority and muster tests. Actual run 46103496405 observed in_progress/job 140850982025. No successful test claim. No new APK or Preview write. N31 rejected as invalid, no duplicate provider dispatch."
     }
   ]
 }
