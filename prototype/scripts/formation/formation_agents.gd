@@ -537,14 +537,14 @@ static func _index(p: Vector2) -> int:
 	return clampi(floori(p.x) + 28, 0, GRID_W - 1) * GRID_H + clampi(floori(p.y) + 22, 0, GRID_H - 1)
 
 
-func _build_grid() -> void:
+func _build_grid(include_aggregate: bool = false) -> void:
 	for side: String in _used:
 		var cells: Array = _cells[side]
 		for index in _used[side]:
 			cells[index].clear()
 		_used[side] = PackedInt32Array()
 	for a: Agent in agents.values():
-		if a.level == LEVEL_C:
+		if a.level == LEVEL_C and not include_aggregate:
 			continue
 		if not _cells.has(a.side):
 			var cells := []
@@ -639,7 +639,9 @@ func _substep() -> void:
 			continue
 		_update_frame(u, f)
 		_update_charge(u)
-	_build_grid()
+	# Physical root occupancy includes cheap level-C agents. Steering and
+	# post-step contact solving retain their original individual-level scope.
+	_build_grid(true)
 	for a: Agent in agents.values():
 		a.prev_pos = a.pos
 		a.prev_yaw = a.yaw
@@ -702,7 +704,7 @@ func _aggregate_member(a: Agent) -> void:
 	var goal: Vector2 = u.slot_world[a.slot]
 	if a.leaving:
 		goal = a.pos + Vector2(-sin(u.facing), -cos(u.facing)) * 3.0
-	a.pos = _aggregate_step(a.pos, Field.project(goal), a.l_run * DT)
+	a.pos = _body_step(a, _aggregate_step(a.pos, Field.project(goal), a.l_run * DT))
 	a.vel = (a.pos - a.prev_pos) / DT
 	a.speed = a.vel.length()
 	a.yaw = rotate_toward(a.yaw, atan2(a.vel.x, a.vel.y) if a.speed > 0.1 else u.facing + PI, a.l_turn * DT)
@@ -868,7 +870,52 @@ func _integrate(a: Agent) -> void:
 	var rate := a.l_accel if absf(wanted) > absf(a.speed) and wanted * a.speed >= 0.0 else a.l_brake
 	a.speed = move_toward(a.speed, wanted, rate * DT)
 	a.vel = forward * a.speed
-	a.pos += a.vel * DT
+	var start := a.pos
+	a.pos = _body_step(a, start + a.vel * DT)
+	# Keep the commanded speed/acceleration authority. Contact forecasting
+	# uses actual travel, and animation already measures actual displacement.
+	a.vel = (a.pos - start) / DT
+
+
+## Clip the proposed root segment against occupied body circles before moving.
+## The grid contains the start-of-tick positions of all detail levels; use
+## current positions for the actual sweep so later agents see earlier moves.
+## Existing per-tick travel and hard spacing limits are never increased.
+func _body_step(a: Agent, target: Vector2) -> Vector2:
+	var start := a.pos
+	var travel := target - start
+	var length_squared := travel.length_squared()
+	if length_squared <= 0.000000000001:
+		return start
+	var length := sqrt(length_squared)
+	var fraction := 1.0
+	_gather(a.side, true, start, 2, _friends)
+	_gather(a.side, false, start, 2, _foes)
+	_friends.append_array(_foes)
+	for other: Agent in _friends:
+		if other == a:
+			continue
+		var radius := HARD_SAME_M if a.side == other.side else HARD_ENEMY_M
+		var offset := start - other.pos
+		var distance_squared := offset.length_squared()
+		if distance_squared > (radius + length) * (radius + length):
+			continue
+		var approach := offset.dot(travel)
+		# Legacy overlap can only move outward. The existing contact resolver
+		# still handles separation; the sweep must not worsen it.
+		if distance_squared < radius * radius:
+			if approach < 0.0:
+				fraction = 0.0
+			continue
+		if approach >= 0.0:
+			continue
+		var discriminant := approach * approach - length_squared * (distance_squared - radius * radius)
+		if discriminant <= 0.0:
+			continue
+		var entry := (-approach - sqrt(discriminant)) / length_squared
+		if entry >= 0.0 and entry <= fraction:
+			fraction = maxf(0.0, entry - 0.0001 / length)
+	return start + travel * fraction
 
 
 func _avoid(a: Agent, desired: Vector2) -> Vector2:
@@ -883,6 +930,8 @@ func _avoid(a: Agent, desired: Vector2) -> Vector2:
 		# charge can brake before contact.
 		_gather(a.side, false, a.pos, 3, _foes)
 		for b: Agent in _foes:
+			if b.level == LEVEL_C:
+				continue
 			var offset := a.pos - b.pos
 			var d := offset.length()
 			nearest_foe = minf(nearest_foe, d)
@@ -901,7 +950,7 @@ func _avoid(a: Agent, desired: Vector2) -> Vector2:
 			clamps.append([-direction, maxf(0.0, allowed)])
 	_gather(a.side, true, a.pos, 1, _friends)
 	for b: Agent in _friends:
-		if b == a:
+		if b == a or b.level == LEVEL_C:
 			continue
 		var offset := a.pos - b.pos
 		var d := offset.length()

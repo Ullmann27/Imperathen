@@ -1,7 +1,7 @@
-name: Aeterna focused formation contact trace
+name: Aeterna formation body sweep and complete motion regression
 on:
   push:
-    branches: ['fix/aeterna-formation-contact-trace-20261128']
+    branches: ['fix/aeterna-formation-body-sweep-20261128']
 permissions:
   contents: read
 jobs:

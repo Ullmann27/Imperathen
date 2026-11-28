@@ -87,8 +87,40 @@ func _aggregate_routes() -> void:
 			check(legal, "Rock %d side %+.0f: every actual aggregate segment clears the original obstacle" % [i, sign])
 			check(longest <= stride + 0.00001 and at.distance_to(goal) <= 0.002, "Rock %d side %+.0f: bounded route reaches its opposite endpoint" % [i, sign])
 
+## Exercise actual broadphase/sweep with both directions of a C/B promotion,
+## original hard spacing, free travel and a legacy overlap escaping outward.
+func _body_sweep_cases() -> void:
+	var system := Agents.new()
+	var a := Agents.Agent.new()
+	var b := Agents.Agent.new()
+	a.uid = "sweep_a"
+	b.uid = "sweep_b"
+	a.side = "ally"
+	b.side = "enemy"
+	a.pos = Vector2(-1, 0)
+	b.pos = Vector2.ZERO
+	system.agents[a.uid] = a
+	system.agents[b.uid] = b
+	for level: int in [Agents.LEVEL_B, Agents.LEVEL_C]:
+		a.level = level
+		b.level = Agents.LEVEL_C if level == Agents.LEVEL_B else Agents.LEVEL_B
+		system._build_grid(true)
+		var hit := system._body_step(a, Vector2(-.6, 0))
+		check(hit.distance_to(b.pos) >= Agents.HARD_ENEMY_M and hit.distance_to(a.pos) <= .4 and hit.x > a.pos.x, "B/C swept contact stops at original enemy clearance")
+		check(system._body_step(a, Vector2(-1, .4)).is_equal_approx(Vector2(-1, .4)), "Unobstructed tangent travel remains unchanged")
+	b.side = "ally"
+	a.pos = Vector2(-.8, 0)
+	system._build_grid(true)
+	var friendly := system._body_step(a, Vector2(-.4, 0))
+	check(friendly.distance_to(b.pos) >= Agents.HARD_SAME_M and friendly.x > a.pos.x, "Friendly sweep preserves original hard body spacing")
+	a.pos = Vector2(-.5, 0)
+	system._build_grid(true)
+	check(system._body_step(a, Vector2(-.4, 0)).is_equal_approx(a.pos), "Legacy overlap cannot deepen")
+	check(system._body_step(a, Vector2(-.9, 0)).is_equal_approx(Vector2(-.9, 0)), "Legacy overlap may escape outward without teleport")
+
 func _run() -> void:
 	_aggregate_routes()
+	_body_sweep_cases()
 	var v = Valley.new()
 	for s: Dictionary in v.model.squads.values().duplicate():
 		v.model._add_squad(s.id, s.name, s.side, s.kind, s.formation, Vector2(s.x, s.z), s.strength * 3)
