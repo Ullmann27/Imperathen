@@ -1,0 +1,6 @@
+extends SceneTree
+func _initialize() -> void:
+	for method: Dictionary in RenderingServer.get_method_list():
+		if method.name in ["mesh_add_surface", "mesh_get_surface", "mesh_surface_get_format_offset", "mesh_surface_get_format_vertex_stride"]:
+			print(method.name, " ", method.args.map(func(a: Dictionary) -> String: return a.name))
+	quit()

@@ -1,0 +1,1 @@
+FORMATION_STRIDE_RESULT {"checks":3445,"exceeding":26,"expected_samples":798,"failures":26,"max_proxy_jump_m":0.0477375835180283,"samples":798}

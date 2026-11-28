@@ -1,0 +1,2071 @@
+extends RefCounted
+## Authoritative life simulation of the city.
+##
+## Technique (sources in docs/29_living_city/RESEARCH.md): a discrete-event
+## simulation. Every resident has exactly one pending wake-up; a wake-up ends
+## an activity and chooses the next one from the resident's daily schedule
+## (role, hours) and a utility score over needs (hunger, company, piety) and
+## what the surroundings offer (activity anchors with free slots). Between
+## wake-ups nothing is computed: a resident's position is a pure function of
+## time along a street-graph route, so the same world state exists whether or
+## not anybody is rendered. Events are processed in strict (time, resident)
+## order; the per-frame time budget only limits how many are processed now,
+## never their order, so results do not depend on frame rate.
+##
+## `state` holds only JSON-safe integers, strings, booleans, arrays and
+## dictionaries. Money is counted in quadrantes and only moves through
+## `_pay`; goods only through `_goods`. `audit()` proves both conserve.
+
+const Calendar = preload("res://scripts/domain/world_calendar.gd")
+const LocalWeather := preload("res://scripts/domain/local_weather.gd")
+const Anchors = preload("res://scripts/domain/city_anchors.gd")
+const Streets = preload("res://scripts/domain/city_streets.gd")
+const Population = preload("res://scripts/domain/city_population.gd")
+const Social = preload("res://scripts/domain/city_social.gd")
+
+const VERSION := 2
+const ECONOMY_PATH := "res://assets/city/economy/city_economy.json"
+const DAY := 86400
+const SYS_DAY := 8190
+const SYS_WEATHER := 8189
+const KEY := 8192
+const MAX_EVENTS := 320
+const CLOSE_HOUR := 3
+const INDOOR_ACTS := ["home", "sleep", "visit", "away", "flee"]
+const SOCIAL_KINDS := ["gossip_spot", "fountain", "tavern_seat", "play_spot"]
+const WORK_ROLES := ["vendor", "craft"]
+const EARNER_ROLES := ["vendor", "craft", "guard", "porter", "labourer", "patron"]
+const OUTDOOR_LEISURE := ["gossip", "play", "stroll", "beg", "water"]
+const TILL_FLOAT := 400
+const WEATHER := ["clear", "cloudy", "rain", "mist", "storm"]
+const WEATHER_SAMPLE_SECONDS := 300
+
+var state: Dictionary = {}
+var index: Dictionary = {}
+var streets: Streets
+var economy: Dictionary = {}
+var error := ""
+var year := -58
+## Presentation may narrow anchors to scene nodes that exist (requires_node).
+var present_nodes: Callable = Callable()
+
+var _heap: Array[int] = []
+var _occupancy := {}
+var _usable := {}
+var _by_kind := {}
+var _near_cache := {}
+var _anchor_hashes: Dictionary[String, int] = {}
+var _sellers := {}
+var _exits: Array[String] = []
+var _processed_total := 0
+
+
+# --- construction, save and load --------------------------------------------
+
+func setup_data() -> bool:
+	index = Anchors.load_all()
+	if not index.ok:
+		error = "activity anchors invalid: " + str(index.errors.slice(0, 3))
+		return false
+	streets = Streets.new()
+	if not streets.load_graph():
+		error = streets.error
+		return false
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(ECONOMY_PATH)) if FileAccess.file_exists(ECONOMY_PATH) else null
+	if not parsed is Dictionary or parsed.get("format") != "imperathen-city-economy":
+		error = "city economy data missing or invalid"
+		return false
+	economy = _canon(parsed)
+	return true
+
+
+## Founds a new city at the given calendar instant.
+func found(seed: int, jdn: int, second_of_day: int) -> bool:
+	if index.is_empty() and not setup_data():
+		return false
+	year = Calendar.year_of(jdn)
+	_index_anchors()
+	var founded := Population.found(seed, index, _usable.keys(), economy, year)
+	state = {"version": VERSION, "seed": seed, "origin_jdn": jdn, "t": second_of_day, "now": second_of_day,
+		"residents": founded.residents, "households": founded.households, "businesses": founded.businesses,
+		"relations": founded.relations, "external": {"hinterland": 0, "export": 0, "estates": 0, "aerarium": 0, "player": 0},
+		"money_total": 0, "ledger": {}, "flow": {}, "events": [], "event_seq": 0, "jobs": [], "weather": "clear",
+		"weather_forced": false, "next_job": 0, "sys": {"day": 0, "weather": 0, "stage": 0, "hungry": 0}, "news": 0, "closed_day": -1,
+		"stats": {"purchases": 0, "conversations": 0, "deliveries": 0, "thefts": 0, "marriages": 0, "job_changes": 0, "moves": 0, "alms": 0, "hungry_households": 0}}
+	for good: String in economy.goods:
+		state.flow[good] = {"start": 0, "in": 0, "made": 0, "sold": 0, "out": 0}
+	for business: Dictionary in state.businesses:
+		for good: String in business.stock:
+			state.flow[good].start += int(business.stock[good])
+	for hh in state.households.size():
+		_choose_shopper(state.households[hh])
+		_stock_pantry(state.households[hh])
+	state.money_total = _money_sum()
+	state = _canon(state)
+	Social.restore(state)
+	_rebuild_runtime()
+	var first_close := (second_of_day / DAY) * DAY + CLOSE_HOUR * 3600
+	if first_close <= second_of_day:
+		first_close += DAY
+	state.sys.day = first_close
+	state.sys.weather = second_of_day
+	_push(first_close * KEY + SYS_DAY)
+	_push(second_of_day * KEY + SYS_WEATHER)
+	for person in state.residents.size():
+		_schedule(person, second_of_day + 1 + person % 90)
+	return true
+
+
+func save_state() -> Dictionary:
+	return state.duplicate(true)
+
+
+func load_state(saved: Variant) -> bool:
+	if index.is_empty() and not setup_data():
+		return false
+	var problem := validate(saved)
+	if not problem.is_empty():
+		error = problem
+		return false
+	state = _canon((saved as Dictionary).duplicate(true))
+	Social.restore(state)
+	year = Calendar.year_of(int(state.origin_jdn) + int(state.now) / DAY)
+	_index_anchors()
+	for resident: Dictionary in state.residents:
+		if not _usable.has(resident.at) or not _usable.has(resident.prev) or int(resident.slot) < -1 or int(resident.slot) >= int(index.anchors[resident.at].capacity):
+			error = "Unbekannter oder nicht nutzbarer Aufenthaltsort eines Einwohners."
+			return false
+	for household: Dictionary in state.households:
+		if not _usable.has(household.get("home")):
+			error = "Die Wohnung eines Haushalts fehlt."
+			return false
+	_rebuild_runtime()
+	# Old saves may still have a three-hour weather appointment. Bring only
+	# that future appointment forward; never alter residents or booked trade.
+	state.sys.weather = mini(int(state.sys.weather), (floori(float(state.t)/WEATHER_SAMPLE_SECONDS)+1)*WEATHER_SAMPLE_SECONDS)
+	_push(int(state.sys.day) * KEY + SYS_DAY)
+	_push(int(state.sys.weather) * KEY + SYS_WEATHER)
+	for person in state.residents.size():
+		_push(int(state.residents[person].wake) * KEY + person)
+	return true
+
+
+static func validate(saved: Variant) -> String:
+	if not saved is Dictionary or not Calendar.is_integral(saved.get("version")) or int(saved.version) not in [1, VERSION]:
+		return "Unbekannter Stadtstand."
+	for key: String in ["seed", "origin_jdn", "t", "now", "money_total", "event_seq", "next_job", "news", "closed_day"]:
+		if not Calendar.is_integral(saved.get(key)):
+			return "Ungültige Stadtzeit oder Zähler: " + key
+	if saved.t < 0 or saved.now < saved.t or saved.origin_jdn < 0 or saved.origin_jdn + int(saved.now) / DAY > Calendar.max_jdn():
+		return "Stadtzeit außerhalb des Weltkalenders."
+	for key: String in ["residents", "households", "businesses", "jobs", "events", "relations"]:
+		if not saved.get(key) is Array:
+			return "Stadtregister fehlt: " + key
+	for key: String in ["flow", "sys", "stats", "external", "ledger"]:
+		if not saved.get(key) is Dictionary:
+			return "Stadtbuch fehlt: " + key
+	if not saved.external.has_all(["hinterland", "export", "estates", "aerarium", "player"]) or not saved.sys.has_all(["day", "weather", "stage", "hungry"]) or saved.get("weather") not in WEATHER or not saved.get("weather_forced") is bool:
+		return "Kalenderdienst, Wetter oder externe Konten fehlen."
+	if saved.residents.is_empty() or saved.residents.size() >= SYS_WEATHER or saved.events.size() > MAX_EVENTS or saved.relations.size() != Population.RELATION_SHARDS:
+		return "Ungültige Größe des Stadtregisters."
+	var people := {}
+	for number in saved.residents.size():
+		var person: Variant = saved.residents[number]
+		if not person is Dictionary or not person.has_all(["hh", "name", "act", "at", "prev", "slot", "wake", "birth_year", "purse", "role", "job", "bag", "errand", "known"]) or not person.get("traits") is Array or person.traits.size() != 5:
+			return "Ungültiges Personenregister."
+		if not Calendar.is_integral(person.hh) or not Calendar.is_integral(person.slot) or not Calendar.is_integral(person.wake) or not Calendar.is_integral(person.purse) or person.purse < 0:
+			return "Ungültiger Einwohnerzustand."
+		people[Population.resident_id(number)] = true
+	var relation_error := Social.validate_saved(saved, people, int(saved.t) / DAY / 7)
+	if not relation_error.is_empty():
+		return relation_error
+	for household: Variant in saved.households:
+		if not household is Dictionary or not household.get("members") is Array or not Calendar.is_integral(household.get("funds")) or household.funds < 0:
+			return "Haushalt beschädigt."
+		for member: Variant in household.members:
+			if not Calendar.is_integral(member) or int(member) < 0 or int(member) >= saved.residents.size():
+				return "Haushalt verweist auf unbekannte Person."
+	var cash := 0
+	for amount: Variant in saved.external.values():
+		if not Calendar.is_integral(amount):
+			return "Ungültiges Außenkonto."
+		cash += int(amount)
+	for resident: Dictionary in saved.residents:
+		cash += int(resident.purse)
+	for household: Dictionary in saved.households:
+		cash += int(household.funds)
+	var stock := {}
+	for good: String in saved.flow:
+		var flow: Variant = saved.flow[good]
+		if not flow is Dictionary or not flow.has_all(["start", "in", "made", "sold", "out"]):
+			return "Ungültiger Warenfluss."
+		for amount: Variant in flow.values():
+			if not Calendar.is_integral(amount) or amount < 0:
+				return "Ungültige Warenmenge."
+		stock[good] = 0
+	for business: Variant in saved.businesses:
+		if not business is Dictionary or not business.has_all(["anchor", "queue", "shop", "price", "type", "node", "stock", "owner"]) or not business.get("staff") is Array or not business.stock is Dictionary or not Calendar.is_integral(business.get("till")) or business.till < 0:
+			return "Betrieb beschädigt."
+		if not Calendar.is_integral(business.owner) or business.owner < -1 or business.owner >= saved.households.size() or not business.get("open") is Array or business.open.size() != 2:
+			return "Betrieb ohne gültige Eigentums- oder Öffnungsdaten."
+		for employee: Variant in business.staff:
+			if not Calendar.is_integral(employee) or employee < 0 or employee >= saved.residents.size():
+				return "Betrieb mit unbekannter Arbeitskraft."
+		for good: String in business.stock:
+			var amount: Variant = business.stock[good]
+			if not stock.has(good) or not Calendar.is_integral(amount) or amount < 0:
+				return "Ungültiger Betriebsbestand."
+			stock[good] += int(amount)
+		cash += int(business.till)
+	if cash != int(saved.money_total):
+		return "Die Stadtgeldbilanz stimmt nicht."
+	for job: Variant in saved.jobs:
+		if not job is Dictionary or not job.get("goods") is Dictionary or not Calendar.is_integral(job.get("business")) or job.business < 0 or job.business >= saved.businesses.size():
+			return "Ungültiger Transportauftrag."
+		if job.get("state") == "carried":
+			for good: String in job.goods:
+				if not stock.has(good) or not Calendar.is_integral(job.goods[good]) or job.goods[good] < 0:
+					return "Ungültiges Transportgut."
+				stock[good] += int(job.goods[good])
+	for good: String in stock:
+		var flow: Dictionary = saved.flow[good]
+		if stock[good] != int(flow.start + flow["in"] + flow.made - flow.sold - flow.out):
+			return "Die Stadtwarenbilanz stimmt nicht."
+	var seen := {}
+	for hh in saved.households.size():
+		for member: Variant in saved.households[hh].members:
+			if seen.has(int(member)):
+				return "Person gehört zu zwei Haushalten."
+			seen[int(member)] = true
+			if int(saved.residents[int(member)].get("hh", -1)) != hh:
+				return "Person und Haushalt widersprechen sich."
+	if seen.size() != saved.residents.size():
+		return "Person ohne Haushalt."
+	return ""
+
+
+## Integral floats become ints so a JSON round trip reproduces the state.
+static func _canon(value: Variant) -> Variant:
+	match typeof(value):
+		TYPE_FLOAT:
+			return int(value) if value == floorf(value) and absf(value) < 9.0e15 else value
+		TYPE_DICTIONARY:
+			for key: Variant in value:
+				value[key] = _canon(value[key])
+		TYPE_ARRAY:
+			for slot in value.size():
+				value[slot] = _canon(value[slot])
+	return value
+
+
+## A newly available historical building may be added to the index. Retiring
+## an occupied district needs a settlement migration, so preserve its people.
+func enter_year(next_year: int) -> bool:
+	var available := {}
+	for id: String in Anchors.usable(index, next_year, present_nodes):
+		available[id] = true
+	for id: String in _usable:
+		if not available.has(id):
+			return false
+	year = next_year
+	_index_anchors()
+	return true
+
+
+func _index_anchors() -> void:
+	_usable.clear()
+	_by_kind.clear()
+	_near_cache.clear()
+	_anchor_hashes.clear()
+	_exits.clear()
+	for id: String in Anchors.usable(index, year, present_nodes):
+		_usable[id] = true
+		_anchor_hashes[id] = Population.fnv(id)
+		var anchor: Dictionary = index.anchors[id]
+		if not _by_kind.has(anchor.kind):
+			_by_kind[anchor.kind] = []
+		_by_kind[anchor.kind].append(id)
+		if Anchors.has_tag(anchor, "city_exit"):
+			_exits.append(id)
+
+
+func _rebuild_runtime() -> void:
+	_heap.clear()
+	_occupancy.clear()
+	_sellers.clear()
+	for number in state.businesses.size():
+		for good: String in state.businesses[number].stock:
+			if not _sellers.has(good):
+				_sellers[good] = []
+			_sellers[good].append(number)
+	for person in state.residents.size():
+		var resident: Dictionary = state.residents[person]
+		if int(resident.slot) >= 0:
+			_slots(resident.at)[int(resident.slot)] = person
+
+
+# --- time -------------------------------------------------------------------
+
+static func hour_of(t: int) -> float:
+	return float(posmod(t, DAY)) / 3600.0
+
+
+func clock() -> Dictionary:
+	return Calendar.advance_clock(Calendar.new_clock(int(state.origin_jdn), 0), int(state.now))
+
+
+## Advances the world to `now` (seconds since the origin day began), spending
+## at most `budget_usec` of real time. Returns what is still outstanding.
+func advance_to(now: int, budget_usec: int = 2000) -> Dictionary:
+	if now > int(state.now):
+		state.now = now
+	var started := Time.get_ticks_usec()
+	var processed := 0
+	var limit := int(state.now)
+	while not _heap.is_empty():
+		var top := _heap[0]
+		var t := top / KEY
+		if t > limit:
+			break
+		_pop()
+		var actor := top % KEY
+		if actor == SYS_DAY:
+			if t == int(state.sys.day):
+				state.t = t
+				_close_day(t)
+		elif actor == SYS_WEATHER:
+			if t == int(state.sys.weather):
+				state.t = t
+				_weather_tick(t)
+		elif t == int(state.residents[actor].wake):
+			state.t = t
+			_wake(actor, t)
+		else:
+			continue
+		processed += 1
+		# Yield between individual events; the previous batch could overshoot by seven events.
+		if budget_usec > 0 and Time.get_ticks_usec() - started >= budget_usec:
+			break
+	var pending := not _heap.is_empty() and _heap[0] / KEY <= limit
+	if not pending:
+		state.t = limit
+	_processed_total += processed
+	return {"done": not pending, "processed": processed, "lag_seconds": limit - int(state.t), "usec": Time.get_ticks_usec() - started}
+
+
+func advance(seconds: int, budget_usec: int = 2000) -> Dictionary:
+	return advance_to(int(state.now) + seconds, budget_usec)
+
+
+func _push(key: int) -> void:
+	_heap.append(key)
+	var child := _heap.size() - 1
+	while child > 0:
+		var parent := (child - 1) >> 1
+		if _heap[parent] <= key:
+			break
+		_heap[child] = _heap[parent]
+		child = parent
+	_heap[child] = key
+
+
+func _pop() -> void:
+	var last: int = _heap.pop_back()
+	var size := _heap.size()
+	if size == 0:
+		return
+	var parent := 0
+	while true:
+		var child := parent * 2 + 1
+		if child >= size:
+			break
+		if child + 1 < size and _heap[child + 1] < _heap[child]:
+			child += 1
+		if _heap[child] >= last:
+			break
+		_heap[parent] = _heap[child]
+		parent = child
+	_heap[parent] = last
+
+
+func _schedule(person: int, t: int) -> void:
+	state.residents[person].wake = t
+	_push(t * KEY + person)
+
+
+func _roll(person: int, salt: int) -> int:
+	var resident: Dictionary = state.residents[person]
+	resident.n = int(resident.n) + 1
+	return Population.mix(int(state.seed), person, int(resident.n), salt)
+
+
+# --- anchors, slots and travel ----------------------------------------------
+
+func _slots(anchor_id: String) -> Array:
+	if not _occupancy.has(anchor_id):
+		var slots := []
+		slots.resize(int(index.anchors[anchor_id].capacity))
+		slots.fill(-1)
+		_occupancy[anchor_id] = slots
+	return _occupancy[anchor_id]
+
+
+func _free_slots(anchor_id: String) -> int:
+	if not _occupancy.has(anchor_id):
+		return int(index.anchors[anchor_id].capacity)
+	return _occupancy[anchor_id].count(-1)
+
+
+func occupants(anchor_id: String) -> Array:
+	var result := []
+	for person: int in _occupancy.get(anchor_id, []):
+		if person >= 0:
+			result.append(person)
+	return result
+
+
+func _release(person: int, resident: Dictionary) -> void:
+	if int(resident.slot) >= 0:
+		var slots := _slots(resident.at)
+		if int(resident.slot) < slots.size() and slots[int(resident.slot)] == person:
+			slots[int(resident.slot)] = -1
+		resident.slot = -1
+
+
+## Doorways and exits hold any number of people; every other place has slots.
+func _claim(person: int, resident: Dictionary, anchor_id: String) -> bool:
+	var kind: String = index.anchors[anchor_id].kind
+	if kind == "doorway" or kind == "entrance":
+		return true
+	var slots := _slots(anchor_id)
+	var free := slots.find(-1)
+	if free < 0:
+		return false
+	slots[free] = person
+	resident.slot = free
+	return true
+
+
+func walk_speed_cm(person: int) -> int:
+	var resident: Dictionary = state.residents[person]
+	var base := 112 + int(resident.look) % 26
+	if resident.role == "elder":
+		base -= 22
+	elif resident.role == "child":
+		base -= 8
+	return base
+
+
+func _travel_seconds(person: int, from_id: String, to_id: String) -> int:
+	if from_id == to_id:
+		return 0
+	var a: Dictionary = index.anchors[from_id]
+	var b: Dictionary = index.anchors[to_id]
+	var node_a := streets.node_for(from_id, a.position)
+	var node_b := streets.node_for(to_id, b.position)
+	var metres := streets.length(node_a, node_b)
+	if metres < 0.0:
+		metres = (a.position as Vector3).distance_to(b.position) * 1.4
+	metres += (a.position as Vector3).distance_to(streets.node_position(node_a)) + (b.position as Vector3).distance_to(streets.node_position(node_b))
+	return maxi(1, int(ceilf(metres * 100.0 / float(walk_speed_cm(person)))))
+
+
+## Starts an activity: walk to the anchor, then stay. Returns false when the
+## place has no free slot (the caller then picks something else).
+func _go(person: int, resident: Dictionary, t: int, act: String, anchor_id: String, stay: int) -> bool:
+	var origin: String = resident.at
+	if anchor_id != origin or int(resident.slot) < 0:
+		_release(person, resident)
+		if not _claim(person, resident, anchor_id):
+			# Keep standing where we are; the old slot was released, so take
+			# it back if possible (a doorway always works).
+			_claim(person, resident, origin)
+			return false
+	resident.prev = origin
+	resident.at = anchor_id
+	resident.act = act
+	resident.dep = t
+	resident.arr = t + _travel_seconds(person, origin, anchor_id)
+	resident.until = int(resident.arr) + maxi(stay, 1)
+	resident.step = 0
+	resident.with = -1
+	_schedule(person, int(resident.arr))
+	return true
+
+
+func _nearest(kind: String, from_id: String, count: int = 6) -> Array:
+	var key := kind + "|" + from_id
+	if _near_cache.has(key):
+		return _near_cache[key]
+	var origin: Vector3 = index.anchors[from_id].position
+	var rows: Array = []
+	for id: String in _by_kind.get(kind, []):
+		rows.append([origin.distance_squared_to(index.anchors[id].position), id])
+	rows.sort_custom(func(a: Array, b: Array) -> bool:
+		return a[0] < b[0] if a[0] != b[0] else a[1] < b[1])
+	var result: Array = []
+	for row: Array in rows.slice(0, count):
+		result.append(row[1])
+	_near_cache[key] = result
+	return result
+
+
+func home_of(resident: Dictionary) -> String:
+	return state.households[int(resident.hh)].home
+
+
+# --- money and goods ----------------------------------------------------------
+
+func _balance(kind: String, who: Variant) -> int:
+	match kind:
+		"hh": return int(state.households[who].funds)
+		"biz": return int(state.businesses[who].till)
+		"purse": return int(state.residents[who].purse)
+	return int(state.external[who])
+
+
+func _add(kind: String, who: Variant, amount: int) -> void:
+	match kind:
+		"hh": state.households[who].funds = int(state.households[who].funds) + amount
+		"biz": state.businesses[who].till = int(state.businesses[who].till) + amount
+		"purse": state.residents[who].purse = int(state.residents[who].purse) + amount
+		_: state.external[who] = int(state.external[who]) + amount
+
+
+## The only way money moves. Residents, households and businesses cannot
+## overdraw; the outside world (external accounts) can.
+func _pay(from_kind: String, from: Variant, to_kind: String, to: Variant, amount: int, reason: String) -> bool:
+	if amount <= 0:
+		return amount == 0
+	if from_kind != "ext" and _balance(from_kind, from) < amount:
+		return false
+	_add(from_kind, from, -amount)
+	_add(to_kind, to, amount)
+	state.ledger[reason] = int(state.ledger.get(reason, 0)) + amount
+	return true
+
+
+func _money_sum() -> int:
+	var total := 0
+	for household: Dictionary in state.households:
+		total += int(household.funds)
+	for business: Dictionary in state.businesses:
+		total += int(business.till)
+	for resident: Dictionary in state.residents:
+		total += int(resident.purse)
+	for name: String in state.external:
+		total += int(state.external[name])
+	return total
+
+
+## Goods enter ("in" import, "made" production) and leave ("sold" to a
+## household or the player, "out" export, theft, spoilage) only here.
+func _goods(business: Dictionary, good: String, quantity: int, flow: String) -> void:
+	business.stock[good] = int(business.stock.get(good, 0)) + (quantity if flow in ["in", "made"] else -quantity)
+	state.flow[good][flow] = int(state.flow[good][flow]) + quantity
+
+
+## Proves conservation: money never appears or vanishes, and every unit of
+## every good is accounted for by its recorded flows.
+func audit() -> Dictionary:
+	var result := {"ok": true, "errors": [], "money": _money_sum(), "money_expected": int(state.money_total)}
+	if result.money != result.money_expected:
+		result.errors.append("money %d differs from founding total %d" % [result.money, result.money_expected])
+	for household: Dictionary in state.households:
+		if int(household.funds) < 0:
+			result.errors.append("household %s overdrawn" % household.id)
+	for business: Dictionary in state.businesses:
+		if int(business.till) < 0:
+			result.errors.append("business %s overdrawn" % business.id)
+	var stock := {}
+	for good: String in state.flow:
+		stock[good] = 0
+	for business: Dictionary in state.businesses:
+		for good: String in business.stock:
+			stock[good] += int(business.stock[good])
+			if int(business.stock[good]) < 0:
+				result.errors.append("negative stock %s at %s" % [good, business.id])
+	for job: Dictionary in state.jobs:
+		if job.state == "carried":
+			for good: String in job.goods:
+				stock[good] += int(job.goods[good])
+	for good: String in state.flow:
+		var flow: Dictionary = state.flow[good]
+		var expected := int(flow.start) + int(flow["in"]) + int(flow.made) - int(flow.sold) - int(flow.out)
+		if expected != int(stock[good]):
+			result.errors.append("%s: stock %d but flows say %d" % [good, stock[good], expected])
+	var seen := {}
+	for hh in state.households.size():
+		for member: int in state.households[hh].members:
+			if seen.has(member) or int(state.residents[member].hh) != hh:
+				result.errors.append("resident %d has a broken household link" % member)
+			seen[member] = true
+	if seen.size() != state.residents.size():
+		result.errors.append("%d residents without household" % (state.residents.size() - seen.size()))
+	result.ok = result.errors.is_empty()
+	return result
+
+
+# --- events for the visible and audible world ---------------------------------
+
+func _event(t: int, kind: String, data: Dictionary) -> void:
+	state.event_seq = int(state.event_seq) + 1
+	data["seq"] = int(state.event_seq)
+	data["t"] = t
+	data["kind"] = kind
+	state.events.append(data)
+	if state.events.size() > MAX_EVENTS:
+		state.events.pop_front()
+
+
+func events_since(seq: int) -> Array:
+	var result := []
+	for event: Dictionary in state.events:
+		if int(event.seq) > seq:
+			result.append(event)
+	return result
+
+
+# --- needs ---------------------------------------------------------------------
+
+func hunger(resident: Dictionary, t: int) -> int:
+	return clampi((t - int(resident.ate)) * 1000 / 36000, 0, 2000)
+
+
+func loneliness(resident: Dictionary, t: int) -> int:
+	return clampi((t - int(resident.talked)) * int(resident.traits[0]) / 4320, 0, 1500)
+
+
+func devotion(resident: Dictionary, t: int) -> int:
+	return clampi((t - int(resident.prayed)) * int(resident.traits[2]) / 17280, 0, 1500)
+
+
+func age(resident: Dictionary) -> int:
+	return Population.age_of(resident, year)
+
+
+# --- the daily schedule ----------------------------------------------------------
+
+func _wake_hour(person: int, resident: Dictionary) -> float:
+	var early := float(Population.mix(int(state.seed), person, 91) % 60) / 60.0
+	match resident.role:
+		"vendor", "craft", "porter", "labourer", "servant":
+			return 4.9 + early * 0.8
+		"guard":
+			return 5.2 + early * 0.5 if person % 2 == 0 else 13.5 + early
+		"child":
+			return 6.6 + early
+		"patron", "matron":
+			return 6.4 + early * 1.2
+	return 5.8 + early
+
+
+func _bed_hour(person: int, resident: Dictionary) -> float:
+	var late := float(Population.mix(int(state.seed), person, 92) % 60) / 60.0
+	match resident.role:
+		"child":
+			return 19.3 + late * 0.8
+		"guard":
+			return 20.8 + late if person % 2 == 0 else 6.3 + late * 0.4
+	return 20.6 + late * 1.6
+
+
+func _asleep_at(person: int, resident: Dictionary, hour: float) -> bool:
+	var up := _wake_hour(person, resident)
+	var down := _bed_hour(person, resident)
+	if up < down:
+		return hour < up or hour >= down
+	return hour >= down and hour < up
+
+
+func _seconds_until_hour(t: int, hour: float) -> int:
+	# One second past the hour so the caller is clearly on the far side of it.
+	var target := (int(ceilf(hour * 3600.0)) + 1) % DAY
+	var now := posmod(t, DAY)
+	return target - now if target > now else target + DAY - now
+
+
+func _wake(person: int, t: int) -> void:
+	var resident: Dictionary = state.residents[person]
+	if t < int(resident.arr):
+		# Woken early while walking (rain, alarm): carry on to the destination.
+		_schedule(person, int(resident.arr))
+		return
+	if int(resident.step) == 0:
+		resident.step = 1
+		if _arrive(person, resident, t):
+			return
+	elif resident.act == "shop" and int(resident.step) == 2:
+		if _shop_arrive(person, resident, t):
+			return
+		resident.until = t
+	if t < int(resident.until) and resident.act != "wait":
+		_schedule(person, int(resident.until))
+		return
+	_finish(person, resident, t)
+	_decide(person, resident, t)
+
+
+## Called once on arrival. Returns true when it scheduled the next wake itself.
+func _arrive(person: int, resident: Dictionary, t: int) -> bool:
+	match resident.act:
+		"home", "sleep", "flee":
+			_come_home(person, resident, t)
+		"shop":
+			if _shop_arrive(person, resident, t):
+				return true
+			resident.until = t
+		"gossip", "water", "play", "stroll", "tavern", "pray":
+			if resident.act == "tavern":
+				_tavern_order(person, resident, t)
+			if resident.act == "pray":
+				resident.prayed = t
+			_try_talk(person, resident, t)
+		"haul":
+			return _haul_step(person, resident, t)
+		"steal":
+			_theft(person, resident, t)
+		"vend", "work":
+			_open_shop(person, resident, t)
+	return false
+
+
+func _finish(person: int, resident: Dictionary, t: int) -> void:
+	match resident.act:
+		"vend", "work", "guard", "patrol", "beg":
+			resident.worked = int(resident.worked) + maxi(0, t - int(resident.arr))
+			if int(resident.job) >= 0:
+				var business: Dictionary = state.businesses[int(resident.job)]
+				business.worked = int(business.worked) + maxi(0, t - int(resident.arr))
+		"away":
+			resident.worked = int(resident.worked) + maxi(0, t - int(resident.arr))
+			# Day labourers eat a midday ration where they work.
+			resident.ate = maxi(int(resident.ate), t - 3 * 3600)
+		"water":
+			var household: Dictionary = state.households[int(resident.hh)]
+			household.water_day = t / DAY
+	if int(resident.with) >= 0:
+		resident.with = -1
+
+
+func _decide(person: int, resident: Dictionary, t: int) -> void:
+	var hour := hour_of(t)
+	var home := home_of(resident)
+	var roll := _roll(person, 1)
+	# Night: everyone not on duty is at home.
+	if _asleep_at(person, resident, hour):
+		var sleep := _seconds_until_hour(t, _wake_hour(person, resident))
+		if not _go(person, resident, t, "sleep", home, sleep):
+			_wait(person, resident, t, 300)
+		return
+	var raining: bool = state.weather in ["rain","storm"]
+	var household: Dictionary = state.households[int(resident.hh)]
+	var has_food := int(household.pantry.staple) + int(household.pantry.side) > 0
+	# Real hunger overrides duty: go home and eat when there is food.
+	if hunger(resident, t) >= 900 and has_food and (resident.at != home or resident.act != "home"):
+		if _go(person, resident, t, "home", home, 1200 + roll % 600):
+			return
+	if resident.errand.get("steal", false) and hour >= 9.0 and hour < 16.5:
+		if _plan_theft(person, resident, t):
+			return
+	match resident.role:
+		"vendor", "craft":
+			if _work_block(person, resident, t, hour):
+				return
+		"guard":
+			if hunger(resident, t) < 800 or not has_food:
+				_guard_duty(person, resident, t, roll)
+				return
+		"porter":
+			if hour < 15.5 and _porter_duty(person, resident, t):
+				return
+		"labourer":
+			if hour >= 5.5 and hour < 15.5 and not _exits.is_empty():
+				var exit: String = _exits[person % _exits.size()]
+				if _go(person, resident, t, "away", exit, _seconds_until_hour(t, 15.6 + float(roll % 40) / 60.0)):
+					return
+		"beggar":
+			if hour >= 7.0 and hour < 18.5 and not raining:
+				for spot: String in _nearest("beggar_spot", home, 9):
+					if Anchors.open_at(index.anchors[spot], hour) and _go(person, resident, t, "beg", spot, 2400 + roll % 2400):
+						return
+	# Household duties come before leisure.
+	if _household_errand(person, resident, t, hour, roll):
+		return
+	# Meals at home.
+	if hunger(resident, t) >= 600 and resident.at != home:
+		if has_food or resident.role == "child":
+			if _go(person, resident, t, "home", home, 1500 + roll % 900):
+				return
+	# Free time: score what the surroundings offer.
+	if _leisure(person, resident, t, hour, roll, raining):
+		return
+	if not _go(person, resident, t, "home", home, 1800 + roll % 1800):
+		_wait(person, resident, t, 600)
+
+
+func _wait(person: int, resident: Dictionary, t: int, seconds: int) -> void:
+	resident.act = "wait"
+	resident.arr = t
+	resident.until = t + seconds
+	resident.step = 1
+	_schedule(person, t + seconds)
+
+
+# --- home ------------------------------------------------------------------------
+
+func _come_home(person: int, resident: Dictionary, t: int) -> void:
+	var household: Dictionary = state.households[int(resident.hh)]
+	# Shopping is put away.
+	if not resident.bag.is_empty():
+		for good: String in resident.bag:
+			var category: String = economy.goods[good].category
+			if category in ["staple", "side"]:
+				household.pantry[category] = int(household.pantry[category]) + int(resident.bag[good])
+		resident.bag = {}
+		_event(t, "brought_home", {"a": person, "at": resident.at})
+	if hunger(resident, t) >= 600:
+		_eat_at_home(resident, household, t)
+
+
+func _eat_at_home(resident: Dictionary, household: Dictionary, t: int) -> void:
+	# Bread at every meal; something with it at the main meal later in the day.
+	if int(household.pantry.staple) >= 1:
+		household.pantry.staple = int(household.pantry.staple) - 1
+		resident.ate = t
+		if int(household.pantry.side) >= 1 and hour_of(t) >= 15.0:
+			household.pantry.side = int(household.pantry.side) - 1
+	elif int(household.pantry.side) >= 1:
+		household.pantry.side = int(household.pantry.side) - 1
+		resident.ate = t - 14400
+	else:
+		household.fed_day = -2
+
+
+func _stock_pantry(household: Dictionary) -> void:
+	household.pantry.staple = household.members.size() * 3
+	household.pantry.side = household.members.size()
+
+
+func _choose_shopper(household: Dictionary) -> void:
+	var best := -1
+	var best_rank := 99
+	for member: int in household.members:
+		var resident: Dictionary = state.residents[member]
+		var rank: int = {"servant": 0, "homemaker": 1, "elder": 2, "matron": 3, "labourer": 5, "beggar": 4, "porter": 6, "craft": 7, "vendor": 8, "guard": 7, "patron": 9}.get(resident.role, 50)
+		if rank < best_rank:
+			best_rank = rank
+			best = member
+	household.shopper = best
+
+
+# --- work ------------------------------------------------------------------------
+
+func _work_block(person: int, resident: Dictionary, t: int, hour: float) -> bool:
+	if int(resident.job) < 0:
+		return false
+	var business: Dictionary = state.businesses[int(resident.job)]
+	var open := float(business.open[0])
+	var close := float(business.open[1])
+	if hour < open - 0.6 or hour >= close:
+		return false
+	var act := "vend" if resident.role == "vendor" else "work"
+	# A midday break lets workers eat and be seen elsewhere.
+	var block := _seconds_until_hour(t, close)
+	if hour < 12.0 and block > 3 * 3600:
+		block = _seconds_until_hour(t, 12.0 + float(person % 50) / 60.0)
+	if hour >= 12.0 and hour < 13.4 and resident.act in ["vend", "work"] and hunger(resident, t) >= 300:
+		return false
+	if _go(person, resident, t, act, resident.work, block):
+		return true
+	return false
+
+
+func _open_shop(person: int, resident: Dictionary, t: int) -> void:
+	if int(resident.job) < 0:
+		return
+	var number := int(resident.job)
+	var business: Dictionary = state.businesses[number]
+	# A delivery no porter picked up well after opening time comes by cart.
+	var hour := hour_of(t)
+	for job: Dictionary in state.jobs.duplicate():
+		if int(job.business) == number and job.state == "open" and t - int(job.t) > 5400 and hour >= float(business.open[0]) + 1.0:
+			_deliver(job, t, -1)
+	if hour >= 11.0:
+		_order(number, t)
+
+
+## A scheduled worker is actually serving only in the half-open duty
+## interval. A wake event at this same second may not yet have been processed.
+## Neither an expired vendor nor a commuter may open a business or sell goods.
+func _staff_member_present(business: Dictionary, member: int, t: int) -> bool:
+	if member < 0 or member >= state.residents.size():
+		return false
+	var resident: Dictionary = state.residents[member]
+	return resident.at == business.anchor and resident.act in ["vend", "work"] and int(resident.arr) <= t and t < int(resident.until)
+
+
+func business_staffed(number: int, t: int) -> bool:
+	return _vendor_of(number, t) >= 0
+
+
+func business_open(number: int, t: int) -> bool:
+	var business: Dictionary = state.businesses[number]
+	var hour := hour_of(t)
+	return hour >= float(business.open[0]) and hour < float(business.open[1]) and business_staffed(number, t)
+
+
+func _guard_duty(person: int, resident: Dictionary, t: int, roll: int) -> void:
+	var posts: Array = _by_kind.get("guard_post", [])
+	if posts.is_empty():
+		_wait(person, resident, t, 1800)
+		return
+	# Walk the round: the next post after the current one, by seeded order.
+	var here := posts.find(resident.at)
+	var start := (here + 1 + roll % 2) % posts.size() if here >= 0 else person % posts.size()
+	for offset in posts.size():
+		var post: String = posts[(start + offset) % posts.size()]
+		if post != resident.at and _go(person, resident, t, "guard", post, 900 + roll % 1200):
+			return
+	_wait(person, resident, t, 900)
+
+
+func _porter_duty(person: int, resident: Dictionary, t: int) -> bool:
+	for slot in state.jobs.size():
+		var job: Dictionary = state.jobs[slot]
+		if job.state != "open":
+			continue
+		job.state = "taken"
+		job.porter = person
+		resident.errand = {"job": int(job.id)}
+		if _go(person, resident, t, "haul", job.pickup, 90):
+			return true
+		job.state = "open"
+		job.porter = -1
+		resident.errand = {}
+	# No load right now: wait at a cart stop where work is handed out.
+	for stop: String in _nearest("cart_stop", home_of(resident), 9):
+		if stop == resident.at and resident.act == "idle":
+			_wait(person, resident, t, 600)
+			return true
+		if _go(person, resident, t, "idle", stop, 900):
+			return true
+	return false
+
+
+func _job(id: int) -> Dictionary:
+	for job: Dictionary in state.jobs:
+		if int(job.id) == id:
+			return job
+	return {}
+
+
+func _haul_step(person: int, resident: Dictionary, t: int) -> bool:
+	var job := _job(int(resident.errand.get("job", -1)))
+	if job.is_empty():
+		resident.errand = {}
+		return false
+	var business: Dictionary = state.businesses[int(job.business)]
+	if job.state == "taken":
+		# At the pickup: pay the supplier and shoulder the load.
+		if not _load(job, t):
+			state.jobs.erase(job)
+			resident.errand = {}
+			return false
+		job.state = "carried"
+		resident.bag = job.goods.duplicate()
+		_event(t, "pickup", {"a": person, "at": resident.at, "business": int(job.business)})
+		var target: String = business.queue
+		_release(person, resident)
+		resident.prev = resident.at
+		resident.at = business.anchor if not _claim_soft(person, resident, target) else target
+		resident.dep = t + 60
+		resident.arr = int(resident.dep) + _travel_seconds(person, resident.prev, resident.at)
+		resident.until = int(resident.arr) + 120
+		resident.step = 0
+		_schedule(person, int(resident.arr))
+		return true
+	if job.state == "carried":
+		_deliver(job, t, person)
+		resident.bag = {}
+		resident.errand = {}
+	return false
+
+
+func _claim_soft(person: int, resident: Dictionary, anchor_id: String) -> bool:
+	return _claim(person, resident, anchor_id)
+
+
+## Supplier is paid when the goods are picked up.
+func _load(job: Dictionary, t: int) -> bool:
+	var number := int(job.business)
+	var business: Dictionary = state.businesses[number]
+	var cost := int(job.cost)
+	if int(business.till) < cost and int(business.owner) >= 0:
+		_pay("hh", int(business.owner), "biz", number, mini(cost - int(business.till), int(state.households[int(business.owner)].funds)), "owner_float")
+	if int(business.till) < cost:
+		return false
+	if int(job.source) >= 0:
+		var supplier: Dictionary = state.businesses[int(job.source)]
+		for good: String in job.goods:
+			if int(supplier.stock.get(good, 0)) < int(job.goods[good]):
+				return false
+		_pay("biz", number, "biz", int(job.source), cost, "wholesale")
+		for good: String in job.goods:
+			supplier.stock[good] = int(supplier.stock[good]) - int(job.goods[good])
+	else:
+		_pay("biz", number, "ext", "hinterland", cost, "import")
+		for good: String in job.goods:
+			state.flow[good]["in"] = int(state.flow[good]["in"]) + int(job.goods[good])
+	return true
+
+
+func _deliver(job: Dictionary, t: int, porter: int) -> void:
+	var number := int(job.business)
+	var business: Dictionary = state.businesses[number]
+	if job.state != "carried":
+		if not _load(job, t):
+			state.jobs.erase(job)
+			return
+	for good: String in job.goods:
+		business.stock[good] = int(business.stock.get(good, 0)) + int(job.goods[good])
+	if porter >= 0:
+		_pay("biz", number, "hh", int(state.residents[porter].hh), int(economy.porter_fee), "porter_fee")
+	state.stats.deliveries = int(state.stats.deliveries) + 1
+	_event(t, "delivery", {"a": porter, "business": number, "at": business.anchor, "goods": job.goods.duplicate(), "vehicle": "porter" if porter >= 0 else "cart"})
+	state.jobs.erase(job)
+
+
+## Orders what is missing up to the target stock, from a local producer when
+## one has the goods, otherwise from the hinterland.
+func _order(number: int, t: int) -> void:
+	var business: Dictionary = state.businesses[number]
+	var definition: Dictionary = economy.business_types[business.type]
+	if not definition.has("supply") or int(business.owner) < 0:
+		return
+	for job: Dictionary in state.jobs:
+		if int(job.business) == number:
+			return
+	var wanted := {}
+	for good: String in definition.sells:
+		var missing := int(definition.sells[good]) - int(business.stock.get(good, 0))
+		if missing * 4 >= int(definition.sells[good]):
+			wanted[good] = missing
+	if wanted.is_empty():
+		return
+	var budget := int(business.till) + (int(state.households[int(business.owner)].funds) / 4)
+	for source: String in definition.supply:
+		var goods := {}
+		var cost := 0
+		var supplier := -1
+		if source == "import":
+			for good: String in wanted:
+				var unit := maxi(1, int(economy.goods[good].price) * int(economy.import_cost_percent) / 100)
+				var quantity := mini(int(wanted[good]), maxi(0, (budget - cost) / unit))
+				if quantity > 0:
+					goods[good] = quantity
+					cost += quantity * unit
+		else:
+			for candidate in state.businesses.size():
+				var other: Dictionary = state.businesses[candidate]
+				if other.type != source:
+					continue
+				var offer := {}
+				var offer_cost := 0
+				for good: String in wanted:
+					var unit := maxi(1, int(economy.goods[good].price) * int(economy.wholesale_percent) / 100)
+					var quantity := mini(mini(int(wanted[good]), int(other.stock.get(good, 0))), maxi(0, (budget - offer_cost) / unit))
+					if quantity > 0:
+						offer[good] = quantity
+						offer_cost += quantity * unit
+				if offer_cost > cost:
+					goods = offer
+					cost = offer_cost
+					supplier = candidate
+		if goods.is_empty():
+			continue
+		var pickup := _pickup_for(business, supplier)
+		state.next_job = int(state.next_job) + 1
+		state.jobs.append({"id": int(state.next_job), "business": number, "goods": goods, "cost": cost,
+			"source": supplier, "pickup": pickup, "state": "open", "porter": -1, "t": t})
+		for good: String in goods:
+			wanted[good] = int(wanted[good]) - int(goods[good])
+			if int(wanted[good]) <= 0:
+				wanted.erase(good)
+		return
+
+
+func _pickup_for(business: Dictionary, supplier: int) -> String:
+	if supplier >= 0:
+		return state.businesses[supplier].anchor
+	var stops := _nearest("cart_stop", business.anchor, 1)
+	return stops[0] if not stops.is_empty() else business.queue
+
+
+# --- shopping ----------------------------------------------------------------------
+
+func _household_errand(person: int, resident: Dictionary, t: int, hour: float, roll: int) -> bool:
+	var household: Dictionary = state.households[int(resident.hh)]
+	if int(household.shopper) != person or hour < 6.2 or hour >= 17.2:
+		return false
+	if resident.role in WORK_ROLES and hour < 16.0:
+		return false
+	var day := t / DAY
+	# Water first thing for homes without their own supply.
+	if int(household.tier) <= 1 and int(household.water_day) != day and hour < 11.0:
+		for fountain: String in _nearest("fountain", household.home, 2):
+			if _go(person, resident, t, "water", fountain, 150 + roll % 200):
+				return true
+	var list := _shopping_list(household, day)
+	if list.is_empty():
+		return false
+	resident.errand = {"list": list, "tries": 0}
+	return _shop_next(person, resident, t)
+
+
+func _shopping_list(household: Dictionary, day: int) -> Array:
+	var list := []
+	var people: int = household.members.size()
+	# The poor buy for the day, others keep a small store.
+	var days := 1 if int(household.tier) == 0 else 2
+	if int(household.pantry.staple) < people * 3:
+		list.append(["staple", people * 3 * days + people - int(household.pantry.staple)])
+	if int(household.pantry.side) < people:
+		list.append(["side", people * days + 1 - int(household.pantry.side)])
+	for category: String in economy.household_demand:
+		if category == "note":
+			continue
+		var every := int(economy.household_demand[category][int(household.tier)])
+		if every <= 0:
+			continue
+		if not household.due.has(category):
+			household.due[category] = day + Population.mix(int(state.seed), Population.fnv(household.id), Population.fnv(category)) % every
+		if day >= int(household.due[category]):
+			list.append([category, 1])
+	return list
+
+
+func _shop_next(person: int, resident: Dictionary, t: int) -> bool:
+	var errand: Dictionary = resident.errand
+	while not errand.list.is_empty():
+		var item: Array = errand.list[0]
+		var choice := _choose_seller(person, resident, t, str(item[0]))
+		if choice.is_empty():
+			errand.list.pop_front()
+			continue
+		errand["business"] = int(choice.business)
+		errand["good"] = str(choice.good)
+		if _go(person, resident, t, "shop", state.businesses[int(choice.business)].queue, 600):
+			return true
+		errand.tries = int(errand.tries) + 1
+		if int(errand.tries) > 3:
+			errand.list.pop_front()
+			errand.tries = 0
+	resident.errand = {}
+	return false
+
+
+## The cheapest reachable open seller of a good in the category, weighing the
+## walk by how thrifty the shopper is.
+func _choose_seller(person: int, resident: Dictionary, t: int, category: String) -> Dictionary:
+	var here: Vector3 = index.anchors[resident.at].position
+	var best := {}
+	var best_score := 1.0e12
+	var thrift := float(resident.traits[3]) / 100.0
+	for good: String in economy.goods:
+		if economy.goods[good].category != category:
+			continue
+		for number: int in _sellers.get(good, []):
+			var business: Dictionary = state.businesses[number]
+			if int(business.stock.get(good, 0)) <= 0 or not business_open(number, t):
+				continue
+			if _free_slots(business.queue) <= 0 and business.queue != resident.at:
+				continue
+			var distance := here.distance_to(index.anchors[business.queue].position)
+			var jitter := float(Population.mix(int(state.seed), person, number, t / 3600) % 100) / 100.0
+			var score := float(business.price[good]) * (0.6 + thrift) * 10.0 + distance * (1.4 - thrift) + jitter * 18.0
+			if score < best_score:
+				best_score = score
+				best = {"business": number, "good": good}
+	return best
+
+
+func _shop_arrive(person: int, resident: Dictionary, t: int) -> bool:
+	var errand: Dictionary = resident.errand
+	if errand.is_empty() or errand.list.is_empty():
+		return false
+	var number := int(errand.business)
+	var good: String = errand.good
+	var business: Dictionary = state.businesses[number]
+	if int(resident.step) == 1:
+		if not business_open(number, t) or int(business.stock.get(good, 0)) <= 0:
+			# Closed or sold out on arrival: look elsewhere.
+			errand.tries = int(errand.tries) + 1
+			if int(errand.tries) > 3:
+				errand.list.pop_front()
+				errand.tries = 0
+			return _shop_next(person, resident, t)
+		var vendor := _vendor_of(number, t)
+		var haggle := 18 + _roll(person, 3) % 40 + (25 if int(business.price[good]) >= 60 else 0)
+		resident.with = vendor
+		resident.step = 2
+		resident.until = t + haggle
+		_event(t, "haggle", {"a": person, "b": vendor, "business": number, "at": business.queue, "good": good, "ask": int(business.price[good]), "seconds": haggle})
+		_schedule(person, t + haggle)
+		return true
+	# Step 2: the deal. The staff member who haggled may have gone home
+	# while the customer was waiting. Keep that identity only if the
+	# person still serves this business; never award trade memories to an
+	# absent employee. A real replacement can complete the purchase.
+	var household: Dictionary = state.households[int(resident.hh)]
+	var item: Array = errand.list[0]
+	var vendor := int(resident.with)
+	if not business.staff.has(vendor) or not _staff_member_present(business, vendor, t):
+		vendor = _vendor_of(number, t)
+	var quantity := mini(int(item[1]), int(business.stock.get(good, 0)))
+	var regular := Population.trust(state, vendor, person) if vendor >= 0 else 0.0
+	var discount := clampi(int(resident.traits[3]) / 12 + int(regular / 10.0), 0, 12)
+	var unit := maxi(1, int(business.price[good]) * (100 - discount) / 100)
+	quantity = mini(quantity, int(household.funds) / unit)
+	if quantity > 0 and vendor >= 0 and business_open(number, t) and _pay("hh", int(resident.hh), "biz", number, quantity * unit, "retail"):
+		_goods(business, good, quantity, "sold")
+		business.sold[good] = int(business.sold.get(good, 0)) + quantity
+		resident.bag[good] = int(resident.bag.get(good, 0)) + quantity
+		state.stats.purchases = int(state.stats.purchases) + 1
+		_event(t, "purchase", {"a": person, "b": vendor, "business": number, "at": business.queue, "good": good, "quantity": quantity, "paid": quantity * unit, "discount": discount})
+		if vendor >= 0:
+			var tick := t / DAY / 7
+			Population.meet(state, person, vendor, "trade:%d:%d" % [t, number], tick, "trade", 1)
+			Population.meet(state, vendor, person, "trade:%d:%d" % [t, number], tick, "trade", 1)
+		var category: String = economy.goods[good].category
+		if household.due.has(category):
+			household.due[category] = t / DAY + int(economy.household_demand[category][int(household.tier)])
+		item[1] = int(item[1]) - quantity
+	else:
+		item[1] = 0
+	_alms(person, resident, t)
+	if int(item[1]) <= 0:
+		errand.list.pop_front()
+	resident.with = -1
+	resident.step = 0
+	if _shop_next(person, resident, t):
+		return true
+	# Everything bought (or given up): carry it home.
+	if _go(person, resident, t, "home", home_of(resident), 900 + _roll(person, 4) % 1500):
+		return true
+	return false
+
+
+func _vendor_of(number: int, t: int) -> int:
+	var business: Dictionary = state.businesses[number]
+	for member: int in business.staff:
+		if _staff_member_present(business, member, t):
+			return member
+	return -1
+
+
+func _alms(person: int, resident: Dictionary, t: int) -> void:
+	if int(resident.purse) < 12 or int(resident.traits[2]) < 45:
+		return
+	var here: Vector3 = index.anchors[resident.at].position
+	for spot: String in _by_kind.get("beggar_spot", []):
+		if here.distance_squared_to(index.anchors[spot].position) > 900.0:
+			continue
+		for beggar: int in occupants(spot):
+			if state.residents[beggar].act == "beg" and int(state.residents[beggar].arr) <= t:
+				var gift := 1 + int(resident.traits[2]) / 30
+				if _pay("purse", person, "hh", int(state.residents[beggar].hh), gift, "alms"):
+					state.stats.alms = int(state.stats.alms) + 1
+					_event(t, "alms", {"a": person, "b": beggar, "at": spot, "gift": gift})
+				return
+
+
+func _tavern_order(person: int, resident: Dictionary, t: int) -> void:
+	var stall := Anchors.tag_value(index.anchors[resident.at], "stall")
+	for number in state.businesses.size():
+		var business: Dictionary = state.businesses[number]
+		if business.anchor != stall or not business_open(number, t):
+			continue
+		for good: String in ["stew", "wine"]:
+			if int(business.stock.get(good, 0)) > 0 and _pay("purse", person, "biz", number, int(business.price[good]), "tavern"):
+				_goods(business, good, 1, "sold")
+				business.sold[good] = int(business.sold.get(good, 0)) + 1
+				if good == "stew":
+					resident.ate = t
+				_event(t, "purchase", {"a": person, "b": _vendor_of(number, t), "business": number, "at": resident.at, "good": good, "quantity": 1, "paid": int(business.price[good]), "discount": 0})
+				state.stats.purchases = int(state.stats.purchases) + 1
+		return
+
+
+# --- company -----------------------------------------------------------------------
+
+func _leisure(person: int, resident: Dictionary, t: int, hour: float, roll: int, raining: bool) -> bool:
+	var home := home_of(resident)
+	var origin: String = resident.work if resident.role in WORK_ROLES and not str(resident.work).is_empty() else home
+	var lonely := loneliness(resident, t)
+	var options: Array = []
+	# Children play; adults talk, pray, drink or visit.
+	if resident.role == "child":
+		if age(resident) >= 5 and hour >= 8.0 and hour < 18.3 and not raining:
+			for spot: String in _nearest("play_spot", home, 3):
+				options.append([520 + (Population.mix(roll, _anchor_hashes[spot]) % 200), "play", spot, 1500 + roll % 2400])
+	else:
+		var tier: String = Population.TIERS[int(resident.tier)]
+		for spot: String in _nearest("gossip_spot", origin, 5):
+			var anchor: Dictionary = index.anchors[spot]
+			if not Anchors.open_at(anchor, hour) or not Anchors.serves(anchor, tier):
+				continue
+			if raining and not Anchors.has_tag(anchor, "shelter"):
+				continue
+			var company := 0
+			for other: int in _occupancy.get(spot, []):
+				if other >= 0:
+					company += 40 + int(maxf(0.0, Population.trust(state, person, other)) * 6.0)
+			options.append([lonely / 2 + company + Population.mix(roll, _anchor_hashes[spot]) % 160, "gossip", spot, 420 + roll % 900])
+		var piety := devotion(resident, t)
+		if piety >= 500:
+			for shrine: String in _nearest("shrine", home, 2):
+				if Anchors.open_at(index.anchors[shrine], hour):
+					options.append([piety / 2 + 150, "pray", shrine, 300 + roll % 420])
+		if hour >= 11.5 and int(resident.purse) >= 24:
+			var appetite := hunger(resident, t)
+			if appetite >= 450 or hour >= 16.5:
+				for seat: String in _nearest("tavern_seat", origin, 3):
+					if Anchors.open_at(index.anchors[seat], hour):
+						options.append([260 + appetite / 3 + Population.mix(roll, _anchor_hashes[seat]) % 120, "tavern", seat, 900 + roll % 1500])
+		if hour >= 15.0 and not raining:
+			var friend := _friend_at_home(person, resident, t, roll)
+			if friend >= 0:
+				options.append([lonely / 2 + 240, "visit", home_of(state.residents[friend]), 1500 + roll % 2400, friend])
+		if resident.role in ["patron", "matron", "elder"] and hour >= 8.0 and hour < 17.5 and not raining:
+			var forum: Array = _by_kind.get("gossip_spot", [])
+			if not forum.is_empty():
+				var spot: String = forum[roll % forum.size()]
+				if Anchors.open_at(index.anchors[spot], hour):
+					options.append([300 + lonely / 3, "stroll", spot, 600 + roll % 900])
+	# Staying in is always possible and wins when nothing else is attractive.
+	options.append([330 - (120 if resident.at == home else 0) + (200 if raining else 0), "home", home, 1500 + roll % 2700])
+	options.sort_custom(func(a: Array, b: Array) -> bool:
+		return a[0] > b[0] if a[0] != b[0] else str(a[2]) < str(b[2]))
+	for option: Array in options:
+		if _go(person, resident, t, str(option[1]), str(option[2]), int(option[3])):
+			if option.size() > 4:
+				resident.with = int(option[4])
+				Population.meet(state, person, int(option[4]), "visit:%d" % t, t / DAY / 7, "visit", 3)
+				Population.meet(state, int(option[4]), person, "visit:%d" % t, t / DAY / 7, "visit", 3)
+				resident.talked = t
+				_event(t, "visit", {"a": person, "b": int(option[4]), "at": str(option[2])})
+			return true
+	return false
+
+
+func _friend_at_home(person: int, resident: Dictionary, t: int, roll: int) -> int:
+	var known: Array = resident.known
+	if known.is_empty():
+		return -1
+	for attempt in mini(3, known.size()):
+		var other := int(known[(roll + attempt) % known.size()])
+		var friend: Dictionary = state.residents[other]
+		if Population.trust(state, person, other) >= 25.0 and friend.act == "home" and int(friend.arr) <= t and int(friend.hh) != int(resident.hh):
+			return other
+	return -1
+
+
+## Starts a conversation with someone already standing here and free.
+func _try_talk(person: int, resident: Dictionary, t: int) -> void:
+	if int(resident.with) >= 0 or resident.role == "child" and resident.act != "play":
+		return
+	var best := -1
+	var best_score := -1.0e9
+	for other: int in occupants(resident.at):
+		if other == person:
+			continue
+		var partner: Dictionary = state.residents[other]
+		if int(partner.arr) > t or int(partner.with) >= 0 or int(partner.until) - t < 45:
+			continue
+		if (partner.role == "child") != (resident.role == "child"):
+			continue
+		var score := Population.trust(state, person, other) + float(Population.mix(int(state.seed), person, other, t) % 20)
+		if score > best_score:
+			best_score = score
+			best = other
+	if best < 0:
+		return
+	var partner: Dictionary = state.residents[best]
+	var seconds := mini(mini(int(resident.until), int(partner.until)) - t, 50 + _roll(person, 5) % 130)
+	if seconds < 30:
+		return
+	var topic := _topic(person, resident, best, partner, t)
+	resident.with = best
+	partner.with = person
+	resident.talked = t
+	partner.talked = t
+	var warmth := 2 + (int(resident.traits[0]) + int(partner.traits[0])) / 60
+	if topic == "quarrel":
+		warmth = -4
+	var tick := t / DAY / 7
+	var id := "talk:%d:%d:%d" % [t, person, best]
+	Population.meet(state, person, best, id, tick, topic, warmth)
+	Population.meet(state, best, person, id, tick, topic, warmth)
+	var news := maxi(int(resident.heard), int(partner.heard))
+	resident.heard = news
+	partner.heard = news
+	state.stats.conversations = int(state.stats.conversations) + 1
+	_event(t, "conversation", {"a": person, "b": best, "at": resident.at, "topic": topic, "seconds": seconds, "seed": Population.mix(int(state.seed), person, best, t) % 100000})
+	# Both stay for the talk; whoever would have left earlier leaves after it.
+	if int(resident.until) < t + seconds:
+		resident.until = t + seconds
+	if int(partner.until) < t + seconds:
+		partner.until = t + seconds
+		_schedule(best, int(partner.until))
+
+
+func _topic(person: int, resident: Dictionary, other: int, partner: Dictionary, t: int) -> String:
+	var trust := Population.trust(state, person, other)
+	var known := Population.knows(state, person, other)
+	var roll := Population.mix(int(state.seed), person, other, t / 60) % 100
+	if resident.role == "child":
+		return "play"
+	if trust <= -20.0:
+		return "quarrel"
+	if int(resident.heard) != int(partner.heard):
+		return "news"
+	if not known:
+		return "introduction"
+	if state.weather in ["rain","storm"] and roll < 40:
+		return "weather"
+	if int(resident.job) >= 0 and int(resident.job) == int(partner.job):
+		return "work"
+	if trust >= 30.0 and roll < 45:
+		return "family"
+	if roll < 30:
+		return "prices"
+	if roll < 55:
+		return "weather"
+	if roll < 75:
+		return "work"
+	return "neighbourhood"
+
+
+# --- trouble: theft, alarms and reactions ------------------------------------------
+
+func _theft(person: int, resident: Dictionary, t: int) -> void:
+	var number := int(resident.errand.get("business", -1))
+	resident.errand = {}
+	if number < 0:
+		return
+	var business: Dictionary = state.businesses[number]
+	var good := ""
+	for candidate: String in business.stock:
+		if economy.goods[candidate].category in ["staple", "side"] and int(business.stock[candidate]) > 0:
+			good = candidate
+			break
+	if good.is_empty():
+		return
+	_goods(business, good, 1, "out")
+	resident.ate = t
+	var vendor := _vendor_of(number, t)
+	var noticed := vendor >= 0 and _roll(person, 7) % 100 < 65
+	state.stats.thefts = int(state.stats.thefts) + 1
+	state.news = int(state.news) + 1
+	_event(t, "theft", {"a": person, "b": vendor, "business": number, "at": business.queue, "good": good, "noticed": noticed})
+	if noticed:
+		Social.witnessed_theft(state, vendor, person, t)
+		state.residents[vendor].heard = int(state.news)
+		alarm(t, "theft", business.queue, 45.0, person)
+	resident.until = t + 2
+
+
+func _plan_theft(person: int, resident: Dictionary, t: int) -> bool:
+	var here: Vector3 = index.anchors[resident.at].position
+	var best := -1
+	var best_distance := 1.0e12
+	for number in state.businesses.size():
+		var business: Dictionary = state.businesses[number]
+		if not business.anchor.contains(".stall_") or not business_open(number, t) or _free_slots(business.queue) <= 0:
+			continue
+		var edible := false
+		for good: String in business.stock:
+			if economy.goods[good].category in ["staple", "side"] and int(business.stock[good]) > 0:
+				edible = true
+		var distance := here.distance_squared_to(index.anchors[business.queue].position)
+		if edible and distance < best_distance:
+			best_distance = distance
+			best = number
+	if best < 0:
+		return false
+	resident.errand = {"business": best}
+	if _go(person, resident, t, "steal", state.businesses[best].queue, 4):
+		return true
+	resident.errand = {}
+	return false
+
+
+## Public entry for events the simulation did not cause itself (a brawl the
+## player started, a patrol passing, a scripted scene). People nearby react
+## by temperament: the bold watch, the others leave; guards come.
+func alarm(t: int, kind: String, anchor_id: String, radius: float, culprit: int = -1) -> Dictionary:
+	if not index.anchors.has(anchor_id):
+		return {"ok": false}
+	return alarm_at(t, kind, index.anchors[anchor_id].position, radius, culprit, anchor_id)
+
+
+func alarm_at(t: int, kind: String, centre: Vector3, radius: float, culprit: int = -1, anchor_id: String = "") -> Dictionary:
+	var watchers: Array = []
+	var fled: Array = []
+	var guards: Array = []
+	state.news = int(state.news) + 1
+	for person in state.residents.size():
+		if person == culprit:
+			continue
+		var resident: Dictionary = state.residents[person]
+		if resident.act in INDOOR_ACTS and int(resident.arr) <= t:
+			continue
+		var where := position_of(person, t)
+		var distance := Vector2(where.x - centre.x, where.z - centre.z).length()
+		if resident.role == "guard" and distance <= radius * 3.0 and resident.act in ["guard", "patrol", "wait"]:
+			var post := _nearest_anchor_to(centre, ["guard_post", "queue", "gossip_spot"])
+			if not post.is_empty() and _go(person, resident, t, "guard", post, 300):
+				resident.act = "respond"
+				guards.append(person)
+			continue
+		if distance > radius or int(resident.arr) > t:
+			continue
+		resident.heard = int(state.news)
+		if resident.role in WORK_ROLES and resident.act in ["vend", "work"]:
+			watchers.append(person)
+			continue
+		if int(resident.traits[4]) >= 60 and resident.role != "child":
+			watchers.append(person)
+			resident.act = "watch"
+			resident.with = -1
+			resident.until = t + 60 + person % 60
+			resident.step = 1
+			_schedule(person, int(resident.until))
+		else:
+			fled.append(person)
+			resident.errand = {}
+			if not _go(person, resident, t, "home", home_of(resident), 1200):
+				_wait(person, resident, t, 120)
+			resident.act = "flee"
+	var data := {"at": anchor_id, "x": int(centre.x * 100.0), "z": int(centre.z * 100.0), "cause": kind, "culprit": culprit,
+		"watchers": watchers, "fled": fled, "guards": guards}
+	_event(t, "alarm", data)
+	return {"ok": true, "watchers": watchers, "fled": fled, "guards": guards}
+
+
+func _nearest_anchor_to(point: Vector3, kinds: Array) -> String:
+	var best := ""
+	var best_distance := 1.0e12
+	for kind: String in kinds:
+		for id: String in _by_kind.get(kind, []):
+			if _free_slots(id) <= 0:
+				continue
+			var distance := point.distance_squared_to(index.anchors[id].position)
+			if distance < best_distance:
+				best_distance = distance
+				best = id
+	return best
+
+
+# --- weather -----------------------------------------------------------------------
+
+func _weather_tick(t: int) -> void:
+	state.sys.weather = (floori(float(t)/WEATHER_SAMPLE_SECONDS)+1)*WEATHER_SAMPLE_SECONDS
+	_push(int(state.sys.weather) * KEY + SYS_WEATHER)
+	if state.weather_forced:
+		return
+	var jdn := int(state.origin_jdn) + floori(float(t)/DAY)
+	var sample_second := floori(float(posmod(t,DAY))/WEATHER_SAMPLE_SECONDS)*WEATHER_SAMPLE_SECONDS
+	_set_weather(LocalWeather.city_kind(Calendar.new_clock(jdn,sample_second)),t)
+
+
+## An external weather system may take over; pass forced = false to return
+## to the built-in seasonal weather.
+func set_weather(kind: String, forced: bool = true) -> void:
+	if kind in WEATHER:
+		state.weather_forced = forced
+		_set_weather(kind, int(state.t))
+
+
+func _set_weather(kind: String, t: int) -> void:
+	if kind == state.weather:
+		return
+	state.weather = kind
+	var sheltering := 0
+	if kind in ["rain","storm"]:
+		for person in state.residents.size():
+			var resident: Dictionary = state.residents[person]
+			if resident.act not in OUTDOOR_LEISURE or Anchors.has_tag(index.anchors[resident.at], "shelter"):
+				continue
+			# Preserve the reserved destination, travel interpolation and
+			# arrival wake. Once there, the resident can choose shelter using
+			# the normal decision system. Never extend an already short stay.
+			var arrival := int(resident.arr)
+			var deadline: int = arrival + 1 if arrival > t else t + 5 + int(person) % 40
+			if int(resident.until) <= deadline:
+				continue
+			resident.until = deadline
+			# An earlier arrival/decision must still execute. Do not book a
+			# duplicate wake at the same instant or move the heap backwards.
+			if arrival <= t and int(resident.wake) > deadline:
+				_schedule(person, deadline)
+			sheltering += 1
+	_event(t, "weather", {"weather": kind, "sheltering": sheltering})
+
+
+# --- the day's close: wages, production, prices, orders, life -------------------------
+
+## The close runs in stages, one stage per event, so no single frame carries
+## the whole city's bookkeeping. All stages share the closing instant and run
+## in a fixed order before any later event.
+const CLOSE_BUSINESS_CHUNK := 24
+const CLOSE_HOUSEHOLD_CHUNK := 60
+const CLOSE_RESIDENT_CHUNK := 260
+
+
+func _close_day(t: int) -> void:
+	var day := t / DAY
+	var stage := int(state.sys.get("stage", 0))
+	var business_stages: int = (state.businesses.size() + CLOSE_BUSINESS_CHUNK - 1) / CLOSE_BUSINESS_CHUNK
+	var household_stages: int = (state.households.size() + CLOSE_HOUSEHOLD_CHUNK - 1) / CLOSE_HOUSEHOLD_CHUNK
+	var weekly := day % 7 == 0
+	var resident_stages: int = (state.residents.size() + CLOSE_RESIDENT_CHUNK - 1) / CLOSE_RESIDENT_CHUNK if weekly else 0
+	var shard_stages: int = state.relations.size() if weekly else 0
+	var done := false
+	if stage == 0:
+		state.sys["hungry"] = 0
+	if stage < business_stages:
+		for number in range(stage * CLOSE_BUSINESS_CHUNK, mini(state.businesses.size(), (stage + 1) * CLOSE_BUSINESS_CHUNK)):
+			_close_business(number, t)
+	elif stage < business_stages + household_stages:
+		var first: int = (stage - business_stages) * CLOSE_HOUSEHOLD_CHUNK
+		for hh in range(first, mini(state.households.size(), first + CLOSE_HOUSEHOLD_CHUNK)):
+			_close_household(hh, day)
+	elif stage == business_stages + household_stages:
+		state.stats.hungry_households = int(state.sys.hungry)
+		_hungry_measures(t)
+		if weekly:
+			_job_market(t)
+	elif stage <= business_stages + household_stages + shard_stages:
+		Social.close_week(state, stage - business_stages - household_stages - 1)
+	elif stage <= business_stages + household_stages + shard_stages + resident_stages:
+		var first: int = (stage - business_stages - household_stages - shard_stages - 1) * CLOSE_RESIDENT_CHUNK
+		_courtship(t, first, mini(state.residents.size(), first + CLOSE_RESIDENT_CHUNK))
+	else:
+		done = true
+	if done:
+		state.sys.stage = 0
+		state.sys.day = t + DAY
+		state.closed_day = day
+		_event(t, "day_closed", {"day": day, "hungry": int(state.stats.hungry_households)})
+	else:
+		state.sys.stage = stage + 1
+	_push(int(state.sys.day) * KEY + SYS_DAY)
+
+
+func _close_business(number: int, t: int) -> void:
+	var business: Dictionary = state.businesses[number]
+	if int(business.owner) < 0:
+		return
+	_produce(number, business)
+	_pay_staff(number, business)
+	_adjust_prices(business)
+	_export_surplus(number, business)
+	if int(business.till) > TILL_FLOAT:
+		_pay("biz", number, "hh", int(business.owner), int(business.till) - TILL_FLOAT, "profit")
+	business.worked = 0
+	for good: String in business.sold:
+		business.sold[good] = 0
+	_order(number, t)
+
+
+func _close_household(hh: int, day: int) -> void:
+	var household: Dictionary = state.households[hh]
+	var tier := int(household.tier)
+	_pay("ext", "estates", "hh", hh, int(economy.estate_income_per_day[tier]), "estate_income")
+	for member: int in household.members:
+		var resident: Dictionary = state.residents[member]
+		var worked := int(resident.worked)
+		resident.worked = 0
+		match resident.role:
+			"guard":
+				if worked >= 4 * 3600:
+					_wage("ext", "aerarium", member, int(economy.wages_per_day.guard), "public_pay")
+			"labourer":
+				if worked >= 4 * 3600:
+					_wage("ext", "estates", member, int(economy.wages_per_day.labourer), "day_labour")
+			"porter":
+				_wage("ext", "hinterland", member, int(economy.wages_per_day.porter), "porter_base")
+			"servant":
+				_pay("hh", hh, "purse", member, int(economy.wages_per_day.servant_allowance), "allowance")
+			"patron", "matron":
+				_pay("hh", hh, "purse", member, mini(40, int(household.funds) / 200), "allowance")
+	if day % 7 == 0 and int(household.landlord) >= 0:
+		var rent := int(economy.rent_per_week[tier])
+		if _pay("hh", hh, "hh", int(household.landlord), rent, "rent"):
+			household.arrears = 0
+		else:
+			household.arrears = int(household.arrears) + 1
+	if int(household.fed_day) == -2:
+		household.hungry_days = int(household.hungry_days) + 1
+		state.sys.hungry = int(state.sys.hungry) + 1
+	else:
+		household.hungry_days = 0
+	household.fed_day = day
+	_choose_shopper(household)
+
+
+func _wage(from_kind: String, from: Variant, person: int, amount: int, reason: String) -> bool:
+	var pocket := amount * 15 / 100
+	var hh := int(state.residents[person].hh)
+	if from_kind != "ext" and _balance(from_kind, from) < amount:
+		return false
+	_pay(from_kind, from, "hh", hh, amount - pocket, reason)
+	_pay(from_kind, from, "purse", person, pocket, reason)
+	return true
+
+
+func _produce(number: int, business: Dictionary) -> void:
+	var definition: Dictionary = economy.business_types[business.type]
+	if not definition.has("produces"):
+		return
+	# Output follows the hours the staff really spent at the workshop.
+	var milli_hours := int(business.worked) * 1000 / 3600
+	for good: String in definition.produces:
+		var recipe: Dictionary = definition.produces[good]
+		var cap := int(definition.get("sells", {}).get(good, 6)) * 3
+		var carry := int(business.made.get(good, 0)) + int(float(recipe.per_hour) * float(milli_hours))
+		var units := mini(carry / 1000, maxi(0, cap - int(business.stock.get(good, 0))))
+		var unit_cost := maxi(1, int(economy.goods[good].price) * int(economy.material_cost_percent) / 100)
+		if recipe.has("input"):
+			unit_cost = int(economy.goods[recipe.input].price) * int(recipe.input_units)
+		units = mini(units, (int(business.till) + int(state.households[int(business.owner)].funds) / 4) / unit_cost)
+		business.made[good] = carry - units * 1000 if units * 1000 <= carry else 0
+		if int(business.made[good]) > 3000:
+			business.made[good] = 3000
+		if units <= 0:
+			continue
+		var cost := units * unit_cost
+		if int(business.till) < cost:
+			_pay("hh", int(business.owner), "biz", number, cost - int(business.till), "owner_float")
+		if _pay("biz", number, "ext", "hinterland", cost, "materials"):
+			_goods(business, good, units, "made")
+
+
+func _pay_staff(number: int, business: Dictionary) -> void:
+	var owner := int(business.owner)
+	for member: int in business.staff:
+		var resident: Dictionary = state.residents[member]
+		if int(resident.hh) == owner:
+			continue
+		if int(resident.worked) < 3 * 3600:
+			continue
+		var wage := int(economy.wages_per_day.vendor if resident.role == "vendor" else economy.wages_per_day.craft)
+		if int(business.till) < wage:
+			_pay("hh", owner, "biz", number, mini(wage - int(business.till), int(state.households[owner].funds)), "owner_float")
+		if _wage("biz", number, member, wage, "wage"):
+			resident.unpaid = 0
+		else:
+			resident.unpaid = int(resident.unpaid) + 1
+
+
+func _adjust_prices(business: Dictionary) -> void:
+	var definition: Dictionary = economy.business_types[business.type]
+	for good: String in definition.get("sells", {}):
+		var base := int(economy.goods[good].price)
+		var price := int(business.price[good])
+		var target := int(definition.sells[good])
+		var step := maxi(1, price / 20)
+		if int(business.stock.get(good, 0)) == 0 and int(business.sold.get(good, 0)) > 0:
+			price = mini(price + step, base * 3 / 2 + 1)
+		elif int(business.stock.get(good, 0)) * 2 > target * 3 or int(business.sold.get(good, 0)) == 0 and int(business.stock.get(good, 0)) >= target:
+			price = maxi(price - step, maxi(1, base * 7 / 10))
+		business.price[good] = price
+
+
+func _export_surplus(number: int, business: Dictionary) -> void:
+	var definition: Dictionary = economy.business_types[business.type]
+	if not definition.has("produces"):
+		return
+	for good: String in definition.produces:
+		var cap := int(definition.get("sells", {}).get(good, 6)) * 2
+		var surplus := int(business.stock.get(good, 0)) - cap
+		if surplus > 0:
+			_goods(business, good, surplus, "out")
+			_pay("ext", "export", "biz", number, surplus * int(economy.goods[good].price) * int(economy.export_percent) / 100, "export")
+
+
+## Households that went hungry get relief from a patron's dole (a client's
+## sportula) when someone they know well is wealthy; the boldest steal.
+func _hungry_measures(t: int) -> void:
+	for hh in state.households.size():
+		var household: Dictionary = state.households[hh]
+		if int(household.hungry_days) < 2 or household.members.is_empty():
+			continue
+		var head := int(household.members[0])
+		var resident: Dictionary = state.residents[head]
+		if int(household.landlord) >= 0 and int(state.households[int(household.landlord)].funds) > 20000:
+			_pay("hh", int(household.landlord), "hh", hh, 60, "sportula")
+			continue
+		if int(resident.traits[4]) >= 70 and resident.role != "child" and int(household.funds) < 12:
+			resident.errand = {"steal": true}
+
+
+func _job_market(t: int) -> void:
+	# People unpaid for days leave; open posts go to labourers who then earn
+	# a steady wage. Each change is an event the story layer can pick up.
+	for person in state.residents.size():
+		var resident: Dictionary = state.residents[person]
+		if int(resident.job) >= 0 and int(resident.unpaid) >= 3:
+			var business: Dictionary = state.businesses[int(resident.job)]
+			business.staff.erase(person)
+			_event(t, "job_left", {"a": person, "business": int(resident.job)})
+			resident.job = -1
+			resident.work = ""
+			resident.role = "labourer"
+			resident.unpaid = 0
+			state.stats.job_changes = int(state.stats.job_changes) + 1
+	for number in state.businesses.size():
+		var business: Dictionary = state.businesses[number]
+		if int(business.owner) < 0:
+			continue
+		var wanted := int(economy.business_types[business.type].staff)
+		wanted = mini(wanted, int(index.anchors[business.anchor].capacity))
+		var cursor := Population.mix(int(state.seed), number, t / DAY)
+		var looked := 0
+		while business.staff.size() < wanted and looked < state.residents.size():
+			var person: int = (cursor + looked) % int(state.residents.size())
+			looked += 1
+			var resident: Dictionary = state.residents[person]
+			if resident.role != "labourer" or resident.dependent or int(resident.tier) > 1:
+				continue
+			business.staff.append(person)
+			resident.job = number
+			resident.work = business.anchor
+			resident.role = "vendor" if business.anchor.contains(".stall_") else "craft"
+			state.stats.job_changes = int(state.stats.job_changes) + 1
+			_event(t, "job_taken", {"a": person, "business": number})
+
+
+## Two unmarried adults who trust each other deeply marry; the one from the
+## poorer home moves in with the other and brings a share of the savings.
+func _courtship(t: int, first: int, last: int) -> void:
+	for person in range(first, last):
+		var resident: Dictionary = state.residents[person]
+		if int(resident.spouse) >= 0 or resident.dependent or resident.role in ["child", "elder"]:
+			continue
+		var years := age(resident)
+		if years < 17 or years > 45:
+			continue
+		for known: int in resident.known:
+			var other := int(known)
+			if other <= person:
+				continue
+			var partner: Dictionary = state.residents[other]
+			if int(partner.spouse) >= 0 or partner.dependent or partner.female == resident.female or partner.role in ["child", "elder"]:
+				continue
+			if int(partner.hh) == int(resident.hh) or age(partner) < 17 or age(partner) > 45:
+				continue
+			if Population.trust(state, person, other) < 45.0 or Population.trust(state, other, person) < 45.0:
+				continue
+			resident.spouse = other
+			partner.spouse = person
+			var mover: int = person if int(state.households[int(resident.hh)].funds) <= int(state.households[int(partner.hh)].funds) else other
+			var stays: int = other if mover == person else person
+			var from := int(state.residents[mover].hh)
+			var to := int(state.residents[stays].hh)
+			state.stats.marriages = int(state.stats.marriages) + 1
+			_event(t, "marriage", {"a": person, "b": other, "at": state.households[to].home})
+			_move_resident(mover, from, to, t)
+			break
+
+
+## Moves one person to another household (marriage, adoption, service).
+## A household never ends up empty: the last member stays.
+func _move_resident(person: int, from: int, to: int, t: int) -> bool:
+	var origin: Dictionary = state.households[from]
+	if from == to or origin.members.size() <= 1:
+		return false
+	var resident: Dictionary = state.residents[person]
+	var share := int(origin.funds) / maxi(1, origin.members.size()) / 2
+	origin.members.erase(person)
+	state.households[to].members.append(person)
+	resident.hh = to
+	_pay("hh", from, "hh", to, share, "dowry")
+	if int(origin.shopper) == person:
+		_choose_shopper(origin)
+	_choose_shopper(state.households[to])
+	state.stats.moves = int(state.stats.moves) + 1
+	_event(t, "moved", {"a": person, "from": origin.home, "at": state.households[to].home})
+	return true
+
+
+# --- the player's trade at a stall -----------------------------------------------------
+
+func business_for_shop(shop_id: String) -> int:
+	for number in state.businesses.size():
+		if state.businesses[number].shop == shop_id:
+			return number
+	return -1
+
+
+## Data-driven offers of a business: what it sells, current price and stock,
+## and the optional display scene and player-shop item of each good.
+func offers(number: int) -> Array:
+	var result := []
+	var business: Dictionary = state.businesses[number]
+	for good: String in business.stock:
+		var definition: Dictionary = economy.goods[good]
+		result.append({"good": good, "name": definition.name, "price": int(business.price[good]), "stock": int(business.stock[good]),
+			"shop_item": str(definition.get("shop_item", "")), "display": str(definition.get("display", ""))})
+	return result
+
+
+## Maps an item to exactly one simulated good at this business.
+func player_trade_good(number: int, shop_item: String) -> String:
+	if number < 0 or shop_item.is_empty():
+		return ""
+	var business: Dictionary = state.businesses[number]
+	var matched := ""
+	for good: String in business.stock:
+		if str(economy.goods[good].get("shop_item", "")) == shop_item:
+			if not matched.is_empty():
+				return ""
+			matched = good
+	return matched
+
+
+## Read-only preflight. A rejected trade must never change money, stock,
+## statistics, events or the player's external ledger. The WorldModel remains
+## responsible for inventory, access rules and the player's actual wallet.
+func player_trade_error(shop_id: String, shop_item: String, quantity: int, denarii: int, buying: bool) -> String:
+	if state.is_empty() or quantity < 1 or quantity > 99 or denarii < 0 or denarii > 1000000000:
+		return "invalid_trade"
+	var number := business_for_shop(shop_id)
+	if number < 0:
+		return "unmapped_shop"
+	var good := player_trade_good(number, shop_item)
+	if good.is_empty():
+		return "unmapped_item"
+	var business: Dictionary = state.businesses[number]
+	if buying and int(business.stock[good]) < quantity:
+		return "insufficient_stock"
+	if not buying:
+		var amount := denarii * int(economy.currency.per_denarius)
+		var owner := int(business.owner)
+		if int(business.till) + int(state.households[owner].funds) < amount:
+			return "insufficient_funds"
+	return ""
+
+
+## Books a fully validated transaction, never a partial one. The caller must
+## coordinate this with the existing shop model in one transaction boundary.
+func record_player_trade(shop_id: String, shop_item: String, quantity: int, denarii: int, buying: bool) -> bool:
+	if not player_trade_error(shop_id, shop_item, quantity, denarii, buying).is_empty():
+		return false
+	var number := business_for_shop(shop_id)
+	var business: Dictionary = state.businesses[number]
+	var good := player_trade_good(number, shop_item)
+	var amount := denarii * int(economy.currency.per_denarius)
+	if buying:
+		_pay("ext", "player", "biz", number, amount, "player_purchase")
+		_goods(business, good, quantity, "sold")
+	else:
+		# Preflight guarantees the sum of both accounts can cover the full sale.
+		var from_till := mini(amount, int(business.till))
+		_pay("biz", number, "ext", "player", from_till, "player_sale")
+		_pay("hh", int(business.owner), "ext", "player", amount - from_till, "player_sale")
+		_goods(business, good, quantity, "in")
+	_event(int(state.t), "player_trade", {"business": number, "at": business.queue, "good": good, "quantity": quantity, "buying": buying})
+	return true
+
+
+# --- where everybody is ---------------------------------------------------------------
+
+func is_indoors(person: int, now: int) -> bool:
+	var resident: Dictionary = state.residents[person]
+	return resident.act in INDOOR_ACTS and now >= int(resident.arr)
+
+
+func is_walking(person: int, now: int) -> bool:
+	var resident: Dictionary = state.residents[person]
+	return now < int(resident.arr) and now >= int(resident.dep)
+
+
+## Standing spot of a resident at an anchor (slots spread people out).
+func slot_position(anchor_id: String, slot: int) -> Vector3:
+	var anchor: Dictionary = index.anchors[anchor_id]
+	var at: Vector3 = anchor.position
+	if slot < 0 or int(anchor.capacity) <= 1:
+		return at
+	var yaw := deg_to_rad(float(anchor.facing_deg))
+	var forward := Vector3(-sin(yaw), 0, -cos(yaw))
+	var right := Vector3(forward.z, 0, -forward.x) * -1.0
+	match anchor.kind:
+		"queue", "cart_stop":
+			return at - forward * (0.85 * slot) + right * (0.22 if slot % 2 == 1 else 0.0)
+		"guard_post":
+			return at + right * (1.1 * slot)
+		"fountain":
+			var ring := float(Anchors.tag_value(anchor, "ring")) if not Anchors.tag_value(anchor, "ring").is_empty() else 3.0
+			var angle := TAU * float(slot) / float(anchor.capacity) + 0.4
+			return at + Vector3(cos(angle), 0, sin(angle)) * ring
+	var spread := 0.75 + 0.12 * float(anchor.capacity)
+	var around := TAU * float(slot) / float(anchor.capacity)
+	return at + Vector3(cos(around), 0, sin(around)) * spread
+
+
+func slot_facing(anchor_id: String, slot: int) -> float:
+	var anchor: Dictionary = index.anchors[anchor_id]
+	if slot < 0 or int(anchor.capacity) <= 1 or anchor.kind in ["queue", "cart_stop", "guard_post"]:
+		return deg_to_rad(float(anchor.facing_deg))
+	var toward: Vector3 = (anchor.position as Vector3) - slot_position(anchor_id, slot)
+	return atan2(-toward.x, -toward.z)
+
+
+## Polyline of the current walk: start spot, street nodes, destination spot.
+func trip_path(person: int) -> PackedVector3Array:
+	var resident: Dictionary = state.residents[person]
+	var points := PackedVector3Array()
+	var from_anchor: Dictionary = index.anchors[resident.prev]
+	var to_anchor: Dictionary = index.anchors[resident.at]
+	points.append(from_anchor.position)
+	if resident.prev != resident.at:
+		for point: Vector3 in streets.route(streets.node_for(resident.prev, from_anchor.position), streets.node_for(resident.at, to_anchor.position)):
+			points.append(point)
+	points.append(slot_position(resident.at, int(resident.slot)))
+	return points
+
+
+func trip_fraction(person: int, now: int) -> float:
+	var resident: Dictionary = state.residents[person]
+	var span := int(resident.arr) - int(resident.dep)
+	if span <= 0:
+		return 1.0
+	return clampf(float(now - int(resident.dep)) / float(span), 0.0, 1.0)
+
+
+## World position at `now`. Exact for standing residents; for walkers it is
+## the point on the route at the elapsed share of the walk.
+func position_of(person: int, now: int) -> Vector3:
+	var resident: Dictionary = state.residents[person]
+	if now >= int(resident.arr):
+		return slot_position(resident.at, int(resident.slot))
+	var points := trip_path(person)
+	return Streets.along(points, Streets.polyline_length(points) * trip_fraction(person, now))[0]
+
+
+func summary() -> Dictionary:
+	var acts := {}
+	var outdoors := 0
+	var now := int(state.now)
+	for person in state.residents.size():
+		var resident: Dictionary = state.residents[person]
+		var act: String = "walking" if now < int(resident.arr) else str(resident.act)
+		acts[act] = int(acts.get(act, 0)) + 1
+		if not is_indoors(person, now):
+			outdoors += 1
+	return {"residents": state.residents.size(), "households": state.households.size(), "businesses": state.businesses.size(),
+		"outdoors": outdoors, "activities": acts, "weather": state.weather, "stats": state.stats.duplicate(), "processed": _processed_total,
+		"jobs": state.jobs.size()}

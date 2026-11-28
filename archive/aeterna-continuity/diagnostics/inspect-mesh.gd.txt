@@ -1,0 +1,17 @@
+extends SceneTree
+func _initialize() -> void:
+	var scene := load("res://assets/soldiers/heavy_far.glb") as PackedScene
+	if scene == null:
+		quit(1)
+		return
+	var node := scene.instantiate()
+	var inst := node as MeshInstance3D
+	if inst == null:
+		inst = node.find_children("*", "MeshInstance3D", true, false)[0]
+	var mesh := inst.mesh as ArrayMesh
+	var surface: Dictionary = mesh.get("_surfaces")[0]
+	var fmt: int = surface.format
+	print("format=", fmt, " compressed=", bool(fmt & Mesh.ARRAY_FLAG_COMPRESS_ATTRIBUTES), " keys=", surface.keys(), " aabb=", surface.aabb)
+	print("vertex_count=",surface.vertex_count," vertex bytes=",surface.vertex_data.size()," has offset api=",RenderingServer.has_method("mesh_surface_get_format_offset")," has stride api=",RenderingServer.has_method("mesh_surface_get_format_vertex_stride"))
+	node.free()
+	quit()

@@ -1,0 +1,135 @@
+{
+  "forest_spear-baseline.glb": {
+    "git_blob": "c961a42abd5f1cc20c239baf4fa285bad0238a0e",
+    "sha256": "500187a1ae705cd58bbbd3c54e16f2153bff98ff678ca5c5bf98e75e7d7994f7",
+    "bytes": 96212,
+    "original_path": "prototype/assets/germanic_warriors/forest_spear_far.glb",
+    "existing_revision_path": "4d14cd50:prototype/assets/germanic_warriors/forest_spear_far.glb"
+  },
+  "forest_spear-original.glb": {
+    "git_blob": "b370b05dc12f5e5863c2368dc693fc5718fa1b0c",
+    "sha256": "eae00d484e5189177fabc08e8d1c549d877eaa9924f22aa2197050563758e29d",
+    "bytes": 95680,
+    "original_path": "prototype/assets/germanic_warriors/forest_spear_far.glb",
+    "existing_revision_path": "65fd1e53:prototype/assets/germanic_warriors/forest_spear_far.glb"
+  },
+  "forest_spear-planar.glb": {
+    "git_blob": "038d1ecd0920f4f35136de39b224c4ee26477bcb",
+    "sha256": "218ca8b1bfd599dd922a179d0a32a1fe350e51ed7d4db7d609d0104b041ad9f5",
+    "bytes": 96212,
+    "original_path": "prototype/assets/germanic_warriors/forest_spear_far.glb",
+    "archive_path": "archive/aeterna-continuity/formation/forest_spear-planar.glb"
+  },
+  "forest_spear-repro.glb": {
+    "git_blob": "c961a42abd5f1cc20c239baf4fa285bad0238a0e",
+    "sha256": "500187a1ae705cd58bbbd3c54e16f2153bff98ff678ca5c5bf98e75e7d7994f7",
+    "bytes": 96212,
+    "original_path": "prototype/assets/germanic_warriors/forest_spear_far.glb",
+    "existing_revision_path": "4d14cd50:prototype/assets/germanic_warriors/forest_spear_far.glb"
+  },
+  "forest_spear-sole-center.glb": {
+    "git_blob": "c961a42abd5f1cc20c239baf4fa285bad0238a0e",
+    "sha256": "500187a1ae705cd58bbbd3c54e16f2153bff98ff678ca5c5bf98e75e7d7994f7",
+    "bytes": 96212,
+    "original_path": "prototype/assets/germanic_warriors/forest_spear_far.glb",
+    "existing_revision_path": "4d14cd50:prototype/assets/germanic_warriors/forest_spear_far.glb"
+  },
+  "forest_spear-support.glb": {
+    "git_blob": "c961a42abd5f1cc20c239baf4fa285bad0238a0e",
+    "sha256": "500187a1ae705cd58bbbd3c54e16f2153bff98ff678ca5c5bf98e75e7d7994f7",
+    "bytes": 96212,
+    "original_path": "prototype/assets/germanic_warriors/forest_spear_far.glb",
+    "existing_revision_path": "4d14cd50:prototype/assets/germanic_warriors/forest_spear_far.glb"
+  },
+  "forest_swordsman-baseline.glb": {
+    "git_blob": "b523f7dd979a65be6b8f6d74d9a8e736e3113cdd",
+    "sha256": "03d411c460de45507fd1cfb3e80277e98d55d9b404f3958f687f4481f269701f",
+    "bytes": 96276,
+    "original_path": "prototype/assets/germanic_warriors/forest_swordsman_far.glb",
+    "existing_revision_path": "5d798af5:prototype/assets/germanic_warriors/forest_swordsman_far.glb"
+  },
+  "forest_swordsman-contact.glb": {
+    "git_blob": "af4e58561af21fe02a6fca1a0ada57b0b428fe42",
+    "sha256": "5d8f294db8fc5b51c7970002f6526315b9b0e5f5b986cb7520aa23ce92093a0d",
+    "bytes": 96276,
+    "original_path": "prototype/assets/germanic_warriors/forest_swordsman_far.glb",
+    "existing_revision_path": "4d14cd50:prototype/assets/germanic_warriors/forest_swordsman_far.glb"
+  },
+  "forest_swordsman-original.glb": {
+    "git_blob": "73ecda41fd70fefc1541e1a2631b4a40aa37d5d8",
+    "sha256": "f88923624994034a096d47e02926439f7c936a9bd12bf7461d029b2032a6960b",
+    "bytes": 95744,
+    "original_path": "prototype/assets/germanic_warriors/forest_swordsman_far.glb",
+    "existing_revision_path": "65fd1e53:prototype/assets/germanic_warriors/forest_swordsman_far.glb"
+  },
+  "forest_swordsman-planar.glb": {
+    "git_blob": "176ab6591c84ab9ad1c6a84685d7f81595e4b2e7",
+    "sha256": "c6f4d63b50763cf1b1071668dc1d7acc403d927bd994167f2f4ab5cee825aeb3",
+    "bytes": 96276,
+    "original_path": "prototype/assets/germanic_warriors/forest_swordsman_far.glb",
+    "archive_path": "archive/aeterna-continuity/formation/forest_swordsman-planar.glb"
+  },
+  "forest_swordsman-repro.glb": {
+    "git_blob": "af4e58561af21fe02a6fca1a0ada57b0b428fe42",
+    "sha256": "5d8f294db8fc5b51c7970002f6526315b9b0e5f5b986cb7520aa23ce92093a0d",
+    "bytes": 96276,
+    "original_path": "prototype/assets/germanic_warriors/forest_swordsman_far.glb",
+    "existing_revision_path": "4d14cd50:prototype/assets/germanic_warriors/forest_swordsman_far.glb"
+  },
+  "forest_swordsman-sole-center.glb": {
+    "git_blob": "7dc65bbab16c511a172f7b41cbc971a60fdfba76",
+    "sha256": "6a42f8574188e361b6f7362b45e63cc56be8687120c72a07afeb9f16d639d84d",
+    "bytes": 96276,
+    "original_path": "prototype/assets/germanic_warriors/forest_swordsman_far.glb",
+    "archive_path": "archive/aeterna-continuity/formation/forest_swordsman-sole-center.glb"
+  },
+  "forest_swordsman-support.glb": {
+    "git_blob": "2d10176d652da0e8dab7774cbc628cfce22ac5ee",
+    "sha256": "7ad0348eb6743b2fa86434d7666b982fcb774bc66b57729ee12d66f939851a6a",
+    "bytes": 96276,
+    "original_path": "prototype/assets/germanic_warriors/forest_swordsman_far.glb",
+    "archive_path": "archive/aeterna-continuity/formation/forest_swordsman-support.glb"
+  },
+  "forest_skirmisher-baseline.glb": {
+    "git_blob": "98c9aba77486855a3a002e808ecdef588e52b82c",
+    "sha256": "67f3362d8f1122437592843d7634e48be4ef9ef78d0a9c6116522ebf40d3a54c",
+    "bytes": 95744,
+    "original_path": "prototype/assets/germanic_warriors/forest_skirmisher_far.glb",
+    "existing_revision_path": "4d14cd50:prototype/assets/germanic_warriors/forest_skirmisher_far.glb"
+  },
+  "forest_skirmisher-original.glb": {
+    "git_blob": "39d931b313aac79e68f979df472ce59710d7e689",
+    "sha256": "06e081302a13c491ddd76b539af78a7b2fd46ae6d11e4442467eac3d9a24df6e",
+    "bytes": 94984,
+    "original_path": "prototype/assets/germanic_warriors/forest_skirmisher_far.glb",
+    "existing_revision_path": "65fd1e53:prototype/assets/germanic_warriors/forest_skirmisher_far.glb"
+  },
+  "forest_skirmisher-planar.glb": {
+    "git_blob": "cec081f7b87969cb02ac4d68beb7098fbbf4c1cc",
+    "sha256": "d216d102cbe91dbd0cac1fcd8bfe0c096872b39cea8fcc509c5441a3296aef1d",
+    "bytes": 95744,
+    "original_path": "prototype/assets/germanic_warriors/forest_skirmisher_far.glb",
+    "archive_path": "archive/aeterna-continuity/formation/forest_skirmisher-planar.glb"
+  },
+  "forest_skirmisher-repro.glb": {
+    "git_blob": "98c9aba77486855a3a002e808ecdef588e52b82c",
+    "sha256": "67f3362d8f1122437592843d7634e48be4ef9ef78d0a9c6116522ebf40d3a54c",
+    "bytes": 95744,
+    "original_path": "prototype/assets/germanic_warriors/forest_skirmisher_far.glb",
+    "existing_revision_path": "4d14cd50:prototype/assets/germanic_warriors/forest_skirmisher_far.glb"
+  },
+  "forest_skirmisher-sole-center.glb": {
+    "git_blob": "16392b7b96cd47215a6cce16158bb63f4a06d863",
+    "sha256": "4e6d727828abff47a2ead52cb954d6e23ba966fc8b64d885f63bf3024108de89",
+    "bytes": 95744,
+    "original_path": "prototype/assets/germanic_warriors/forest_skirmisher_far.glb",
+    "archive_path": "archive/aeterna-continuity/formation/forest_skirmisher-sole-center.glb"
+  },
+  "forest_skirmisher-support.glb": {
+    "git_blob": "4cab7569003f5a36b69ed0dc0a36fd5fd7636197",
+    "sha256": "82a082ef63752723da76b975b72cc0f2ccbc7f289097cdfa01bb38d671664acb",
+    "bytes": 95744,
+    "original_path": "prototype/assets/germanic_warriors/forest_skirmisher_far.glb",
+    "archive_path": "archive/aeterna-continuity/formation/forest_skirmisher-support.glb"
+  }
+}
