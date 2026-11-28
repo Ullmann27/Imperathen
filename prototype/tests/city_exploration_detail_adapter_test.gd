@@ -89,6 +89,22 @@ func _ray_height(world: Node3D, x: float, z: float) -> float:
 	return (hit.get("position", Vector3(0, -99, 0)) as Vector3).y
 
 
+func _collision_signature(world: Node3D) -> Array[String]:
+	var entries: Array[String] = []
+	for node in world.find_children("*", "CollisionShape3D", true, false):
+		var shape := node as CollisionShape3D
+		var cursor: Node = shape
+		while cursor != null and cursor != world:
+			if cursor.get_meta(Adapter.OWNER_META, 0) == Adapter.OWNER_VERSION:
+				var box := shape.shape as BoxShape3D
+				if box != null:
+					entries.append(str(shape.global_transform) + "|" + str(box.size))
+				break
+			cursor = cursor.get_parent()
+	entries.sort()
+	return entries
+
+
 func _run() -> void:
 	var invalid := Adapter.install(null)
 	verify(not invalid.ok and invalid.status == "unsupported_city", "Null city is an explicit no-op")
@@ -125,17 +141,28 @@ func _run() -> void:
 	verify(absf(_ray_height(world, -8, 60) - 0.115) < 0.0001, "Near corner has the exact local walk height")
 	verify(absf(_ray_height(world, 8, 68) - 0.115) < 0.0001, "Far corner has the exact local walk height")
 	verify(absf(_ray_height(world, 12, 64) - 0.11) < 0.0001, "Original road remains unchanged outside the detail patch")
+	var physical := _collision_signature(world)
+	verify(physical.size() == 4, "All four authored box shapes exist")
 	var again := Adapter.install(city, "high")
 	verify(again.ok and again.removed_groups == 3 and _owned_count(world) == 3, "Repeated application replaces only its three owned groups")
 	verify(not is_instance_valid(street_group), "Previous owned group is freed rather than accumulated")
 	verify(_original_snapshot(world) == original, "Original assets survive the quality rebuild unchanged")
+	verify(_collision_signature(world) == physical, "High and balanced have identical physical shapes")
+	var very_high := Adapter.install(city, "very_high")
+	verify(very_high.ok and _collision_signature(world) == physical, "Very high preserves identical collision")
 	var low := Adapter.install(city, "low")
-	verify(low.ok and low.status == "disabled_for_low" and low.removed_groups == 3, "Low profile removes optional detail")
-	verify(_owned_count(world) == 0, "No detail groups remain in the low profile")
+	verify(low.ok and low.status == "installed" and low.removed_groups == 3 and low.lod == 2, "Low uses existing LOD2 instead of deleting physical objects")
+	verify(_owned_count(world) == 3 and _collision_signature(world) == physical, "All low profile physics remains identical")
+	var low_batch := city.get_node(Adapter.GROUP_NAME + "/basoli_4m_batch") as MultiMeshInstance3D
+	verify(low_batch != null and low_batch.visibility_range_end == 45.0, "Low keeps a shorter bounded visual range")
 	await physics_frame
 	await physics_frame
-	verify(absf(_ray_height(world, 0, 64) - 0.11) < 0.0001, "Disabling the overlay restores the original road surface")
+	verify(absf(_ray_height(world, 0, 64) - 0.115) < 0.0001, "Low retains the exact authoritative walk height")
+	verify(absf(_ray_height(world, 12, 64) - 0.11) < 0.0001, "Low preserves original street outside the patch")
 	verify(_original_snapshot(world) == original, "Low mode preserves original world authority")
+	# Explicitly clear only the owned fixture groups before testing first-install failures.
+	for parent: Node3D in [city, pottery, food]:
+		parent.get_node(Adapter.GROUP_NAME).free()
 	var foreign := Node3D.new()
 	foreign.name = Adapter.GROUP_NAME
 	city.add_child(foreign)

@@ -46,18 +46,14 @@ static func install(city_root: Node3D, profile: String = "balanced") -> Dictiona
 			report.reason = "An unrelated node already uses the support name; nothing changed."
 			return report
 		previous.append(existing)
-	if profile == "low":
-		report.removed_groups = _remove_owned(previous)
-		report.ok = true
-		report.status = "disabled_for_low"
-		report.reason = "Only this adapter's optional details were removed; existing city remains."
-		return report
 	if not ResourceLoader.exists(Architecture.LIBRARY_PATH, "PackedScene") or not FileAccess.file_exists(Architecture.MANIFEST_PATH):
 		report.status = "detail_assets_unavailable"
 		report.reason = "Detail resources are not imported; existing city and details remain."
 		return report
-	var lod := 1 if profile == "balanced" else 0
-	var distance_limit := 75.0 if profile == "balanced" else (100.0 if profile == "high" else 130.0)
+	# Graphics profiles change visual LOD and range, never the walkable
+	# surface or the physical market objects. LOD2 retains their silhouette.
+	var lod := 2 if profile == "low" else (1 if profile == "balanced" else 0)
+	var distance_limit := 45.0 if profile == "low" else (75.0 if profile == "balanced" else (100.0 if profile == "high" else 130.0))
 	var road_group := _new_group("street")
 	road_group.transform = _relative_transform(street, city_root)
 	var placements: Array[Transform3D] = []

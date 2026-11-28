@@ -28,7 +28,7 @@ FAILURE = re.compile(r"SCRIPT ERROR:|Parse Error:|^ERROR:|^USER ERROR:", re.MULT
 
 def run_check(engine, name, arguments, marker, environment, report):
     started = time.monotonic()
-    timeout = {"import": 600, "vegetation_safe": 360, "motion_measurement": 2400, "formation_agents": 600, "formation_levels": 600}.get(name, 120)
+    timeout = {"import": 600, "vegetation_safe": 360, "motion_measurement": 2400, "formation_agents": 600, "formation_levels": 600, "character_phase1": 420, "character_phase2": 420}.get(name, 120)
     try:
         result = subprocess.run([engine, "--headless", "--path", str(PROJECT), *arguments],
                                 cwd=ROOT, env=environment, text=True, encoding="utf-8",
@@ -145,6 +145,8 @@ def main():
             ("house_interiors", ["--fixed-fps", "60", "--script", "res://tests/house_interiors_test.gd"], "HOUSE_INTERIORS_PASS"),
             ("operation_prima_art", ["--fixed-fps", "60", "--script", "res://tests/operation_prima_art_test.gd"], "OPERATION_PRIMA_ART_PASS"),
             ("genesis_mission_event_batch", ["--script", "res://tests/genesis_mission_event_batch_test.gd"], "GENESIS_MISSION_BATCH_PASS"),
+            ("character_phase1", ["--fixed-fps", "60", "--script", "res://tests/character_core_phase1_test.gd"], "CHARACTER_PHASE1_PASS"),
+            ("character_phase2", ["--fixed-fps", "60", "--script", "res://tests/character_equipment_phase2_test.gd"], "CHARACTER_PHASE2_PASS"),
             ("frontier_integration", ["--fixed-fps", "60", "--script", "res://tests/frontier_integration_test.gd"], "FRONTIER_INTEGRATION_PASS"),
             ("village_experience", ["--fixed-fps", "60", "--script", "res://tests/village_experience_test.gd"], "VILLAGE_EXPERIENCE_PASS"),
             ("village_panels", ["--fixed-fps", "60", "--script", "res://tests/village_panel_test.gd"], "VILLAGE_PANEL_PASS"),

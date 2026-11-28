@@ -107,6 +107,9 @@ var _running := false
 var _camera_solver := CameraObstruction.new()
 var _camera_previous := Vector3.INF
 var _action_left := 0.0
+var _player_capsule: CollisionShape3D
+var _step_remaining: float = 0.0
+var _step_direction: Vector3 = Vector3.ZERO
 var _save_elapsed := 0.0
 var _hud := CanvasLayer.new()
 var _safe := Control.new()
@@ -427,6 +430,7 @@ func _build_player() -> void:
 	collider.shape = capsule
 	collider.position.y = -0.15
 	player.add_child(collider)
+	_player_capsule = collider
 	add_child(player)
 	figure.name = "Youth"
 	figure.profile = profile
@@ -780,36 +784,88 @@ func _physics_process(delta: float) -> void:
 			figure.youth_ground_floor_y=nominal
 	_place_camera(delta)
 
-func _step_up(motion: Vector3) -> bool:
-	if not player.is_on_floor() or motion.length_squared()<0.0000001:
+## Adapt the independently tested CharacterCore swept-capsule entry to the
+## existing city controller. The city still owns its original body, visuals,
+## animation drive and WorldModel; no parallel controller is instantiated.
+func _city_walkable_landing(from: Transform3D, distance: float, hit: KinematicCollision3D) -> bool:
+	return player.test_move(from, Vector3.DOWN * distance, hit, player.safe_margin, false) and hit.get_normal().dot(Vector3.UP) >= cos(player.floor_max_angle)
+
+
+func _continue_city_step(horizontal: Vector3) -> bool:
+	if horizontal.length_squared() < 0.000001 or horizontal.normalized().dot(_step_direction) < 0.95:
+		_step_remaining = 0.0
 		return false
-	var start := player.global_transform
-	if not player.test_move(start,motion):
+	var origin: Transform3D = player.global_transform
+	if player.test_move(origin, horizontal, null, player.safe_margin, false):
+		_step_remaining = 0.0
 		return false
-	if player.test_move(start,Vector3.UP*MAX_STEP):
-		return false
-	var elevated := start
-	elevated.origin += Vector3.UP*MAX_STEP
-	if player.test_move(elevated,motion):
-		return false
-	elevated.origin += motion
+	var next: Transform3D = origin
+	next.origin += horizontal
 	var landing := KinematicCollision3D.new()
-	if not player.test_move(elevated,Vector3.DOWN*(MAX_STEP+0.03),landing,player.safe_margin):
+	if _city_walkable_landing(next, 0.045, landing):
+		next.origin += landing.get_travel()
+		player.global_position = next.origin
+		player.velocity.y = 0.0
+		_step_remaining = 0.0
+		return true
+	var look: Vector3 = horizontal.normalized() * _step_remaining
+	var ahead: Transform3D = next
+	if _step_remaining <= 0.0 or player.test_move(next, look, null, player.safe_margin, false):
+		_step_remaining = 0.0
 		return false
-	var destination := elevated.origin+landing.get_travel()
-	var rise := destination.y-start.origin.y
-	if rise<0.003 or rise>MAX_STEP or landing.get_normal().y<=0.01:
+	ahead.origin += look
+	if not _city_walkable_landing(ahead, 0.045, landing):
+		_step_remaining = 0.0
 		return false
-	var probe := landing.get_position()+motion.normalized()*0.04+Vector3.UP*0.06
-	var query := PhysicsRayQueryParameters3D.create(probe,probe+Vector3.DOWN*0.12,1,[player.get_rid()])
-	var floor := get_world_3d().direct_space_state.intersect_ray(query)
-	if floor.is_empty() or (floor.normal as Vector3).dot(Vector3.UP)<cos(player.floor_max_angle):
+	player.global_position = next.origin
+	player.velocity.y = 0.0
+	_step_remaining = maxf(0.0, _step_remaining - horizontal.length())
+	return true
+
+
+func _step_up(horizontal: Vector3) -> bool:
+	if _step_remaining > 0.0:
+		return _continue_city_step(horizontal)
+	if not player.is_on_floor() or horizontal.length_squared() < 0.000001:
 		return false
-	var tread_rise := float(floor.position.y)-(start.origin.y-SOLE_OFFSET)
-	if tread_rise>MAX_STEP+player.safe_margin:
+	if not is_instance_valid(_player_capsule) or _player_capsule.disabled or not _player_capsule.shape is CapsuleShape3D:
 		return false
-	player.global_position = destination
-	player.velocity.y = 0
+	var origin: Transform3D = player.global_transform
+	var obstruction := KinematicCollision3D.new()
+	if not player.test_move(origin, horizontal, obstruction, player.safe_margin, false):
+		return false
+	if obstruction.get_normal().dot(Vector3.UP) >= cos(player.floor_max_angle):
+		return false
+	var capsule: CapsuleShape3D = _player_capsule.shape as CapsuleShape3D
+	var probe: float = capsule.radius * maxf(_player_capsule.global_basis.x.length(), _player_capsule.global_basis.z.length()) + 0.025
+	var lift: Vector3 = Vector3.UP * (MAX_STEP + player.safe_margin * 3.0)
+	if player.test_move(origin, lift, null, player.safe_margin, false):
+		return false
+	var raised: Transform3D = origin
+	raised.origin += lift
+	var look: Vector3 = horizontal + horizontal.normalized() * probe
+	if player.test_move(raised, look, null, player.safe_margin, false):
+		return false
+	var ahead: Transform3D = raised
+	ahead.origin += look
+	var landing := KinematicCollision3D.new()
+	if not _city_walkable_landing(ahead, MAX_STEP + player.floor_snap_length, landing):
+		return false
+	var destination: Vector3 = ahead.origin + landing.get_travel()
+	var rise: float = destination.y - origin.origin.y
+	if rise < 0.003 or rise > MAX_STEP:
+		return false
+	var actual_lift: Vector3 = Vector3.UP * (rise + player.safe_margin * 3.0)
+	if player.test_move(origin, actual_lift, null, player.safe_margin, false):
+		return false
+	var entry: Transform3D = origin
+	entry.origin += actual_lift
+	if player.test_move(entry, horizontal, null, player.safe_margin, false):
+		return false
+	player.global_position = entry.origin + horizontal
+	player.velocity.y = 0.0
+	_step_remaining = probe
+	_step_direction = horizontal.normalized()
 	return true
 
 ## The QA owner supplies calendar instants, never a second autonomous clock.
@@ -1149,6 +1205,8 @@ func teleport(point: Vector3) -> void:
 	if _horse_mounted():
 		_market_message("Steig vor dem Ortswechsel ab.")
 		return
+	_step_remaining = 0.0
+	_step_direction = Vector3.ZERO
 	player.position = point
 	player.velocity = Vector3.ZERO
 	figure.youth_ground_floor_y=INF

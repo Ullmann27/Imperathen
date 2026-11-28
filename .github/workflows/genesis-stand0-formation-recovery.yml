@@ -1,7 +1,7 @@
 name: GENESIS Stand 0 formation recovery (strict gates)
 on:
   push:
-    branches: ['fix/genesis-stand0-formation-recovery-20261128', 'hoplite/*--stand-zero', 'integration/astra-sol-stand-zero-20261128', 'fix/astra-sol-city-fixture-parity-20261128']
+    branches: ['fix/genesis-stand0-formation-recovery-20261128', 'hoplite/*--stand-zero', 'integration/astra-sol-stand-zero-20261128', 'fix/astra-sol-city-fixture-parity-20261128', 'fix/astra-sol-city-runtime-parity-20261128']
 permissions:
   contents: read
 jobs:
@@ -108,6 +108,7 @@ jobs:
           run_check operation_prima_art_test viva-breakfast OPERATION_PRIMA_ART_PASS
           run_check genesis_mission_event_batch_test genesis-receipts GENESIS_MISSION_BATCH_PASS
           run_check roman_city_surface_visibility_test city-chronology ROMAN_CITY_SURFACE_VISIBILITY_PASS
+          run_check city_exploration_detail_adapter_test city-detail CITY_EXPLORATION_DETAIL_PASS
           run_check roman_city_routes_test city-routes ROMAN_CITY_ROUTES_PASS
           run_check formation_far_ground_test far-ground FORMATION_FAR_GROUND_PASS
           run_check tribal_lod_contract_test tribal-lod TRIBAL_LOD_PASS
