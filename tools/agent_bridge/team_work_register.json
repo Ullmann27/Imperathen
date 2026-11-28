@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 228,
+  "version": 229,
   "tasks": [
     {
       "id": "K101",
@@ -1138,6 +1138,19 @@
         "prototype/scripts/formation/formation_levels.gd"
       ],
       "note": "New review of post-fix swept body broadphase performance/progress, not re-diagnosing N21/N24/N30. Actual run 46104088321: 28/28 focused, original root/phase gates all green, static LOD/wheel separate. Check bounded candidate enumeration, deterministic update ordering, possible mutual blocking/starvation and dense formations. Propose independent new negative-control tests/measurements without modifying validated limits or active branches. Existing CI cost limits, no paid requests. Actual bridge commit 1949489ecabf3ef12651b68ce3c8cc7e0d1fcbce pushed with expected HEAD, one task 12288 tokens. Workflow 46105483466 observed in_progress."
+    },
+    {
+      "id": "CITY-FORUM-MORTAR-REVIEW",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "8a8256a30145918739312588d70c4585768fa568",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/world/city_exploration.gd",
+        "prototype/tests/roman_city_visual_capture.gd"
+      ],
+      "note": "Independent actual city visual defect from run 46101992690, artifact 15245677495 ZIP SHA256 verified; 6 real 1280x720 captures. Bright travertine mortar visibly dominates joints; builder explicitly intended dark mortar but uses STONE. Isolated runtime material override only for exact Forum_Worn_Stonework Travertine surface; copy source material, preserve texture/geometry/collision/LOD, verify targeted surface and capture hashes, no visual acceptance pending comparison. Base city builder, runtime and capture blobs match baseline. No external API or owner asset transfer."
     }
   ]
 }
