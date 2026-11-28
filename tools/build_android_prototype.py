@@ -295,6 +295,11 @@ def configure_copy(project: Path, toolchain: dict, renderer: str = "compatibilit
         # app can coexist with an existing signed installation.
         config.set(options, "package/unique_name", json.dumps(QA_PACKAGE))
         config.set(options, "package/name", json.dumps("IMPERATHEN QA"))
+        # Godot also discovers regression scripts nested under scripts/.
+        preset = toolchain["preset_section"]
+        filters = json.loads(config.get(preset, "exclude_filter")).split(",")
+        if "scripts/tests/*" not in filters:
+            config.set(preset, "exclude_filter", json.dumps(",".join([*filters, "scripts/tests/*"])))
     config.set(options, "custom_template/debug", json.dumps(str(Path(toolchain["template_dir"]) / "android_debug.apk")))
     release = Path(toolchain["template_dir"]) / "android_release.apk"
     if release.is_file():
