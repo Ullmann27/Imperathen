@@ -12,6 +12,7 @@ var _elapsed := 0.0
 var _blink_at := -1.0
 var _blink_duration := 0.18
 var _next_blink := 2.0
+var _distant := false
 
 
 func bind(model: Node3D, actor_identity: String) -> void:
@@ -23,8 +24,12 @@ func bind(model: Node3D, actor_identity: String) -> void:
 		_blink_at = -1.0
 		_next_blink = _random.randf_range(1.2, 3.8)
 		_values.fill(0.0)
+		_distant = false
 	_elapsed = 0.0
-	for mesh: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
+	var meshes := model.find_children("*", "MeshInstance3D", true, false)
+	if model is MeshInstance3D:
+		meshes.push_front(model)
+	for mesh: MeshInstance3D in meshes:
 		if not mesh.mesh:
 			continue
 		var slots := PackedInt32Array()
@@ -42,15 +47,21 @@ func advance(delta: float, action: String, detail: int) -> void:
 	if _targets.is_empty() or not is_finite(delta) or delta < 0.0:
 		return
 	_clock += delta
-	_elapsed += delta
 	if _clock >= _next_blink:
 		_blink_at = _clock
 		_blink_duration = _random.randf_range(0.16, 0.21)
 		_next_blink = _clock + _random.randf_range(2.4, 5.6)
-	# No per-frame face uploads for distant silhouettes. The bind/pose path clears
-	# the outgoing weights immediately, so an actor cannot remain half blinking.
+	# Clear exactly once on entry, including distance changes without a rebind.
+	# Do not accumulate near-face interpolation time while distant.
 	if detail >= 2:
+		if not _distant:
+			_values.fill(0.0)
+			_apply()
+		_distant = true
+		_elapsed = 0.0
 		return
+	_distant = false
+	_elapsed += delta
 	var interval := 1.0 / (30.0 if detail == 0 else 15.0)
 	if _elapsed < interval:
 		return
@@ -73,8 +84,10 @@ func pose(action: String, normalized: float, detail: int) -> void:
 	if action == "death":
 		_values[0] = 1.0
 		_values[1] = 1.0
-	if detail >= 2:
+	_distant = detail >= 2
+	if _distant:
 		_values.fill(0.0)
+		_elapsed = 0.0
 	_apply()
 
 

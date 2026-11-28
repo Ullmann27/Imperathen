@@ -1,0 +1,94 @@
+name: AETERNA night consolidated runtime verification
+on:
+  push:
+    branches: ['integration/aeterna-night-consolidated-20261128']
+permissions:
+  contents: read
+concurrency:
+  group: aeterna-night-consolidation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      OPENBLAS_NUM_THREADS: '2'
+      OMP_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Pin source and verify exact transferred blobs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/night-consolidation "$RUNNER_TEMP/godot"
+          git rev-parse HEAD > artifacts/night-consolidation/source.txt
+          for pair in 'prototype/scripts/world/village/i02_props.gd 1f7966a6ffd1d3e28aab6e4475c481ac94439d43' 'prototype/tests/i02_props_test.gd 98b9aaba3aba7e0584513a39fa434feb66fbbe16' 'prototype/scripts/visuals/facial_motion.gd ebe187496e37ddd4ba3281bad7ae4c934291e364' 'prototype/tests/facial_motion_lifecycle_test.gd d7d45bbdf33009c068830d9ad121e2db4f38c7e7' 'prototype/assets/legio/neighbour_basket.glb 0c9043c91be9727e2d6c9c2dbe41f0ed46946c60'; do
+            read -r file expected <<< "$pair"
+            actual="$(git hash-object "$file")"
+            printf '%s %s\n' "$file" "$actual" | tee -a artifacts/night-consolidation/blobs.txt
+            test "$actual" = "$expected"
+          done
+      - name: Stage existing original civil youth in the runner only
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 300s sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update -q
+          timeout 600s sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends python3-numpy python3-scipy python3-pil xvfb xauth libgl1-mesa-dri
+          /usr/bin/python3 tools/characters/stage_original_youth.py --archive "$RUNNER_TEMP/imperathen-original-youth-runtime.zip" --report artifacts/night-consolidation/original-youth-status.json
+          curl -fLsS --retry 3 --connect-timeout 15 --max-time 90 'https://accad.ohio-state.edu/sites/accad.osu.edu/files/Male2_bvh.zip' -o "$RUNNER_TEMP/accad-male2.zip"
+          /usr/bin/python3 tools/characters/stage_youth_civil.py --source prototype/assets/characters --accad-archive "$RUNNER_TEMP/accad-male2.zip" --work "$RUNNER_TEMP/youth-civil" 2>&1 | tee artifacts/night-consolidation/civil-stage.log
+          for lod in 0 1 2 3; do test -s "prototype/assets/characters/hero_meshy_italia_civil_$lod.glb"; done
+          test -s prototype/assets/animations/accad_youth_civil_motion.json
+      - name: Install official checksum-verified Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 --connect-timeout 15 --max-time 120 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 --connect-timeout 15 --max-time 300 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Joint runtime, story, camera and city regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$GITHUB_WORKSPACE/artifacts/night-consolidation"
+          timeout --kill-after=10s 600s "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee "$out/import.log"
+          status=0
+          run_check() {
+            local label="$1" marker="$2" state
+            shift 2
+            state="$(mktemp -d "$RUNNER_TEMP/night-test.XXXXXX")"
+            mkdir -p "$state/data" "$state/config" "$state/cache"
+            if ! XDG_DATA_HOME="$state/data" XDG_CONFIG_HOME="$state/config" XDG_CACHE_HOME="$state/cache" timeout --kill-after=10s 600s "$@" 2>&1 | tee "$out/$label.log"; then status=1; fi
+            if ! grep -Fq "$marker" "$out/$label.log" || grep -Eq 'SCRIPT ERROR:|Parse Error:|^ERROR:' "$out/$label.log"; then status=1; fi
+          }
+          run_check i02-props I02_PROPS_PASS "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/i02_props_test.gd
+          run_check i02-world I02_WORLD_PASS "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/i02_world_props_test.gd
+          run_check facial FACIAL_LOD_PASS "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/facial_motion_lifecycle_test.gd
+          run_check camera CAMERA_COLLISION_PASS "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/camera_collision_test.gd
+          run_check i01 I01_FLOW_PASS "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/i01_flow_test.gd
+          run_check i03 I03_FLOW_PASS "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/i03_flow_test.gd
+          run_check i04 I04_SLICE_PASS "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/i04_slice_test.gd
+          run_check city-microdetail CITY_SURFACE_MICRODETAIL_PASS xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --fixed-fps 60 --script res://tests/city_surface_microdetail_test.gd
+          run_check city-signage CITY_MARKET_SIGNAGE_PASS "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/city_market_signage_test.gd
+          run_check city-paving CITY_EXPLORATION_DETAIL_PASS "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/city_exploration_detail_adapter_test.gd
+          exit "$status"
+      - name: Retain evidence, not private assets or APKs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: aeterna-night-consolidation-${{ github.run_id }}
+          path: artifacts/night-consolidation/
+          if-no-files-found: warn
+          retention-days: 14
