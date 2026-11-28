@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 203,
+  "version": 204,
   "tasks": [
     {
       "id": "K101",
@@ -920,7 +920,7 @@
       "owner": "Coordinator",
       "status": "submitted",
       "revision": "8a8256a30145918739312588d70c4585768fa568",
-      "run_id": "46092418232",
+      "run_id": "46096417387",
       "scope": [
         "prototype/scripts/battle/battle_model.gd",
         "prototype/scripts/formation/formation_agents.gd",
@@ -929,7 +929,7 @@
         "prototype/tests/formation_agents_test.gd"
       ],
       "access": "edit",
-      "note": "Own isolated branch fix/aeterna-formation-wheel-authority-20261128 commit 5153f8354595d9472cde45f3c056ad7761976d73 on #197. Verified #177 battle model and formation base blobs identical to shared candidate base; reuse prior independently green authority/casualty implementation only in isolated branch. New runtime distinguishes adjacent authoritative >75-degree discrete turn from visual wheel lag, per-unit counters, applies once; adds real face/reverse-move regressions preserving original 60/180 and valley_muster gates. Actual run 46092418232 in_progress. No integration/green claim; original global assertion and all motion budgets untouched. Actual 46092418232/job 140816137495 at 5153f83: focused slot authority 27/27, battle command 411/411, rules 146/146, valley muster 133/133. Original formation 82/87 and 18/22 remain red. Max lag 92.9093 deg vs max authoritative step 41.253 deg; reverse refile once. Original global wheel counter gate still fails. Next bounded diagnostic retains all gates, adds per-unit refile/rematch deltas and worst actual LOD transition details to formation_agents_test.gd on the same isolated branch. No shared integration."
+      "note": "Own isolated branch fix/aeterna-formation-wheel-authority-20261128 commit 5153f8354595d9472cde45f3c056ad7761976d73 on #197. Verified #177 battle model and formation base blobs identical to shared candidate base; reuse prior independently green authority/casualty implementation only in isolated branch. New runtime distinguishes adjacent authoritative >75-degree discrete turn from visual wheel lag, per-unit counters, applies once; adds real face/reverse-move regressions preserving original 60/180 and valley_muster gates. Actual run 46092418232 in_progress. No integration/green claim; original global assertion and all motion budgets untouched. Actual 46092418232/job 140816137495 at 5153f83: focused slot authority 27/27, battle command 411/411, rules 146/146, valley muster 133/133. Original formation 82/87 and 18/22 remain red. Max lag 92.9093 deg vs max authoritative step 41.253 deg; reverse refile once. Original global wheel counter gate still fails. Next bounded diagnostic retains all gates, adds per-unit refile/rematch deltas and worst actual LOD transition details to formation_agents_test.gd on the same isolated branch. No shared integration. Diagnostic commit 842f995bdb2bd08f03b43ba77cc3a80a3e38893a pushed with exact expected SHA 5153f83; compare ahead 1 behind 0, only formation_agents_test.gd (+16/-1); original global wheel assertion and 40mm LOD, position and phase gates untouched. Actual focused workflow 46096417387 observed in_progress. No runtime patch or green claim."
     },
     {
       "id": "N30",
