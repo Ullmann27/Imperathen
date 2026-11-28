@@ -350,11 +350,36 @@ class RomanCityLayoutTest(unittest.TestCase):
                     for (_x, _y, cz), (sx, sy, sz), _a, _p in records:
                         out[round(cz, 6), round(sz, 6)] += sx * sy
                     return out
-                solid = areas([r for r in self.city.boxes[id(colliders[0].data)] if r[3]])
-                visual = defaultdict(float)
-                for tile in tiles:
-                    for key, value in areas(self.city.boxes[id(tile.data)]).items():
-                        visual[key] += value
+                if group_name == "Main_Streets":
+                    # The street is now an exterior shell, not a collection
+                    # of independent boxes. Compare ALL actual upward faces
+                    # by support plane and projected area, including slopes.
+                    # This catches a missing or extra floor even if the
+                    # overall footprint and volume happen to match.
+                    def add_support_planes(out, obj, physical):
+                        vertices = obj.data.cv if physical else obj.data.v
+                        indices = obj.data.cf if physical else obj.data.f
+                        for face in indices:
+                            points = [Vector(transform(obj, vertices[i])) for i in face]
+                            for i in range(1,len(points)-1):
+                                normal = (points[i]-points[0]).cross(points[i+1]-points[0])
+                                if normal[2] <= 1e-12:
+                                    continue
+                                plane = (round(normal[0]/normal[2],6),
+                                         round(normal[1]/normal[2],6),
+                                         round(sum(normal[k]*points[0][k] for k in range(3))/normal[2],6))
+                                out[plane] += normal[2]*.5
+                    solid, visual = defaultdict(float), defaultdict(float)
+                    add_support_planes(solid,colliders[0],True)
+                    for tile in tiles:
+                        add_support_planes(visual,tile,False)
+                else:
+                    solid = areas([r for r in self.city.boxes[id(colliders[0].data)] if r[3]])
+                    visual = defaultdict(float)
+                    for tile in tiles:
+                        for key, value in areas(self.city.boxes[id(tile.data)]).items():
+                            visual[key] += value
+                self.assertEqual(set(solid),set(visual),"visual/collision support plane signatures")
                 for key, value in solid.items():
                     self.assertAlmostEqual(visual[key], value, delta=1e-6 * value, msg=key)
                 for tile in tiles:
