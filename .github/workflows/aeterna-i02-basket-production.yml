@@ -1,0 +1,88 @@
+name: AETERNA I02 production youth and basket regression
+on:
+  pull_request:
+    branches: ['candidate/aeterna-i02-basket-20261128']
+    types: [opened, synchronize, reopened]
+    paths: ['prototype/tests/i02_props_test.gd', '.github/workflows/aeterna-i02-basket-production.yml']
+permissions:
+  contents: read
+concurrency:
+  group: aeterna-i02-basket-production-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    if: github.head_ref == 'fix/aeterna-i02-basket-qa-20261128'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      OPENBLAS_NUM_THREADS: '2'
+      OMP_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Verify preserved original Kimi module and original GLB
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/i02-production "$RUNNER_TEMP/godot"
+          git rev-parse HEAD > artifacts/i02-production/source.txt
+          git hash-object prototype/scripts/world/village/i02_props.gd | tee artifacts/i02-production/module-blob.txt
+          git hash-object prototype/assets/legio/neighbour_basket.glb | tee artifacts/i02-production/basket-blob.txt
+          git hash-object prototype/tests/i02_props_test.gd | tee artifacts/i02-production/test-blob.txt
+          test "$(cat artifacts/i02-production/module-blob.txt)" = '1f7966a6ffd1d3e28aab6e4475c481ac94439d43'
+          test "$(cat artifacts/i02-production/basket-blob.txt)" = '0c9043c91be9727e2d6c9c2dbe41f0ed46946c60'
+      - name: Install existing production staging dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 300s sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update -q
+          timeout 600s sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends python3-numpy python3-scipy python3-pil
+      - name: Stage verified original youth and civil derivative using existing production contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 tools/characters/stage_original_youth.py --archive "$RUNNER_TEMP/imperathen-original-youth-runtime.zip" --report artifacts/i02-production/original-youth-status.json
+          curl -fLsS --retry 3 --connect-timeout 15 --max-time 90 'https://accad.ohio-state.edu/sites/accad.osu.edu/files/Male2_bvh.zip' -o "$RUNNER_TEMP/accad-male2.zip"
+          /usr/bin/python3 tools/characters/stage_youth_civil.py --source prototype/assets/characters --accad-archive "$RUNNER_TEMP/accad-male2.zip" --work "$RUNNER_TEMP/youth-civil" 2>&1 | tee artifacts/i02-production/civil-stage.log
+          for lod in 0 1 2 3; do test -s "prototype/assets/characters/hero_meshy_italia_civil_$lod.glb"; done
+          test -s prototype/assets/animations/accad_youth_civil_motion.json
+      - name: Install checksum-verified Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 --connect-timeout 15 --max-time 120 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 --connect-timeout 15 --max-time 300 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Import and execute actual original youth basket regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          export XDG_DATA_HOME="$RUNNER_TEMP/i02-production-data"
+          export XDG_CONFIG_HOME="$RUNNER_TEMP/i02-production-config"
+          export XDG_CACHE_HOME="$RUNNER_TEMP/i02-production-cache"
+          mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME"
+          timeout --kill-after=10s 600s "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee artifacts/i02-production/import.log
+          timeout --kill-after=10s 420s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/i02_props_test.gd 2>&1 | tee artifacts/i02-production/test.log
+          grep -Fxq I02_PROPS_PASS artifacts/i02-production/test.log
+          grep -Eq '^I02_PROPS_RESULT checks=[1-9][0-9]* failures=0$' artifacts/i02-production/test.log
+          if grep -Eq 'SCRIPT ERROR:|^ERROR:|I02_PROPS_FAIL' artifacts/i02-production/test.log; then exit 1; fi
+      - name: Retain evidence only (never upload private GLBs or archives)
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: aeterna-i02-production-${{ github.run_id }}
+          path: artifacts/i02-production/
+          if-no-files-found: warn
+          retention-days: 14
