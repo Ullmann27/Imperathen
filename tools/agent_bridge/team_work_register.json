@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 248,
+  "version": 249,
   "tasks": [
     {
       "id": "K101",
@@ -1274,14 +1274,14 @@
       "id": "I02-PRODUCTION-FIXTURE",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "b34adfdf014625828bf13ec47e60a220b9732da5",
-      "run_id": null,
+      "run_id": "46114021072",
       "scope": [
         "prototype/tests/i02_props_test.gd",
         ".github/workflows/aeterna-i02-basket-production.yml"
       ],
-      "note": "Actual Kimi run 46113029476 failed: original youth not staged, GLB height assertion used only first primitive (0.3083849549 vs actual all primitive max 0.308640450239), actor_position Vector2 passed to set_player_position Vector3; timeout124. New isolated successor fix/aeterna-i02-basket-qa-20261128. Correct fixture, stage exact original civil youth via existing authorized scripts, check exact LODs, real Hand_L and all geometry, preserve 1mm/0.2mm thresholds and existing checks. No change to original Kimi module, original GitLab branch, main or runtime wiring. No private asset publication, new provider requests or costs. Actual test required."
+      "note": "Actual Kimi run 46113029476 failed: original youth not staged, GLB height assertion used only first primitive (0.3083849549 vs actual all primitive max 0.308640450239), actor_position Vector2 passed to set_player_position Vector3; timeout124. New isolated successor fix/aeterna-i02-basket-qa-20261128. Correct fixture, stage exact original civil youth via existing authorized scripts, check exact LODs, real Hand_L and all geometry, preserve 1mm/0.2mm thresholds and existing checks. No change to original Kimi module, original GitLab branch, main or runtime wiring. No private asset publication, new provider requests or costs. Actual test required. | Actual repair #204 head 5ee56ef700e0b17e4201cd8afa67bab3c24df467; exact original module/GLB unchanged, test +77/-11, one production CI workflow. Observed targeted run 46114021072 in_progress. No pass or integration claim."
     },
     {
       "id": "FACIAL-LOD-NEUTRAL-LIFECYCLE",
