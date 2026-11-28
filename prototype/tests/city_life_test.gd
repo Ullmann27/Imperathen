@@ -171,7 +171,7 @@ func _simulation() -> Dictionary:
 		worst = maxi(worst, int(report.usec))
 		if not report.done:
 			unfinished += 1
-		# One batch of eight events may finish after the budget ran out.
+		# Scheduling and an in-progress event can exceed the requested slice.
 		if int(report.usec) > 500 + 4000:
 			over_budget += 1
 		if (now == end and report.done) or frames > 400000:
@@ -319,7 +319,8 @@ func _simulation() -> Dictionary:
 
 	return {"residents": residents, "households": a.state.households.size(), "businesses": a.state.businesses.size(), "roles": roles,
 		"midday": midday, "stats_after_36h": a.state.stats, "budget_frames": frames, "budget_deferred_frames": unfinished,
-		"budget_worst_usec": worst, "events_processed_36h": a.summary().processed, "spoken_lines": spoken, "voiced_lines": voiced,
+		"budget_worst_usec": worst, "budget_overruns": over_budget, "final_state_sha256": final_hash,
+		"events_processed_36h": a.summary().processed, "spoken_lines": spoken, "voiced_lines": voiced,
 		"audio_status": "text_only_until_voice_pool_recordings_land" if voiced == 0 else "voiced", "measurement": "desktop CPU, headless"}
 
 func _test_staff_duty_boundary(saved_text: String) -> void:

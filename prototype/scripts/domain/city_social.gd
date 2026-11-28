@@ -62,6 +62,23 @@ static func trust(state: Dictionary, observer: int, subject: int) -> float:
 	var graph := _for_people(state, observer, subject)
 	return 0.0 if graph.is_empty() else Relations.value(graph, resident_id(observer), resident_id(subject), "trust")
 
+## Leisure reads each occupied slot in order without rebuilding a graph per person.
+static func company_score(state: Dictionary, observer: int, slots: Array) -> int:
+	var count: int = state.residents.size()
+	var graph := _graph(state, observer % SHARDS) if observer >= 0 and observer < count else {}
+	var observer_id := resident_id(observer)
+	var score := 0
+	for subject: int in slots:
+		if subject < 0:
+			continue
+		score += 40
+		if subject == observer or subject >= count or graph.is_empty():
+			continue
+		var trust_value := Relations.value(graph, observer_id, resident_id(subject), "trust")
+		score += int(maxf(0.0, trust_value) * 6.0)
+	return score
+
+
 static func knows(state: Dictionary, observer: int, subject: int) -> bool:
 	var graph := _for_people(state, observer, subject)
 	return not graph.is_empty() and Relations.knows(graph, resident_id(observer), resident_id(subject))

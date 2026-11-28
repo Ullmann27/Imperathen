@@ -531,6 +531,7 @@
 - `static func witnessed_theft(state: Dictionary, vendor: int, thief: int, at_second: int) -> bool`
 - `static func close_week(state: Dictionary, number: int) -> bool`
 - `static func trust(state: Dictionary, observer: int, subject: int) -> float`
+- `static func company_score(state: Dictionary, observer: int, slots: Array) -> int`
 - `static func knows(state: Dictionary, observer: int, subject: int) -> bool`
 - `static func validate_saved(state: Dictionary, people: Dictionary, week: int) -> String`
 - `static func restore(state: Dictionary) -> void`

@@ -54,6 +54,7 @@ var _occupancy := {}
 var _usable := {}
 var _by_kind := {}
 var _near_cache := {}
+var _anchor_hashes: Dictionary[String, int] = {}
 var _sellers := {}
 var _exits: Array[String] = []
 var _processed_total := 0
@@ -275,9 +276,11 @@ func _index_anchors() -> void:
 	_usable.clear()
 	_by_kind.clear()
 	_near_cache.clear()
+	_anchor_hashes.clear()
 	_exits.clear()
 	for id: String in Anchors.usable(index, year, present_nodes):
 		_usable[id] = true
+		_anchor_hashes[id] = Population.fnv(id)
 		var anchor: Dictionary = index.anchors[id]
 		if not _by_kind.has(anchor.kind):
 			_by_kind[anchor.kind] = []
@@ -340,7 +343,8 @@ func advance_to(now: int, budget_usec: int = 2000) -> Dictionary:
 		else:
 			continue
 		processed += 1
-		if (processed & 7) == 0 and budget_usec > 0 and Time.get_ticks_usec() - started >= budget_usec:
+		# Yield between individual events; the previous batch could overshoot by seven events.
+		if budget_usec > 0 and Time.get_ticks_usec() - started >= budget_usec:
 			break
 	var pending := not _heap.is_empty() and _heap[0] / KEY <= limit
 	if not pending:
@@ -1304,26 +1308,28 @@ func _leisure(person: int, resident: Dictionary, t: int, hour: float, roll: int,
 	if resident.role == "child":
 		if age(resident) >= 5 and hour >= 8.0 and hour < 18.3 and not raining:
 			for spot: String in _nearest("play_spot", home, 3):
-				options.append([520 + (Population.mix(roll, Population.fnv(spot)) % 200), "play", spot, 1500 + roll % 2400])
+				options.append([520 + (Population.mix(roll, _anchor_hashes[spot]) % 200), "play", spot, 1500 + roll % 2400])
 	else:
+		var tier: String = Population.TIERS[int(resident.tier)]
 		for spot: String in _nearest("gossip_spot", origin, 5):
 			var anchor: Dictionary = index.anchors[spot]
-			if not Anchors.open_at(anchor, hour) or not Anchors.serves(anchor, Population.TIERS[int(resident.tier)]):
+			if not Anchors.open_at(anchor, hour) or not Anchors.serves(anchor, tier):
 				continue
 			if raining and not Anchors.has_tag(anchor, "shelter"):
 				continue
-			var company := 0
-			for other: int in occupants(spot):
-				company += 40 + int(maxf(0.0, Population.trust(state, person, other)) * 6.0)
-			options.append([lonely / 2 + company + Population.mix(roll, Population.fnv(spot)) % 160, "gossip", spot, 420 + roll % 900])
-		if devotion(resident, t) >= 500:
+			var company := Social.company_score(state, person, _occupancy.get(spot, []))
+			options.append([lonely / 2 + company + Population.mix(roll, _anchor_hashes[spot]) % 160, "gossip", spot, 420 + roll % 900])
+		var piety := devotion(resident, t)
+		if piety >= 500:
 			for shrine: String in _nearest("shrine", home, 2):
 				if Anchors.open_at(index.anchors[shrine], hour):
-					options.append([devotion(resident, t) / 2 + 150, "pray", shrine, 300 + roll % 420])
-		if hour >= 11.5 and int(resident.purse) >= 24 and (hunger(resident, t) >= 450 or hour >= 16.5):
-			for seat: String in _nearest("tavern_seat", origin, 3):
-				if Anchors.open_at(index.anchors[seat], hour):
-					options.append([260 + hunger(resident, t) / 3 + Population.mix(roll, Population.fnv(seat)) % 120, "tavern", seat, 900 + roll % 1500])
+					options.append([piety / 2 + 150, "pray", shrine, 300 + roll % 420])
+		if hour >= 11.5 and int(resident.purse) >= 24:
+			var appetite := hunger(resident, t)
+			if appetite >= 450 or hour >= 16.5:
+				for seat: String in _nearest("tavern_seat", origin, 3):
+					if Anchors.open_at(index.anchors[seat], hour):
+						options.append([260 + appetite / 3 + Population.mix(roll, _anchor_hashes[seat]) % 120, "tavern", seat, 900 + roll % 1500])
 		if hour >= 15.0 and not raining:
 			var friend := _friend_at_home(person, resident, t, roll)
 			if friend >= 0:

@@ -17,9 +17,42 @@
 - Stimmen: alle Zeilen sind reiner Text (`voiced=false`), bis die Aufnahmen des Stimmpools vorliegen.
 - Motion-Gate und vollständige Regression wurden auf diesem Branch nicht ausgeführt.
 
-**Bekannte Mängel:** einzelne `advance_to`-Aufrufe bis ca. 6 ms bei 0,5 ms Budget (Desktop, gemessen) – Ursache noch nicht eingegrenzt; Exportmengen der Werkstätten sind unausgewogen; Pferde-, Karren- und Kindermodelle fehlen im Repository.
+**Bekannte Mängel:** einzelne `advance_to`-Aufrufe können das Budget überschreiten (siehe Nachmessung); Exportmengen der Werkstätten sind unausgewogen; Pferde-, Karren- und Kindermodelle fehlen im Repository.
 
 **Offene Entscheidung des Auftraggebers:** Darstellung der Abhängigen wohlhabender Haushalte (historisch überwiegend Versklavte); derzeit neutrales Datenfeld `dependent`.
+
+## Nachmessung des Ereignisbudgets (Stand Zero)
+
+Die ursprünglichen 140 Überschreitungen in 9.197 Aufrufen (1,52 %) enthielten starke
+Laufzeitschwankungen. Eine lokale Funktionsmessung mit Godot 4.7.2 über dasselbe
+36-Stunden-Szenario zeigte unter den Bewohnerereignissen vor allem die Freizeitwahl:
+4,45 s von 7,52 s in den Aufwachroutinen, darin bereits enthalten die jeweiligen Wege
+und Unteraufrufe. Der Heap-Pop lag bei 0,36 s, Laden/Bestellung von Waren zusammen
+unter 0,01 s, die Tagesabschluss-Etappen bei 0,016 s. Die Messung hat eigenen Aufwand
+und ist keine Leistungsabnahme.
+
+Die Simulation prüft die Uhr jetzt nach jedem tatsächlich verarbeiteten Ereignis
+statt nach jeweils acht. Die Freizeitwahl verwendet vorab berechnete Anker-Hashes
+und liest Belegung und Vertrauen ohne temporäre Bewohnerlisten oder einen neuen
+Beziehungsgraphen pro Sitzplatz. Ereignisfolge und Entscheidungswerte bleiben gleich.
+
+Die unveränderte Prüfvorgabe beträgt 500 µs pro Aufruf; mehr als 4.500 µs zählen
+als Überschreitung, höchstens 0,5 % sind erlaubt. Vier nacheinander ausgeführte
+Läufe mit separaten Save-Verzeichnissen, Godot 4.7.2 headless und derselben
+CPU-Affinität ergaben:
+
+| Arbeitsstand | Überschreitungen / Aufrufe | Höchste gemessene Dauer |
+| --- | ---: | ---: |
+| Vorher (`da8d9155`), A | 12 / 9.357 (0,128 %) | 26,525 ms |
+| Nachher, A | 5 / 10.546 (0,047 %) | 5,932 ms |
+| Nachher, B | 17 / 10.742 (0,158 %) | 31,646 ms |
+| Vorher (`da8d9155`), B | 21 / 9.268 (0,227 %) | 45,675 ms |
+
+Alle vier Läufe bestanden je 122 Prüfungen: 150.677 Ereignisse, derselbe
+SHA-256 des Endzustands (`16da1cd6…34b2ca`), lückenlose Ereignisnummern und
+gleicher Zustand bei ungebremster Simulation, budgetierter Simulation und nach
+Save/Load. Auch Geld- und Warenbilanz blieben erhalten. Die Streuung der
+Maximaldauer bleibt sichtbar; diese Desktop-Messungen ersetzen keine Fold7-Messung.
 
 ## Technik und Quellen
 
