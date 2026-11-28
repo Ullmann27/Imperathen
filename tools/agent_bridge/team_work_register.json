@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 286,
+  "version": 288,
   "tasks": [
     {
       "id": "K101",
@@ -1427,7 +1427,23 @@
         "prototype/tests/city_market_staff_test.gd",
         ".github/workflows/aeterna-city-market-staff.yml"
       ],
-      "note": "M28 authoritative city economy: current business_staffed/_vendor_of accepts an expired worker until its queued wake event is processed. Use half-open actual arrived duty interval consistently; during completion of a purchase retain original haggle participant only if still serving that business, otherwise select current staff (same pricing formula, conservation and real memory participant). Test actual business opening boundaries and shift handoff using existing CityLife roster, real transaction ledger, no fabricated staff. Preserve existing city simulation, trade and budget regressions; isolated push-only candidate, no APK."
+      "note": "M28 authoritative city economy: current business_staffed/_vendor_of accepts an expired worker until its queued wake event is processed. Use half-open actual arrived duty interval consistently; during completion of a purchase retain original haggle participant only if still serving that business, otherwise select current staff (same pricing formula, conservation and real memory participant). Test actual business opening boundaries and shift handoff using existing CityLife roster, real transaction ledger, no fabricated staff. Preserve existing city simulation, trade and budget regressions; isolated push-only candidate, no APK. Interrupted by explicit phase-1 priority. Partial runtime commit d4a7477988f1fbaa6c92a0c7ecd2c8618f689844 retained in isolated branch; tests/CI not yet created, no acceptance. Resume separately after phase priority permits."
+    },
+    {
+      "id": "CHARACTER-CORE-PHASE1",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "7820c4c6d8f0cb9df550956c041ed08c53a0624e",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/character_core",
+        "prototype/scenes/character_core",
+        "prototype/tests/character_core_phase1_test.gd",
+        "docs/44_integration/CHARACTER_CORE_PHASE1.md",
+        ".github/workflows/aeterna-character-core-phase1.yml"
+      ],
+      "note": "User's seven-phase masterplan, only phase 1. New isolated actual character scene and typed component contracts, original frontier rig/animations, manual AnimationTree 2D gait blend and upper-body filter, real TwoBoneIK3D + LookAtModifier3D, raycast feet, hip/bank, physics body steering, demo/test. Native IK requires 4.6+, current project 4.7.2; no older-engine compatibility claim. Sprint retimed existing run and turn procedural, no new mocap claim. No replacing live campaign, private assets, main or APK. Branch feature/aeterna-character-core-phase1-20261128; actual engine CI required."
     }
   ]
 }
