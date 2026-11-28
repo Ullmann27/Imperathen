@@ -1318,6 +1318,9 @@ func _physics_process(delta: float) -> void:
 		var stream_velocity := _player.get_real_velocity() if _active and _mode == "person" and is_instance_valid(_player) else Vector3.ZERO
 		regional_terrain.follow(get_player_position(), _quality_profile, stream_velocity)
 		regional_terrain.waystation.update_nearby(get_player_position(),_state.village.economy.get("freight",{}),delta)
+		regional_terrain.waystation._update_workshop_grove(get_player_position(),_quality_profile,
+			_vegetation_wind_time if _vegetation_wind_time >= 0.0 else _animation_time,
+			float(_weather_view.get("wind",1.0)),delta)
 	population.update_nearby(get_player_position(),_active and _mode == "person")
 	if is_instance_valid(vegetation):
 		vegetation.set_player_position(get_player_position())

@@ -28,7 +28,7 @@ FAILURE = re.compile(r"SCRIPT ERROR:|Parse Error:|^ERROR:|^USER ERROR:", re.MULT
 
 def run_check(engine, name, arguments, marker, environment, report):
     started = time.monotonic()
-    timeout = {"import": 600, "vegetation_safe": 360, "motion_measurement": 2400, "formation_agents": 600, "formation_levels": 600, "character_phase1": 420, "character_phase2": 420, "world_workshop_entry": 240, "world_expansion": 240}.get(name, 120)
+    timeout = {"import": 600, "vegetation_safe": 360, "motion_measurement": 2400, "formation_agents": 600, "formation_levels": 600, "character_phase1": 420, "character_phase2": 420, "world_workshop_entry": 240, "world_expansion": 240, "waystation_workshop_assets": 240, "waystation_journey": 240}.get(name, 120)
     try:
         result = subprocess.run([engine, "--headless", "--path", str(PROJECT), *arguments],
                                 cwd=ROOT, env=environment, text=True, encoding="utf-8",
@@ -241,6 +241,7 @@ def main():
             ("legio_objects", ["--fixed-fps", "60", "--script", "res://tests/legio_objects_test.gd"], "failures=0"),
             ("party_reconciliation", ["--fixed-fps", "60", "--script", "res://tests/party_reconciliation_test.gd"], "failures=0"),
             ("regional_freight", ["--fixed-fps", "60", "--script", "res://tests/regional_freight_test.gd"], "REGIONAL_FREIGHT"),
+            ("waystation_workshop_assets", ["--fixed-fps", "60", "--script", "res://tests/waystation_workshop_assets_test.gd"], "WAYSTATION_WORKSHOP_ASSETS_PASS"),
             ("legio_art", ["--fixed-fps", "60", "--script", "res://tests/legio_art_test.gd"], "failures=0"),
             ("city_watch", ["--fixed-fps", "60", "--script", "res://tests/city_watch_test.gd"], "\"failures\":[]"),
             ("waystation_journey", ["--fixed-fps", "60", "--script", "res://tests/waystation_journey_test.gd"], "CAMPAIGN_MARKET_VISIT_PASS"),
