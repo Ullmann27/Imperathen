@@ -1,0 +1,31 @@
+name: IMPERATHEN architecture index
+on:
+  push:
+    branches: ['setup/architecture-foundation']
+    paths:
+      - 'AGENTS.md'
+      - 'ARCHITEKTUR_INDEX.md'
+      - 'tools/architecture/**'
+      - '.github/workflows/architecture-index.yml'
+  pull_request:
+    paths:
+      - 'prototype/scripts/**'
+      - 'prototype/project.godot'
+      - 'AGENTS.md'
+      - 'ARCHITEKTUR_INDEX.md'
+      - 'tools/architecture/**'
+      - '.github/workflows/architecture-index.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check declaration inventory generator
+        run: node tools/architecture/test_index.mjs
+      - name: Verify committed architecture index
+        run: node tools/architecture/build_index.mjs --check

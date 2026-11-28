@@ -79,3 +79,26 @@ Der aktuelle Auftrag enthält keinen Merge nach `main`, keinen Store-Release und
 ## Übergabe
 
 Zum Abschluss konkrete Dateien, Issue-Nummern, Branch und Commit nennen, tatsächlich überprüfte Ergebnisse von geplanten Arbeiten trennen und den nächsten ausführbaren Schritt beschreiben. Den Spielerfolg und die gewünschte offene Karriereentwicklung bewahren; keine automatische Kaiserkarriere und kein versteckter Ersatz der Stadtbausimulation durch reine Menüverwaltung.
+
+
+## Architektur- und GitHub-Regeln – 28.11.2026 (verbindliche Ergänzung)
+
+- Vor jeder Aufgabe die **tatsächliche Zielrevision** bestimmen und deren `AGENTS.md` sowie `ARCHITEKTUR_INDEX.md` lesen. Nicht von der historisch leeren `main` ausgehen. Bestehende Leases und die aktuelle gemeinsame Integrationslinie prüfen.
+- Pro Durchlauf genau eine zusammenhängende Phase oder ein Issue. Eigenen `feature/<modulname>`-Branch vom passenden geprüften Stand erstellen, bei Korrekturen einen isolierten Fix-Branch nutzen. Kein direkter Commit oder Merge nach `main`; bestehende Freigabe- und Kostengrenzen gelten weiter.
+- Neuer GDScript-Code muss statisch typisiert und vollständig implementiert sein. Keine funktionslosen Methoden oder Platzhalter. Native `SkeletonModifier3D`-, `TwoBoneIK3D`- und `LookAtModifier3D`-APIs verwenden, wenn das Feature sie benötigt; keine neuen `SkeletonIK3D`-Abhängigkeiten. Native TwoBoneIK3D-Features benötigen Godot 4.6+; der aktuelle Prüfbuild verwendet Godot 4.7.2. Keine ungeprüfte 4.4-Kompatibilität versprechen.
+- Keine `.uid`-Dateien manuell erzeugen, ändern oder löschen und keinen `.godot/`-Cache versionieren oder manipulieren. Bestehende Referenzen bewahren; enginegenerierte Cache-Dateien sind kein Quellcode.
+- Der Root-Index ist eine **deterministische Inventur des jeweiligen Branches**: globale und innere Klassendeklarationen, Basistypen, Signale, öffentliche Methoden (ohne führenden Unterstrich) der tatsächlich vorhandenen Runtime-Skripte unter `prototype/scripts/` außer dem Testverzeichnis sowie Autoloads aus `prototype/project.godot`. Altcode wird wortgetreu erfasst; der Index ist kein Godot-Compiler und kein Nachweis vollständiger Typisierung.
+- **Vor jedem Pull Request** neue/entfernte Runtime-Dateien im Git-Index erfassen und den Root-Index regenerieren, dann Generator-Test und Aktualitätsprüfung ausführen:
+  ```sh
+  node tools/architecture/build_index.mjs
+  node tools/architecture/test_index.mjs
+  node tools/architecture/build_index.mjs --check
+  git add ARCHITEKTUR_INDEX.md
+  ```
+  Anschließend den tatsächlich vorgesehenen Diff kontrollieren und mit dem Feature committen. Der read-only Workflow prüft relevante PRs, schreibt aber nicht ins Repository und führt keine Merges aus. Auf abweichenden älteren Branches zuerst die Foundation übernehmen, sobald freigegeben; keine fremden Änderungen überschreiben.
+- Für jeden PR drei getrennte **simulierte Prüfschritte** dokumentieren: Godot Architect (Node-/Interface-Vertrag und Implementierung), Bug-Hunter/QA (Syntax-/Null-/Performance-/Indexprüfung und reproduzierbare Befunde), Lead Integrator (Korrektur, tatsächliche Tests, Git-Diff und Übergabe). Simulation ersetzt keine unabhängige Engine-Ausführung. Bei Setup ohne Runtime-Änderung ist das ausdrücklich festzuhalten.
+- PR-Beschreibung: exakte Basis und Ergebnisrevision, betroffene Dateien/Nodes, öffentliche Schnittstellen, tatsächlich ausgeführte Prüfungen, offene Befunde und Freigabegrenzen. Kein angeblicher Testerfolg ohne Logbeleg.
+
+### Phase 1 – bestehender Kandidat, kein Neustart
+
+Die neue CharacterCore-Architektur wird bereits getrennt auf `feature/aeterna-character-core-phase1-20261128` ([Draft #208](https://github.com/Ullmann27/Imperathen/pull/208)) entwickelt. Schnittstellen und Szenen stehen dort in `docs/44_integration/CHARACTER_CORE_PHASE1.md`. Basis und Integration sind voneinander zu unterscheiden: Der Root-Index listet nur auf dem jeweiligen Branch vorhandene Klassen, nicht die geplanten Klassen der Phasen 1–13. Keine zweite konkurrierende CharacterCore-Klasse und kein paralleles Neuanlegen der vorhandenen Phase 1. Vor dem nächsten Feature den aktuellen Head, laufende Prüfungen und tatsächliche Abnahme prüfen; bestehendes WorldModel und Produktions-Assets bleiben autoritativ.
