@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 217,
+  "version": 218,
   "tasks": [
     {
       "id": "K101",
@@ -1031,14 +1031,28 @@
       "id": "TRIBAL-LOD-STATIC-CONTRACT",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
-      "revision": "842f995bdb2bd08f03b43ba77cc3a80a3e38893a",
-      "run_id": null,
+      "status": "submitted",
+      "revision": "2612b01b00951facf8ce77303325903b6189e77a",
+      "run_id": "46103635941",
       "scope": [
         "prototype/tests/tribal_lod_contract_test.gd",
         ".github/workflows/aeterna-tribal-lod-contract.yml"
       ],
-      "note": "Independent actual forest_spear production actor static LOD diagnosis following completed N31 rejected raw patch. Same existing 40mm sole-proxy test and CPU far shader mirror across idle and block exact phases; additionally measure actual skinned foot vertices through existing MotionSkinMeasurement. No changes to runtime/assets, no parallel edits to formation branch, no new numeric approval gates or automatic model retry. Capture actual source-bound results; no visual/device acceptance."
+      "note": "Independent actual forest_spear production actor static LOD diagnosis following completed N31 rejected raw patch. Same existing 40mm sole-proxy test and CPU far shader mirror across idle and block exact phases; additionally measure actual skinned foot vertices through existing MotionSkinMeasurement. No changes to runtime/assets, no parallel edits to formation branch, no new numeric approval gates or automatic model retry. Capture actual source-bound results; no visual/device acceptance. Actual commit 2612b01b00951facf8ce77303325903b6189e77a on fix/aeterna-tribal-lod-contract-20261128. 32 real production actor/pose/phase samples, 2 LODs, translated/yawed root, actual imported skin clouds and existing nearest far-sole proxy comparison. Original 40mm limit retained; no geometry/runtime edits. Actual run 46103635941/job 140851418060 observed in_progress. No result or acceptance claim."
+    },
+    {
+      "id": "MASTERPLAN-01-SOURCE-AUDIT-20261128",
+      "owner": "Coordinator",
+      "access": "read",
+      "status": "done",
+      "revision": "8a8256a30145918739312588d70c4585768fa568",
+      "run_id": "46087073083",
+      "scope": [
+        "prototype/scripts",
+        "prototype/assets",
+        "prototype/tests"
+      ],
+      "note": "Masterplan pp.9–10 source audit on exact combined QA237 tree: recursive tree complete 5411 entries; 166 open PRs enumerated (100+66 pages), prioritized 10 PR file-list SHA comparisons. #195 all 28/28 exact, #194 3/3, #192 2/2, #191 4/4, #190 10/10, #189 3/3, #188 3/3; #196 runtime valley_rider and valley_muster test 2/2 exact, isolated workflow not copied. #177 0/4 exact on combined base; successor wheel/rock candidate still red/in CI, no blind merge. #198 0/3 exact, only test/workflow files; newest QA240 run 46101992721 success artifact 15246562721, but branch diverges 8 ahead/2 behind combined QA237, not a consolidated replacement. QA237 artifact 15240501052 unexpired. Actual original atelier GLBs exact (woman 832153a77e6141b108a9370ef648e5a048e08368, legion a40e2a1e710dfb809fbecb48b77c640dcdfec6e7), runtime catalog/equipment prior green. Latest actual production youth parity run 46101989464 success, 692/692 each control/candidate, civil 0 edge violations at LOD0/2, armoured LOD0 14 residual run edge violations with max excess 0.007911m, LOD2 zero; not a repaired or visually accepted model. Full youth candidate run 46101992690 still in_progress. Combined 46087073083 failed formations; 46103496405 and 46103635941 in_progress. Remaining older PR file-level audit not claimed. No merge or APK production or device acceptance in audit."
     }
   ]
 }
