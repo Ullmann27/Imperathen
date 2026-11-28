@@ -2,7 +2,7 @@ name: IMPERATHEN Fold7 candidate – real city, genuine APK, image checks
 
 on:
   push:
-    branches: ['integration/fold7-release-candidate-20261125', 'hoplite/*--stand-zero', 'integration/astra-sol-stand-zero-20261128', 'integration/astra-sol-complete-20261128']
+    branches: ['integration/fold7-release-candidate-20261125', 'hoplite/*--stand-zero', 'integration/astra-sol-stand-zero-20261128', 'integration/astra-sol-complete-20261128', 'integration/astra-sol-apk-finalization-20261128']
   pull_request:
     paths:
       - 'prototype/**'
@@ -200,7 +200,10 @@ jobs:
           path: artifacts/voice-candidates
           run-id: 46131134266
           github-token: ${{ github.token }}
-      - name: Recover the seven-line retry results (no paid generation)
+      - name: Recover available seven-line retry results (no paid generation)
+        # Missing retry artifacts cannot conceal unrelated engine/asset defects.
+        # The strict authored coverage gate below still blocks every missing line.
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           pattern: german-dialogue-recovery-*-46147196180
@@ -222,55 +225,104 @@ jobs:
           grep -q IMPORTED_VOICE_ONSETS_PASS artifacts/voice/imported-onsets.log
           python3 tools/audio/reanchor_imported_voice_onsets.py --staged artifacts/voice/staged.json --measured artifacts/voice/imported-onsets.json --report artifacts/voice/onset-derivation.json
           python3 tools/audio/audit_german_dialogue.py artifacts/voice/authored.json --report artifacts/voice/coverage.json
-      - name: Real Godot world, full movement regressions and built assets
+      - name: Real Godot world and all independent release gates on one source
         shell: bash
         run: |
           set -euo pipefail
-          IMPERATHEN_FULL_ASSET_ACCEPTANCE=1 python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --report artifacts/engine-checks
-          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
-            --script res://tests/roman_city_real_asset_test.gd \
-            2>&1 | tee artifacts/city/real-assets.log
-          grep -q ROMAN_CITY_REAL_ASSET_PASS artifacts/city/real-assets.log
-          IMPERATHEN_REQUIRE_ORIGINAL_YOUTH=1 "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
-            --script res://tests/roman_city_real_walk_test.gd \
-            2>&1 | tee artifacts/city/real-walk.log
-          grep -q ROMAN_CITY_REAL_WALK_PASS artifacts/city/real-walk.log
-          grep -Eq '"original_youth_active":true' artifacts/city/real-walk.log
-          grep -Eq '"mocap_active":true' artifacts/city/real-walk.log
-          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
-            --script res://tests/youth_mocap_test.gd \
-            2>&1 | tee artifacts/city/youth-mocap-runtime.log
-          grep -q YOUTH_MOCAP_RUNTIME_PASS artifacts/city/youth-mocap-runtime.log
-          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
-            --script res://tests/i02_props_test.gd \
-            2>&1 | tee artifacts/city/i02-props.log
-          grep -q I02_PROPS_PASS artifacts/city/i02-props.log
-          ! grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/city/i02-props.log
-          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
-            --script res://tests/city_crowd_layout_test.gd \
-            2>&1 | tee artifacts/city/crowd.log
-          grep -q CITY_CROWD_LAYOUT_PASS artifacts/city/crowd.log
-          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
-            --script res://tests/roman_city_surface_visibility_test.gd \
-            2>&1 | tee artifacts/city/surface-visibility.log
-          grep -q ROMAN_CITY_SURFACE_VISIBILITY_PASS artifacts/city/surface-visibility.log
-          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
-            --script res://tests/roman_city_portico_walk_test.gd \
-            2>&1 | tee artifacts/city/portico-walk.log
-          grep -q ROMAN_CITY_PORTICO_WALK_PASS artifacts/city/portico-walk.log
-          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
-            --script res://tests/roman_city_routes_test.gd \
-            2>&1 | tee artifacts/city/routes.log
-          grep -q ROMAN_CITY_ROUTES_PASS artifacts/city/routes.log
-          # Preserve the independent release checks. No unvoiced authored
-          # line or failed real audio/viseme timing is accepted by the exporter.
-          python3 tools/audio/audit_german_dialogue.py artifacts/voice/authored.json --report artifacts/voice/coverage.json --strict
-          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/dialogue_lipsync_test.gd -- "--authored=$GITHUB_WORKSPACE/artifacts/voice/authored.json" 2>&1 | tee artifacts/voice/full-lipsync.log
-          grep -q DIALOGUE_LIPSYNC_PASS artifacts/voice/full-lipsync.log
-          ! grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/voice/full-lipsync.log
-          # Release acceptance remains mandatory; source-specific proofs above are
-          # collected first so a known global motion failure cannot hide them.
-          python3 tools/motion_quality_gate.py --evidence artifacts/engine-checks
+          mkdir -p artifacts/engine-checks artifacts/city artifacts/voice
+          printf 'gate\texit_code\n' > artifacts/release-gates.tsv
+          failed=0
+          # Each gate runs in a new strict Bash process. Collect failures
+          # independently, but never let an unsuccessful gate reach export.
+          gate() {
+            local name="$1" rc=0
+            bash -euo pipefail -c "$name" || rc=$?
+            printf '%s\t%s\n' "$name" "$rc" | tee -a artifacts/release-gates.tsv
+            if (( rc != 0 )); then failed=1; fi
+          }
+          engine_full() {
+            IMPERATHEN_FULL_ASSET_ACCEPTANCE=1 python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --report artifacts/engine-checks
+          }
+          export -f engine_full
+          real_assets() {
+            "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+              --script res://tests/roman_city_real_asset_test.gd \
+              2>&1 | tee artifacts/city/real-assets.log
+            grep -q ROMAN_CITY_REAL_ASSET_PASS artifacts/city/real-assets.log
+          }
+          export -f real_assets
+          real_walk() {
+            IMPERATHEN_REQUIRE_ORIGINAL_YOUTH=1 "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+              --script res://tests/roman_city_real_walk_test.gd \
+              2>&1 | tee artifacts/city/real-walk.log
+            grep -q ROMAN_CITY_REAL_WALK_PASS artifacts/city/real-walk.log
+            grep -Eq '"original_youth_active":true' artifacts/city/real-walk.log
+            grep -Eq '"mocap_active":true' artifacts/city/real-walk.log
+          }
+          export -f real_walk
+          youth_mocap() {
+            "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+              --script res://tests/youth_mocap_test.gd \
+              2>&1 | tee artifacts/city/youth-mocap-runtime.log
+            grep -q YOUTH_MOCAP_RUNTIME_PASS artifacts/city/youth-mocap-runtime.log
+          }
+          export -f youth_mocap
+          i02_props() {
+            "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+              --script res://tests/i02_props_test.gd \
+              2>&1 | tee artifacts/city/i02-props.log
+            grep -q I02_PROPS_PASS artifacts/city/i02-props.log
+            ! grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/city/i02-props.log
+          }
+          export -f i02_props
+          city_crowd() {
+            "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+              --script res://tests/city_crowd_layout_test.gd \
+              2>&1 | tee artifacts/city/crowd.log
+            grep -q CITY_CROWD_LAYOUT_PASS artifacts/city/crowd.log
+          }
+          export -f city_crowd
+          city_surface() {
+            "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+              --script res://tests/roman_city_surface_visibility_test.gd \
+              2>&1 | tee artifacts/city/surface-visibility.log
+            grep -q ROMAN_CITY_SURFACE_VISIBILITY_PASS artifacts/city/surface-visibility.log
+          }
+          export -f city_surface
+          portico_walk() {
+            "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+              --script res://tests/roman_city_portico_walk_test.gd \
+              2>&1 | tee artifacts/city/portico-walk.log
+            grep -q ROMAN_CITY_PORTICO_WALK_PASS artifacts/city/portico-walk.log
+          }
+          export -f portico_walk
+          city_routes() {
+            "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+              --script res://tests/roman_city_routes_test.gd \
+              2>&1 | tee artifacts/city/routes.log
+            grep -q ROMAN_CITY_ROUTES_PASS artifacts/city/routes.log
+          }
+          export -f city_routes
+          voice_coverage() {
+            python3 tools/audio/audit_german_dialogue.py artifacts/voice/authored.json --report artifacts/voice/coverage.json --strict
+          }
+          export -f voice_coverage
+          voice_lipsync() {
+            "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/dialogue_lipsync_test.gd -- "--authored=$GITHUB_WORKSPACE/artifacts/voice/authored.json" 2>&1 | tee artifacts/voice/full-lipsync.log
+            grep -q DIALOGUE_LIPSYNC_PASS artifacts/voice/full-lipsync.log
+            ! grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/voice/full-lipsync.log
+          }
+          export -f voice_lipsync
+          motion_quality() {
+            python3 tools/motion_quality_gate.py --evidence artifacts/engine-checks
+          }
+          export -f motion_quality
+          for name in engine_full real_assets real_walk youth_mocap i02_props city_crowd city_surface portico_walk city_routes voice_coverage voice_lipsync motion_quality; do
+            gate "$name"
+          done
+          # A successful export still requires every original gate, including
+          # current source-bound motion measurements/reviews and all 170+ lines.
+          test "$failed" -eq 0
       - name: Verify Android-safe vegetation in a real Compatibility framebuffer
         shell: bash
         run: |
@@ -361,6 +413,7 @@ jobs:
           name: imperathen-fold7-qa-apk-${{ github.run_number }}
           path: |
             artifacts/source-commit.txt
+            artifacts/release-gates.tsv
             artifacts/mobile/
             artifacts/city/
             artifacts/engine-checks/
