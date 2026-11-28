@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 270,
+  "version": 271,
   "tasks": [
     {
       "id": "K101",
@@ -1347,16 +1347,16 @@
       "id": "FORMATION-AUTHORED-KEYFRAME-GAIT",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "89e62f50d75a4a9cdc39efa0311cd9169b832670",
-      "run_id": null,
+      "run_id": "46115096757",
       "scope": [
         "prototype/scripts/visuals/far_ranks.gd",
         "prototype/shaders/rank_stride.gdshader",
         "prototype/tests/formation_stride_contact_test.gd",
         ".github/workflows/aeterna-formation-authored-gait.yml"
       ],
-      "note": "Mirror exact source company gait sagittal hinge keyframes (art/soldiers/build.py, 25/18/22 intervals) with shared CPU/GPU key table, retain static guard, source sole topology, existing stride helper and original strict 40mm/full tests. Preflight against 798 actual rig samples reproduces old distances within 3um; predicts 264->54 failures, not engine proof or full fix. New isolated push-only candidate; no arbitrary offsets, no budget/gate relaxation, no main/APK."
+      "note": "Mirror exact source company gait sagittal hinge keyframes (art/soldiers/build.py, 25/18/22 intervals) with shared CPU/GPU key table, retain static guard, source sole topology, existing stride helper and original strict 40mm/full tests. Preflight against 798 actual rig samples reproduces old distances within 3um; predicts 264->54 failures, not engine proof or full fix. New isolated push-only candidate; no arbitrary offsets, no budget/gate relaxation, no main/APK. Actual four-file head aacbcac802cc89cabcd9dba163400cfef68ff1eb, runtime29913a5f shaderbf175906, unchanged strict diagnostic3f1e24c4; push-only actual run46115096757 in progress, all original headless tests and 25 real compatibility-rendered frames requested. No engine result yet."
     }
   ]
 }
