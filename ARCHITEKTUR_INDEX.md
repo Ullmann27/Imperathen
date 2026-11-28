@@ -2893,6 +2893,14 @@
 - `static func build_mesh() -> ArrayMesh`
 - `static func material() -> ShaderMaterial`
 
+## prototype/scripts/world/village/breakfast_acting.gd
+
+- `class_name BreakfastActing`
+- `extends RefCounted`
+- `func advance(world: Node3D, life: Node3D, delta: float, data: Dictionary) -> void`
+- `func focus_id() -> String`
+- `func owns_gaze(actor_id: String) -> bool`
+
 ## prototype/scripts/world/village/brook.gd
 
 - `extends RefCounted`
