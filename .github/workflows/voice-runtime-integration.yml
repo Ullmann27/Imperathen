@@ -1,7 +1,7 @@
 name: IMPERATHEN all authored German dialogue runtime verification
 on:
   push:
-    branches: ['feature/astra-sol-voice-runtime-integration-20261128']
+    branches: ['feature/astra-sol-voice-runtime-integration-20261128', 'fix/astra-sol-encoded-voice-onsets-20261128']
 permissions:
   contents: read
   actions: read
@@ -46,11 +46,16 @@ jobs:
         run: |
           set -euo pipefail
           python3 tools/audio/test_voice_contract.py
+          python3 tools/audio/test_reanchor_imported_voice_onsets.py
           "$GODOT_BIN" --headless --path prototype --import --quit
           "$GODOT_BIN" --headless --path prototype --script res://tests/tools/export_dialogue_lines.gd -- "$GITHUB_WORKSPACE/artifacts/voice/authored.json"
           python3 tools/audio/stage_verified_dialogue.py --authored artifacts/voice/authored.json --candidates artifacts/voice-candidates --report artifacts/voice/staged.json --missing artifacts/voice/missing.json
           python3 tools/audio/audit_german_dialogue.py artifacts/voice/authored.json --report artifacts/voice/coverage.json
           "$GODOT_BIN" --headless --path prototype --import --quit
+          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/dialogue_lipsync_test.gd -- "--measure-staged-onsets=$GITHUB_WORKSPACE/artifacts/voice/staged.json" "--onset-output=$GITHUB_WORKSPACE/artifacts/voice/imported-onsets.json" 2>&1 | tee artifacts/voice/imported-onsets.log
+          grep -q IMPORTED_VOICE_ONSETS_PASS artifacts/voice/imported-onsets.log
+          python3 tools/audio/reanchor_imported_voice_onsets.py --staged artifacts/voice/staged.json --measured artifacts/voice/imported-onsets.json --report artifacts/voice/onset-derivation.json
+          python3 tools/audio/audit_german_dialogue.py artifacts/voice/authored.json --report artifacts/voice/coverage.json
           "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/dialogue_lipsync_test.gd -- "--authored=$GITHUB_WORKSPACE/artifacts/voice/authored.json" --allow-missing-authored 2>&1 | tee artifacts/voice/full-lipsync.log
           grep -q DIALOGUE_LIPSYNC_PASS artifacts/voice/full-lipsync.log
           ! grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/voice/full-lipsync.log

@@ -142,7 +142,62 @@ func _check_voice_contract() -> void:
 		_check(not VoiceLines.viseme_track(row).is_empty(), "Shipped viseme contract: " + str(row.line_id))
 
 
+## Measure the FINAL imported Ogg, not the pre-encode WAV master.
+## Only explicitly staged, receipt-bound recordings may be re-anchored.
+func _measure_staged_onsets(receipt_path: String, output_path: String) -> void:
+	var receipt: Variant = JSON.parse_string(FileAccess.get_file_as_string(receipt_path))
+	var measurements: Array[Dictionary] = []
+	var valid: bool = receipt is Dictionary and receipt.get("rows") is Array and not output_path.is_empty()
+	if valid:
+		for item: Variant in receipt.rows:
+			if not item is Dictionary:
+				valid = false
+				break
+			var row: Dictionary = item
+			var entry: Dictionary = VoiceLines.find_line_id(str(row.get("line_id","")))
+			if entry.is_empty() or entry.get("sha256") != row.get("sha256") or entry.get("visemes_sha256") != row.get("visemes_sha256") or entry.get("speaker_id") != row.get("speaker_id"):
+				valid = false
+				break
+			var raw_audio: String = "res://assets/audio/voice/" + str(entry.file)
+			if FileAccess.get_sha256(raw_audio) != row.sha256 or VoiceLines.viseme_track(entry).is_empty():
+				valid = false
+				break
+			var stream: AudioStream = VoiceLines.stream_for(entry)
+			if stream == null:
+				valid = false
+				break
+			var audio: Dictionary = _audio_onset(stream)
+			if audio.is_empty() or not is_finite(float(audio.get("onset",-1))) or float(audio.onset) < 0.0:
+				valid = false
+				break
+			measurements.append({"line_id":entry.line_id,"speaker_id":entry.speaker_id,"sha256":entry.sha256,
+				"visemes_sha256":entry.visemes_sha256,"decoded_onset_s":audio.onset,"stream_length_s":stream.get_length()})
+	if valid and measurements.size() == int(receipt.get("staged",-1)):
+		var file: FileAccess = FileAccess.open(output_path,FileAccess.WRITE)
+		if file != null:
+			file.store_string(JSON.stringify({"engine":Engine.get_version_info().string,"mix_rate":AudioServer.get_mix_rate(),
+				"method":"Godot imported playback; 10 ms RMS, 5 ms hop, -40 dB", "rows":measurements}))
+			file.close()
+			await MixerTeardown.drain(self)
+			print("IMPORTED_VOICE_ONSETS_PASS count=%d" % measurements.size())
+			quit(0)
+			return
+	await MixerTeardown.drain(self)
+	printerr("IMPORTED_VOICE_ONSETS_FAIL")
+	quit(1)
+
+
 func _run() -> void:
+	var receipt_path: String = ""
+	var output_path: String = ""
+	for arg: String in OS.get_cmdline_user_args():
+		if arg.begins_with("--measure-staged-onsets="):
+			receipt_path = arg.trim_prefix("--measure-staged-onsets=")
+		elif arg.begins_with("--onset-output="):
+			output_path = arg.trim_prefix("--onset-output=")
+	if not receipt_path.is_empty():
+		await _measure_staged_onsets(receipt_path,output_path)
+		return
 	_check_voice_contract()
 	# The current film includes alternate family reactions and topic branches,
 	# not only the default VID-A path. Every authored spoken line must have
