@@ -78,7 +78,7 @@ func _run() -> void:
 	var finish: Vector3 = life.slot_position(destination,0)
 	_check(start.is_equal_approx(source),"Domain route stays at source during loading")
 	_check(_horizontal(start,finish)>18.0,"Premature destination would exceed the six-metre re-stream guard")
-	for offset in [0,1,30,58,59]:
+	for offset: int in [0,1,30,58,59]:
 		var now := start_time+offset
 		_check(not life.is_walking(person,now),"Loading is not walking at %ds" % offset)
 		_check(view._target(person,now).is_equal_approx(start),"Presentation remains at actual source at %ds" % offset)
@@ -116,7 +116,7 @@ func _run() -> void:
 	_check(absf(actor.global_position.y-world_start.y)<.01,"Physical feet stand on the measured floor")
 	_check(actor.get_node("Figure").body != null,"Real imported resident figure exists")
 	var world_before := actor.global_position
-	for offset in [0,30,59]:
+	for offset: int in [0,30,59]:
 		life.state.t = start_time+offset
 		var snapshot := JSON.stringify(life.state)
 		await physics_frame
