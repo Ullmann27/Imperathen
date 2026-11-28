@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 232,
+  "version": 233,
   "tasks": [
     {
       "id": "K101",
@@ -1115,7 +1115,7 @@
       "id": "YOUTH-ARMOUR-LOCAL-WEIGHTS",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "458bb1d666d4f440d2459a78c76bed629d128c18",
       "run_id": "46105418620",
       "scope": [
@@ -1123,7 +1123,7 @@
         "tools/art/test_youth_armour_local_weights.py",
         ".github/workflows/aeterna-youth-armour-local-weights.yml"
       ],
-      "note": "Independent implementation following reviewed N33; isolated new tools/workflow only, do not edit active youth parity test/workflow or original source assets. Pin production retarget revision, verify named weights/rest position/real edge topology, exact source hash, reject ambiguous split seams; only local four-weight candidate. Existing full Godot youth regression unchanged, compare actual A/B per-clip counts and sole positions. No private binary artifact or acceptance claim. Actual commit 458bb1d666d4f440d2459a78c76bed629d128c18, exactly 3 new files, no edits to prior tests or assets; named rest geometry and real edge matching, normalized local average, coincident seam and cross-primitive rejection, actual local 60Hz no-new/no-worse edge guard, original full 692-check engine A/B and zero residual requirement. Actual run 46105418620 in_progress; no successful source match or candidate generation yet."
+      "note": "Actual run 46105418620/job 140856973614 failed at candidate build: ValueError Expected one measured connected edge, found 0. No asset was changed; no A/B result. Prior source identity checks and local guard retained. Next isolated candidate searches actual named four-influence signatures, connected invariant edge length and explicitly enumerated orthogonal coordinate conventions across all MeshyYouthBody primitives. No tolerance relaxation, no private GLB publication."
     },
     {
       "id": "N34",
@@ -1167,6 +1167,20 @@
         ".github/workflows/aeterna-tribal-sole-topology.yml"
       ],
       "note": "Masterplan phase01, independent of discontinued USE AI. Actual pinned far GLB b370b05d, 885 triangles, one material. Raw static heel vertex distance 83.102mm but nearest true existing surface triangle 17.038mm. Geometry-only conforming transverse foot-edge midpoint splits (existing shader x-dependent deformation), not selected by test probes, all incident UV seam faces split, preserve original positions/material atlas/rest surface and 900-triangle cap. Simulated source geometry width-priority 899 triangles, neutral original proxy distances 17.687/20.107/8.004/15.712mm; no Godot pass claim. Isolated candidate from verified body-sweep, exact wheel test blob from b3cdf9 and static diagnostic from 2612b0; rerun original 40mm plus full motion gates. No preview/main or production APK. Actual commit 603e4354ddfcd1545d26e6d695239f9efe6876f0, new exact GLB blob c961a42abd5f1cc20c239baf4fa285bad0238a0e; five-file compare/readback verified. 885->899 triangles, 2655->2669 vertices, atlas identical, one material, max parent rest area deviation 1.57e-9m2, max transverse width 171.81->89.95mm. Exact wheel/static test blobs a974a711/7d52d118. Actual CI 46108009771 in_progress, no Godot/visual/device success claim."
+    },
+    {
+      "id": "YOUTH-ARMOUR-SOURCE-MAPPING",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "458bb1d666d4f440d2459a78c76bed629d128c18",
+      "run_id": null,
+      "scope": [
+        "tools/art/youth_armour_local_weights.py",
+        "tools/art/test_youth_armour_local_weights.py",
+        ".github/workflows/aeterna-youth-armour-local-weights.yml"
+      ],
+      "note": "Independent repair of source lookup failure. Same exact named weights, measured edge length, position tolerances and local no-regression guard. Search all real body primitives, only accept one connected pair with matching signed-axis transformation, reject ambiguous/missing matches with bounded evidence; correct primitive index in writer. Require negative controls and original production-parity full Godot A/B, no other outfit or LOD changes. New isolated branch, no change to active youth parity test or original private assets."
     }
   ]
 }
