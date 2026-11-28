@@ -52,6 +52,14 @@ var run_id := ""
 var opening_director
 var opening_voice := DialoguePlayer.new()
 var opening_voice_duration := 0.0
+# Films and ordinary conversations share the one existing DialoguePlayer.
+var _live_dialogue_screen: String = ""
+var _live_dialogue_key: String = ""
+var _live_dialogue_speaker: String = ""
+var _live_dialogue_queue: Array[String] = []
+var _live_dialogue_figure: Node3D
+var _live_dialogue_body: Node3D
+var _live_dialogue_paused: bool = false
 var opening_overlay
 var opening_sequence: Dictionary = {}
 var opening_index := 0
@@ -119,6 +127,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	_advance_live_dialogue()
 	if screen in ["city_exploration", "world_workshop"]:
 		return
 	if screen == "opening":
@@ -219,6 +228,13 @@ func _on_go_back_requested() -> void:
 
 
 func _notification(what: int) -> void:
+	if not _live_dialogue_screen.is_empty() and screen == _live_dialogue_screen:
+		if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT]:
+			_live_dialogue_paused = true
+			opening_voice.set_paused(true)
+		elif what in [NOTIFICATION_APPLICATION_RESUMED, NOTIFICATION_APPLICATION_FOCUS_IN]:
+			_live_dialogue_paused = false
+			opening_voice.set_paused(false)
 	if screen == "world_workshop" and is_instance_valid(_world_workshop):
 		if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT]:
 			if not _world_workshop.controller.motion_paused:
@@ -369,6 +385,8 @@ func _continue_game() -> void:
 
 
 func _resume() -> void:
+	if not _live_dialogue_screen.is_empty():
+		_stop_opening_voice()
 	if screen == "opening":
 		_opening_set_paused(false)
 		return
@@ -395,6 +413,8 @@ func _resume() -> void:
 
 
 func _pause() -> void:
+	if not _live_dialogue_screen.is_empty():
+		_stop_opening_voice()
 	if screen == "opening":
 		_opening_set_paused(true)
 		return
@@ -426,6 +446,8 @@ func _save(show_feedback: bool = true) -> Dictionary:
 
 
 func _request_menu() -> void:
+	if not _live_dialogue_screen.is_empty():
+		_stop_opening_voice()
 	if not session_started:
 		_show_menu()
 		return
@@ -798,7 +820,9 @@ func _show_village_npc(npc_id: String) -> void:
 	screen = "village_dialog"
 	world.set_active(false)
 	world.focus_village_npc(npc_id)
-	ui.show_village_dialog(_npc_dialog(npc_id))
+	var dialog: Dictionary = _npc_dialog(npc_id)
+	ui.show_village_dialog(dialog)
+	_play_live_dialogue(str(dialog.get("text", "")), npc_id, world.get_cinematic_figure(npc_id))
 	print("IMPERATHEN_VILLAGE_DIALOG: " + npc_id)
 
 
@@ -824,6 +848,7 @@ func _village_command(command: String, args: Dictionary) -> void:
 		var dialog := _npc_dialog(village_npc)
 		dialog["feedback"] = str(result.get("message", ""))
 		ui.show_village_dialog(dialog)
+		_play_live_dialogue(str(dialog.get("text", "")), village_npc, world.get_cinematic_figure(village_npc))
 
 
 func _npc_dialog(npc_id: String) -> Dictionary:
@@ -866,6 +891,8 @@ func _append_political_choices(dialog: Dictionary, politics: Dictionary) -> void
 
 
 func _show_council_records() -> void:
+	if not _live_dialogue_screen.is_empty():
+		_stop_opening_voice()
 	var politics: Dictionary = model.politics_view()
 	var recommendation: Dictionary = politics.get("recommendation", {})
 	var text := "Südweg · Prüfen, ob die Bohlen am Ablauf fest aufliegen."
@@ -911,7 +938,9 @@ func _show_frontier(npc_id: String) -> void:
 	screen = "frontier_dialog"
 	world.set_active(false)
 	world.focus_frontier_npc(npc_id)
-	ui.show_frontier_dialog(_dialog_with_behavior(dialog, npc_id))
+	var shown: Dictionary = _dialog_with_behavior(dialog, npc_id)
+	ui.show_frontier_dialog(shown)
+	_play_live_dialogue(str(shown.get("text", "")), npc_id, world._gaze_dialog_actor)
 	print("IMPERATHEN_FRONTIER_DIALOG: " + npc_id)
 
 
@@ -926,7 +955,9 @@ func _choose_frontier(payload: Dictionary) -> void:
 	if dialog.is_empty():
 		_resume()
 	else:
-		ui.show_frontier_dialog(_dialog_with_behavior(dialog, frontier_npc))
+		var shown: Dictionary = _dialog_with_behavior(dialog, frontier_npc)
+		ui.show_frontier_dialog(shown)
+		_play_live_dialogue(str(shown.get("text", "")), frontier_npc, world._gaze_dialog_actor)
 
 
 func _show_companion() -> void:
@@ -956,7 +987,9 @@ func _show_companion() -> void:
 		screen = "dialog"
 		world.set_active(false)
 		world.focus_companion_gaze()
-		ui.show_dialog("Marcus · auf dem Weg zum Markt", "»Erst das Salz. Wir sehen uns an Cassias Stand.«", [{"label":"Weitergehen", "action":"resume", "enabled":true, "reason":""}])
+		var phrase: String = "»Erst das Salz. Wir sehen uns an Cassias Stand.«"
+		ui.show_dialog("Marcus · auf dem Weg zum Markt", phrase, [{"label":"Weitergehen", "action":"resume", "enabled":true, "reason":""}])
+		_play_live_dialogue(phrase, "marcus", world.get_cinematic_figure("marcus"))
 		return
 	if Childhood.enabled(model.data) and not companion.get("met", false):
 		# Before I-03 Marcus only greets. The former hut dialogue ("4 Holz
@@ -978,6 +1011,7 @@ func _show_companion() -> void:
 		greeting_choices.append({"label":"Weitergehen", "action":"resume", "enabled":true, "reason":""})
 		world.focus_companion_gaze()
 		ui.show_dialog("Marcus · am Brunnen", greeting, greeting_choices)
+		_play_live_dialogue(greeting, "marcus", world.get_cinematic_figure("marcus"))
 		return
 	if companion.get("met", false):
 		model.capture_npc_observations()
@@ -1012,12 +1046,16 @@ func _show_companion() -> void:
 		world.focus_companion_gaze()
 		world._companion.get_node("Figure").set_conversation_focus(true)
 		ui.show_dialog(str(authored.title), str(authored.text), options)
+		if model.data.origin_id == "italia":
+			_play_live_dialogue(str(authored.text), "marcus", world.get_cinematic_figure("marcus"))
 		return
 	screen = "dialog"
 	world.set_active(false)
 	world.focus_companion_gaze()
 	var dialogue: Dictionary = OpeningStory.companion_dialog(model.data)
 	ui.show_dialog(str(dialogue.title), str(dialogue.text), dialogue.choices)
+	if model.data.origin_id == "italia":
+		_play_live_dialogue(str(dialogue.text), "marcus", world.get_cinematic_figure("marcus"))
 
 
 func _begin_opening(sequence: Dictionary, start_index: int = 0) -> void:
@@ -1128,12 +1166,109 @@ func _update_opening_voice(beat: Dictionary) -> void:
 	opening_voice_duration = stream.get_length()
 
 
+## Only exact recorded phrases of the actual speaker may be played.
+## Social status and dynamically generated paragraphs remain written text
+## unless they themselves have an exact recording.
+func _play_live_dialogue(text: String, speaker: String, figure: Node3D) -> void:
+	if screen not in ["village_dialog", "frontier_dialog", "dialog"]:
+		return
+	if not is_instance_valid(figure) or not figure.is_visible_in_tree():
+		_stop_opening_voice()
+		return
+	var sid: String = VoiceLines.speaker_id(speaker)
+	var phrases: Array[String] = []
+	var whole: Dictionary = VoiceLines.find(text, sid)
+	if not whole.is_empty() and VoiceLines.stream_for(whole) != null and not VoiceLines.viseme_track(whole).is_empty():
+		phrases.append(text)
+	else:
+		for paragraph: String in text.split("\n\n", false):
+			var line: Dictionary = VoiceLines.find(paragraph, sid)
+			if not line.is_empty() and VoiceLines.stream_for(line) != null and not VoiceLines.viseme_track(line).is_empty():
+				phrases.append(paragraph)
+	var identity: String = sid + ":" + JSON.stringify(phrases).sha256_text()
+	if _live_dialogue_screen == screen and _live_dialogue_key == identity and _live_dialogue_figure == figure:
+		return
+	_stop_opening_voice()
+	if phrases.is_empty():
+		return
+	_live_dialogue_screen = screen
+	_live_dialogue_key = identity
+	_live_dialogue_speaker = sid
+	_live_dialogue_figure = figure
+	_live_dialogue_queue.assign(phrases)
+	opening_voice.set_paused(false)
+	_advance_live_dialogue()
+
+
+func _bind_live_voice_face() -> void:
+	if not is_instance_valid(_live_dialogue_figure):
+		return
+	# All callers supply the existing VillagePerson figure. Its imported body
+	# may change on a LOD switch; never retain the previous body's face.
+	var body: Node3D = _live_dialogue_figure.get("body") as Node3D
+	if not is_instance_valid(body):
+		body = _live_dialogue_figure
+	if _live_dialogue_body == body and is_instance_valid(opening_voice.face):
+		return
+	if is_instance_valid(opening_voice.face):
+		opening_voice.face.clear()
+		opening_voice.face.set_process(false)
+		opening_voice.face.queue_free()
+		opening_voice.face = null
+	_live_dialogue_body = body
+	var face := FaceDriver.new()
+	face.blink_enabled = false
+	face.process_priority = 20
+	opening_voice.add_child(face)
+	var bound: Dictionary = face.bind(body)
+	if not bool(bound.jaw_bone) and int(bound.blend_shapes) == 0:
+		face.set_process(false)
+		face.queue_free()
+		return
+	opening_voice.face = face
+	if opening_voice.is_active():
+		var entry: Dictionary = VoiceLines.find_line_id(str(opening_voice.current.get("line_id","")))
+		face.set_track(VoiceLines.viseme_track(entry), opening_voice.clock)
+
+
+func _advance_live_dialogue() -> void:
+	if _live_dialogue_screen.is_empty():
+		return
+	if screen != _live_dialogue_screen or not is_instance_valid(_live_dialogue_figure) or not _live_dialogue_figure.is_visible_in_tree():
+		_stop_opening_voice()
+		return
+	if _live_dialogue_paused:
+		return
+	if opening_voice.is_active():
+		if _live_dialogue_body != _live_dialogue_figure.get("body"):
+			_bind_live_voice_face()
+		return
+	if _live_dialogue_queue.is_empty():
+		if is_instance_valid(opening_voice.face):
+			opening_voice.face.clear()
+			opening_voice.face.set_process(false)
+			opening_voice.face.queue_free()
+			opening_voice.face = null
+		return
+	_bind_live_voice_face()
+	var phrase: String = _live_dialogue_queue.pop_front()
+	opening_voice.play(phrase, _live_dialogue_speaker)
+
+
 func _stop_opening_voice() -> void:
 	opening_voice.stop()
 	if is_instance_valid(opening_voice.face):
+		opening_voice.face.set_process(false)
 		opening_voice.face.queue_free()
 		opening_voice.face = null
 	opening_voice_duration = 0.0
+	_live_dialogue_screen = ""
+	_live_dialogue_key = ""
+	_live_dialogue_speaker = ""
+	_live_dialogue_queue.clear()
+	_live_dialogue_figure = null
+	_live_dialogue_body = null
+	_live_dialogue_paused = false
 
 
 func _opening_process(delta: float) -> void:
