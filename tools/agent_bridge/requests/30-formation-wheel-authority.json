@@ -1,0 +1,11 @@
+{
+  "revision": "158e22df72a8fafb1ab690bd55011a16f27b801d",
+  "task": "N30: independent, tightly bounded residual wheel/refile contract review, NOT LOD/foot-contact N21 or N24. On exact #177 158e22d, actual Godot run 46026104912: authority 19/19, battle command 411/411, battle rules 146/146; original formation_agents 82/87, residual 'A front change below 75 deg wheels instead of re-filing' fails while actual rank owners and recorded matching pass. Determine whether _update_frame uses accumulated presentation-facing lag rather than authoritative discrete front change, whether other units increment global counters, or another concrete cause. Compare _step and _snapshot_unit/_update_frame; distinguish actual refile from ongoing wheel. Propose ONE minimal runtime Unified Diff and a focused real Godot regression exercising sustained lag, a real >75-degree discrete front change and original oblique order, without changing original gates, rank authority, wheel-rate or LOD budgets. If evidence insufficient, provide minimal instrumentation diff instead. Do not propose loosening original global assertion; report why if test semantics are wrong. No execution claims. Maximum 800 words, only necessary diff and brief rationale, no reasoning transcript.",
+  "files": [
+    "prototype/scripts/battle/battle_model.gd",
+    "prototype/scripts/formation/formation_agents.gd",
+    "prototype/tests/formation_agents_test.gd",
+    "prototype/tests/formation_slot_authority_test.gd"
+  ],
+  "max_tokens": 8192
+}
