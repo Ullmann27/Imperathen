@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 242,
+  "version": 243,
   "tasks": [
     {
       "id": "K101",
@@ -929,7 +929,7 @@
         "prototype/tests/formation_agents_test.gd"
       ],
       "access": "edit",
-      "note": "Own isolated branch fix/aeterna-formation-wheel-authority-20261128 commit 5153f8354595d9472cde45f3c056ad7761976d73 on #197. Verified #177 battle model and formation base blobs identical to shared candidate base; reuse prior independently green authority/casualty implementation only in isolated branch. New runtime distinguishes adjacent authoritative >75-degree discrete turn from visual wheel lag, per-unit counters, applies once; adds real face/reverse-move regressions preserving original 60/180 and valley_muster gates. Actual run 46092418232 in_progress. No integration/green claim; original global assertion and all motion budgets untouched. Actual 46092418232/job 140816137495 at 5153f83: focused slot authority 27/27, battle command 411/411, rules 146/146, valley muster 133/133. Original formation 82/87 and 18/22 remain red. Max lag 92.9093 deg vs max authoritative step 41.253 deg; reverse refile once. Original global wheel counter gate still fails. Next bounded diagnostic retains all gates, adds per-unit refile/rematch deltas and worst actual LOD transition details to formation_agents_test.gd on the same isolated branch. No shared integration. Diagnostic commit 842f995bdb2bd08f03b43ba77cc3a80a3e38893a pushed with exact expected SHA 5153f83; compare ahead 1 behind 0, only formation_agents_test.gd (+16/-1); original global wheel assertion and 40mm LOD, position and phase gates untouched. Actual focused workflow 46096417387 observed in_progress. No runtime patch or green claim. Actual 46096417387/job 140828665531 failed, 82/87 and 18/22; target valley_spears per-unit refiles/rematches 0/0, sole global refile/rematch from ridge_bows 1/1. This proves unrelated company increments global counters; no claim its refile is invalid. Balanced/60 and very_high/60 worst foot 0.0927992m forest_spear block at 16s, balanced/180 same family block at 16.2s. Balanced/180 ridge_spears_04 at 25.45s C-detail-hidden(3)/B before and after: 0.692983m root jump and 0.376398 phase jump, correction debt 1.492725m, run, noncontact. No runtime patch; original tests retained. Existing coordinator edit scope unchanged pending independent review."
+      "note": "Full original evidence retained in register version 242 at 76c1eecd4efec04f3a127b3a8513e40f0021e146. Isolated #197 branch fix/aeterna-formation-wheel-authority-20261128; 5153f8354595d9472cde45f3c056ad7761976d73 distinguished authoritative >75deg turn from visual wheel lag, per-unit counters, exact base blobs. Run 46092418232/job140816137495: slot27/27, commands411/411, rules146/146, muster133/133, formation82/87 and18/22 red; max lag92.9093deg vs authoritative41.253deg. Diagnostic 842f995bdb2bd08f03b43ba77cc3a80a3e38893a changed only formation_agents_test.gd +16/-1; all original gates retained. Actual run46096417387/job140828665531 failed 82/87 and18/22; target valley_spears refile/rematch0/0, sole global ridge_bows1/1; unrelated increment proven, not invalid refile. Worst balanced/60 and very_high/60 foot0.0927992m forest_spear block at16s; balanced/180 same family at16.2s. Balanced/180 ridge_spears_04 at25.45s C-detail-hidden(3)/B before/after: root0.692983m, phase0.376398, debt1.492725m, run/noncontact. No runtime patch in diagnostic or integration; status, revision, run, scope and gates unchanged."
     },
     {
       "id": "N30",
@@ -1240,7 +1240,22 @@
         "prototype/tests/i02_props_test.gd",
         "prototype/tests/i02_props_test.gd.uid"
       ],
-      "note": "GitLab Duo Kimi K3.1 Pro proposed M21/VIS-003 isolated I02 presentation. Exact GitHub/GitLab integration SHA 8a8256a verified, M21 queued, new paths absent and no active overlap. Use candidate/aeterna-i02-basket-20261128 on GitLab project 89577832; original neighbour_basket.glb blob 0c9043c91be9727e2d6c9c2dbe41f0ed46946c60, authoritative village_childhood carried neighbor_basket plus screenplay i02; pending alone does not grant item, correction retains, complete removes. Only new module/test and optional Godot UID files; no existing source/state/save/CI changes. Require actual hand/anchor transforms, LOD rebind, duplicate-free lifecycle, save/load/read-only state checks, no fabricated asset or test result. Coordinator transfers exact reviewed blobs and owns subsequent CI/runtime wiring with separate lease. Preparatory isolated work only; MENU remains blocked and no journey advancement. Reserved, not submitted/run/accepted; GitLab Duo user-mediated, no direct API dispatch. | Actual GitLab Duo user-mediated handoff !201/#206 source fb30624dd7a90cb0d3cd5724daa6fd68b01f02e8, exact two new files +349/-0 and correct base. GitHub candidate #201 b34adfdf014625828bf13ec47e60a220b9732da5 contains identical blobs 1f7966a6ffd1d3e28aab6e4475c481ac94439d43 / 074f1219df2b87058ac7ecff05374988b962b66e. Coordinator's isolated QA-only PR #202 at a2d474b4d76ffa48057aa739b29bca5641128929 verifies those hashes before actual Godot import and focused test. Observed real run 46113029476 in_progress, not Kimi provider run. No pass, runtime integration, merge, visual/device or APK claim. Preserve reservation pending independent QA."
+      "note": "Full original handoff note retained in register v242 at 76c1eecd4efec04f3a127b3a8513e40f0021e146. GitLab !201/#206 source fb30624dd7a90cb0d3cd5724daa6fd68b01f02e8, exact base 8a8256a30145918739312588d70c4585768fa568, +349/-0 only two new files. GitHub candidate #201 b34adfdf014625828bf13ec47e60a220b9732da5 exact blobs 1f7966a6ffd1d3e28aab6e4475c481ac94439d43 / 074f1219df2b87058ac7ecff05374988b962b66e. Original GLB 0c9043c91be9727e2d6c9c2dbe41f0ed46946c60; pending alone does not grant item, correction retains, complete removes. Actual QA-only #202 a2d474b4d76ffa48057aa739b29bca5641128929 run46113029476 in_progress, coordinator test not provider run. Preserve lease; no runtime wiring, merge, pass, visual/device/APK acceptance or campaign progression. MENU remains blocked."
+    },
+    {
+      "id": "ARGON-M28-NPC-OPPORTUNITIES",
+      "owner": "Gemini",
+      "status": "reserved",
+      "revision": "8a8256a30145918739312588d70c4585768fa568",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/story/npc_opportunity_preview.gd",
+        "prototype/scripts/story/npc_opportunity_preview.gd.uid",
+        "prototype/tests/npc_opportunity_preview_test.gd",
+        "prototype/tests/npc_opportunity_preview_test.gd.uid"
+      ],
+      "access": "edit",
+      "note": "Gemini 4 Argon via user-mediated GitLab Duo. M28 preparatory read-only opportunity selector from existing authoritative NPC behavior, economy and village life state. One bounded existing-needs path, deterministic candidates, actual observed availability and safe gating, no invented rewards/quest progression/markers, no state writes. Isolated branch candidate/aeterna-m28-npc-opportunities-20261128 from exact common base; new module and independent regression test only (+optional exact UIDs); no existing files, CI, tracker, register, assets or main. Coordinator owns later QA and runtime wiring under separate lease. Recheck remote and active leases before writing; no claim of dispatch/test or M28 completion."
     }
   ]
 }
