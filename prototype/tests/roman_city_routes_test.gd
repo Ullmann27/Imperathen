@@ -39,7 +39,10 @@ const ROUTES := {
 	"east_gate_through":[Vector3(380.0, 0.0, 65.0), Vector3(440.0, 0.0, 65.0)],
 	"north_gate_through":[Vector3(-100.0, 0.0, -290.0), Vector3(-100.0, 0.0, -350.0)],
 	"south_gate_through":[Vector3(-100.0, 0.0, 290.0), Vector3(-100.0, 0.0, 350.0)],
-	"forum_piazza_east_west":[Vector3(-72.0, 0.0, -10.0), Vector3(50.0, 0.0, -10.0)],
+	# The integrated NorthJunction contains the original Apotheca at x=18.88.
+	# Preserve the same endpoints, but cross the actual public space south
+	# of the quarter instead of expecting a route through its solid walls.
+	"forum_piazza_east_west":[Vector3(-72.0, 0.0, -10.0), Vector3(15.0, 0.0, -10.0), Vector3(15.0, 0.0, 9.0), Vector3(42.0, 0.0, 9.0), Vector3(42.0, 0.0, -10.0), Vector3(50.0, 0.0, -10.0)],
 	"forum_piazza_to_main_street":[Vector3(-30.0, 0.0, -30.0), Vector3(-30.0, 0.0, 65.0)],
 	"forum_to_north_south_street":[Vector3(-13.0, 0.0, 40.0), Vector3(-100.0, 0.0, 40.0)],
 	"market_row_front_west":[Vector3(-392.0, 0.0, 51.5), Vector3(-108.0, 0.0, 51.5)],
@@ -156,29 +159,67 @@ func _routes(scene: Node3D, profile: String) -> Dictionary:
 	var shape := _body()
 	var result := {}
 	for route: String in ROUTES:
-		var from: Vector3 = ROUTES[route][0]
-		var to: Vector3 = ROUTES[route][1]
-		var free := _sweep(scene, shape, from, to)
-		var blocked_at := from.lerp(to, free)
-		_check(free >= 1.0, "%s: %s is free for a walking body (blocked after %.1f m at x %.1f z %.1f)" % [
-			profile, route, free*from.distance_to(to), blocked_at.x, blocked_at.z])
-		# The floor under the route is continuous: no hole and no riser above the step limit.
-		var length := from.distance_to(to)
+		var points: Array = ROUTES[route]
+		var free := true
+		var length := 0.0
+		var covered := 0.0
+		var blocked_at: Vector3 = points[0]
 		var previous := NAN
 		var worst := 0.0
 		var holes := 0
-		var samples := int(ceil(length/0.05))
-		for i in samples+1:
-			var y := _floor_y(scene, from.lerp(to, float(i)/samples))
-			if is_nan(y):
-				holes += 1
-				continue
-			if not is_nan(previous):
-				worst = maxf(worst, absf(y-previous))
-			previous = y
-		_check(holes == 0, "%s: %s has floor collision along its whole length (%d of %d samples without floor)" % [profile, route, holes, samples+1])
+		var total_samples := 0
+		for leg in range(points.size() - 1):
+			var from: Vector3 = points[leg]
+			var to: Vector3 = points[leg + 1]
+			var leg_length := from.distance_to(to)
+			var fraction := _sweep(scene, shape, from, to)
+			if free:
+				covered += fraction * leg_length
+				blocked_at = from.lerp(to, fraction)
+				free = fraction >= 1.0
+			length += leg_length
+			var samples := int(ceil(leg_length / 0.05))
+			for i in samples + 1:
+				if leg > 0 and i == 0:
+					continue
+				total_samples += 1
+				var y := _floor_y(scene, from.lerp(to, float(i) / samples))
+				if is_nan(y):
+					holes += 1
+					continue
+				if not is_nan(previous):
+					worst = maxf(worst, absf(y - previous))
+				previous = y
+		_check(free, "%s: %s is free for a walking body (blocked after %.1f m at x %.1f z %.1f)" % [
+			profile, route, covered, blocked_at.x, blocked_at.z])
+		_check(holes == 0, "%s: %s has floor collision along its whole length (%d of %d samples without floor)" % [profile, route, holes, total_samples])
 		_check(worst <= City.MAX_STEP, "%s: %s has no riser above the %.2f m step limit (max %.3f m)" % [profile, route, City.MAX_STEP, worst])
-		result[route] = {"length_m":snappedf(length, 0.1), "free":free >= 1.0, "max_riser_m":snappedf(worst, 0.001), "floor_holes":holes}
+		result[route] = {"length_m": snappedf(length, 0.1), "free": free, "max_riser_m": snappedf(worst, 0.001), "floor_holes": holes}
+	# Negative control: never make the real pharmacy wall non-solid to pass
+	# the old straight-line fixture. Its imported rear wall begins at x=18.88;
+	# a radius-0.24 capsule must meet it at approximately x=18.64.
+	var direct_from := Vector3(-72.0, 0.0, -10.0)
+	var direct_to := Vector3(50.0, 0.0, -10.0)
+	var fraction := _sweep(scene, shape, direct_from, direct_to)
+	var contact := direct_from.lerp(direct_to, fraction)
+	_check(fraction < 1.0 and absf(contact.x - 18.64) <= 0.15, profile + ": the original Apotheca blocks the old direct crossing")
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = shape
+	query.collision_mask = 1
+	query.exclude = [scene.player.get_rid()]
+	query.transform = Transform3D(Basis.IDENTITY, Vector3(18.9, (SWEEP_LOW + SWEEP_HIGH) * 0.5, -10.0))
+	var found := false
+	var collider_names: Array[String] = []
+	for hit: Dictionary in scene.get_world_3d().direct_space_state.intersect_shape(query, 32):
+		var collider: Node = hit.get("collider") as Node
+		if is_instance_valid(collider):
+			var name_in_scene := String(collider.name)
+			collider_names.append(name_in_scene)
+			if name_in_scene.begins_with("QuarterCollision_NorthJunction_") and name_in_scene.contains("Apotheca"):
+				found = true
+	_check(found, profile + ": the direct obstruction is the actual imported Apotheca wall, not an invisible blocker " + str(collider_names))
+	print("ROMAN_CITY_FORUM_CONTACT ", profile, " x=", contact.x, " colliders=", collider_names)
+	result["forum_straight_wall"] = {"blocked": fraction < 1.0, "source_verified": found}
 	return result
 
 
