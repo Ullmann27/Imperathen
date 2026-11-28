@@ -1,0 +1,19 @@
+name: IMPERATHEN Android integrated payload contract
+on:
+  push:
+    branches: ['fix/astra-sol-apk-payload-parity-20261128']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Run existing and extended APK static regressions
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tests -p 'android_*_test.py' -v
+          python3 tools/audio/test_voice_contract.py

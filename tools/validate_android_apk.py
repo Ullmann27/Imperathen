@@ -390,7 +390,30 @@ NATIVE_VEGETATION_RESOURCES = (
     "scripts/vegetation/vegetation_library.gd",
     "scripts/vegetation/vegetation_wind.gdshaderinc",
 )
+WORLD_WORKSHOP_RESOURCES = (
+    "scenes/world_expansion/preview.tscn",
+    "assets/world_expansion/manifest.json",
+    *(f"scripts/world_expansion/{name}.gd" for name in
+      ("asset_library", "atlas", "environment_controller", "preview", "settlement_layout", "settlement_view")),
+    *(f"shaders/world_expansion/{name}.gdshader" for name in ("ground_detail", "vegetation_wind")),
+    *(f"assets/world_expansion/architecture/{name}_lod{lod}.glb"
+      for name in ("taberna", "insula", "basilica", "basalt_road") for lod in range(3)),
+    *(f"assets/world_expansion/vegetation/{name}_lod{lod}.glb"
+      for name in ("field_elm", "cypress", "laurel") for lod in range(3)),
+)
+CHARACTER_CORE_RESOURCES = (
+    *(f"scripts/character_core/{name}.gd" for name in
+      ("armor_piece_resource", "body_pose_modifier", "character_core", "equipment_component",
+       "foot_alignment_modifier", "foot_placement", "locomotion_graph", "phase1_review")),
+    *(f"scenes/character_core/{name}.tscn" for name in
+      ("equipment_character", "imperathen_character", "phase1_review")),
+)
+VOICE_MANIFEST = "assets/audio/voice/manifest.json"
+VOICE_RUNTIME = ("scripts/audio/voice_lines.gd", "scripts/audio/dialogue_player.gd", "scripts/audio/face_driver.gd")
+
 FEATURE_RESOURCE_GROUPS = (
+    ("world_workshop_content", WORLD_WORKSHOP_RESOURCES),
+    ("native_character_core_content", CHARACTER_CORE_RESOURCES),
     ("native_vegetation_content", NATIVE_VEGETATION_RESOURCES),
     ("android_static_vegetation_content", (
         "scripts/vegetation/vegetation_safe.gd",
@@ -438,6 +461,8 @@ FEATURE_RESOURCE_GROUPS = (
     ("world_state_content", WORLD_STATE_RESOURCES),
 )
 FEATURE_ACTIVATION_RESOURCES = {
+    "world_workshop_content": ("scenes/world_expansion/preview.tscn", "scripts/world_expansion/preview.gd"),
+    "native_character_core_content": ("scripts/character_core/character_core.gd",),
     "native_vegetation_content": ("scripts/vegetation/vegetation_field.gd",),
     "android_static_vegetation_content": ("scripts/vegetation/vegetation_safe.gd",),
     "valdora_house_content": ("scripts/world/village/architecture/valdora_house_family.gd",),
@@ -542,7 +567,7 @@ def resolve_resource(archive: zipfile.ZipFile, names: set[str], source: str) -> 
     raw = "assets/" + source
     if raw in names and archive.getinfo(raw).file_size > 0:
         return {"source": source, "entry": raw, "mode": "direct"}
-    remap = raw + (".import" if source.endswith((".glb", ".jpg", ".png", ".webp")) else ".remap")
+    remap = raw + (".import" if source.endswith((".glb", ".jpg", ".png", ".webp", ".ogg", ".wav", ".mp3")) else ".remap")
     if remap in names and archive.getinfo(remap).file_size <= 65536:
         text = archive.read(remap).decode("utf-8", errors="replace")
         for match in re.finditer(r'^\s*path(?:\.[\w.-]+)?\s*=\s*"res://([^"\r\n]+)"', text, re.MULTILINE):
@@ -570,6 +595,84 @@ def record_payload_hash(archive: zipfile.ZipFile, resource: dict) -> None:
     resource["sha256"] = digest.hexdigest()
     if resource.get("remap"):
         resource["remap_sha256"] = hashlib.sha256(archive.read(resource["remap"])).hexdigest()
+
+
+def inspect_voice_payload(archive: zipfile.ZipFile, names: set[str], report: dict, source_root: Path,
+                          *, packed_only: bool = False) -> None:
+    """Compare every staged catalogue row against its actual exported audio and viseme bytes.
+
+    Raw JSON must match exactly. Godot converts imported Ogg streams, so their
+    payload hashes are recorded separately rather than compared to raw Ogg.
+    """
+    source_manifest = source_root / VOICE_MANIFEST
+    manifest_entry = "assets/" + VOICE_MANIFEST
+    if not source_manifest.is_file() and manifest_entry not in names:
+        return
+    if packed_only:
+        add_check(report, "german_dialogue_content", "incomplete", "Packed PCK dialogue bytes cannot be inspected by the ZIP validator.")
+        return
+    errors, payloads = [], []
+    line_count = 0
+    try:
+        if manifest_entry not in names:
+            raise ValueError("Missing raw German voice catalogue")
+        if archive.getinfo(manifest_entry).file_size > 16 * 1024**2:
+            raise ValueError("Voice catalogue exceeds bounded size")
+        raw = archive.read(manifest_entry)
+        if source_manifest.is_file() and raw != source_manifest.read_bytes():
+            errors.append("Exported voice catalogue differs from staged source")
+        data = json.loads(raw)
+        if not isinstance(data, dict) or data.get("language") != "de" or not isinstance(data.get("lines"), list) or not data["lines"]:
+            raise ValueError("Invalid or empty German voice catalogue")
+        ids, identities = set(), set()
+        for row in data["lines"]:
+            if not isinstance(row, dict):
+                raise ValueError("Malformed voice catalogue row")
+            lid, speaker, text = (row.get(k) for k in ("line_id", "speaker_id", "text"))
+            key = row.get("text_key")
+            if not all(isinstance(v, str) and v for v in (lid, speaker, text, key)):
+                raise ValueError("Malformed voice identity")
+            if lid in ids or hashlib.sha256(text.encode("utf-8")).hexdigest()[:16] != key:
+                raise ValueError("Duplicate or stale dialogue identity: " + lid)
+            ids.add(lid)
+            if row.get("kind", "story") == "story":
+                identity = (speaker, key)
+                if identity in identities:
+                    raise ValueError("Ambiguous story voice: " + lid)
+                identities.add(identity)
+            line_count += 1
+            for field, checksum, directory, ext in (("file","sha256","lines",".ogg"), ("visemes","visemes_sha256","visemes",".json")):
+                relative = row.get(field)
+                expected = row.get(checksum)
+                if not isinstance(relative, str) or not re.fullmatch(directory + r"/[A-Za-z0-9_.-]+" + re.escape(ext), relative) or not isinstance(expected, str) or not re.fullmatch(r"[a-f0-9]{64}",expected):
+                    raise ValueError("Unsafe or malformed voice asset: " + lid)
+                source = "assets/audio/voice/" + relative
+                resolved = resolve_resource(archive, names, source)
+                record_payload_hash(archive, resolved)
+                payloads.append(resolved)
+                if source_manifest.is_file():
+                    path = source_root / source
+                    if not path.is_file() or sha256_file(path) != expected:
+                        errors.append("Missing or changed staged source: " + source)
+                if resolved["entry"] is None:
+                    errors.append("Missing APK voice resource: " + source)
+                elif field == "visemes" or resolved["mode"] == "direct":
+                    if resolved["mode"] != "direct" or resolved["sha256"] != expected:
+                        errors.append("Exported raw voice asset differs from receipt: " + source)
+                elif not resolved["entry"].startswith("assets/.godot/imported/") or not resolved["entry"].endswith(".oggvorbisstr"):
+                    errors.append("Unexpected imported audio payload: " + source)
+        for source in VOICE_RUNTIME:
+            resolved = resolve_resource(archive, names, source)
+            record_payload_hash(archive, resolved)
+            payloads.append(resolved)
+            if resolved["entry"] is None:
+                errors.append("Missing dialogue runtime: " + source)
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        errors.append(str(error))
+    add_check(report, "german_dialogue_content", "fail" if errors else "pass",
+              "Every catalogue row requires exact source/viseme hashes, an actual audio payload and the existing dialogue runtime.",
+              line_count=line_count, resources=payloads, errors=errors,
+              hash_scope="Raw manifest/visemes match source; imported Ogg payload hashes record actual APK bytes, not a decoded-device test.")
 
 
 def inspect_zip(apk: Path, report: dict, expected_abi: str, source_root: Path) -> bool:
@@ -688,6 +791,7 @@ def inspect_zip(apk: Path, report: dict, expected_abi: str, source_root: Path) -
                           required_by_source=required_by_source, detected_in_archive=detected_in_archive,
                           resources=payloads, missing_resources=missing_payloads,
                           hash_scope="SHA-256 of actual exported APK payloads and import remaps; not a device runtime claim.")
+            inspect_voice_payload(archive, names, report, source_root, packed_only=bool(not valid_config and packs))
             if not valid_config and packs:
                 add_check(report, "godot_project_content", "incomplete",
                           "A packed Godot project was found, but this checker does not inspect PCK indexes. Project contents are not confirmed.", packs=packs)
