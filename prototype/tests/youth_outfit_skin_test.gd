@@ -51,6 +51,7 @@ func _run() -> void:
 				var violations := 0
 				var clip_lowest := INF
 				var worst := {}
+				var worst_phase := -1.0
 				for phase: float in PHASES:
 					if name in FISTS:
 						actor.sample_combat(name, phase)
@@ -61,13 +62,15 @@ func _run() -> void:
 					_check(bool(observed.finite), "%s LOD%d finite %s %.3f" % [outfit, level, name, phase])
 					violations += int(observed.skin_edge_violations)
 					if float(observed.get("worst_skin_edge", {}).get("excess_m", 0.0)) > float(worst.get("excess_m", 0.0)):
-						worst = observed.worst_skin_edge
+						worst = observed.worst_skin_edge.duplicate(true)
+						worst_phase = phase
 					if observed.lowest_sole_m != null:
 						clip_lowest = minf(clip_lowest, float(observed.lowest_sole_m))
 				if name in FISTS:
 					actor.cancel_action()
 				per_clip[name] = {"skin_edge_violations": violations, "lowest_sole_m": clip_lowest,
-					"worst_edge_excess_m": float(worst.get("excess_m", 0.0)), "worst_edge_mesh_surface": [worst.get("mesh", ""), worst.get("surface", -1)]}
+					"worst_edge_excess_m": float(worst.get("excess_m", 0.0)), "worst_edge_mesh_surface": [worst.get("mesh", ""), worst.get("surface", -1)],
+					"worst_edge_phase": worst_phase if worst_phase >= 0.0 else null, "worst_edge": worst}
 				total += violations
 				lowest = minf(lowest, clip_lowest)
 			result[outfit]["lod%d" % level] = {"clips": per_clip.size(), "skin_edge_violations": total, "lowest_sole_m": lowest, "per_clip": per_clip}
@@ -76,7 +79,7 @@ func _run() -> void:
 		for key: String in result.civil:
 			_check(int(result.civil[key].skin_edge_violations) == 0, "civil %s: no torn skin edge in any clip (%d)" % [key, int(result.civil[key].skin_edge_violations)])
 			if result.has("armoured"):
-				_check(absf(float(result.civil[key].lowest_sole_m) - float(result.armoured[key].lowest_sole_m)) < .0005, "civil %s soles as low as the armoured original" % key)
+				_check(absf(float(result.civil[key].lowest_sole_m) - float(result.armoured[key].lowest_sole_m)) < .0005, "civil %s soles as low as the armoured counterpart" % key)
 	print("YOUTH_OUTFIT_SKIN_RESULT " + JSON.stringify({"checks": checks, "failures": failures, "result": result}))
 	print("YOUTH_OUTFIT_SKIN_PASS" if failures.is_empty() else "YOUTH_OUTFIT_SKIN_FAIL")
 	quit(0 if failures.is_empty() else 1)
