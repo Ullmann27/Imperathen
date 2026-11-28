@@ -2,7 +2,7 @@ name: IMPERATHEN Fold7 candidate – real city, genuine APK, image checks
 
 on:
   push:
-    branches: ['integration/fold7-release-candidate-20261125']
+    branches: ['integration/fold7-release-candidate-20261125', 'hoplite/*--stand-zero']
   pull_request:
     paths:
       - 'prototype/**'
