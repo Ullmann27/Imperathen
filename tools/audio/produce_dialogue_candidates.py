@@ -21,6 +21,28 @@ TOOLS = ROOT / "tools/audio"
 ALIASES = {"chronik": "narrator", "wachmann": "severus"}
 MAX_WER = 0.12
 
+# Exact authored words; only delivery punctuation changes. The repeated
+# Whisper failures are concentrated at the compound boundary Körbe/Kohle
+# and the profession Holzfäller. Do not normalize these errors away.
+SEXTUS_LINE = "Dann nimm dieses Wachstäfelchen. Fabius ist der Holzfäller. Sag ihm, ich brauche bis zum Markttag zwei Körbe Kohle."
+SEXTUS_PROSODY = [
+    "Dann nimm dieses Wachstäfelchen! Fabius ist der Holzfäller! Sag ihm, ich brauche bis zum Markttag zwei Körbe, Kohle.",
+    "Dann nimm dieses Wachstäfelchen. Fabius ist der Holzfäller! Sag ihm: ich brauche bis zum Markttag zwei Körbe ... Kohle.",
+    "Dann nimm dieses Wachstäfelchen! Fabius ist der Holzfäller. Sag ihm, ich brauche bis zum Markttag zwei Körbe; Kohle.",
+    "Dann nimm dieses Wachstäfelchen. Fabius ist der Holzfäller. Sag ihm: ich brauche bis zum Markttag zwei Körbe Kohle!",
+]
+
+def prosody_words(text):
+    return re.findall(r"[a-zäöü0-9']+", text.lower().replace("ß", "ss"))
+
+def exact_sextus_variants(line):
+    if (line["line_id"] != "I04_A_REACT_MESSAGE" or line["speaker_id"] != "sextus"
+            or prosody_words(line["text"]) != prosody_words(SEXTUS_LINE)):
+        return []
+    if any(prosody_words(value) != prosody_words(line["text"]) for value in SEXTUS_PROSODY):
+        raise ValueError("Sextus prosody changed an authored word")
+    return list(SEXTUS_PROSODY)
+
 
 def load(path):
     return json.loads(path.read_text(encoding="utf-8"))
@@ -157,6 +179,10 @@ def main():
             raise ValueError("Unsafe or duplicate line ID " + lid)
         used_ids.add(lid)
         line["line_id"] = lid
+        if a.segmented:
+            variants = exact_sextus_variants(line)
+            if variants:
+                line["synthesis_variants"] = variants
         wanted.append(line)
     if a.line_id and not wanted and report["already_recorded"] != 1:
         raise ValueError("Requested exact line not found or not valid")

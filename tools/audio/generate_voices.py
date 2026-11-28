@@ -257,7 +257,8 @@ def main():
             seed = base_seed + a.seed_offset + attempt
             # Preserve the first 16 deterministic attempts for the existing
             # repair; later attempts vary phrasing boundaries, not words.
-            variant = variants[0] if attempt < 16 else variants[(attempt - 16) % len(variants)]
+            absolute_attempt = a.seed_offset + attempt
+            variant = variants[0] if absolute_attempt < 16 else variants[(absolute_attempt - 16) % len(variants)]
             t0 = time.time()
             if a.segmented:
                 parts = split_exact_phrases(variant)

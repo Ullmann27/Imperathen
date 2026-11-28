@@ -49,7 +49,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p artifacts/german-voices
-          "$RUNNER_TEMP/audio-venv/bin/python" tools/audio/produce_dialogue_candidates.py --speaker "$SPEAKER" --authored artifacts/voice-inventory/missing.json --work "$RUNNER_TEMP/german-$SPEAKER" --out "artifacts/german-voices/$SPEAKER" --attempts 8 --seed-offset 24 --segmented --line-id I04_A_REACT_MESSAGE 2>&1 | tee "artifacts/german-voices/$SPEAKER.log"
+          "$RUNNER_TEMP/audio-venv/bin/python" tools/audio/produce_dialogue_candidates.py --speaker "$SPEAKER" --authored artifacts/voice-inventory/missing.json --work "$RUNNER_TEMP/german-$SPEAKER" --out "artifacts/german-voices/$SPEAKER" --attempts 12 --seed-offset 32 --segmented --line-id I04_A_REACT_MESSAGE 2>&1 | tee "artifacts/german-voices/$SPEAKER.log"
       - name: Preserve validated audio and exact rejection report (no release)
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
