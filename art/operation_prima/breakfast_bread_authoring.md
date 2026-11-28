@@ -1,7 +1,5 @@
-# I-01 breakfast bread
+# I-01: Frühstücksbrot
 
-The family breakfast already references the `table_bread` prop at the imported kitchen table. Its replacement is authored as Godot-native mesh geometry in `prototype/assets/operation_prima/breakfast_bread.gd`: a shallow oval serving board, one irregular scored loaf, and three recessed score strips.
+Der Eintrag `table_bread` steht bereits einmal in `HouseholdDesigns.items("baker_home")`. Nicht zusätzlich instanziieren. `prototype/assets/operation_prima/breakfast_bread.gd` baut das Brett, den Laib und drei Einschnitte als ein Mesh beim Laden des Einrichtungskits, nicht pro Bild. Die drei Oberflächen erhalten eigene raue Materialien durch `interior_kit.gd`; ihre lokalen UVs passen nicht zum gepackten Atlas der importierten Requisiten. Die Produktivansicht zeigte mit dem falschen Material ein fast schwarzes Brett.
 
-The mesh keeps the existing prop origin and `kit_manifest.json` bounds. The existing manifest remains the source of collision dimensions, and the mesh uses the interior kit's oak and food PBR materials plus a profile-managed toasted-cut tint. No external model, texture, paid service, save field, or mission-state change is introduced. The dedicated geometry/collision/triangle-budget test is `prototype/tests/operation_prima_art_test.gd`.
-
-The engine render and baseline-to-after visual comparison are pending the parent-managed Godot preview; this authoring note is not a visual acceptance claim.
+Kein externer Asset-Import. Ursprung, Weltplatzierung, Spielstand und Manifest-Kollider bleiben gleich; 1.140 Dreiecke bei einem vorhandenen Budget von 1.184. Prüfung: `operation_prima_art_test.gd`. Die echte erste Tischeinstellung kann mit `operation_prima_table_capture.gd` wiederholt werden; Beispiel und Grenzen im [Produktionsbericht](../../docs/44_integration/OPERATION_PRIMA.md).

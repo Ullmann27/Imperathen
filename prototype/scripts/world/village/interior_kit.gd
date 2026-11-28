@@ -10,6 +10,11 @@ const BreakfastBread = preload("res://assets/operation_prima/breakfast_bread.gd"
 const TEXTURE := "res://assets/interiors/textures/%s_%s.png"
 const MATERIALS := ["oak", "wood_rough", "wicker", "straw", "linen", "wool", "leather", "terracotta",
 	"coarseware", "iron", "bronze", "stone", "food", "hearth_clay", "embers"]
+const BREAKFAST_PALETTE := {
+	"prima_bread_board": Color(0.45, 0.27, 0.13),
+	"prima_bread_loaf": Color(0.78, 0.49, 0.22),
+	"prima_bread_cut": Color(0.43, 0.23, 0.12),
+}
 # Flat surfaces other items may rest on, measured from the kit geometry.
 const TOPS := {
 	"chest_wood": [.54], "chest_small": [.44], "arca": [.66], "shelf_rack": [.315, .875, 1.435],
@@ -82,10 +87,12 @@ static func ensure() -> void:
 	info = parsed.props if parsed is Dictionary else {}
 	for name: String in MATERIALS:
 		materials[name] = _make_material(name)
-	var bread_cut: StandardMaterial3D = (materials["food"] as StandardMaterial3D).duplicate() as StandardMaterial3D
-	bread_cut.resource_name = "Interior_bread_cut"
-	bread_cut.albedo_color = Color(0.62, 0.40, 0.24)
-	materials["bread_cut"] = bread_cut
+	for name: String in BREAKFAST_PALETTE:
+		var paint := StandardMaterial3D.new()
+		paint.resource_name = "Interior_" + name
+		paint.albedo_color = BREAKFAST_PALETTE[name]
+		paint.roughness = .92
+		materials[name] = paint
 	set_profile("balanced")
 
 

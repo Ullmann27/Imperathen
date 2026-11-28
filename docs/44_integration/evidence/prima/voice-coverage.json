@@ -1,0 +1,1642 @@
+{
+  "language": "de",
+  "authored": 170,
+  "accepted": 40,
+  "missing_or_invalid": 130,
+  "scopes": {
+    "I-00": {
+      "authored": 5,
+      "accepted": 5
+    },
+    "I-01": {
+      "authored": 30,
+      "accepted": 27,
+      "missing_or_invalid": 3
+    },
+    "I-02": {
+      "authored": 5,
+      "accepted": 4,
+      "missing_or_invalid": 1
+    },
+    "I-03": {
+      "authored": 31,
+      "accepted": 4,
+      "missing_or_invalid": 27
+    },
+    "I-04": {
+      "authored": 28,
+      "missing_or_invalid": 28
+    },
+    "I-05": {
+      "authored": 5,
+      "missing_or_invalid": 5
+    },
+    "I-06": {
+      "authored": 7,
+      "missing_or_invalid": 7
+    },
+    "I-07": {
+      "authored": 25,
+      "missing_or_invalid": 25
+    },
+    "I-08": {
+      "authored": 4,
+      "missing_or_invalid": 4
+    },
+    "I-09": {
+      "authored": 4,
+      "missing_or_invalid": 4
+    },
+    "I-10": {
+      "authored": 3,
+      "missing_or_invalid": 3
+    },
+    "I-11": {
+      "authored": 2,
+      "missing_or_invalid": 2
+    },
+    "I-12": {
+      "authored": 3,
+      "missing_or_invalid": 3
+    },
+    "I-13": {
+      "authored": 3,
+      "missing_or_invalid": 3
+    },
+    "I-14": {
+      "authored": 2,
+      "missing_or_invalid": 2
+    },
+    "village": {
+      "authored": 10,
+      "missing_or_invalid": 10
+    },
+    "legacy_opening": {
+      "authored": 3,
+      "missing_or_invalid": 3
+    }
+  },
+  "issues": [
+    {
+      "line_id": "I-01.contact.marcus",
+      "scope": "I-01",
+      "source": "missions/band1/I-01.json:slice.contact_lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Du auch schon wach? Ich soll Wasser holen, aber der Eimer am Brunnen hat ein Loch. Wenn du nachher zum Markt gehst – ich kenne eine Abkürzung an der Gasse.«",
+      "text_key": "baa9d9dc0a471c7f",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-01.contact.cassia",
+      "scope": "I-01",
+      "source": "missions/band1/I-01.json:slice.contact_lines",
+      "speaker_id": "cassia",
+      "speaker_label": "cassia",
+      "text": "»Früh unterwegs? Ich lege gerade die Waren aus. Sag deiner Mutter, ihre Bestellung liegt bereit, sobald jemand mit dem Denar kommt.«",
+      "text_key": "57b6553d48006e55",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-01.contact.aelia",
+      "scope": "I-01",
+      "source": "missions/band1/I-01.json:slice.contact_lines",
+      "speaker_id": "aelia",
+      "speaker_label": "aelia",
+      "text": "»Siehst du diesen Stein? Er trägt drei andere. Wenn er fehlt, fällt die Ecke. So ist das mit vielen Dingen im Dorf.«",
+      "text_key": "29309c26af8f4c61",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-03.deliver_food",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:text",
+      "speaker_id": "julia",
+      "speaker_label": "julia",
+      "text": "»Du hast zugehört und die richtige Bestellung gebracht. Dein Vater möchte, dass du heute Sextus kennenlernst, seinen ältesten Freund. Frag ihn, was du in die Schmiede mitbringen sollst; dann kommst du nicht mit leeren Händen.«",
+      "text_key": "d49a996f1e43f80d",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-03.deliver_food.result",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Die Bestellung erreicht die Küche. Julia merkt sich, dass sie sich auf dich verlassen konnte.",
+      "text_key": "ab348bbc5a1c4344",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_A_COINS",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "narrator",
+      "speaker_label": "chronik",
+      "text": "An der Gasse zum Markt hält Marcus zwei Kupfermünzen in der Faust und einen leeren Tontopf unter dem Arm.",
+      "text_key": "2464a7d3bdde0246",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_A_STREET",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Da bist du ja. Ich soll für meine Mutter Salz holen, zwei Asse hat sie mir mitgegeben. Durch die Gasse sind wir schneller am Markt als über den Platz.«",
+      "text_key": "171e96ad52b6a6b7",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_A_WORRY",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Unser Ochse lahmt. Wenn das nicht besser wird, muss ich im Sommer mit aufs Feld und darf nicht mit Varro in den Wald. Sag das keinem.«",
+      "text_key": "a43b25e6d5a0f8c3",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_A_REACT_TOGETHER",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Gut. Dann gehen wir zusammen.«",
+      "text_key": "9323208a84c0867e",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_A_REACT_LATER",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Dann bis gleich bei Cassia. Aber komm wirklich, ich warte am Stand.«",
+      "text_key": "85326113af048e08",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_A_REACT_APART",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Wie du willst. Ich bin trotzdem zuerst da.«",
+      "text_key": "d47f74980487c04b",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_B_STALL",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "narrator",
+      "speaker_label": "chronik",
+      "text": "An Cassias Stand liegen Marcus’ zwei Asse neben dem Salzmaß. Cassia hat sie nicht eingesteckt.",
+      "text_key": "ae9c48ab8e69231b",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_B_CASSIA",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "cassia",
+      "speaker_label": "cassia",
+      "text": "»Zwei Asse kostet das kleine Maß. Deine Mutter hat mir aber den großen Topf geschickt, und das große Maß kostet drei. Gestern habe ich dir den Preis für das kleine genannt. Gelogen hat keiner von uns.«",
+      "text_key": "6ec5641134f6daef",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_B_MARCUS_WATCH",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Mutter hat mir zwei Asse gegeben und gesagt, das reicht. Mehr weiß ich auch nicht.«",
+      "text_key": "a5a6751b5f3c3da4",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_B_MARCUS_OFFER",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Du musst das nicht für mich machen. Aber wenn du es ernst meinst, vergesse ich es dir nicht.«",
+      "text_key": "8cd46b6b0ccd32a9",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_B_MARCUS_OBJECT",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Du hättest dich nicht einmischen müssen. Ich habe nur gesagt, was sie mir gestern gesagt hat.«",
+      "text_key": "d28d5be8b76f71fc",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_B_RESOLVE_CLARIFY",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "cassia",
+      "speaker_label": "cassia",
+      "text": "»Dann messen wir das kleine Maß ab. Füll es selbst in den Topf, dann sieht seine Mutter, wie viel zwei Asse sind.«",
+      "text_key": "69da2f712a9645a2",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_B_RESOLVE_SERVICE",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "cassia",
+      "speaker_label": "cassia",
+      "text": "»Das große Maß also. Für das fehlende As bringt ihr mir einen Krug Wasser vom Brunnen, dann ist es bezahlt. Angeschrieben wird nichts.«",
+      "text_key": "181dd3ebd3ff0f0d",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_B_RESOLVE_DEBT",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "cassia",
+      "speaker_label": "cassia",
+      "text": "»Das große Maß also. Das dritte As bringst du mir morgen, Marcus. Ich schneide eine Kerbe ins Holz, und dein Freund hat es gehört.«",
+      "text_key": "be5404ae5e1e1765",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_B_RESOLVE_REFUSE",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "cassia",
+      "speaker_label": "cassia",
+      "text": "»Dann bleibt das Salz heute hier. Nimm deine zwei Asse wieder mit und frag deine Mutter, welches Maß sie will.«",
+      "text_key": "60a0f714b27dec5d",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_C_OPEN_FRIENDLY",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Das mit dem Salz hätte ich allein nicht so hinbekommen. Gehen wir zusammen zurück?«",
+      "text_key": "953998a526c26045",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_C_OPEN_DEBT",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Morgen muss ich ihr das As bringen. Wenn ich es vergesse, erinnerst du mich. Gehen wir zusammen zurück?«",
+      "text_key": "ca35dce8796e058f",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_C_OPEN_NONE",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Jetzt komme ich ohne Salz heim. Wenigstens habe ich die zwei Asse noch. Kommst du mit?«",
+      "text_key": "acb97e16c5ab65e1",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_C_OPEN_DISPUTE",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Vor Cassia hast du so geredet, als hätte ich mir den Preis ausgedacht. Das merke ich mir.«",
+      "text_key": "e6a75a2848cb2138",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_C_TOGETHER",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Dann komm. Bis zur Gasse haben wir denselben Weg.«",
+      "text_key": "49db82fa196a19e6",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_C_TOGETHER_TENSE",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Von mir aus. Aber reden müssen wir nicht.«",
+      "text_key": "0265d1f4ff0ec63c",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_C_APART",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Gut. Bis morgen.«",
+      "text_key": "2ae87dfe69df2b35",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_C_APOLOGY",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Schon gut. Ich war auch laut. Bis zur Gasse haben wir denselben Weg.«",
+      "text_key": "d177f0926998876a",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I03_A_HOOK_WELL",
+      "scope": "I-03",
+      "source": "missions/band1/I-03.json:slice.lines",
+      "speaker_id": "marcus",
+      "speaker_label": "marcus",
+      "text": "»Heute Morgen am Brunnen hast du mir zugehört, als der Eimer leckte. Dafür zeig ich dir jetzt die Abkürzung.«",
+      "text_key": "1c5d322bd31e875f",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-04.woodcutter_request",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:text",
+      "speaker_id": "silvanus",
+      "speaker_label": "silvanus",
+      "text": "»Sextus kennt mich länger, als du lebst. Am Holzlager westlich des Dorfes liegt ein markiertes Bündel Kleinholz für seine Esse. Nimm nur das kleine Bündel; die schweren Stämme bleiben liegen. Mach erst die Arbeit – reden können wir danach immer noch.«",
+      "text_key": "e465c226baeac59b",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-04.woodcutter_request.result",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Dein Vater beschreibt dir den Lagerplatz. Jetzt weißt du, welches Bündel für Sextus bestimmt ist.",
+      "text_key": "c47416c899dfd7ea",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-04.collect_kindling.result",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Du nimmst das vorbereitete Bündel auf. Es muss noch zur Schmiede auf der anderen Dorfseite.",
+      "text_key": "5266f963e87f10f3",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-04.deliver_kindling",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:text",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Du bist also Silvanus’ Kind. Dein Vater und ich kennen uns länger, als du lebst. Du hast den Weg selbst gemacht und das richtige Holz gebracht. Wenn du etwas nicht kannst, sag es. Dann kann ich es dir zeigen. Wenn du einen Probemorgen versuchen möchtest, rede vorher mit deinem Vater.«",
+      "text_key": "68616512cec8bb58",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-04.deliver_kindling.result",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Sextus nimmt das Bündel an. Er bietet einen begleiteten Probemorgen an, keine fertige Berufsausbildung.",
+      "text_key": "769e948b3e05bd90",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-04.apprentice_permission",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:text",
+      "speaker_id": "silvanus",
+      "speaker_label": "silvanus",
+      "text": "»Du musst nicht der Stärkste sein. Du musst wissen, wann du stehenbleibst. Ein Probemorgen ist in Ordnung, wenn Sextus dabeibleibt und du auf seine Anweisungen hörst. Geh heute noch zu ihm und vereinbare, was du morgen tun darfst.«",
+      "text_key": "658ea4d01962a6e0",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-04.apprentice_permission.result",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Vater stimmt dem beaufsichtigten Probemorgen zu. Du bleibst zwölf und wohnst weiter bei deiner Familie.",
+      "text_key": "e235574107183c93",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-04.smith_trial",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:text",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Morgen zeige ich dir Blasebalg, Amboss und Kühlbottich. Heute ruhst du dich aus. Du fasst kein heißes Werkstück an, bevor ich es dir sage. Sieh hin, bevor du Kraft brauchst.«",
+      "text_key": "f470e42507bbb3a0",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-04.smith_trial.result",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Der Probemorgen ist verabredet. Geh nach Hause; der nächste Tag beginnt erst, wenn du dort bewusst ruhst.",
+      "text_key": "6b5c0b77226917d3",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_A_FIRE",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "narrator",
+      "speaker_label": "chronik",
+      "text": "Unter dem Schutzdach der Schmiede glüht die Esse. Am Gestell hängen Zangen und Hämmer, am Kühltrog liegt das Bündel, das du gebracht hast.",
+      "text_key": "5f6b23ffcb0eb208",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_A_SILVANUS",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "silvanus",
+      "speaker_label": "silvanus",
+      "text": "»Sextus, das ist mein Junge. Er hat das Bündel allein vom Holzlager hergetragen.«",
+      "text_key": "015293a485c7989f",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_A_MEMORY",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Allein? Dein Vater bringt mir das Holz für diese Esse, seit ich ihm auf dem Weg nach Aquileia die Achse geflickt habe. Ich habe ihm nie gesagt, dass das nur ein halber Tag Arbeit war.«",
+      "text_key": "6c146af6ad65048b",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_A_ASK",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Hier fasst du nichts Heißes an. Aber es gibt genug zu tun: Das Kleinholz muss an die Esse, und Fabius wartet auf eine Nachricht von mir. Oder du siehst erst einmal nur zu.«",
+      "text_key": "ea4722f44e59be4a",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_A_REACT_STACK",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Gut. Nimm immer nur so viel, wie du mit einem Arm halten kannst, und schichte es neben den Blasebalg.«",
+      "text_key": "14ee664e6c5bed4b",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_A_REACT_MESSAGE",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Dann nimm dieses Wachstäfelchen. Fabius ist der Holzfäller. Sag ihm, ich brauche bis zum Markttag zwei Körbe Kohle.«",
+      "text_key": "0523bfb9b49271b9",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_A_REACT_WATCH",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Auch gut. Wer zuerst hinsieht, verbrennt sich seltener. Bleib auf dieser Seite vom Amboss.«",
+      "text_key": "3253f08bd0755ae1",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_B_TOOL",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "narrator",
+      "speaker_label": "chronik",
+      "text": "Sextus legt zwei Zangen nebeneinander auf den Amboss. Eine hat einen feinen Riss am Gelenk.",
+      "text_key": "38d01bc8cad856fd",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_B_SEXTUS",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Die eine hält noch ein Jahr, die andere bricht beim nächsten heißen Eisen. Von außen sehen sie fast gleich aus. Darum prüfe ich jedes Werkzeug, bevor ich es ins Feuer halte.«",
+      "text_key": "3b8b44e0c80971a1",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_B_WORK_STACK",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Dein Holz liegt trocken und luftig. So brennt es, wenn ich es brauche.«",
+      "text_key": "ec951eb67ccc9f16",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_B_WORK_MESSAGE",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Fabius hat die Nachricht, sagst du. Dann kommt die Kohle rechtzeitig.«",
+      "text_key": "a3a7088617c8c502",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_B_WORK_WATCH",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Du hast zugesehen und nichts angefasst. Das ist mehr, als mancher Erwachsene schafft.«",
+      "text_key": "c70c07ceb1aaf754",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_B_TOPIC_CRAFT",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Eisen verzeiht keine Eile. Hier, ein kalter, krummer Nagel. Wenn du wiederkommst, zeige ich dir, wie man ihn gerade richtet. So lange bleibt er auf dem Ambossstock liegen.«",
+      "text_key": "a65d521bc71ea465",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_B_TOPIC_RIDING",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Die Händler nach Aquileia bringen mir ihre Pferde, wenn ein Huf ausbricht oder am Zaumzeug ein Ring fehlt. Ein Pferd merkt, ob du Angst hast. Wenn eines hier steht, darfst du den Strick halten, mehr nicht.«",
+      "text_key": "dd48d79d30ff0fb6",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_B_TOPIC_FATHER",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Dein Vater redet nicht viel über sich. Frag ihn nach der Achse und dem Winter. Und wenn er abwinkt, frag mich noch einmal.«",
+      "text_key": "e117c89624b2f585",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_C_LESSON_CRAFT",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Und der Nagel wartet auf dem Ambossstock, bis du wiederkommst.«",
+      "text_key": "f82abb55252d0947",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_C_LESSON_RIDING",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Wenn morgen ein Händler mit Pferd kommt, rufe ich dich.«",
+      "text_key": "20365fa941207336",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I04_C_LESSON_FATHER",
+      "scope": "I-04",
+      "source": "missions/band1/I-04.json:slice.lines",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Und frag deinen Vater nach der Achse.«",
+      "text_key": "4b0df846e0544cbc",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-05.rest_first.result",
+      "scope": "I-05",
+      "source": "missions/band1/I-05.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Nach Essen und Schlaf beginnt der zweite erzählte Dorftag. Dein Alter bleibt zwölf.",
+      "text_key": "6f8f56f34749edf0",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-05.forge_bellows.result",
+      "scope": "I-05",
+      "source": "missions/band1/I-05.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Die erste angeleitete Arbeitsfolge ist beendet. Sextus legt einen beschädigten Truhengriff auf den Amboss.",
+      "text_key": "3bd4f8b9823f1a01",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-05.forge_anvil.result",
+      "scope": "I-05",
+      "source": "missions/band1/I-05.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Du hast zuerst den Riss gesucht und den Griff erst danach mit Sextus gerichtet. Er muss noch am Kühlbottich geprüft werden.",
+      "text_key": "5d34af5d6983063b",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-05.forge_quench.result",
+      "scope": "I-05",
+      "source": "missions/band1/I-05.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Sextus prüft den gerichteten Griff und gibt ihn dir für Cassias Markttruhe mit.",
+      "text_key": "f626401af963aaf8",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-06.deliver_hinge",
+      "scope": "I-06",
+      "source": "missions/band1/I-06.json:text",
+      "speaker_id": "cassia",
+      "speaker_label": "cassia",
+      "text": "»Das ist der Griff für meine Truhe. Ein Versprechen wiegt genau so viel wie die Ware, die am Ende wirklich ankommt. Zwei Denare sind dein vereinbarter Botenlohn. Hilfst du mir auch bei der Abrechnung einer kleinen Nachbarschaftsbestellung?«",
+      "text_key": "87adc7b5d36a14a2",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-06.deliver_hinge.result",
+      "scope": "I-06",
+      "source": "missions/band1/I-06.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Die Truhe erhält ihren Griff. Du verdienst einmalig zwei Denare für die tatsächliche Lieferung.",
+      "text_key": "4f0d1a4f00495c5c",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-06.market_trade",
+      "scope": "I-06",
+      "source": "missions/band1/I-06.json:text",
+      "speaker_id": "cassia",
+      "speaker_label": "cassia",
+      "text": "»Du kannst feilschen. Du kannst mich aber nicht dazu bringen, fünf Säcke aus drei zu machen. Also: Du kannst den vereinbarten Lohn von zwei Denaren nehmen. Oder du lässt einen Denar beim Nachbarn, dessen Krug zerbrochen ist. Ich merke mir beides: einen eingehaltenen Preis und eine freiwillige Hilfe.«",
+      "text_key": "4e4b70d85403a7dd",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-06.market_trade.result",
+      "scope": "I-06",
+      "source": "missions/band1/I-06.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Die Abrechnung bleibt als konkrete Entscheidung gespeichert.",
+      "text_key": "2bdfe85486307b43",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-06.smith_apprentice",
+      "scope": "I-06",
+      "source": "missions/band1/I-06.json:text",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Du bist wiedergekommen, hast das Werkstück geliefert und Rechenschaft abgelegt. Du kannst bei mir weiterlernen. Ein paar Arbeitsfolgen machen dich noch nicht zum Meister; wir nehmen uns Zeit.«",
+      "text_key": "7c3623f8472885fc",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-06.smith_apprentice.result",
+      "scope": "I-06",
+      "source": "missions/band1/I-06.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Sextus nimmt dich als beginnenden Schmiedelehrling an. Deine praktische Arbeit und sein Vertrauen tragen diese Entscheidung.",
+      "text_key": "497f3377b1386e32",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.family_report",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:text",
+      "speaker_id": "julia",
+      "speaker_label": "julia",
+      "text": "»Du hast heute Menschen geholfen und selbst etwas verdient. Beides hat Zeit gekostet. Leg die Arbeit für heute beiseite; morgen kannst du den Wachmann nach einer begleiteten Dorfrunde fragen.«",
+      "text_key": "fb1ef84519ede090",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.family_report.result",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Die Familie hört von deinen tatsächlichen Lieferungen und der begonnenen Lehre.",
+      "text_key": "c5cdaa076b141246",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.rest_second.result",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Der dritte erzählte Tag beginnt. Du bist weiterhin ein zwölfjähriger Dorfbewohner.",
+      "text_key": "9c8de8394fe1df42",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.patrol_brief",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:text",
+      "speaker_id": "decimus",
+      "speaker_label": "decimus",
+      "text": "»Ich brauche keine Heldenmeldung. Ich brauche eine Zahl, einen Ort und jemanden, der dort wirklich steht. Du gehst mit dem Wachmann, nicht allein auf Wache: innerer Weg, Wagenstraße, Tor. Ihr beobachtet und meldet; ihr sucht keinen Kampf.«",
+      "text_key": "f2e77639c497262f",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.patrol_brief.result",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Decimus gibt die Runde frei, der Wachmann übernimmt die Aufsicht. Die drei Wegabschnitte müssen wirklich erreicht und geprüft werden.",
+      "text_key": "07aa23924711b8bd",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.patrol_inner.result",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Der innere Weg ist geprüft. Gehe mit dem Wachmann weiter zur Wagenstraße.",
+      "text_key": "06b6d7d1815169db",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.patrol_road.result",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Du erkennst die Sichtlinie zwischen Wagenstraße und Tor. Der äußere Abschnitt fehlt noch.",
+      "text_key": "30cb0b148088180b",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.patrol_gate.result",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Ihr habt das Tor gemeinsam erreicht. Berichte dem Wachmann jetzt von deinen Beobachtungen.",
+      "text_key": "50aec938529e0be8",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.patrol_report",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:text",
+      "speaker_id": "decimus",
+      "speaker_label": "decimus",
+      "text": "»Zeig mir, was du weißt. Nicht, was du vermutest. – Gut. Du hast die ganze Runde gemacht und nur berichtet, was du gesehen hast. Für heute reicht es; geh zu deiner Familie zurück.«",
+      "text_key": "5dea1e56a0baaaae",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.patrol_report.result",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Decimus bestätigt deinen ersten begleiteten Rundgang. Es ist keine Ernennung zum Soldaten.",
+      "text_key": "2e6a895bd42c3a0d",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.rest_patrol.result",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Am vierten Morgen lässt Aurelia ausrichten, dass der Wachmann krank ist. Seine Stelle im Wachroster bleibt tatsächlich unbesetzt.",
+      "text_key": "08874cdad0ccfad3",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.healer_request",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:text",
+      "speaker_id": "aurelia",
+      "speaker_label": "aurelia",
+      "text": "»Er braucht Ruhe und soll heute nicht am Tor stehen. Bring ihm dieses vorbereitete Päckchen. Danach kann er mit deinen Eltern klären, ob du für einen kurzen Tagesdienst am Tor aushelfen darfst.«",
+      "text_key": "1c70fb6a70110747",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.healer_request.result",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Aurelia übergibt dir das vorbereitete Versorgungspäckchen für den Wachmann.",
+      "text_key": "79d4837b9df4e08d",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.deliver_medicine",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:text",
+      "speaker_id": "severus",
+      "speaker_label": "severus",
+      "text": "»Danke. Ich bleibe heute hier. Decimus teilt die Wache ein; du könntest nach der bekannten Runde eine kurze Nachricht überbringen. Frag erst deinen Vater. Die Leihsachen bleiben Eigentum der Wache.«",
+      "text_key": "8bff197b4e7e7de0",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.deliver_medicine.result",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Das Versorgungspäckchen erreicht den Wachmann. Er ist versorgt, bleibt aber für diesen Dienst aus dem Arbeitsroster genommen.",
+      "text_key": "a4b4422de9f4b3dc",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.watch_permission",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:text",
+      "speaker_id": "silvanus",
+      "speaker_label": "silvanus",
+      "text": "»Du musst nicht der Stärkste sein. Du musst wissen, wann du stehenbleibst. Decimus bleibt verantwortlich; eine kurze Aushilfe am inneren Tor ist erlaubt. Du gehst nicht auf einen Feldzug und kommst mit den Leihsachen zum Wachmann zurück.«",
+      "text_key": "4efc38fe442698bf",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.watch_permission.result",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Vater erlaubt eine begrenzte Aushilfe unter Decimus’ Verantwortung. Dein Lebensalter und deine zivile Rolle ändern sich nicht.",
+      "text_key": "a389ec76a6d904f4",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.borrow_gear",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:text",
+      "speaker_id": "severus",
+      "speaker_label": "severus",
+      "text": "»Helm und kleiner Holzschild gehören der Wache. Prüfe den Weg, bleib im bekannten Torabschnitt und melde Cassia, dass ihr Wagen passieren kann. Danach bringst du alles zurück.«",
+      "text_key": "b1c62860f7bf545b",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.borrow_gear.result",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Du erhältst begrenzte Leihgegenstände für diesen Auftrag. Sie werden nicht zu dauerhaftem Eigentum.",
+      "text_key": "649afd94ecee6fac",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.watch_post.result",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Der bekannte Torabschnitt ist geprüft. Du erhältst die Durchlassnachricht für Cassias Wagen.",
+      "text_key": "64af0a647411add0",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.watch_message",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:text",
+      "speaker_id": "cassia",
+      "speaker_label": "cassia",
+      "text": "»Gut, dann schicke ich den Wagen über den geprüften Weg. Geh jetzt zum Wachmann und gib die Leihsachen ab. Ein Dienst endet mit einer ordentlichen Übergabe.«",
+      "text_key": "e29afed7635e09a2",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.watch_message.result",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Cassia erhält die Nachricht vom tatsächlich geprüften Tor. Der Dienst muss noch an den Wachmann übergeben werden.",
+      "text_key": "9285701e4c5d2600",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.return_gear",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:text",
+      "speaker_id": "severus",
+      "speaker_label": "severus",
+      "text": "»Du hast die Nachricht gebracht und die Sachen vollständig zurückgegeben. Zwei Denare sind dein Botenlohn. Ich erhole mich und übernehme meine bisherige Stelle wieder, sobald sie frei ist. Geh nach Hause.«",
+      "text_key": "153615541238c633",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.return_gear.result",
+      "scope": "I-07",
+      "source": "missions/band1/I-07.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Der Dienst ist übergeben, die Leihsachen sind zurück und zwei Denare sind bezahlt. Du bist weiter zwölf, kein angeworbener Soldat.",
+      "text_key": "d476de8b8b2a4ba7",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-08.i08_tracks.result",
+      "scope": "I-08",
+      "source": "missions/band1/I-08.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Du sicherst die Beobachtung: mehrere frische Hufspuren, aber noch keinen belastbaren Täter.",
+      "text_key": "20ad6bc61a0e2a7e",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-08.i08_report",
+      "scope": "I-08",
+      "source": "missions/band1/I-08.json:text",
+      "speaker_id": "decimus",
+      "speaker_label": "decimus",
+      "text": "»Zeig mir, was du weißt. Nicht, was du vermutest.«",
+      "text_key": "b9ab146362409481",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-08.i08_report.result",
+      "scope": "I-08",
+      "source": "missions/band1/I-08.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Die Hufspuren werden als offene Warnung protokolliert; ein Täter bleibt unbekannt.",
+      "text_key": "a8f204e08a2bc85e",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-09.family_evening",
+      "scope": "I-09",
+      "source": "missions/band1/I-09.json:text",
+      "speaker_id": "julia",
+      "speaker_label": "julia",
+      "text": "»Ein Haus ist nicht nur Holz. Es sind die Menschen, die wissen, wo du deinen Becher abstellst. Du kennst inzwischen den Markt, die Werkstätten und den Weg zum Tor. Für heute essen wir zusammen und machen die Tür zu.«",
+      "text_key": "a3eb185f51fa5f61",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-09.family_evening.result",
+      "scope": "I-09",
+      "source": "missions/band1/I-09.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Du verbringst den Abend bei deiner Familie. Die offenen Aufgaben dieses Tages sind wirklich erledigt.",
+      "text_key": "0579f46875fb8e5b",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-09.night_rest.result",
+      "scope": "I-09",
+      "source": "missions/band1/I-09.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Du legst dich im vertrauten Familienhaus schlafen. Das Dorf wird still.",
+      "text_key": "aacab9e125eaa7a8",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-10.i10_choice",
+      "scope": "I-10",
+      "source": "missions/band1/I-10.json:text",
+      "speaker_id": "silvanus",
+      "speaker_label": "silvanus",
+      "text": "»Bleib bei uns, wenn du dich versteckst. Wenn du hinausgehst, dann um Menschen zu helfen – nicht um ein Held zu spielen.«",
+      "text_key": "6d7803273b23fd93",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-10.i10_choice.result",
+      "scope": "I-10",
+      "source": "missions/band1/I-10.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Deine Nachtentscheidung wird dauerhaft gespeichert.",
+      "text_key": "47c3bac13639f9ec",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-11.i11_forge.result",
+      "scope": "I-11",
+      "source": "missions/band1/I-11.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Sextus stirbt, während er den Fluchtweg offen hält. Die Schmiede verliert ihren realen Arbeiter.",
+      "text_key": "6c8d742c30eb1c36",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-12.i12_father",
+      "scope": "I-12",
+      "source": "missions/band1/I-12.json:text",
+      "speaker_id": "silvanus",
+      "speaker_label": "silvanus",
+      "text": "»Sieh nach deiner Mutter. Und wenn du später wütend bist – entscheide erst, wenn du wieder sehen kannst, was vor dir liegt.«",
+      "text_key": "db6494c9ea407492",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-12.i12_father.result",
+      "scope": "I-12",
+      "source": "missions/band1/I-12.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Silvanus stirbt. Julias Zustand folgt aus deiner tatsächlichen Rettung oder dem Versteckweg.",
+      "text_key": "8778645016447f1b",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-13.i13_morning",
+      "scope": "I-13",
+      "source": "missions/band1/I-13.json:text",
+      "speaker_id": "aurelia",
+      "speaker_label": "aurelia",
+      "text": "»Wir zählen keine Schatten. Wir zählen Menschen. Wer fehlt, fehlt auch morgen noch an seinem Arbeitsplatz.«",
+      "text_key": "1b3843ff7fa3e688",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-13.i13_morning.result",
+      "scope": "I-13",
+      "source": "missions/band1/I-13.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Der Morgen übernimmt die tatsächlichen Personen- und Verlustzustände der Nacht.",
+      "text_key": "8b86523cc35ad726",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-14.i14_oath.result",
+      "scope": "I-14",
+      "source": "missions/band1/I-14.json:result",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Du schwörst, die Verantwortlichen zu finden. Der Schwur eröffnet Ermittlung – keine sofortige Soldatenkarriere.",
+      "text_key": "3cff155ac6976ecb",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-02.directed_intro",
+      "scope": "I-02",
+      "source": "campaign_direction.INTRO",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Ein Korb ist nur ein kleiner Auftrag. Doch die Menschen hier sind darauf angewiesen, dass sie bekommen, was ihnen zugesagt wurde.",
+      "text_key": "85c0caef2d745a6e",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-03.directed_intro",
+      "scope": "I-03",
+      "source": "campaign_direction.INTRO",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Hinter den vertrauten Häusern beginnt ein anderer Teil des Dorfes. Auf dem Markt zählt, was jemand verspricht – und was davon übrig bleibt.",
+      "text_key": "e8bc41db83cb6e07",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-04.directed_intro",
+      "scope": "I-04",
+      "source": "campaign_direction.INTRO",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Silvanus hat einen Freund, dem er seit Jahren vertraut. In dessen Schmiede kannst du lernen, warum eine ruhige Hand manchmal mehr wert ist als Kraft.",
+      "text_key": "fe515fb14c8ab72e",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-05.directed_intro",
+      "scope": "I-05",
+      "source": "campaign_direction.INTRO",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Ein gutes Werkzeug entsteht nicht mit dem ersten Schlag. Wer genau hinsieht, erkennt auch die Fehler, die sich unter der Oberfläche verbergen.",
+      "text_key": "b559df96d8d77db9",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-06.directed_intro",
+      "scope": "I-06",
+      "source": "campaign_direction.INTRO",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Ein Werkstück muss seinen Weg zum richtigen Menschen finden. Am Markt zeigt sich, was Arbeit tatsächlich wert ist.",
+      "text_key": "abfca396a8aab9bf",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-07.directed_intro",
+      "scope": "I-07",
+      "source": "campaign_direction.INTRO",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Die Wachen kennen die Wege um Valdora. Auch sie brauchen Hilfe, wenn ihre Kraft nicht ausreicht.",
+      "text_key": "69e7fbe7e38aa288",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-08.directed_intro",
+      "scope": "I-08",
+      "source": "campaign_direction.INTRO",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Der Regen verwischt manche Spuren, andere bleiben im Boden. Erst was du selbst gesehen hast, darf zu deiner Gewissheit werden.",
+      "text_key": "080baaf65e9664e5",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-09.directed_intro",
+      "scope": "I-09",
+      "source": "campaign_direction.INTRO",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Wenn die Arbeit ruht, haben die Menschen noch ihre eigenen Geschichten. Heute Abend ist Zeit für sie.",
+      "text_key": "a0d91a1dfa441fda",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-10.directed_intro",
+      "scope": "I-10",
+      "source": "campaign_direction.INTRO",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Die Nacht gehört nicht mehr nur den Schlafenden. Was jetzt geschieht, verlangt deine Entscheidung.",
+      "text_key": "4f688c62897691c9",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-11.directed_intro",
+      "scope": "I-11",
+      "source": "campaign_direction.INTRO",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Die Werkstatt ist mehr als Holz, Stein und eine Esse. Dort zählt jetzt, wem noch geholfen werden kann.",
+      "text_key": "3855b2e57e67afcb",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-12.directed_intro",
+      "scope": "I-12",
+      "source": "campaign_direction.INTRO",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "In den vertrauten Gassen entscheiden nicht Versprechen allein. Jetzt kommt es darauf an, was du tatsächlich tun kannst.",
+      "text_key": "fa74356f5c2390fc",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-13.directed_intro",
+      "scope": "I-13",
+      "source": "campaign_direction.INTRO",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Am Morgen wird sichtbar, was die Nacht zurückgelassen hat. Manche Stimmen fehlen; andere Menschen brauchen dich.",
+      "text_key": "881f592e521fe95a",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "I-14.directed_intro",
+      "scope": "I-14",
+      "source": "campaign_direction.INTRO",
+      "speaker_id": "narrator",
+      "speaker_label": "Chronik",
+      "text": "Nicht jede Spur führt sofort zu einer Antwort. Was du aus dieser Nacht mitnimmst, wird deinen nächsten Weg bestimmen.",
+      "text_key": "99a4d067e870cc0a",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "village.idle.decimus",
+      "scope": "village",
+      "source": "village_childhood.NEIGHBORS",
+      "speaker_id": "decimus",
+      "speaker_label": "decimus",
+      "text": "Deine Eltern wohnen schon lange hier. Schau dir das Dorf an und halte die Zusagen, die du den Nachbarn gibst. Die Amtsgeschäfte erledigen wir Erwachsenen.",
+      "text_key": "f2c72b487ca11206",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "village.idle.aelia",
+      "scope": "village",
+      "source": "village_childhood.NEIGHBORS",
+      "speaker_id": "aelia",
+      "speaker_label": "aelia",
+      "text": "Die Mauer steht, weil ihre Steine zusammenarbeiten. Bevor man etwas umbaut, muss man verstehen, was es trägt.",
+      "text_key": "52935d163741b400",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "village.idle.varro",
+      "scope": "village",
+      "source": "village_childhood.NEIGHBORS",
+      "speaker_id": "varro",
+      "speaker_label": "varro",
+      "text": "Auf einem bekannten Weg entdeckt man jeden Tag etwas anderes. Frag nach, bevor du allein den Waldweg nimmst.",
+      "text_key": "30aa6868db71f1f4",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "village.idle.fabius",
+      "scope": "village",
+      "source": "village_childhood.NEIGHBORS",
+      "speaker_id": "fabius",
+      "speaker_label": "fabius",
+      "text": "Am Lager kannst du das bereitgelegte Kleinholz holen. An die gefällten Stämme und die Axt gehst du nur mit einem Erwachsenen.",
+      "text_key": "d49ee9a7e865fb3a",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "village.idle.aurelia",
+      "scope": "village",
+      "source": "village_childhood.NEIGHBORS",
+      "speaker_id": "aurelia",
+      "speaker_label": "aurelia",
+      "text": "Im Dorf kümmern wir uns umeinander. Eine Nachricht rechtzeitig zu bringen hilft oft mehr als ein großer Auftritt.",
+      "text_key": "5f0065c58081b790",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "village.idle.cassia",
+      "scope": "village",
+      "source": "village_childhood.NEIGHBORS",
+      "speaker_id": "cassia",
+      "speaker_label": "cassia",
+      "text": "Auf meinem Tisch liegen Waren, die andere brauchen. Höre erst zu, prüfe die Menge und nenne dann den Preis.",
+      "text_key": "1d0e5d8ab7c60816",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "village.idle.severus",
+      "scope": "village",
+      "source": "village_childhood.NEIGHBORS",
+      "speaker_id": "severus",
+      "speaker_label": "severus",
+      "text": "Eine Runde mit der Wache ist kein Feldzug. Wir sehen nach Wegen und Toren, helfen den Leuten und melden, was wir tatsächlich beobachtet haben.",
+      "text_key": "b78aa56bb18ac4de",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "village.idle.julia",
+      "scope": "village",
+      "source": "village_childhood._idle_text",
+      "speaker_id": "julia",
+      "speaker_label": "julia",
+      "text": "»Hier ist dein Zuhause. Erzähle mir, was du heute vorhast, und komm mit deinen Fragen wieder.«",
+      "text_key": "537c8ae0c8b2b414",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "village.idle.silvanus",
+      "scope": "village",
+      "source": "village_childhood._idle_text",
+      "speaker_id": "silvanus",
+      "speaker_label": "silvanus",
+      "text": "»Du musst noch kein Soldat und kein Verwalter sein. Lerne die Menschen kennen und führe deine Zusagen selbst zu Ende.«",
+      "text_key": "37000d4fafbb271e",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "village.idle.sextus",
+      "scope": "village",
+      "source": "village_childhood._idle_text",
+      "speaker_id": "sextus",
+      "speaker_label": "sextus",
+      "text": "»Eine Schmiede ist ein Arbeitsplatz, keine Abkürzung zum Heldentum. Erst zuhören, dann gemeinsam üben und die Arbeit ordentlich übergeben.«",
+      "text_key": "23df2a3a71cd9b09",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "legacy.marcus.request",
+      "scope": "legacy_opening",
+      "source": "opening_story.REGIONS.italia.request",
+      "speaker_id": "marcus",
+      "speaker_label": "Marcus",
+      "text": "He, bleib kurz! Am Brunnen ist eine Strebe gebrochen. Vier Holzstücke würden reichen. Hilfst du mir, bevor du dein Dach baust?",
+      "text_key": "34473eebb5dc46f2",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "legacy.marcus.help_reply",
+      "scope": "legacy_opening",
+      "source": "opening_story.REGIONS.italia.help_reply",
+      "speaker_id": "marcus",
+      "speaker_label": "Marcus",
+      "text": "»Danke. Die Strebe bekommen wir hin. Dein Holz werde ich nicht vergessen.«",
+      "text_key": "4da5980fca2e8766",
+      "reasons": [
+        "missing_recording"
+      ]
+    },
+    {
+      "line_id": "legacy.marcus.decline_reply",
+      "scope": "legacy_opening",
+      "source": "opening_story.REGIONS.italia.decline_reply",
+      "speaker_id": "marcus",
+      "speaker_label": "Marcus",
+      "text": "»Verstehe. Du brauchst selbst ein Dach. Ich frage die anderen.«",
+      "text_key": "2351a88e901a4d9b",
+      "reasons": [
+        "missing_recording"
+      ]
+    }
+  ],
+  "limits": "Manifest, exact text, checksums, stored ASR and viseme metadata; not a new audio transcription or a device lip-sync measurement."
+}

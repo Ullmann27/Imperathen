@@ -192,9 +192,11 @@ static func attach(model: Node3D, pieces: Array, detail: int) -> Array[Node3D]:
 		if prop == null:
 			continue
 		var socket := prop.find_child(str(spec.socket), true, false) as Node3D
-		if socket == null:
+		var resolved_socket := _socket_transform(prop, socket)
+		if resolved_socket.is_empty():
 			prop.free()
 			continue
+		var socket_transform: Transform3D = resolved_socket.transform
 		var attachment := BoneAttachment3D.new()
 		attachment.name = "MarketGear_" + str(piece.slot)
 		attachment.bone_name = str(spec.bone)
@@ -217,9 +219,31 @@ static func attach(model: Node3D, pieces: Array, detail: int) -> Array[Node3D]:
 		attachment.add_child(grip)
 		var align := Node3D.new()
 		align.name = "SocketAlignment"
-		align.position = -socket.position
+		align.transform = socket_transform.affine_inverse()
 		grip.add_child(align)
 		prop.name = "Prop"
 		align.add_child(prop)
 		result.append(attachment)
 	return result
+
+
+static func _socket_transform(root: Node3D, socket: Node3D) -> Dictionary:
+	if root == null or socket == null:
+		return {}
+	var relative := Transform3D.IDENTITY
+	var current: Node = socket
+	while current != root:
+		var part := current as Node3D
+		if part == null:
+			return {}
+		relative = part.transform * relative
+		current = part.get_parent()
+		if current == null:
+			return {}
+	var transform := root.transform * relative
+	var determinant := transform.basis.determinant()
+	if not transform.origin.is_finite() or not transform.basis.x.is_finite() or not transform.basis.y.is_finite() or not transform.basis.z.is_finite():
+		return {}
+	if not is_finite(determinant) or absf(determinant) < 0.000001:
+		return {}
+	return {"transform": transform}
