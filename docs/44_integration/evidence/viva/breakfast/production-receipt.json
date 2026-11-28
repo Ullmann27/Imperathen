@@ -1,0 +1,75 @@
+{
+  "model": "I-01/TableBread",
+  "tested_asset_commit": "95d17f0670ae9684481e95f8541645d0b1d2968a",
+  "runtime_scene": "prototype/main.tscn → I-00 → I-01 VID-A → baker_home / glb_table / table_bread",
+  "blender": "4.0.2, Cycles CPU",
+  "godot": "4.7.2.stable.official.ed1daf0bf, GL Compatibility (Mesa llvmpipe)",
+  "model_parts": [
+    "ServingBoard",
+    "ScoredLoaf"
+  ],
+  "materials": [
+    "INT_prima_bread_board",
+    "INT_prima_bread_loaf",
+    "INT_prima_bread_cut"
+  ],
+  "triangles": 1148,
+  "animation_clips": 0,
+  "embedded_images": [
+    "Viva_Breakfast_normal",
+    "Viva_Breakfast_albedo",
+    "Viva_Breakfast_roughness"
+  ],
+  "results": [
+    "OPERATION_PRIMA_ART_RESULT checks=28 failures=0 triangles=1148",
+    "HOUSE_INTERIORS_RESULT checks=8037 failures=0",
+    "I01_CAPTURE prima-family-table 960x540"
+  ],
+  "physical_device": false,
+  "files": {
+    "prototype/assets/operation_prima/table_bread.glb": {
+      "bytes": 2063788,
+      "sha256": "03f911e1678017a48db1cc06136b7b622ae8715551eb8faa8b7531c2e1d7367a"
+    },
+    "art/operation_prima/breakfast_bread.blend": {
+      "bytes": 2049241,
+      "sha256": "d58e23793a6085f9c0e01df531607182ace364aac13b35fc1be0dfbb10296234"
+    },
+    "art/operation_prima/build_breakfast_bread.py": {
+      "bytes": 12569,
+      "sha256": "fc50adc9d341aa2340734661e45c04e2ae4dbc5f9b0f004e6c26b34e63b36a58"
+    },
+    "art/operation_prima/maps/Viva_Breakfast_albedo.png": {
+      "bytes": 698957,
+      "sha256": "1bd79df00c1ddc6ac51a3bd2c7f895a9b2feb2896542b1d3e9e68b1c2b7eefae"
+    },
+    "art/operation_prima/maps/Viva_Breakfast_normal.png": {
+      "bytes": 1091657,
+      "sha256": "1085ac224cff9bce4ac6934101b29c2f73f3f4ab631f0f335395d244f419d053"
+    },
+    "art/operation_prima/maps/Viva_Breakfast_roughness.png": {
+      "bytes": 145441,
+      "sha256": "ce89f872220770ce6c674fbf687b531de780308f1c76e089bf3a51e733a9704c"
+    },
+    "docs/44_integration/evidence/viva/breakfast/blender-profile.png": {
+      "bytes": 435011,
+      "sha256": "40db656bcbccdc5a49691027a58a8c81c7d97ed424b19e68969b50ed7e8ab5c0"
+    },
+    "docs/44_integration/evidence/viva/breakfast/blender-scored-crust.png": {
+      "bytes": 574155,
+      "sha256": "07fe22699c451289292d3e628240b7df7156c3d68bb876d77cd6b2df36519939"
+    },
+    "docs/44_integration/evidence/viva/breakfast/blender-three-quarter.png": {
+      "bytes": 490727,
+      "sha256": "53206607338d359277d516e85dd49c04fe93c8ccdb4c3dd43840f61389d8ae86"
+    },
+    "docs/44_integration/evidence/viva/breakfast/godot-after-i01.png": {
+      "bytes": 593658,
+      "sha256": "64ba18e5a9058db87aaa5719e2797ed5507b432a72e86400578d001020db5a37"
+    },
+    "docs/44_integration/evidence/viva/breakfast/godot-before-i01.png": {
+      "bytes": 578486,
+      "sha256": "89d4f304e43eb1ea1425f743a433faac726cff16a46727a8fffc96f12625e6b5"
+    }
+  }
+}
