@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 221,
+  "version": 222,
   "tasks": [
     {
       "id": "K101",
@@ -1072,14 +1072,14 @@
       "id": "FORMATION-WHEEL-ATTRIBUTION",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
-      "revision": "c1bb82e924e8d936300851e72bfcb4aefb5918fa",
-      "run_id": null,
+      "status": "submitted",
+      "revision": "e84d7a0e22433db87898eabaa228786d39b51b75",
+      "run_id": "46104212413",
       "scope": [
         "prototype/tests/formation_agents_test.gd",
         ".github/workflows/aeterna-formation-wheel-attribution.yml"
       ],
-      "note": "Independent correction of proven cross-company test attribution, not runtime fix. Keep target zero refile/rematch requirement, same rank owners, outer-file speed, arrival and all numerical limits. Independently validate every other refile/rematch against adjacent authoritative model snapshots and exact global/per-company accounting; global zero remains required absent valid unrelated events. Existing full formation test remains default; focused wheel-only mode adds no bypass to full CI. No integration before actual focused/full tests and blob comparison."
+      "note": "Independent correction of proven cross-company test attribution, not runtime fix. Keep target zero refile/rematch requirement, same rank owners, outer-file speed, arrival and all numerical limits. Independently validate every other refile/rematch against adjacent authoritative model snapshots and exact global/per-company accounting; global zero remains required absent valid unrelated events. Existing full formation test remains default; focused wheel-only mode adds no bypass to full CI. No integration before actual focused/full tests and blob comparison. Actual commit e84d7a0e22433db87898eabaa228786d39b51b75 on fix/aeterna-formation-wheel-attribution-20261128. Two-file diff verified. Original targeted zero refile/rematch, same owners, speed, arrival and all motion thresholds preserved; independently tracks consecutive authoritative rule-facing and roster/layout snapshots, consumes each counter event at most once, requires exact global count accounting and no invalid events. Default full suite unchanged except corrected attribution. Focused Godot run 46104212413 observed queued, no pass or integration claim. Existing body sweep CI continues on disjoint branch."
     }
   ]
 }
