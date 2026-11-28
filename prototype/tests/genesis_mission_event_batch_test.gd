@@ -31,6 +31,15 @@ func _initialize() -> void:
 	_check(Batch.commit(source, fields, draft, "receipts", pair), "same API accepts another domain vocabulary")
 	_check(source.items.basket == "customer" and source.receipts == ["trade.a","trade.b"] and source.age == 12, "only declared fields change")
 	_check(not Batch.commit(source, fields, draft, "receipts", pair), "replaying a committed batch fails")
+	var corrupt: Dictionary = {"items":{}, "receipts":"not a receipt list"}
+	_check(Batch.stage(source, ["typo"]).is_empty(), "missing fields are not invented")
+	_check(not Batch.commit(corrupt, fields, Batch.stage(corrupt, fields), "receipts", pair), "corrupt ledger is rejected")
+	draft = Batch.stage(source, fields)
+	draft.items = "broken"
+	_check(not Batch.commit(source, fields, draft, "receipts", pair), "types cannot change")
+	draft = Batch.stage(source, fields)
+	pair.assign([""])
+	_check(not Batch.commit(source, fields, draft, "receipts", pair), "empty receipt rejected")
 	var model := Model.new()
 	model.new_game("italia", true, true, false, true)
 	var world: Dictionary = model.data
