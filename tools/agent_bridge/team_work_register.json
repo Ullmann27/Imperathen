@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 244,
+  "version": 247,
   "tasks": [
     {
       "id": "K101",
@@ -1231,7 +1231,7 @@
       "id": "KIMI-DUO-I02-BASKET",
       "owner": "Kimi",
       "access": "edit",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "b34adfdf014625828bf13ec47e60a220b9732da5",
       "run_id": "46113029476",
       "scope": [
@@ -1240,7 +1240,7 @@
         "prototype/tests/i02_props_test.gd",
         "prototype/tests/i02_props_test.gd.uid"
       ],
-      "note": "Full original handoff note retained in register v242 at 76c1eecd4efec04f3a127b3a8513e40f0021e146. GitLab !201/#206 source fb30624dd7a90cb0d3cd5724daa6fd68b01f02e8, exact base 8a8256a30145918739312588d70c4585768fa568, +349/-0 only two new files. GitHub candidate #201 b34adfdf014625828bf13ec47e60a220b9732da5 exact blobs 1f7966a6ffd1d3e28aab6e4475c481ac94439d43 / 074f1219df2b87058ac7ecff05374988b962b66e. Original GLB 0c9043c91be9727e2d6c9c2dbe41f0ed46946c60; pending alone does not grant item, correction retains, complete removes. Actual QA-only #202 a2d474b4d76ffa48057aa739b29bca5641128929 run46113029476 in_progress, coordinator test not provider run. Preserve lease; no runtime wiring, merge, pass, visual/device/APK acceptance or campaign progression. MENU remains blocked."
+      "note": "Full original handoff note retained in register v242 at 76c1eecd4efec04f3a127b3a8513e40f0021e146. GitLab !201/#206 source fb30624dd7a90cb0d3cd5724daa6fd68b01f02e8, exact base 8a8256a30145918739312588d70c4585768fa568, +349/-0 only two new files. GitHub candidate #201 b34adfdf014625828bf13ec47e60a220b9732da5 exact blobs 1f7966a6ffd1d3e28aab6e4475c481ac94439d43 / 074f1219df2b87058ac7ecff05374988b962b66e. Original GLB 0c9043c91be9727e2d6c9c2dbe41f0ed46946c60; pending alone does not grant item, correction retains, complete removes. Actual QA-only #202 a2d474b4d76ffa48057aa739b29bca5641128929 run46113029476 in_progress, coordinator test not provider run. Preserve lease; no runtime wiring, merge, pass, visual/device/APK acceptance or campaign progression. MENU remains blocked. | Actual run46113029476/job140880571638 failed after missing private youth staging, second GLB primitive height excluded and Vector2 passed to Vector3 player setter; timeout124. Original source retained. Separate successor required; no pass."
     },
     {
       "id": "ARGON-M28-NPC-OPPORTUNITIES",
@@ -1261,14 +1261,27 @@
       "id": "FORMATION-STRIDE-CONTACT-TRACE",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "89e62f50d75a4a9cdc39efa0311cd9169b832670",
-      "run_id": null,
+      "run_id": "46113829341",
       "scope": [
         "prototype/tests/formation_stride_contact_test.gd",
         ".github/workflows/aeterna-formation-stride-contact.yml"
       ],
-      "note": "Independent QA-only diagnostic after actual guard run 46108635420/job 140866957392. Original 40mm switch gate still fails four moving cases (49.0–52.3mm); no runtime/asset or gate edits. Sample every production Roman/tribal family at real near/mid rig, march/run/retreat phases including exact failing phases, compare canonical sole probes to actual far mesh CPU shader at identical phase, report side/heel/toe and actual imported skinned sole at worst phase. Existing static guard, formation and thresholds preserved; no integration claim. Isolated branch qa/aeterna-formation-stride-contact-20261128 from exact guard head. Do not merge QA-only workflow."
+      "note": "Independent QA-only diagnostic after actual guard run 46108635420/job 140866957392. Original 40mm switch gate still fails four moving cases (49.0–52.3mm); no runtime/asset or gate edits. Sample every production Roman/tribal family at real near/mid rig, march/run/retreat phases including exact failing phases, compare canonical sole probes to actual far mesh CPU shader at identical phase, report side/heel/toe and actual imported skinned sole at worst phase. Existing static guard, formation and thresholds preserved; no integration claim. Isolated branch qa/aeterna-formation-stride-contact-20261128 from exact guard head. Do not merge QA-only workflow. Actual QA-only PR #203 head467d442aceee2a82a62346f3b18eadd351b4fd82, exact two new files +261/-0, real run46113829341 in_progress; no result yet."
+    },
+    {
+      "id": "I02-PRODUCTION-FIXTURE",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "b34adfdf014625828bf13ec47e60a220b9732da5",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/i02_props_test.gd",
+        ".github/workflows/aeterna-i02-basket-production.yml"
+      ],
+      "note": "Actual Kimi run 46113029476 failed: original youth not staged, GLB height assertion used only first primitive (0.3083849549 vs actual all primitive max 0.308640450239), actor_position Vector2 passed to set_player_position Vector3; timeout124. New isolated successor fix/aeterna-i02-basket-qa-20261128. Correct fixture, stage exact original civil youth via existing authorized scripts, check exact LODs, real Hand_L and all geometry, preserve 1mm/0.2mm thresholds and existing checks. No change to original Kimi module, original GitLab branch, main or runtime wiring. No private asset publication, new provider requests or costs. Actual test required."
     }
   ]
 }
