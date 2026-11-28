@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 238,
+  "version": 239,
   "tasks": [
     {
       "id": "K101",
@@ -1172,7 +1172,7 @@
       "id": "YOUTH-ARMOUR-SOURCE-MAPPING",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "458bb1d666d4f440d2459a78c76bed629d128c18",
       "run_id": "46108139625",
       "scope": [
@@ -1180,7 +1180,7 @@
         "tools/art/test_youth_armour_local_weights.py",
         ".github/workflows/aeterna-youth-armour-local-weights.yml"
       ],
-      "note": "Independent repair of source lookup failure. Same exact named weights, measured edge length, position tolerances and local no-regression guard. Search all real body primitives, only accept one connected pair with matching signed-axis transformation, reject ambiguous/missing matches with bounded evidence; correct primitive index in writer. Require negative controls and original production-parity full Godot A/B, no other outfit or LOD changes. New isolated branch, no change to active youth parity test or original private assets. Actual commit aecdc9f730e1a7031767eaa2178dc8441ab15b0d; isolated three-file comparison. Match exact named bindings across source primitives, connected edge/rest length and explicit signed axis permutations, original tolerance and ambiguity rejection. Five new negative/coordinate controls, unchanged no-regression guard and 692-check full A/B gate. Actual run 46108139625 in_progress; no successful mapping, repaired asset or integration claim."
+      "note": "Actual run 46108139625/job 140865420267 failed before asset change; 9 unit tests pass. Staged source SHA256 dcb52efb544fd68be316ef59e6e835fc98f94485cf24d6609bb8a6fac7646605. Primitive0 33888 vertices, minimum named-weight L1 0.0000152589 and 0.0000305474; no exact signatures, primitive1 unrelated. Prior Godot reported weights correspond exactly to uint16 codes [8753,11098,19311,26372] and [12564,7922,28222,16825], totals65534/65533. Likely 16-bit import truncation, not tolerance relaxation. Next match exact encoded codes with actual source SHA, topology/rest position and unchanged tolerances. No geometry change or A/B pass."
     },
     {
       "id": "CITY-FOUNTAIN-WATER-V2",
@@ -1200,9 +1200,9 @@
       "id": "TRIBAL-GUARD-POSE",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "603e4354ddfcd1545d26e6d695239f9efe6876f0",
-      "run_id": null,
+      "run_id": "46108635420",
       "scope": [
         "prototype/scripts/visuals/far_ranks.gd",
         "prototype/shaders/rank_stride.gdshader",
@@ -1211,7 +1211,21 @@
         "prototype/assets/germanic_warriors/forest_skirmisher_far.glb",
         ".github/workflows/aeterna-tribal-sole-topology.yml"
       ],
-      "note": "Independent actual game patch on new branch from 603e435. Mirror the canonical company authoring guard pose (block/wall/testudo) using left thigh/shin pivot rotations with lower-leg/hip spatial blending in both CPU and shader; exact source-derived ground lift, not arbitrary probe tuning. Add direct actual rig comparison for guard and existing static gate. Apply same proven conforming transverse midpoint topology refinement to other two original tribal far GLBs, keep 900 triangles/one material/atlas. Reproduce all three binaries, retain every original 40mm and full formation check. No main/Preview/APK until green. GitLab read-only connected, no IMPERATHEN project; do not touch unrelated projects or bypass quotas."
+      "note": "Independent actual game patch on new branch from 603e435. Mirror the canonical company authoring guard pose (block/wall/testudo) using left thigh/shin pivot rotations with lower-leg/hip spatial blending in both CPU and shader; exact source-derived ground lift, not arbitrary probe tuning. Add direct actual rig comparison for guard and existing static gate. Apply same proven conforming transverse midpoint topology refinement to other two original tribal far GLBs, keep 900 triangles/one material/atlas. Reproduce all three binaries, retain every original 40mm and full formation check. No main/Preview/APK until green. GitLab read-only connected, no IMPERATHEN project; do not touch unrelated projects or bypass quotas. Actual commit 89e62f50d75a4a9cdc39efa0311cd9169b832670; six-file diff. Swordsman885->899 triangles/one material, skirmisher880->900, both atlases unchanged; new exact blobs b523f7dd/98c9aba7. Source-derived guard CPU/GPU and direct actual rig check. CI 46108635420 in_progress; no successful Godot/visual/device claim."
+    },
+    {
+      "id": "YOUTH-ARMOUR-IMPORT-WEIGHTS",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "aecdc9f730e1a7031767eaa2178dc8441ab15b0d",
+      "run_id": null,
+      "scope": [
+        "tools/art/youth_armour_local_weights.py",
+        "tools/art/test_youth_armour_local_weights.py",
+        ".github/workflows/aeterna-youth-armour-local-weights.yml"
+      ],
+      "note": "Actual source lookup evidence: engine reported uint16 weight codes, raw L1 differences exact one/two quantization steps. Match raw float weights via explicit engine-equivalent UINT16 encoding with exact code equality, strict source hash, named binding/connected edge and original coordinate/length tolerances; retain all local regression, seam, full Godot A/B and unchanged unrelated assets. If no exact unique candidate, stop with bounded evidence; no blanket tolerance widening. New isolated branch."
     }
   ]
 }
