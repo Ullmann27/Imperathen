@@ -1,0 +1,108 @@
+name: GENESIS Stand 0 formation recovery (strict gates)
+on:
+  push:
+    branches: ['fix/genesis-stand0-formation-recovery-20261128']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Reproduce actual committed GLB from exact predecessor asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/formation-contact-trace
+          git show 65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de:prototype/assets/germanic_warriors/forest_spear_far.glb > "$RUNNER_TEMP/forest-spear-original.glb"
+          test "$(git hash-object "$RUNNER_TEMP/forest-spear-original.glb")" = b370b05dc12f5e5863c2368dc693fc5718fa1b0c
+          node tools/art/refine_tribal_sole_topology.mjs "$RUNNER_TEMP/forest-spear-original.glb" "$RUNNER_TEMP/forest-spear-refined.glb" b370b05dc12f5e5863c2368dc693fc5718fa1b0c | tee artifacts/formation-contact-trace/sole-topology.log
+          cmp "$RUNNER_TEMP/forest-spear-refined.glb" prototype/assets/germanic_warriors/forest_spear_far.glb
+          for record in 'forest_swordsman 73ecda41fd70fefc1541e1a2631b4a40aa37d5d8' 'forest_skirmisher 39d931b313aac79e68f979df472ce59710d7e689'; do
+            read -r family expected <<< "$record"
+            git show 65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de:prototype/assets/germanic_warriors/${family}_far.glb > "$RUNNER_TEMP/$family-original.glb"
+            test "$(git hash-object "$RUNNER_TEMP/$family-original.glb")" = "$expected"
+            node tools/art/refine_tribal_sole_topology.mjs "$RUNNER_TEMP/$family-original.glb" "$RUNNER_TEMP/$family-refined.glb" "$expected" | tee -a artifacts/formation-contact-trace/sole-topology.log
+            cmp "$RUNNER_TEMP/$family-refined.glb" "prototype/assets/germanic_warriors/${family}_far.glb"
+          done
+      - name: Validate source-derived campaign registry
+        run: |
+          python3 tools/story/validate_campaign_arc.py
+          python3 -m unittest tests.android_campaign_bible_test
+          node tools/architecture/test_index.mjs
+          node tools/architecture/build_index.mjs --check
+      - name: Install checksum-verified Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Actual Godot 180-agent contact trace
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$GITHUB_WORKSPACE/artifacts/formation-contact-trace"
+          mkdir -p "$out"
+          git rev-parse HEAD > "$out/source-commit.txt"
+          timeout --kill-after=10s 300s "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee "$out/import.log"
+          failed=0
+          run_check() {
+            local name="$1" label="$2" marker="$3" state
+            shift 3
+            state="$(mktemp -d "$RUNNER_TEMP/formation-contact-trace.XXXXXX")"
+            mkdir -p "$state"/{data,config,cache}
+            if ! XDG_DATA_HOME="$state/data" XDG_CONFIG_HOME="$state/config" XDG_CACHE_HOME="$state/cache" timeout --kill-after=10s 420s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script "res://tests/$name.gd" "$@" 2>&1 | tee "$out/$label.log"; then failed=1; fi
+            if ! grep -Eq "$marker" "$out/$label.log" || grep -Eq 'SCRIPT ERROR:|^ERROR:' "$out/$label.log"; then failed=1; fi
+          }
+          run_check formation_far_ground_test far-ground FORMATION_FAR_GROUND_PASS
+          run_check tribal_lod_contract_test tribal-lod TRIBAL_LOD_PASS
+          run_check formation_stride_contact_test stride-798 FORMATION_STRIDE_PASS
+          run_check formation_contact_trace_test contact-trace 'FORMATION_CONTACT_TRACE_RESULT checks=[1-9][0-9]* failures=0'
+          run_check formation_slot_authority_test slot-authority FORMATION_SLOT_AUTHORITY_PASS
+          run_check battle_command_test battle-command 'BATTLE_COMMAND_RESULT checks=[1-9][0-9]* failures=0'
+          run_check battle_rules_test battle-rules 'BATTLE_RULES_RESULT checks=[1-9][0-9]* failures=0'
+          run_check valley_muster_test valley-muster VALLEY_MUSTER_PASS
+          run_check formation_agents_test formation-60 FORMATION_AGENTS_PASS
+          run_check formation_agents_test formation-180 FORMATION_AGENTS_PASS -- large
+          exit "$failed"
+      - name: Capture actual compatibility-rendered formations
+        if: always() && env.GODOT_BIN != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v xvfb-run >/dev/null; then sudo apt-get update -qq && sudo apt-get install -y xvfb xauth; fi
+          out="$GITHUB_WORKSPACE/artifacts/formation-contact-trace/rendered"
+          mkdir -p "$out"
+          state="$(mktemp -d "$RUNNER_TEMP/formation-render.XXXXXX")"
+          mkdir -p "$state"/{data,config,cache}
+          XDG_DATA_HOME="$state/data" XDG_CONFIG_HOME="$state/config" XDG_CACHE_HOME="$state/cache" timeout --kill-after=10s 600s xvfb-run -a "$GODOT_BIN" --path prototype --rendering-method gl_compatibility --resolution 1280x720 --script res://tests/formation_capture_review.gd ++ "$out" balanced 2>&1 | tee "$out/capture.log"
+          grep -F 'FORMATION_CAPTURED 25 frames balanced' "$out/capture.log"
+          test "$(find "$out" -name '*.png' -size +1000c | wc -l)" -eq 25
+          test "$(sha256sum "$out"/*.png | cut -d' ' -f1 | sort -u | wc -l)" -gt 1
+          ! grep -Ei 'SCRIPT ERROR:|^ERROR:|shader compilation failed|shader error|empty capture' "$out/capture.log"
+      - name: Retain actual engine evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: aeterna-formation-contact-trace-${{ github.run_id }}
+          path: artifacts/formation-contact-trace/
+          if-no-files-found: warn
+          retention-days: 30

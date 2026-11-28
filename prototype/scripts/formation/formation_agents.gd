@@ -36,7 +36,7 @@ const CONTACT_SETTLE_M := 0.45
 const CONTACT_DRESS_M_S := 0.8
 const CONTACT_HOLD_M := 2.0
 const ROCK_CLEARANCE_M := 0.3
-const REFILE_DEG := 75.0
+const REFILE_DEG := Rules.REFILE_DEG
 const WHEEL_SHARE := 0.8
 const LEAD_MAX_M := 2.2
 const LEAD_RATE := 1.5
@@ -141,6 +141,11 @@ class Unit:
 	var slot_vel: Array[Vector2] = []
 	var half_width := 0.5
 	var needs_match := true
+	# Refiles are discrete authoritative front changes, not visual wheel lag.
+	var refile_snapshot := -1
+	var applied_refile_snapshot := -1
+	var refiles := 0
+	var rematches := 0
 	var drum := 0.0
 	var in_step := false
 	var lead := 0.0
@@ -235,7 +240,8 @@ static func uid_of(man: Dictionary) -> String:
 func sync_model(model) -> void:
 	if model.steps == snapshot_step and model.squads.size() == units.size():
 		return
-	var first := snapshot_step < 0
+	var previous_step := snapshot_step
+	var first := previous_step < 0
 	if first:
 		tick = floori(model_time(model) * HZ + 0.000001)
 	snapshot_step = model.steps
@@ -246,7 +252,7 @@ func sync_model(model) -> void:
 			u = Unit.new()
 			u.id = s.id
 			units[s.id] = u
-		_snapshot_unit(u, s)
+		_snapshot_unit(u, s, previous_step)
 		if s.status == "withdrawn":
 			# The rules take the company off the field once its centre reaches
 			# the edge. Its men are alive: they keep running until they reach
@@ -297,8 +303,12 @@ func sync_model(model) -> void:
 			_die(uid)
 
 
-func _snapshot_unit(u: Unit, s: Dictionary) -> void:
+func _snapshot_unit(u: Unit, s: Dictionary, previous_step: int) -> void:
 	var center := Vector2(s.x, s.z)
+	# Only adjacent rule snapshots establish a discrete turn. Accumulated
+	# presentation lag or a skipped sequence is not evidence of re-filing.
+	if u.initialised and snapshot_step == previous_step + 1 and absf(angle_difference(u.model_facing, float(s.facing))) > deg_to_rad(REFILE_DEG):
+		u.refile_snapshot = snapshot_step
 	u.prev_center = center if not u.initialised else u.center
 	u.prev_facing = float(s.facing) if not u.initialised else u.model_facing
 	u.center = center
@@ -410,17 +420,30 @@ func _match(u: Unit, frame_center: Vector2) -> void:
 	if n == 0:
 		return
 	counters.rematches += 1
+	u.rematches += 1
 	var world: Array[Vector2] = []
 	for offset in u.offsets:
 		world.append(Field.project(frame_center + offset.rotated(-u.facing)))
 	var provided := true
+	var occupied := {}
 	for uid: String in u.members:
 		var slot: int = agents[uid].model_slot
-		provided = provided and slot >= 0 and slot < u.offsets.size()
+		if slot < 0 or slot >= u.offsets.size() or occupied.has(slot):
+			provided = false
+			break
+		occupied[slot] = true
 	if provided:
+		# Record real assignments, including the authoritative fast path.
+		# This evidence does not introduce a second slot authority.
+		var authority_record := {"unit":u.id, "tick":tick, "source":"authority", "uids":[], "from":[], "to":[], "by_index":world.duplicate()}
 		for uid: String in u.members:
-			u.owners[agents[uid].model_slot] = uid
-			agents[uid].slot = agents[uid].model_slot
+			var slot: int = agents[uid].model_slot
+			u.owners[slot] = uid
+			agents[uid].slot = slot
+			authority_record.uids.append(uid)
+			authority_record.from.append(agents[uid].pos)
+			authority_record.to.append(world[slot])
+		last_match[u.id] = authority_record
 		return
 	var pairs := []
 	for i in n:
@@ -457,10 +480,11 @@ func _match(u: Unit, frame_center: Vector2) -> void:
 					improved = true
 		if not improved:
 			break
-	var record := {"unit": u.id, "tick": tick, "from": [], "to": [], "by_index": world.duplicate()}
+	var record := {"unit": u.id, "tick": tick, "source":"fallback", "uids":[], "from": [], "to": [], "by_index": world.duplicate()}
 	for i in n:
 		agents[u.members[i]].slot = slot_of[i]
 		u.owners[slot_of[i]] = u.members[i]
+		record.uids.append(u.members[i])
 		record.from.append(agents[u.members[i]].pos)
 		record.to.append(world[slot_of[i]])
 	last_match[u.id] = record
@@ -471,13 +495,16 @@ func _update_frame(u: Unit, f: float) -> void:
 	var model_facing := lerp_angle(u.prev_facing, u.model_facing, f)
 	u.velocity = (center - u.frame_center) / DT
 	u.frame_center = center
-	var delta := angle_difference(u.facing, model_facing)
-	if absf(delta) > deg_to_rad(REFILE_DEG):
-		# Large changes of front re-file the company: every man takes the
-		# nearest place of the new front instead of a sweeping wheel.
-		u.facing = model_facing
-		u.needs_match = true
-		counters.refiles += 1
+	if u.refile_snapshot == snapshot_step:
+		# The rules already chose the new rank authority for this discrete
+		# front change. Consume the refile exactly once, and do not rotate
+		# back toward the old interpolated front on later substeps.
+		u.facing = u.model_facing
+		if u.applied_refile_snapshot != snapshot_step:
+			u.applied_refile_snapshot = snapshot_step
+			u.needs_match = true
+			u.refiles += 1
+			counters.refiles += 1
 	else:
 		# Wheel about the centre: the outer file never exceeds 80 % of run speed.
 		var rate := float(u.limits.run) * WHEEL_SHARE / maxf(1.0, u.half_width)
@@ -510,14 +537,14 @@ static func _index(p: Vector2) -> int:
 	return clampi(floori(p.x) + 28, 0, GRID_W - 1) * GRID_H + clampi(floori(p.y) + 22, 0, GRID_H - 1)
 
 
-func _build_grid() -> void:
+func _build_grid(include_aggregate: bool = false) -> void:
 	for side: String in _used:
 		var cells: Array = _cells[side]
 		for index in _used[side]:
 			cells[index].clear()
 		_used[side] = PackedInt32Array()
 	for a: Agent in agents.values():
-		if a.level == LEVEL_C:
+		if a.level == LEVEL_C and not include_aggregate:
 			continue
 		if not _cells.has(a.side):
 			var cells := []
@@ -612,7 +639,9 @@ func _substep() -> void:
 			continue
 		_update_frame(u, f)
 		_update_charge(u)
-	_build_grid()
+	# Physical root occupancy includes cheap level-C agents. Steering and
+	# post-step contact solving retain their original individual-level scope.
+	_build_grid(true)
 	for a: Agent in agents.values():
 		a.prev_pos = a.pos
 		a.prev_yaw = a.yaw
@@ -675,7 +704,7 @@ func _aggregate_member(a: Agent) -> void:
 	var goal: Vector2 = u.slot_world[a.slot]
 	if a.leaving:
 		goal = a.pos + Vector2(-sin(u.facing), -cos(u.facing)) * 3.0
-	a.pos = a.pos.move_toward(Field.project(goal), a.l_run * DT)
+	a.pos = _body_step(a, _aggregate_step(a.pos, Field.project(goal), a.l_run * DT))
 	a.vel = (a.pos - a.prev_pos) / DT
 	a.speed = a.vel.length()
 	a.yaw = rotate_toward(a.yaw, atan2(a.vel.x, a.vel.y) if a.speed > 0.1 else u.facing + PI, a.l_turn * DT)
@@ -683,6 +712,60 @@ func _aggregate_member(a: Agent) -> void:
 	a.contact = false
 	a.crowded = false
 	a.correction = Vector2.ZERO
+
+
+## The cheap aggregate movement still owns a physical root. A projected goal
+## alone does not make the intervening segment safe: crossing a rock while C
+## caused the later B contact solver to eject the soldier by over a metre.
+## Use the same clearance as the existing individual contact solver, and
+## choose a bounded tangent step if the immediate segment is obstructed.
+func _aggregate_segment_clear(from: Vector2, to: Vector2) -> bool:
+	if not from.is_finite() or not to.is_finite():
+		return false
+	if from != from.clamp(-Field.LIMIT, Field.LIMIT) or to != to.clamp(-Field.LIMIT, Field.LIMIT):
+		return false
+	var length := from.distance_to(to)
+	for r in _rock_centres.size():
+		var radius := float(_rock_radii[r])
+		var centre := _rock_centres[r]
+		if from.distance_squared_to(centre) > (radius + length) * (radius + length):
+			continue
+		var nearest := from if from == to else Geometry2D.get_closest_point_to_segment(centre, from, to)
+		if nearest.distance_squared_to(centre) < (radius - 0.00001) * (radius - 0.00001):
+			return false
+	return true
+
+
+func _aggregate_step(at: Vector2, goal: Vector2, stride: float) -> Vector2:
+	if stride <= 0.0 or not at.is_finite() or not goal.is_finite():
+		return at
+	# A legacy/external invalid position is recovered at ordinary travel speed;
+	# this is not a licence to teleport the agent or move its roster slot.
+	if not _aggregate_segment_clear(at, at):
+		return at.move_toward(Field.project(at), stride)
+	var direct := at.move_toward(goal, stride)
+	if _aggregate_segment_clear(at, direct):
+		return direct
+	var best := at
+	var best_distance := INF
+	for r in _rock_centres.size():
+		var offset := at - _rock_centres[r]
+		var radius := float(_rock_radii[r])
+		if offset.length_squared() > (radius + stride + 0.002) * (radius + stride + 0.002):
+			continue
+		var normal := offset.normalized()
+		for side: float in [-1.0, 1.0]:
+			# A small outward bias gives the tangent a safe chord around the
+			# existing clearance circle. Never increase the step length.
+			var direction := (normal.orthogonal() * side + normal * 0.05).normalized()
+			var candidate := (at + direction * stride).clamp(-Field.LIMIT, Field.LIMIT)
+			if not _aggregate_segment_clear(at, candidate):
+				continue
+			var score := candidate.distance_squared_to(goal)
+			if score < best_distance:
+				best_distance = score
+				best = candidate
+	return best
 
 
 ## Steering decision: where this man wants to go and how fast (slot, surge,
@@ -787,7 +870,52 @@ func _integrate(a: Agent) -> void:
 	var rate := a.l_accel if absf(wanted) > absf(a.speed) and wanted * a.speed >= 0.0 else a.l_brake
 	a.speed = move_toward(a.speed, wanted, rate * DT)
 	a.vel = forward * a.speed
-	a.pos += a.vel * DT
+	var start := a.pos
+	a.pos = _body_step(a, start + a.vel * DT)
+	# Keep the commanded speed/acceleration authority. Contact forecasting
+	# uses actual travel, and animation already measures actual displacement.
+	a.vel = (a.pos - start) / DT
+
+
+## Clip the proposed root segment against occupied body circles before moving.
+## The grid contains the start-of-tick positions of all detail levels; use
+## current positions for the actual sweep so later agents see earlier moves.
+## Existing per-tick travel and hard spacing limits are never increased.
+func _body_step(a: Agent, target: Vector2) -> Vector2:
+	var start := a.pos
+	var travel := target - start
+	var length_squared := travel.length_squared()
+	if length_squared <= 0.000000000001:
+		return start
+	var length := sqrt(length_squared)
+	var fraction := 1.0
+	_gather(a.side, true, start, 2, _friends)
+	_gather(a.side, false, start, 2, _foes)
+	_friends.append_array(_foes)
+	for other: Agent in _friends:
+		if other == a:
+			continue
+		var radius := HARD_SAME_M if a.side == other.side else HARD_ENEMY_M
+		var offset := start - other.pos
+		var distance_squared := offset.length_squared()
+		if distance_squared > (radius + length) * (radius + length):
+			continue
+		var approach := offset.dot(travel)
+		# Legacy overlap can only move outward. The existing contact resolver
+		# still handles separation; the sweep must not worsen it.
+		if distance_squared < radius * radius:
+			if approach < 0.0:
+				fraction = 0.0
+			continue
+		if approach >= 0.0:
+			continue
+		var discriminant := approach * approach - length_squared * (distance_squared - radius * radius)
+		if discriminant <= 0.0:
+			continue
+		var entry := (-approach - sqrt(discriminant)) / length_squared
+		if entry >= 0.0 and entry <= fraction:
+			fraction = maxf(0.0, entry - 0.0001 / length)
+	return start + travel * fraction
 
 
 func _avoid(a: Agent, desired: Vector2) -> Vector2:
@@ -802,6 +930,8 @@ func _avoid(a: Agent, desired: Vector2) -> Vector2:
 		# charge can brake before contact.
 		_gather(a.side, false, a.pos, 3, _foes)
 		for b: Agent in _foes:
+			if b.level == LEVEL_C:
+				continue
 			var offset := a.pos - b.pos
 			var d := offset.length()
 			nearest_foe = minf(nearest_foe, d)
@@ -820,7 +950,7 @@ func _avoid(a: Agent, desired: Vector2) -> Vector2:
 			clamps.append([-direction, maxf(0.0, allowed)])
 	_gather(a.side, true, a.pos, 1, _friends)
 	for b: Agent in _friends:
-		if b == a:
+		if b == a or b.level == LEVEL_C:
 			continue
 		var offset := a.pos - b.pos
 		var d := offset.length()

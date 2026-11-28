@@ -164,9 +164,41 @@ static func far_mesh(role_name: String) -> Mesh:
 		var mesh_instance := template as MeshInstance3D
 		if mesh_instance == null:
 			mesh_instance = template.find_children("*", "MeshInstance3D", true, false)[0]
-		_far_meshes[role_name] = mesh_instance.mesh
+		_far_meshes[role_name] = _ground_far_mesh(mesh_instance.mesh)
 		template.free()
 	return _far_meshes[role_name]
+
+# The original unskinned company silhouettes have an authored positive
+# rest-sole height. Match their actual mesh floor to the root, just as
+# AuthoredGround does for the imported rig, without touching shared GLBs.
+# This is a one-time cached geometry translation, not a phase-dependent
+# offset fitted to a regression sample.
+static func _ground_far_mesh(source: Mesh) -> Mesh:
+	if source == null or source.get_surface_count() != 1 or source.get_blend_shape_count() != 0:
+		return source
+	var arrays: Array = source.surface_get_arrays(0)
+	if arrays.size() != Mesh.ARRAY_MAX or not arrays[Mesh.ARRAY_VERTEX] is PackedVector3Array:
+		return source
+	var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+	if vertices.is_empty():
+		return source
+	var lowest: float = INF
+	for point: Vector3 in vertices:
+		if not point.is_finite():
+			return source
+		lowest = minf(lowest, point.y)
+	if not is_finite(lowest) or lowest <= 0.000001:
+		return source
+	for i: int in vertices.size():
+		vertices[i] = vertices[i] - Vector3.UP * lowest
+	arrays[Mesh.ARRAY_VERTEX] = vertices
+	var grounded := ArrayMesh.new()
+	grounded.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	if grounded.get_surface_count() != 1:
+		return source
+	grounded.surface_set_material(0, source.surface_get_material(0))
+	return grounded
+
 
 func _body_scene() -> PackedScene:
 	# Keep asset selection separate from the production player/skin binding.

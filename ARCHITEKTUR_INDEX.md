@@ -2226,6 +2226,8 @@
 - `static func root_data(start: Transform3D, finish: Transform3D) -> Color`
 - `static func interpolated_root(finish: Transform3D, previous: Color, fraction: float) -> Transform3D`
 - `static func foot_offset(phase: float, gait: String) -> Vector3`
+- `static func authored_gait_keys() -> PackedVector4Array`
+- `static func guard_vertex(vertex: Vector3) -> Vector3`
 - `static func deformed_vertex(vertex: Vector3, gait: Color, fraction: float) -> Vector3`
 - `func set_step_fraction(fraction: float) -> void`
 - `func sync(by_role: Dictionary, gait_by_role: Dictionary = {}, starts_by_role: Dictionary = {}) -> void`

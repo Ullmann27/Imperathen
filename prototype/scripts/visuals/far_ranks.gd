@@ -49,24 +49,111 @@ static func foot_offset(phase: float, gait: String) -> Vector3:
 	return Vector3(0,float(CLEARANCE[gait])*pow(sin(PI*u),2),z)
 
 
+## The company source bakes axial bone rotations at 25 FPS, including
+## both endpoints. Interpolate those actual authored keys rather than
+## applying an ideal continuous ankle trajectory to an unarticulated leg.
+## Shared key order: each gait, right then left, frames 0 through N.
+const GAIT_NAMES := ["march", "run", "retreat"]
+const GAIT_FRAMES := [25, 18, 22]
+const GAIT_BASES := [0, 52, 90]
+static var _authored_gait_keys := PackedVector4Array()
+
+
+static func _source_gait_key(name: String, phase: float, left: bool) -> Vector4:
+	# Same lower-body equations as art/soldiers/build.py::locomotion.
+	var lift := -.068-.062*cos(TAU*phase*2.0) if name == "run" else -.088-.035*cos(TAU*phase*2.0)
+	var cycle := fposmod(phase+(.5 if left else 0.0),1.0)
+	var stance := float(STANCE[name])
+	var stride := float(SoldierVisual.STRIDES[name])
+	var foot_y := 0.0
+	var foot_height := 0.0
+	var foot_pitch := 0.0
+	if cycle <= stance:
+		foot_y = stride*(cycle-stance*.5)
+	else:
+		var u := (cycle-stance)/(1.0-stance)
+		foot_y = stride*(stance*.5+(1.0-stance)*u-u*u*(3.0-2.0*u))
+		foot_height = float(CLEARANCE[name])*pow(sin(PI*u),2.0)
+		foot_pitch = deg_to_rad(14.0)*sin(TAU*u)*sin(PI*u)
+	var vertical := .89+lift-(.12+foot_height)
+	var a := Vector2(.4,.012).length()
+	var b := Vector2(.37,.012).length()
+	var reach := minf(Vector2(foot_y,vertical).length(),a+b-.00001)
+	var hip := atan2(foot_y,vertical)-acos(clampf((a*a+reach*reach-b*b)/(2.0*a*reach),-1.0,1.0))
+	var bend := PI-acos(clampf((a*a+b*b-reach*reach)/(2.0*a*b),-1.0,1.0))
+	var thigh := hip-atan2(-.012,.4)
+	var shin := bend-(atan2(.012,.37)-atan2(-.012,.4))
+	return Vector4(thigh,shin,foot_pitch-thigh-shin,lift)
+
+
+static func authored_gait_keys() -> PackedVector4Array:
+	if _authored_gait_keys.is_empty():
+		for index in range(GAIT_NAMES.size()):
+			var name: String = GAIT_NAMES[index]
+			var count: int = GAIT_FRAMES[index]
+			for left: bool in [false,true]:
+				for frame in range(count+1):
+					_authored_gait_keys.append(_source_gait_key(name,float(frame)/float(count),left))
+	return _authored_gait_keys
+
+
+static func _sample_authored_gait(mode: int, phase: float, left: bool) -> Vector4:
+	var keys := authored_gait_keys()
+	var count: int = GAIT_FRAMES[mode-1]
+	var base: int = GAIT_BASES[mode-1]+(count+1 if left else 0)
+	var frame := fposmod(phase,1.0)*float(count)
+	var index := mini(int(floor(frame)),count-1)
+	return keys[base+index].lerp(keys[base+index+1],clampf(frame-float(index),0.0,1.0))
+
+
+static func _gait_vertex(vertex: Vector3, mode: int, phase: float) -> Vector3:
+	var side := -1.0 if vertex.x < 0.0 else 1.0
+	var key := _sample_authored_gait(mode,phase,side>0.0)
+	# Blender (x,y,z) -> Godot (x,z,-y). Foot vertices follow the full
+	# ankle/knee/hip hierarchy; blend through the actual leg and skirt.
+	var hip := Vector3(side*.105,.89,0.0)
+	var knee := Vector3(side*.119,.49,.012)
+	var ankle := Vector3(side*.126,.12,0.0)
+	var thigh_rotation := Basis(Vector3.RIGHT,key.x)
+	var shin_rotation := Basis(Vector3.RIGHT,key.y)
+	var foot_rotation := Basis(Vector3.RIGHT,key.z)
+	var upper := hip+thigh_rotation*(vertex-hip)
+	var lower := hip+thigh_rotation*(knee+shin_rotation*(vertex-knee)-hip)
+	var foot := ankle+foot_rotation*(vertex-ankle)
+	foot = hip+thigh_rotation*(knee+shin_rotation*(foot-knee)-hip)
+	var ankle_weight := 1.0-smoothstep(.10,.19,vertex.y)
+	var shin_weight := 1.0-smoothstep(.40,.58,vertex.y)
+	var leg_weight := (1.0-smoothstep(.205,.27,absf(vertex.x)))*(1.0-smoothstep(.75,.95,vertex.y))
+	return vertex.lerp(upper.lerp(lower.lerp(foot,ankle_weight),shin_weight),leg_weight)+Vector3.UP*key.w
+
+
+## Shared company source (art/soldiers/build.py): brace clips bend the
+## left thigh -17 degrees and shin +27 degrees, with a grounded pelvis.
+## Foot vertices follow both hinges; the upper leg blends across the knee.
+## The tiny lift is the source's .011 m floor minus the lowest transformed
+## canonical sole, not a per-model fitted correction.
+static func guard_vertex(vertex: Vector3) -> Vector3:
+	var hip := Vector3(.105, .89, 0.0)
+	var knee := Vector3(.119, .49, .012)
+	var thigh_rotation := Basis(Vector3.RIGHT, deg_to_rad(-17.0))
+	var shin_rotation := Basis(Vector3.RIGHT, deg_to_rad(27.0))
+	var upper := hip + thigh_rotation * (vertex - hip)
+	var shin := knee + shin_rotation * (vertex - knee)
+	var lower := hip + thigh_rotation * (shin - hip)
+	var shin_weight := 1.0 - smoothstep(.40, .58, vertex.y)
+	var leg_weight := smoothstep(0.0, .04, vertex.x) * (1.0 - smoothstep(.22, .30, absf(vertex.x))) * (1.0 - smoothstep(.75, .95, vertex.y))
+	return vertex.lerp(upper.lerp(lower, shin_weight), leg_weight) + Vector3.UP * .0000410085811
+
+
 static func deformed_vertex(vertex: Vector3, gait: Color, fraction: float) -> Vector3:
 	# CPU mirror for numeric regression. A GPU capture is still required to
 	# approve the shader/material/mesh combination on the visible play path.
 	var mode := int(round(gait.a))
 	var phase := gait.r+clampf(fraction,0.0,1.0)*gait.g
 	if mode >= 1 and mode <= 3:
-		var name: String = ["march","run","retreat"][mode-1]
-		var leg := (1.0-smoothstep(.10,.74,vertex.y))*(1.0-smoothstep(.205,.27,absf(vertex.x)))
-		var phase_offset := 0.0 if vertex.x < 0.0 else .5
-		var t := fposmod(phase+phase_offset,1.0)
-		if vertex.y <= .121 and absf(vertex.x) < .205 and t > float(STANCE[name]):
-			var u := (t-float(STANCE[name]))/(1.0-float(STANCE[name]))
-			var pitch := deg_to_rad(14.0)*sin(TAU*u)*sin(PI*u)
-			var ankle := Vector3(-.126 if vertex.x < 0 else .126,.12,0)
-			vertex = ankle+Basis(Vector3.RIGHT,pitch)*(vertex-ankle)
-		var lift := -.068-.062*cos(TAU*phase*2.0) if mode == 2 else -.088-.035*cos(TAU*phase*2.0)
-		var pelvis_weight := smoothstep(.12,.78,vertex.y)
-		return vertex+foot_offset(phase+phase_offset,name)*leg+Vector3.UP*lift*pelvis_weight
+		return _gait_vertex(vertex,mode,phase)
+	if mode >= 6 and mode <= 8:
+		vertex = guard_vertex(vertex)
 	var lean := _upper_lean(phase,mode)
 	var weight := smoothstep(.65,1.18,vertex.y)
 	var pivot := Vector3(0,.8,0)
@@ -123,6 +210,7 @@ func sync(by_role: Dictionary, gait_by_role: Dictionary = {}, starts_by_role: Di
 			stride.set_shader_parameter("step_fraction",maxf(0,_last_fraction))
 			stride.set_shader_parameter("stance",Vector3(STANCE.march,STANCE.run,STANCE.retreat))
 			stride.set_shader_parameter("clearance",Vector3(CLEARANCE.march,CLEARANCE.run,CLEARANCE.retreat))
+			stride.set_shader_parameter("authored_gait_keys",authored_gait_keys())
 			batch.material_override = stride
 			_batches[role] = batch
 			add_child(batch)
