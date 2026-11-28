@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 251,
+  "version": 252,
   "tasks": [
     {
       "id": "K101",
@@ -1194,7 +1194,7 @@
         "prototype/scripts/rendering/city_surface_microdetail.gd",
         "prototype/tests/city_surface_microdetail_test.gd"
       ],
-      "note": "Forum mortar V1/V2 render reviewed, fountain cyan defect addressed in exact authored Forum_Fountain/Northern_Fountain Water_Surface only; preserve geometry, texture, collision, LOD, lighting budgets. Draft #200 head 077075ed08e1e90ee4b865d10bb66437f187b4ac, three paths +103/-1. Independent exact blob match to tested merge d0e9c69ad9cc39eb4daef03a5c9c6704fb705d37: 1db053cbf1f41e2bbf7158d226f78323701cfc48, 3e398231e75565ffde1d57189b836d1d7a92cff0, 5b87ba10183013e042898c092e939424413f28c6. Actual focused 46108205504/job140865627711: microdetail188, signage80, exploration pass. Combined 46108205494 people27 plus same checks pass. Real render 46108205477/job140865627831 high and very_high, six frames passed; artifact15248591429. Report counts mortar only, fountain visual comparison pending. Isolated ARM64 QA 46108205480 passed city asset19/walk30/crowd158/training18, not device or release gate. Full 46108205477/job140865628008 failed formation_agents7/87 and formation_levels4/22. Exact independent review persisted #200 comment7234953675. No integration/visual/device acceptance or release."
+      "note": "Forum mortar V1/V2 render reviewed, fountain cyan defect addressed in exact authored Forum_Fountain/Northern_Fountain Water_Surface only; preserve geometry, texture, collision, LOD, lighting budgets. Draft #200 head 077075ed08e1e90ee4b865d10bb66437f187b4ac, three paths +103/-1. Independent exact blob match to tested merge d0e9c69ad9cc39eb4daef03a5c9c6704fb705d37: 1db053cbf1f41e2bbf7158d226f78323701cfc48, 3e398231e75565ffde1d57189b836d1d7a92cff0, 5b87ba10183013e042898c092e939424413f28c6. Actual focused 46108205504/job140865627711: microdetail188, signage80, exploration pass. Combined 46108205494 people27 plus same checks pass. Real render 46108205477/job140865627831 high and very_high, six frames passed; artifact15248591429. V2/V3 ZIP digests and all 12 frame hashes verified; forum change 0.45204%, market 0.00250%, masonry 0.00152%. Inspected actual fountain crop: turquoise muted, still flat water; local material improved, AAA unresolved. PR comment7234970209. Isolated ARM64 QA 46108205480 passed city asset19/walk30/crowd158/training18, not device or release gate. Full 46108205477/job140865628008 failed formation_agents7/87 and formation_levels4/22. Exact independent review persisted #200 comment7234953675. No integration/visual/device acceptance or release."
     },
     {
       "id": "TRIBAL-GUARD-POSE",
