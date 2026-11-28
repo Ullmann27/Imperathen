@@ -5,7 +5,7 @@
 // CLI: node tools/art/refine_tribal_sole_topology.mjs SOURCE DESTINATION EXPECTED_GIT_BLOB_SHA
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
-function refineTribalSoles(source, cap=900) {
+function refineTribalSoles(source, contactEdge, cap=900) {
   function require(ok, message) { if (!ok) throw new Error(message); }
   const aligned = n => (n+3)&~3;
   const src = new Uint8Array(source);
@@ -57,10 +57,13 @@ function refineTribalSoles(source, cap=900) {
   const maxWidth=()=>Math.max(0,...edgeGroups().map(g=>g.width));
   const beforeWidth=maxWidth();
   const splits=[];
+  const reserved=contactEdge?.map(i=>pointKey(i)).sort().join("|");
   while(triangles.length+2<=cap){
     const choices=edgeGroups().filter(g=>g.width>.045 && g.faces.length===2 && g.faces[0][0]!==g.faces[1][0]).sort((a,b)=>b.width-a.width||(a.key<b.key?-1:a.key>b.key?1:0));
     if(!choices.length)break;
-    const g=choices[0], faces=new Map(g.faces), next=[];
+    const g=(reserved && splits.length===0 ? choices.find(edge=>edge.key===reserved) : choices[0]);
+    require(g, "Pinned forefoot edge is not a conforming sole edge");
+    const faces=new Map(g.faces), next=[];
     for(let i=0;i<triangles.length;i++){
       const t=triangles[i];
       if(!faces.has(i)){next.push(t);continue;}
@@ -105,6 +108,9 @@ if (!input || !output || !/^[0-9a-f]{40}$/.test(expected ?? "") || existsSync(ou
 const raw=readFileSync(input);
 const sha=createHash("sha1").update("blob "+raw.length+"\0").update(raw).digest("hex");
 if (sha!==expected) throw new Error("Source blob identity mismatch");
-const result=refineTribalSoles(raw);
+// Preserve transverse refinement, reserving one split for the swordsman's
+// asymmetric right forefoot. The indices refer to this exact source blob.
+const forefootByBlob = {"73ecda41fd70fefc1541e1a2631b4a40aa37d5d8": [2242, 2223]};
+const result=refineTribalSoles(raw,forefootByBlob[sha]);
 writeFileSync(output,result.bytes,{flag:"wx"});
 console.log("TRIBAL_SOLE_TOPOLOGY "+JSON.stringify({...result.report,source_git_blob:sha,candidate_git_blob:createHash("sha1").update("blob "+result.bytes.length+"\0").update(result.bytes).digest("hex")}));

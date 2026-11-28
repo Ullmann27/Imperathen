@@ -174,7 +174,7 @@ static func far_mesh(role_name: String) -> Mesh:
 # This is a one-time cached geometry translation, not a phase-dependent
 # offset fitted to a regression sample.
 static func _ground_far_mesh(source: Mesh) -> Mesh:
-	if source == null or source.get_surface_count() != 1 or source.get_blend_shape_count() != 0:
+	if not source is ArrayMesh or source.get_surface_count() != 1 or source.get_blend_shape_count() != 0:
 		return source
 	var arrays: Array = source.surface_get_arrays(0)
 	if arrays.size() != Mesh.ARRAY_MAX or not arrays[Mesh.ARRAY_VERTEX] is PackedVector3Array:
@@ -189,15 +189,24 @@ static func _ground_far_mesh(source: Mesh) -> Mesh:
 		lowest = minf(lowest, point.y)
 	if not is_finite(lowest) or lowest <= 0.000001:
 		return source
-	for i: int in vertices.size():
-		vertices[i] = vertices[i] - Vector3.UP * lowest
-	arrays[Mesh.ARRAY_VERTEX] = vertices
+
+	# Preserve imported normals, UVs and LODs without unpacking and repacking them.
+	var surfaces: Array = source.get("_surfaces")
+	var surface: Dictionary = surfaces[0]
+	var bounds: AABB = surface.aabb
+	bounds.position.y -= lowest
+	surface.aabb = bounds
+	var format: int = surface.format
+	if not (format & Mesh.ARRAY_FLAG_COMPRESS_ATTRIBUTES):
+		var count: int = surface.vertex_count
+		var stride := RenderingServer.mesh_surface_get_format_vertex_stride(format, count)
+		var data: PackedByteArray = surface.vertex_data
+		for i: int in count:
+			data.encode_float(i * stride + 4, vertices[i].y - lowest)
+		surface.vertex_data = data
 	var grounded := ArrayMesh.new()
-	grounded.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
-	if grounded.get_surface_count() != 1:
-		return source
-	grounded.surface_set_material(0, source.surface_get_material(0))
-	return grounded
+	grounded.set("_surfaces", surfaces)
+	return grounded if grounded.get_surface_count() == 1 else source
 
 
 func _body_scene() -> PackedScene:

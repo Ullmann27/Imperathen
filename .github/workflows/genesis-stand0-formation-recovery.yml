@@ -1,7 +1,7 @@
 name: GENESIS Stand 0 formation recovery (strict gates)
 on:
   push:
-    branches: ['fix/genesis-stand0-formation-recovery-20261128']
+    branches: ['fix/genesis-stand0-formation-recovery-20261128', 'hoplite/*--stand-zero']
 permissions:
   contents: read
 jobs:
@@ -93,7 +93,7 @@ jobs:
           mkdir -p "$out"
           state="$(mktemp -d "$RUNNER_TEMP/formation-render.XXXXXX")"
           mkdir -p "$state"/{data,config,cache}
-          XDG_DATA_HOME="$state/data" XDG_CONFIG_HOME="$state/config" XDG_CACHE_HOME="$state/cache" timeout --kill-after=10s 600s xvfb-run -a "$GODOT_BIN" --path prototype --rendering-method gl_compatibility --resolution 1280x720 --script res://tests/formation_capture_review.gd ++ "$out" balanced 2>&1 | tee "$out/capture.log"
+          XDG_DATA_HOME="$state/data" XDG_CONFIG_HOME="$state/config" XDG_CACHE_HOME="$state/cache" timeout --kill-after=10s 600s xvfb-run -a "$GODOT_BIN" --path prototype --rendering-method gl_compatibility --audio-driver Dummy --resolution 1280x720 --script res://tests/formation_capture_review.gd ++ "$out" balanced 2>&1 | tee "$out/capture.log"
           grep -F 'FORMATION_CAPTURED 25 frames balanced' "$out/capture.log"
           test "$(find "$out" -name '*.png' -size +1000c | wc -l)" -eq 25
           test "$(sha256sum "$out"/*.png | cut -d' ' -f1 | sort -u | wc -l)" -gt 1
