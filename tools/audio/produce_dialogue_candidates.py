@@ -90,9 +90,14 @@ def main():
     ap.add_argument("--work", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--attempts", type=int, default=8)
+    ap.add_argument("--segmented", action="store_true")
+    ap.add_argument("--seed-offset", type=int, default=0)
+    ap.add_argument("--line-id", help="Only retry this exact authored identity")
     a = ap.parse_args()
     if not 1 <= a.attempts <= 32:
         ap.error("attempts must be 1–32")
+    if not 0 <= a.seed_offset <= 1000000:
+        ap.error("seed-offset out of bounds")
     cast = load(TOOLS / "voice_cast.json")
     if a.speaker not in cast["speakers"]:
         ap.error("Speaker not present in the established synthetic cast")
@@ -130,7 +135,7 @@ def main():
         if identity in seen:
             continue
         seen.add(identity)
-        if line["speaker_id"] != a.speaker:
+        if line["speaker_id"] != a.speaker or (a.line_id and line["line_id"] != a.line_id):
             continue
         key = (line["speaker_id"], line["text_key"])
         if key in existing:
@@ -153,6 +158,8 @@ def main():
         used_ids.add(lid)
         line["line_id"] = lid
         wanted.append(line)
+    if a.line_id and not wanted and report["already_recorded"] != 1:
+        raise ValueError("Requested exact line not found or not valid")
     report["requested"] = wanted
     save(out / "report.json", report)
     if not wanted:
@@ -190,10 +197,13 @@ def main():
     save(work / "wanted.json", {"lines": wanted})
     save(out / "report.json", report)
 
-    subprocess.run([sys.executable, "-I", str(TOOLS / "generate_voices.py"), "--strict",
-                    "--continue-on-rejected", "--attempts", str(a.attempts), "--lines", str(work / "wanted.json"),
-                    "--cast", str(work / "cast.json"), "--work", str(work), "--out", str(stage), "--only", a.speaker],
-                   check=True)
+    command = [sys.executable, "-I", str(TOOLS / "generate_voices.py"), "--strict",
+               "--continue-on-rejected", "--attempts", str(a.attempts), "--seed-offset", str(a.seed_offset),
+               "--lines", str(work / "wanted.json"), "--cast", str(work / "cast.json"),
+               "--work", str(work), "--out", str(stage), "--only", a.speaker]
+    if a.segmented:
+        command.append("--segmented")
+    subprocess.run(command,check=True)
     refs = load(work / "refs.json")
     if not candidates:
         ref = refs[a.speaker]
@@ -210,7 +220,8 @@ def main():
     meta = load(meta_path) if meta_path.exists() else {}
     fields = ("line_id", "kind", "speaker_id", "text", "text_key", "spoken_text", "file", "sha256",
               "visemes", "visemes_sha256", "duration_s", "model", "voice_design_model", "reference_seed",
-              "reference_audio_sha256", "reference_line_id", "seed", "post", "asr_wer", "asr_text", "lufs_integrated", "alignment")
+              "reference_audio_sha256", "reference_line_id", "seed", "post", "asr_wer", "asr_text", "lufs_integrated", "alignment",
+              "generation_mode", "generation_phrases", "segment_seeds")
     accepted = []
     for request in wanted:
         lid = request["line_id"]
