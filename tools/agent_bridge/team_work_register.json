@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 288,
+  "version": 289,
   "tasks": [
     {
       "id": "K101",
@@ -1433,9 +1433,9 @@
       "id": "CHARACTER-CORE-PHASE1",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "7820c4c6d8f0cb9df550956c041ed08c53a0624e",
-      "run_id": null,
+      "run_id": "46116191468",
       "scope": [
         "prototype/scripts/character_core",
         "prototype/scenes/character_core",
@@ -1443,7 +1443,7 @@
         "docs/44_integration/CHARACTER_CORE_PHASE1.md",
         ".github/workflows/aeterna-character-core-phase1.yml"
       ],
-      "note": "User's seven-phase masterplan, only phase 1. New isolated actual character scene and typed component contracts, original frontier rig/animations, manual AnimationTree 2D gait blend and upper-body filter, real TwoBoneIK3D + LookAtModifier3D, raycast feet, hip/bank, physics body steering, demo/test. Native IK requires 4.6+, current project 4.7.2; no older-engine compatibility claim. Sprint retimed existing run and turn procedural, no new mocap claim. No replacing live campaign, private assets, main or APK. Branch feature/aeterna-character-core-phase1-20261128; actual engine CI required."
+      "note": "User's seven-phase masterplan, only phase 1. New isolated actual character scene and typed component contracts, original frontier rig/animations, manual AnimationTree 2D gait blend and upper-body filter, real TwoBoneIK3D + LookAtModifier3D, raycast feet, hip/bank, physics body steering, demo/test. Native IK requires 4.6+, current project 4.7.2; no older-engine compatibility claim. Sprint retimed existing run and turn procedural, no new mocap claim. No replacing live campaign, private assets, main or APK. Branch feature/aeterna-character-core-phase1-20261128; actual engine CI required. Actual 11 new files +1242/-0, exact head d467b29e13253f58f98acc6d2b74acfe2bf4216a; original public frontier blob a40e2a1e710dfb809fbecb48b77c640dcdfec6e7 preserved. Native run46116191468 observed in_progress; no compile or acceptance result yet."
     }
   ]
 }
