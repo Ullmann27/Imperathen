@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 243,
+  "version": 244,
   "tasks": [
     {
       "id": "K101",
@@ -1256,6 +1256,19 @@
       ],
       "access": "edit",
       "note": "Gemini 4 Argon via user-mediated GitLab Duo. M28 preparatory read-only opportunity selector from existing authoritative NPC behavior, economy and village life state. One bounded existing-needs path, deterministic candidates, actual observed availability and safe gating, no invented rewards/quest progression/markers, no state writes. Isolated branch candidate/aeterna-m28-npc-opportunities-20261128 from exact common base; new module and independent regression test only (+optional exact UIDs); no existing files, CI, tracker, register, assets or main. Coordinator owns later QA and runtime wiring under separate lease. Recheck remote and active leases before writing; no claim of dispatch/test or M28 completion."
+    },
+    {
+      "id": "FORMATION-STRIDE-CONTACT-TRACE",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "89e62f50d75a4a9cdc39efa0311cd9169b832670",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/formation_stride_contact_test.gd",
+        ".github/workflows/aeterna-formation-stride-contact.yml"
+      ],
+      "note": "Independent QA-only diagnostic after actual guard run 46108635420/job 140866957392. Original 40mm switch gate still fails four moving cases (49.0–52.3mm); no runtime/asset or gate edits. Sample every production Roman/tribal family at real near/mid rig, march/run/retreat phases including exact failing phases, compare canonical sole probes to actual far mesh CPU shader at identical phase, report side/heel/toe and actual imported skinned sole at worst phase. Existing static guard, formation and thresholds preserved; no integration claim. Isolated branch qa/aeterna-formation-stride-contact-20261128 from exact guard head. Do not merge QA-only workflow."
     }
   ]
 }
