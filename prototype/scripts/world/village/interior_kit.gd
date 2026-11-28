@@ -6,6 +6,7 @@ extends RefCounted
 
 const KIT_SCENE := "res://assets/interiors/interior_kit.glb"
 const MANIFEST := "res://assets/interiors/kit_manifest.json"
+const BreakfastBread = preload("res://assets/operation_prima/breakfast_bread.gd")
 const TEXTURE := "res://assets/interiors/textures/%s_%s.png"
 const MATERIALS := ["oak", "wood_rough", "wicker", "straw", "linen", "wool", "leather", "terracotta",
 	"coarseware", "iron", "bronze", "stone", "food", "hearth_clay", "embers"]
@@ -81,6 +82,10 @@ static func ensure() -> void:
 	info = parsed.props if parsed is Dictionary else {}
 	for name: String in MATERIALS:
 		materials[name] = _make_material(name)
+	var bread_cut: StandardMaterial3D = (materials["food"] as StandardMaterial3D).duplicate() as StandardMaterial3D
+	bread_cut.resource_name = "Interior_bread_cut"
+	bread_cut.albedo_color = Color(0.62, 0.40, 0.24)
+	materials["bread_cut"] = bread_cut
 	set_profile("balanced")
 
 
@@ -89,6 +94,8 @@ static func _load_meshes() -> void:
 	for node: MeshInstance3D in scene.find_children("*", "MeshInstance3D", true, false):
 		meshes[String(node.name)] = node.mesh
 	scene.free()
+	if meshes.has("table_bread"):
+		meshes["table_bread"] = BreakfastBread.build_mesh()
 
 
 ## Drops the source meshes once every room is merged; ensure() reloads them.
