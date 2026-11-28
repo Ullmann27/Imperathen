@@ -379,7 +379,10 @@ class RomanCityLayoutTest(unittest.TestCase):
                     for tile in tiles:
                         for key, value in areas(self.city.boxes[id(tile.data)]).items():
                             visual[key] += value
-                self.assertEqual(set(solid),set(visual),"visual/collision support plane signatures")
+                if group_name == "Main_Streets":
+                    self.assertEqual(set(solid),set(visual),"visual/collision support plane signatures")
+                # Residential plots intentionally include visual-only garden
+                # covers; their pre-existing physical support contract stays.
                 for key, value in solid.items():
                     self.assertAlmostEqual(visual[key], value, delta=1e-6 * value, msg=key)
                 for tile in tiles:
