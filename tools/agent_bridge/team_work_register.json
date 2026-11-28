@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 255,
+  "version": 257,
   "tasks": [
     {
       "id": "K101",
@@ -1301,15 +1301,29 @@
       "id": "I04-CARRY-RIG-LIFECYCLE",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "8a8256a30145918739312588d70c4585768fa568",
-      "run_id": null,
+      "run_id": "46114403076",
       "scope": [
         "prototype/scripts/world/village/i04_props.gd",
         "prototype/tests/i04_props_lifecycle_test.gd",
         ".github/workflows/aeterna-i04-props-lifecycle.yml"
       ],
-      "note": "M23 I04 forge carry lifecycle. Existing _ensure_hands returns on missing carrier/body without invalidating old still-live hand sockets, so props can remain attached to the wrong actor; process-only updates can lag actual skeleton. Replace cached disposable attachment nodes with current rig bone transform and skeleton_updated binding, clear/disconnect immediately on carrier loss/LOD change and hide absent props. Preserve original models, offsets, story authority, wood/tablet counts and existing I04 test. Add isolated real WorldModel path and imported VillagePerson rig regression for hand transforms, LOD, carrier swap/loss, no duplicate/phantom and no state mutation. New branch fix/aeterna-i04-props-lifecycle-20261128 only; no main, no new costs, no release."
+      "note": "M23 I04 forge carry lifecycle. Existing _ensure_hands returns on missing carrier/body without invalidating old still-live hand sockets, so props can remain attached to the wrong actor; process-only updates can lag actual skeleton. Replace cached disposable attachment nodes with current rig bone transform and skeleton_updated binding, clear/disconnect immediately on carrier loss/LOD change and hide absent props. Preserve original models, offsets, story authority, wood/tablet counts and existing I04 test. Add isolated real WorldModel path and imported VillagePerson rig regression for hand transforms, LOD, carrier swap/loss, no duplicate/phantom and no state mutation. New branch fix/aeterna-i04-props-lifecycle-20261128 only; no main, no new costs, no release. Actual runtime repair draft #206 at 5e37472d69b97a5301897cd93e893cc13779f040, exact 3 files +408/-48. Targeted Godot run46114403076 observed in_progress; existing automatic runs46114403019/46114402993/46114402981 also observed, no manual duplicates. No tests/visual/device pass yet."
+    },
+    {
+      "id": "NPC-MEMORY-OBSERVATION-OVERLAP",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "8a8256a30145918739312588d70c4585768fa568",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/domain/npc_social_memory.gd",
+        "prototype/tests/npc_social_memory_test.gd",
+        ".github/workflows/aeterna-npc-memory-overlap.yml"
+      ],
+      "note": "M28 living-world data integrity independent of Argon's new preview. Existing Social.advance adds full delta even when observation time intervals overlap, allowing duplicate seconds and premature friendship; malformed position arrays can create invalid perception or errors. Clip credited time to the unobserved suffix using last_contact, retain same fixed-step behavior, strict finite numeric 3D observation positions, validate shared time against last_contact. Add regression for overlap, replay, actual encounter threshold, serialized continuity and malformed observations; preserve all existing tests, schema, reward/quest contracts. New isolated branch fix/aeterna-npc-memory-overlap-20261128 only; no external calls or release."
     }
   ]
 }
