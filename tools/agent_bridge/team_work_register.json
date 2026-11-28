@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 297,
+  "version": 299,
   "tasks": [
     {
       "id": "K101",
@@ -1347,7 +1347,7 @@
       "id": "FORMATION-AUTHORED-KEYFRAME-GAIT",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "89e62f50d75a4a9cdc39efa0311cd9169b832670",
       "run_id": "46115096757",
       "scope": [
@@ -1356,7 +1356,7 @@
         "prototype/tests/formation_stride_contact_test.gd",
         ".github/workflows/aeterna-formation-authored-gait.yml"
       ],
-      "note": "Mirror exact source company gait sagittal hinge keyframes (art/soldiers/build.py, 25/18/22 intervals) with shared CPU/GPU key table, retain static guard, source sole topology, existing stride helper and original strict 40mm/full tests. Preflight against 798 actual rig samples reproduces old distances within 3um; predicts 264->54 failures, not engine proof or full fix. New isolated push-only candidate; no arbitrary offsets, no budget/gate relaxation, no main/APK. Actual four-file head aacbcac802cc89cabcd9dba163400cfef68ff1eb, runtime29913a5f shaderbf175906, unchanged strict diagnostic3f1e24c4; push-only actual run46115096757 in progress, all original headless tests and 25 real compatibility-rendered frames requested. No engine result yet."
+      "note": "Mirror exact source company gait sagittal hinge keyframes (art/soldiers/build.py, 25/18/22 intervals) with shared CPU/GPU key table, retain static guard, source sole topology, existing stride helper and original strict 40mm/full tests. Preflight against 798 actual rig samples reproduces old distances within 3um; predicts 264->54 failures, not engine proof or full fix. New isolated push-only candidate; no arbitrary offsets, no budget/gate relaxation, no main/APK. Actual four-file head aacbcac802cc89cabcd9dba163400cfef68ff1eb, runtime29913a5f shaderbf175906, unchanged strict diagnostic3f1e24c4; push-only actual run46115096757 in progress, all original headless tests and 25 real compatibility-rendered frames requested. No engine result yet. | Verified failed engine run: 54/798 stride samples exceed original 40mm (previous 264), max 48.086mm. Formation agents 60/180 switches still exceed gate up to 50.518mm; contact trace28, slot27, battle411, rules146, muster133, tribal205 pass. Artifact15251611378. No integration; retain original gates."
     },
     {
       "id": "YOUTH-ARMOUR-CONSTRAINED-WEIGHTS",
@@ -1376,14 +1376,14 @@
       "id": "YOUTH-ARMOUR-CERTIFIED-SOLVER",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "d1d08c73f4d8a0e07e7eb3039bf780a9c80d1277",
       "run_id": "46115352825",
       "scope": [
         "tools/art/youth_armour_local_weights.py",
         "tools/art/test_youth_armour_local_weights.py"
       ],
-      "note": "Preserve original physical constraints and tests. SLSQP can return status8 at numerically feasible point. Internally tighten active squared residual by 2e-6 dimensionless, require independently recomputed strict >=0 active/all residual, finite bounded weights and simplex. Accept feasible step even if optimizer convergence flag false, never accept infeasible result. Report such steps separately; full original float32 local + Godot A/B gates remain mandatory. Same isolated branch only after previous run completed. Actual commit3d765a385a3c7d25c002300f36f641f836076205, added false-success negative control, actual run46115352825 in progress."
+      "note": "Preserve original physical constraints and tests. SLSQP can return status8 at numerically feasible point. Internally tighten active squared residual by 2e-6 dimensionless, require independently recomputed strict >=0 active/all residual, finite bounded weights and simplex. Accept feasible step even if optimizer convergence flag false, never accept infeasible result. Report such steps separately; full original float32 local + Godot A/B gates remain mandatory. Same isolated branch only after previous run completed. Actual commit3d765a385a3c7d25c002300f36f641f836076205, added false-success negative control, actual run46115352825 in progress. | Verified run failed on real source matching exactly one edge: solve_affine_weights line233 rejects no verified feasible local binding, positive directional derivative for linesearch; strict acceptance intact. Artifact15250809457; no revised asset accepted. Blocked pending later phase priority."
     },
     {
       "id": "NIGHT-CONSOLIDATION-FORGE-NPC",
