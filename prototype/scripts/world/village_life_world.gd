@@ -12,6 +12,7 @@ const Activities := preload("res://scripts/visuals/resident_activity.gd")
 const WorkplaceStock := preload("res://scripts/visuals/workplace_stock.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Strike = preload("res://scripts/domain/raider_strike.gd")
+const BreakfastActingScript := preload("res://scripts/world/village/breakfast_acting.gd")
 const COUNCIL := "res://assets/politics/council/valdora_council.glb"
 const COUNCIL_COLLISION := "res://assets/politics/council/valdora_council_collision.glb"
 const COUNCIL_ENTRANCE := Vector3(16.0, 0.012, 9.5)
@@ -27,6 +28,7 @@ var quality := "balanced"
 var active := false
 var focused := ""
 var _focus_yaw := 0.0
+var _breakfast_acting: BreakfastActingScript = BreakfastActingScript.new()
 var _ready_scene := false
 var _wood: StandardMaterial3D
 var _stone: StandardMaterial3D
@@ -62,6 +64,7 @@ var _collision_bodies_dirty := true
 func _physics_process(delta: float) -> void:
 	_advance_raiders(delta)
 	_update_attention(delta)
+	_breakfast_acting.advance(get_parent() as Node3D, self, delta, state)
 
 
 func _advance_raiders(delta: float) -> void:
@@ -219,7 +222,8 @@ func _update_attention(delta: float) -> void:
 		if not actor.visible or actor.get_meta("companion_controlled",false):
 			var inactive_figure := actor.get_node_or_null("Figure")
 			if is_instance_valid(inactive_figure):
-				inactive_figure.clear_gaze_target()
+				if not _breakfast_acting.owns_gaze(id):
+					inactive_figure.clear_gaze_target()
 				inactive_figure.set_resident_prop("")
 			_set_social_pose(actor,false)
 			continue
@@ -241,7 +245,8 @@ func _update_attention(delta: float) -> void:
 					var body := _physical_partner(peer_id)
 					if is_instance_valid(body):
 						partner = body.get_node_or_null("Figure") as Node3D
-			figure.set_gaze_target(partner)
+			if not _breakfast_acting.owns_gaze(id):
+				figure.set_gaze_target(partner)
 			figure.set_resident_prop(Activities.village_prop(activity))
 			# The actual story smith practices his trade at his own workplace,
 			# not in a catalogue or during a conversation. The domain still
