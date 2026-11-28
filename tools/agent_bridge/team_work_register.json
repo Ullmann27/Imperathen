@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 230,
+  "version": 231,
   "tasks": [
     {
       "id": "K101",
@@ -1072,14 +1072,14 @@
       "id": "FORMATION-WHEEL-ATTRIBUTION",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "done",
       "revision": "b3cdf9fff354b612b20dc86a36086acec2c0f105",
       "run_id": "46105279398",
       "scope": [
         "prototype/tests/formation_agents_test.gd",
         ".github/workflows/aeterna-formation-wheel-attribution.yml"
       ],
-      "note": "Independent correction of proven cross-company test attribution, not runtime fix. Keep target zero refile/rematch requirement, same rank owners, outer-file speed, arrival and all numerical limits. Independently validate every other refile/rematch against adjacent authoritative model snapshots and exact global/per-company accounting; global zero remains required absent valid unrelated events. Existing full formation test remains default; focused wheel-only mode adds no bypass to full CI. No integration before actual focused/full tests and blob comparison. Actual commit e84d7a0e22433db87898eabaa228786d39b51b75 on fix/aeterna-formation-wheel-attribution-20261128. Two-file diff verified. Original targeted zero refile/rematch, same owners, speed, arrival and all motion thresholds preserved; independently tracks consecutive authoritative rule-facing and roster/layout snapshots, consumes each counter event at most once, requires exact global count accounting and no invalid events. Default full suite unchanged except corrected attribution. Focused Godot run 46104212413 observed queued, no pass or integration claim. Existing body sweep CI continues on disjoint branch. Actual 46104212413 failed at parse line 334 (cannot infer changed bool). New one-line explicit bool annotation, exact compare one added/removed line; commit b3cdf9fff354b612b20dc86a36086acec2c0f105. Run 46105279398 observed in_progress. No test threshold changes, no success claim."
+      "note": "Actual run 46105279398/job 140856523437 passed 8/8 at b3cdf9fff354b612b20dc86a36086acec2c0f105. Exact target valley_spears 0/0 refile/rematch; unrelated ridge_bows one independently validated 81.792505deg refile at rule snapshot23, one actual roster/layout rematch, global1/1, invalid events empty. Focused test attribution done, not full formation or visual acceptance. Exact test blob may enter new isolated combined test after lease; all numeric motion/LOD gates unchanged."
     },
     {
       "id": "N32",
@@ -1129,7 +1129,7 @@
       "id": "N34",
       "owner": "Nemotron",
       "access": "read",
-      "status": "submitted",
+      "status": "done",
       "revision": "65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de",
       "run_id": "46105483466",
       "scope": [
@@ -1137,7 +1137,7 @@
         "prototype/tests/formation_contact_trace_test.gd",
         "prototype/scripts/formation/formation_levels.gd"
       ],
-      "note": "New review of post-fix swept body broadphase performance/progress, not re-diagnosing N21/N24/N30. Actual run 46104088321: 28/28 focused, original root/phase gates all green, static LOD/wheel separate. Check bounded candidate enumeration, deterministic update ordering, possible mutual blocking/starvation and dense formations. Propose independent new negative-control tests/measurements without modifying validated limits or active branches. Existing CI cost limits, no paid requests. Actual bridge commit 1949489ecabf3ef12651b68ce3c8cc7e0d1fcbce pushed with expected HEAD, one task 12288 tokens. Workflow 46105483466 observed in_progress."
+      "note": "Actual run 46105483466/job 140857296121 complete, receipt answered at 65fd1e53. Raw diff rejected: attempts assignment to GDScript method, Python comprehension, wrong yaw axis, incorrect overlap fixture 0.8m described as below 0.58m, unrealistic pass-time requirement and invented troop caps. Useful independent progress/broadphase testing idea only; no code applied or repeat dispatch."
     },
     {
       "id": "CITY-FORUM-MORTAR-REVIEW",
@@ -1151,6 +1151,22 @@
         "prototype/tests/roman_city_visual_capture.gd"
       ],
       "note": "Independent actual city visual defect from run 46101992690, artifact 15245677495 ZIP SHA256 verified; 6 real 1280x720 captures. Bright travertine mortar visibly dominates joints; builder explicitly intended dark mortar but uses STONE. Isolated runtime material override only for exact Forum_Worn_Stonework Travertine surface; copy source material, preserve texture/geometry/collision/LOD, verify targeted surface and capture hashes, no visual acceptance pending comparison. Base city builder, runtime and capture blobs match baseline. No external API or owner asset transfer. Actual commit 154a5ee4359d77b6552b6cecaee279c9b0adb995 on fix/aeterna-city-mortar-20261128, PR #199, compared exactly 2 files +44/-3. Actual graphical job 140861015179 and ARM64 candidate 140861014945 in progress, no engine/visual/device pass claim. Other CI runs are automatic, no manual duplicates."
+    },
+    {
+      "id": "TRIBAL-SOLE-TOPOLOGY",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de",
+      "run_id": null,
+      "scope": [
+        "prototype/assets/germanic_warriors/forest_spear_far.glb",
+        "tools/art/refine_tribal_sole_topology.mjs",
+        "prototype/tests/tribal_lod_contract_test.gd",
+        "prototype/tests/formation_agents_test.gd",
+        ".github/workflows/aeterna-tribal-sole-topology.yml"
+      ],
+      "note": "Masterplan phase01, independent of discontinued USE AI. Actual pinned far GLB b370b05d, 885 triangles, one material. Raw static heel vertex distance 83.102mm but nearest true existing surface triangle 17.038mm. Geometry-only conforming transverse foot-edge midpoint splits (existing shader x-dependent deformation), not selected by test probes, all incident UV seam faces split, preserve original positions/material atlas/rest surface and 900-triangle cap. Simulated source geometry width-priority 899 triangles, neutral original proxy distances 17.687/20.107/8.004/15.712mm; no Godot pass claim. Isolated candidate from verified body-sweep, exact wheel test blob from b3cdf9 and static diagnostic from 2612b0; rerun original 40mm plus full motion gates. No preview/main or production APK."
     }
   ]
 }
