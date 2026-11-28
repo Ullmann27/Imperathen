@@ -153,10 +153,28 @@ func _run() -> void:
 	actor.set_look_target(actor.global_position+Vector3(2,1.5,-1))
 	await _frames(30)
 	_check(actor.get_bone_world_transform(&"Head").is_finite(),"Native head tracking has a finite real pose")
+	var left_ray: RayCast3D = actor.get_node("FootPlacement/LeftRay") as RayCast3D
+	var right_ray: RayCast3D = actor.get_node("FootPlacement/RightRay") as RayCast3D
+	_check(left_ray.enabled and right_ray.enabled,"Active IK uses both actual ground rays")
 	actor.set_ik_enabled(false)
+	_check(not left_ray.enabled and not right_ray.enabled,"LOD disables both automatic physics ray updates immediately")
+	for side: int in [0,1]:
+		var receipt: Dictionary = actor.get_foot_contact(side)
+		_check(not bool(receipt.grounded) and not bool(receipt.locked) and not (receipt.surface_point as Vector3).is_finite(),"Disabled IK immediately invalidates the planted contact")
 	await _frames(30)
 	_check(float(actor.get_foot_contact(0).weight)<0.02 and float(actor.get_foot_contact(1).weight)<0.02,"IK can be switched off for later LOD budgeting")
+	var lod_before: Vector3 = actor.global_position
+	actor.request_motion(Vector3.RIGHT,1.0,CharacterCore.Gait.WALK)
+	await _frames(60)
+	_check(actor.get_planar_speed()>1.1 and actor.global_position.distance_to(lod_before)>0.5,"Disabled IK preserves actual locomotion")
+	_check(not left_ray.enabled and not right_ray.enabled,"No automatic ray queries while moving with IK disabled")
+	for side: int in [0,1]:
+		var receipt: Dictionary = actor.get_foot_contact(side)
+		_check(not bool(receipt.grounded) and not (receipt.surface_point as Vector3).is_finite(),"Moving disabled IK has no stale ground receipt")
+	actor.stop_motion()
+	await _frames(90)
 	actor.set_ik_enabled(true)
+	_check(left_ray.enabled and right_ray.enabled,"Re-enabled IK restores both actual ground rays")
 	await _frames(60)
 	_check_feet(actor,"Re-enabled IK")
 	actor.free()

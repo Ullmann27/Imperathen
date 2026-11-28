@@ -168,12 +168,18 @@ func _make_leg(thigh: StringName, shin: StringName, foot: StringName,
 
 func set_enabled(value: bool) -> void:
 	_enabled = value
-	if not value:
-		for leg: Leg in _legs:
+	for leg: Leg in _legs:
+		# Disable the engine's automatic ray update as well as manual casts.
+		leg.ray.enabled = value
+		if not value:
+			leg.grounded = false
 			leg.locked = false
+			leg.lock_surface = null
+			leg.surface_point = Vector3.INF
 			leg.weight = 0.0
 			leg.solver.influence = 0.0
 			leg.aligner.influence = 0.0
+	if not value:
 		_hip = 0.0
 
 func set_look_target(world_point: Vector3) -> void:
@@ -206,9 +212,13 @@ func update_pose(delta: float, on_floor: bool, speed: float, yaw_rate: float) ->
 			stepping = cycle > 0.58
 			if stepping:
 				swing = maxf(swing,turn_step_height*sin(PI*(cycle-0.58)/0.42))
-		leg.ray.global_transform = Transform3D(Basis.IDENTITY,ankle+Vector3.UP*probe_up)
-		leg.ray.force_raycast_update()
-		var valid: bool = _enabled and on_floor and leg.ray.is_colliding()
+		var valid: bool = false
+		# A disabled or airborne character has no planted foot. Do not query
+		# physics for a contact that the adapter cannot consume this tick.
+		if _enabled and on_floor:
+			leg.ray.global_transform = Transform3D(Basis.IDENTITY,ankle+Vector3.UP*probe_up)
+			leg.ray.force_raycast_update()
+			valid = leg.ray.is_colliding()
 		var point: Vector3 = ankle
 		var normal: Vector3 = Vector3.UP
 		if valid:
