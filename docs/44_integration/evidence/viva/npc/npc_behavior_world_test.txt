@@ -1,0 +1,7 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+IMPERATHEN_VEGETATION_RENDER_PATH animated_world_space trees=2372 card_chunks=787
+ROUTE_FIRE_SITES 31 ValdoraRouteFires
+IMPERATHEN_VEGETATION_RENDER_PATH animated_world_space trees=2372 card_chunks=787
+ROUTE_FIRE_SITES 31 ValdoraRouteFires
+NPC behavior world: 63 checks passed
