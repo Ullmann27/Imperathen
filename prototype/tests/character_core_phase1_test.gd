@@ -250,6 +250,72 @@ func _run() -> void:
 	_check(not disabled_body.is_physics_processing(),"Loss of collision authority stops physical movement")
 	disabled_body.free()
 
+	# Dependency loss from a synchronous signal must stop the SAME tick,
+	# not merely be detected by the next frame's initial readiness check.
+	var landing_listener: CharacterCore = _new_actor(Vector3(6,1.5,0))
+	var landing_tree: AnimationTree = landing_listener.get_animation_tree()
+	var landing_feet: Node3D = landing_listener.get_node("FootPlacement") as Node3D
+	var landing_target: Node3D = landing_feet.get_node("LeftTarget") as Node3D
+	var landing_receipts: Array[String] = []
+	landing_listener.grounded_changed.connect(func(value: bool) -> void:
+		if value:
+			landing_receipts.append("ground")
+			landing_feet.remove_child(landing_target)
+	)
+	landing_listener.command_rejected.connect(func(_reason: String) -> void: landing_receipts.append("reject"))
+	landing_listener.movement_sampled.connect(func(_velocity: Vector3, grounded: bool) -> void:
+		if grounded:
+			landing_receipts.append("movement")
+	)
+	landing_listener.animation_intent_sampled.connect(func(_velocity: Vector3, _speed: float, _yaw: float, grounded: bool) -> void:
+		if grounded:
+			landing_receipts.append("animation")
+	)
+	await _frames(90)
+	_check(landing_receipts==["ground","reject"],"Landing listener invalidation rejects within the same tick before sample publication")
+	_check(not landing_listener.is_physics_processing() and not landing_tree.active,"Signal-driven dependency loss shuts down the graph and physics")
+	_check_unbound_contract(landing_listener,"Landing listener detaches target")
+	landing_target.free()
+	landing_listener.free()
+
+	var state_listener: CharacterCore = _new_actor(Vector3(6,0.05,0))
+	await _frames(60)
+	var state_tree: AnimationTree = state_listener.get_animation_tree()
+	var state_receipts: Array[String] = []
+	state_listener.motion_state_changed.connect(func(_previous: int, current: int) -> void:
+		if current==CharacterCore.Gait.WALK:
+			state_receipts.append("walk")
+			state_listener.remove_child(state_tree)
+	)
+	state_listener.command_rejected.connect(func(_reason: String) -> void: state_receipts.append("reject"))
+	state_listener.movement_sampled.connect(func(_velocity: Vector3, _grounded: bool) -> void:
+		if state_listener.get_motion_state()==CharacterCore.Gait.WALK:
+			state_receipts.append("movement")
+	)
+	state_listener.request_motion(Vector3.FORWARD,1.0,CharacterCore.Gait.WALK)
+	await _frames(90)
+	_check(state_receipts==["walk","reject"],"State listener invalidation stops before animation evaluation or movement receipt")
+	_check(not state_listener.is_physics_processing() and not state_tree.active,"Detached live graph is deactivated in its invalidating tick")
+	state_tree.free()
+	state_listener.free()
+
+	var sample_listener: CharacterCore = _new_actor(Vector3(6,0.05,0))
+	await _frames(60)
+	var sample_feet: Node3D = sample_listener.get_node("FootPlacement") as Node3D
+	var sample_target: Node3D = sample_feet.get_node("LeftTarget") as Node3D
+	var sample_receipts: Array[String] = []
+	sample_listener.movement_sampled.connect(func(_velocity: Vector3, _grounded: bool) -> void:
+		sample_receipts.append("movement")
+		sample_feet.remove_child(sample_target)
+	)
+	sample_listener.command_rejected.connect(func(_reason: String) -> void: sample_receipts.append("reject"))
+	sample_listener.animation_intent_sampled.connect(func(_velocity: Vector3, _speed: float, _yaw: float, _grounded: bool) -> void: sample_receipts.append("animation"))
+	await _frames(3)
+	_check(sample_receipts==["movement","reject"],"Invalidation in movement receipt suppresses stale animation intent")
+	_check(not sample_listener.is_physics_processing(),"Movement listener invalidation stops further ticks")
+	sample_target.free()
+	sample_listener.free()
+
 	# One real step and a tall wall: only the swept small obstacle may be climbed.
 	_body_box(Vector3(0,0.09,2.0),Vector3(2.4,0.18,2.0))
 	_body_box(Vector3(0,1.0,-0.1),Vector3(3.0,2.0,0.2))

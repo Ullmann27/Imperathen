@@ -1,7 +1,7 @@
 name: IMPERATHEN native equipment phase 2A
 on:
   push:
-    branches: ['feature/aeterna-character-equipment-phase2-20261128']
+    branches: ['feature/aeterna-character-equipment-phase2-20261128', 'fix/astra-sol-character-callback-integration-20261128']
 permissions:
   contents: read
 concurrency:
