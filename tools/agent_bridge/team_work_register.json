@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 198,
+  "version": 200,
   "tasks": [
     {
       "id": "K101",
@@ -918,9 +918,9 @@
     {
       "id": "FORMATION-WHEEL-AUTHORITY",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "8a8256a30145918739312588d70c4585768fa568",
-      "run_id": null,
+      "run_id": "46092418232",
       "scope": [
         "prototype/scripts/battle/battle_model.gd",
         "prototype/scripts/formation/formation_agents.gd",
@@ -928,14 +928,14 @@
         ".github/workflows/aeterna-formation-wheel-authority.yml"
       ],
       "access": "edit",
-      "note": "Independent isolated candidate from #197: #177 battle model and formation agents common-base blobs exactly equal to #197; actual #177 19/19 slot authority, 411/411 battle command, 146/146 battle rules; remaining wheel and LOD red. Investigate authoritative front change vs visual lag, add strict actual engine regression, keep original tests. No shared branch merge."
+      "note": "Own isolated branch fix/aeterna-formation-wheel-authority-20261128 commit 5153f8354595d9472cde45f3c056ad7761976d73 on #197. Verified #177 battle model and formation base blobs identical to shared candidate base; reuse prior independently green authority/casualty implementation only in isolated branch. New runtime distinguishes adjacent authoritative >75-degree discrete turn from visual wheel lag, per-unit counters, applies once; adds real face/reverse-move regressions preserving original 60/180 and valley_muster gates. Actual run 46092418232 in_progress. No integration/green claim; original global assertion and all motion budgets untouched."
     },
     {
       "id": "N30",
       "owner": "Nemotron",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "158e22df72a8fafb1ab690bd55011a16f27b801d",
-      "run_id": null,
+      "run_id": "46092289505",
       "scope": [
         "prototype/scripts/battle/battle_model.gd",
         "prototype/scripts/formation/formation_agents.gd",
@@ -943,7 +943,7 @@
         "prototype/tests/formation_slot_authority_test.gd"
       ],
       "access": "read",
-      "note": "New bounded review exclusively of residual wheel/refile failure on #177 after proven slot-order/casualty improvements. Separate from N21/N24 LOD continuity work; independent read-only review, no API dispatch until actual register and bridge HEAD verified."
+      "note": "Actual bridge commit 925ff07bacb6da94d6537c97a2fea3551cf2c108, NVIDIA run 46092289505 observed in_progress; offline Foundation 46092293470 passed. N30 reads exact #177 only, residual wheel/refile failure, no duplicate LOD request. No completion or quota assertion."
     }
   ]
 }
