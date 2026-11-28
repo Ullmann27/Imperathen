@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 213,
+  "version": 214,
   "tasks": [
     {
       "id": "K101",
@@ -1004,14 +1004,14 @@
       "id": "FORMATION-CONTACT-TRACE",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "842f995bdb2bd08f03b43ba77cc3a80a3e38893a",
-      "run_id": null,
+      "run_id": "46102987956",
       "scope": [
         "prototype/tests/formation_contact_trace_test.gd",
         ".github/workflows/aeterna-formation-contact-trace.yml"
       ],
-      "note": "Independent actual 180-soldier replay to trace the same hidden B agent ridge_spears_04, root jump 0.692983m, phase 0.376398, correction 1.492725m at 25.45s from run 46096417387. New test and focused workflow only, no edit of existing formation/model/visual code, no overlap with N31 static block silhouette. Preserve original position/phase limits and original test files; trace raw tick, contact/rock proximity, correction and rendered root."
+      "note": "Independent actual 180-soldier replay to trace the same hidden B agent ridge_spears_04, root jump 0.692983m, phase 0.376398, correction 1.492725m at 25.45s from run 46096417387. New test and focused workflow only, no edit of existing formation/model/visual code, no overlap with N31 static block silhouette. Preserve original position/phase limits and original test files; trace raw tick, contact/rock proximity, correction and rendered root. Actual commit 7801b0cf1dfef7f1d1b544fe92025f1261b15cab created on fix/aeterna-formation-contact-trace-20261128 with exact expected SHA 842f995b; compare ahead 1 behind 0, exactly two newly added files (147-line standalone replay and 65-line workflow). Focused Godot run 46102987956 observed in_progress. No runtime changes, no new acceptance or build, existing tests untouched. New gate reproduces the original numeric position/phase limits for this UID and logs raw contact correction, nearby agents and rock clearance; not a new threshold."
     }
   ]
 }
