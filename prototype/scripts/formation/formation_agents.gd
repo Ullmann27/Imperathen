@@ -36,7 +36,7 @@ const CONTACT_SETTLE_M := 0.45
 const CONTACT_DRESS_M_S := 0.8
 const CONTACT_HOLD_M := 2.0
 const ROCK_CLEARANCE_M := 0.3
-const REFILE_DEG := 75.0
+const REFILE_DEG := Rules.REFILE_DEG
 const WHEEL_SHARE := 0.8
 const LEAD_MAX_M := 2.2
 const LEAD_RATE := 1.5
@@ -141,6 +141,11 @@ class Unit:
 	var slot_vel: Array[Vector2] = []
 	var half_width := 0.5
 	var needs_match := true
+	# Refiles are discrete authoritative front changes, not visual wheel lag.
+	var refile_snapshot := -1
+	var applied_refile_snapshot := -1
+	var refiles := 0
+	var rematches := 0
 	var drum := 0.0
 	var in_step := false
 	var lead := 0.0
@@ -235,7 +240,8 @@ static func uid_of(man: Dictionary) -> String:
 func sync_model(model) -> void:
 	if model.steps == snapshot_step and model.squads.size() == units.size():
 		return
-	var first := snapshot_step < 0
+	var previous_step := snapshot_step
+	var first := previous_step < 0
 	if first:
 		tick = floori(model_time(model) * HZ + 0.000001)
 	snapshot_step = model.steps
@@ -246,7 +252,7 @@ func sync_model(model) -> void:
 			u = Unit.new()
 			u.id = s.id
 			units[s.id] = u
-		_snapshot_unit(u, s)
+		_snapshot_unit(u, s, previous_step)
 		if s.status == "withdrawn":
 			# The rules take the company off the field once its centre reaches
 			# the edge. Its men are alive: they keep running until they reach
@@ -297,8 +303,12 @@ func sync_model(model) -> void:
 			_die(uid)
 
 
-func _snapshot_unit(u: Unit, s: Dictionary) -> void:
+func _snapshot_unit(u: Unit, s: Dictionary, previous_step: int) -> void:
 	var center := Vector2(s.x, s.z)
+	# Only adjacent rule snapshots establish a discrete turn. Accumulated
+	# presentation lag or a skipped sequence is not evidence of re-filing.
+	if u.initialised and snapshot_step == previous_step + 1 and absf(angle_difference(u.model_facing, float(s.facing))) > deg_to_rad(REFILE_DEG):
+		u.refile_snapshot = snapshot_step
 	u.prev_center = center if not u.initialised else u.center
 	u.prev_facing = float(s.facing) if not u.initialised else u.model_facing
 	u.center = center
@@ -410,17 +420,30 @@ func _match(u: Unit, frame_center: Vector2) -> void:
 	if n == 0:
 		return
 	counters.rematches += 1
+	u.rematches += 1
 	var world: Array[Vector2] = []
 	for offset in u.offsets:
 		world.append(Field.project(frame_center + offset.rotated(-u.facing)))
 	var provided := true
+	var occupied := {}
 	for uid: String in u.members:
 		var slot: int = agents[uid].model_slot
-		provided = provided and slot >= 0 and slot < u.offsets.size()
+		if slot < 0 or slot >= u.offsets.size() or occupied.has(slot):
+			provided = false
+			break
+		occupied[slot] = true
 	if provided:
+		# Record real assignments, including the authoritative fast path.
+		# This evidence does not introduce a second slot authority.
+		var authority_record := {"unit":u.id, "tick":tick, "source":"authority", "uids":[], "from":[], "to":[], "by_index":world.duplicate()}
 		for uid: String in u.members:
-			u.owners[agents[uid].model_slot] = uid
-			agents[uid].slot = agents[uid].model_slot
+			var slot: int = agents[uid].model_slot
+			u.owners[slot] = uid
+			agents[uid].slot = slot
+			authority_record.uids.append(uid)
+			authority_record.from.append(agents[uid].pos)
+			authority_record.to.append(world[slot])
+		last_match[u.id] = authority_record
 		return
 	var pairs := []
 	for i in n:
@@ -457,10 +480,11 @@ func _match(u: Unit, frame_center: Vector2) -> void:
 					improved = true
 		if not improved:
 			break
-	var record := {"unit": u.id, "tick": tick, "from": [], "to": [], "by_index": world.duplicate()}
+	var record := {"unit": u.id, "tick": tick, "source":"fallback", "uids":[], "from": [], "to": [], "by_index": world.duplicate()}
 	for i in n:
 		agents[u.members[i]].slot = slot_of[i]
 		u.owners[slot_of[i]] = u.members[i]
+		record.uids.append(u.members[i])
 		record.from.append(agents[u.members[i]].pos)
 		record.to.append(world[slot_of[i]])
 	last_match[u.id] = record
@@ -471,13 +495,16 @@ func _update_frame(u: Unit, f: float) -> void:
 	var model_facing := lerp_angle(u.prev_facing, u.model_facing, f)
 	u.velocity = (center - u.frame_center) / DT
 	u.frame_center = center
-	var delta := angle_difference(u.facing, model_facing)
-	if absf(delta) > deg_to_rad(REFILE_DEG):
-		# Large changes of front re-file the company: every man takes the
-		# nearest place of the new front instead of a sweeping wheel.
-		u.facing = model_facing
-		u.needs_match = true
-		counters.refiles += 1
+	if u.refile_snapshot == snapshot_step:
+		# The rules already chose the new rank authority for this discrete
+		# front change. Consume the refile exactly once, and do not rotate
+		# back toward the old interpolated front on later substeps.
+		u.facing = u.model_facing
+		if u.applied_refile_snapshot != snapshot_step:
+			u.applied_refile_snapshot = snapshot_step
+			u.needs_match = true
+			u.refiles += 1
+			counters.refiles += 1
 	else:
 		# Wheel about the centre: the outer file never exceeds 80 % of run speed.
 		var rate := float(u.limits.run) * WHEEL_SHARE / maxf(1.0, u.half_width)
