@@ -195,6 +195,71 @@
 - `static func scenario(base: Dictionary, contracts: Array) -> Dictionary`
 - `static func restore_plan(base: Dictionary, key: String) -> Dictionary`
 
+## prototype/scripts/character_core/body_pose_modifier.gd
+
+- `extends SkeletonModifier3D`
+
+## prototype/scripts/character_core/character_core.gd
+
+- `class_name CharacterCore`
+- `extends CharacterBody3D`
+- `signal rig_bound(skeleton: Skeleton3D)`
+- `signal motion_state_changed(previous: int, current: int)`
+- `signal grounded_changed(grounded: bool)`
+- `signal movement_sampled(world_velocity: Vector3, grounded: bool)`
+- `signal animation_intent_sampled(world_velocity: Vector3, speed: float, yaw_rate: float, grounded: bool)`
+- `signal command_rejected(reason: String)`
+- `func is_character_ready() -> bool`
+- `func request_motion(world_direction: Vector3, amount: float, gait: int = Gait.WALK) -> bool`
+- `func stop_motion() -> void`
+- `func request_facing(world_direction: Vector3) -> bool`
+- `func clear_facing() -> void`
+- `func set_movement_enabled(value: bool) -> void`
+- `func set_speed_multiplier(value: float) -> bool`
+- `func set_ik_enabled(value: bool) -> void`
+- `func set_look_target(world_point: Vector3) -> void`
+- `func clear_look_target() -> void`
+- `func set_upper_body_clip(clip: StringName, weight: float) -> bool`
+- `func clear_upper_body() -> void`
+- `func get_character_skeleton() -> Skeleton3D`
+- `func get_animation_tree() -> AnimationTree`
+- `func get_motion_state() -> int`
+- `func get_planar_speed() -> float`
+- `func get_yaw_rate() -> float`
+- `func get_foot_contact(side: int) -> Dictionary`
+- `func get_pelvis_offset() -> float`
+- `func get_upper_filter_paths() -> Array[NodePath]`
+- `func get_bone_world_transform(bone_name: StringName) -> Transform3D`
+
+## prototype/scripts/character_core/foot_alignment_modifier.gd
+
+- `extends SkeletonModifier3D`
+
+## prototype/scripts/character_core/foot_placement.gd
+
+- `extends Node3D`
+- `class Leg extends RefCounted`
+- `func bind(body: CharacterBody3D, skeleton: Skeleton3D, pelvis: int, spine: int, head: int, leg_names: Array[StringName]) -> bool`
+- `func set_enabled(value: bool) -> void`
+- `func set_look_target(world_point: Vector3) -> void`
+- `func clear_look_target() -> void`
+- `func update_pose(delta: float, on_floor: bool, speed: float, yaw_rate: float) -> void`
+- `func get_contact(side: int) -> Dictionary`
+- `func get_pelvis_offset() -> float`
+
+## prototype/scripts/character_core/locomotion_graph.gd
+
+- `extends RefCounted`
+- `func configure(tree: AnimationTree, player: AnimationPlayer, skeleton: Skeleton3D, spine: int, walk: float, run: float, sprint: float) -> bool`
+- `func set_upper_body_clip(clip: StringName, weight: float) -> bool`
+- `func clear_upper_body() -> void`
+- `func advance(delta: float, speed: float, signed_turn: float, grounded: bool) -> void`
+- `func get_upper_filter_paths() -> Array[NodePath]`
+
+## prototype/scripts/character_core/phase1_review.gd
+
+- `extends Node3D`
+
 ## prototype/scripts/cinematic/i00_camp_scenery.gd
 
 - `extends RefCounted`
