@@ -4,6 +4,7 @@ extends RefCounted
 ## every decision writes one unique event into i01_events and applies the
 ## consequence record authored in I-01.json. Films and HUD only read this state.
 
+const EventBatch := preload("res://scripts/story/mission_event_batch.gd")
 const SOURCE := "res://assets/story/missions/band1/I-01.json"
 const CUPS := ["julia", "silvanus", "player"]
 const CONTACTS := ["marcus", "cassia", "aelia"]
@@ -398,15 +399,6 @@ static func _apply_consequence(data: Dictionary, event_id: String) -> void:
 			relation.declined = true
 
 
-static func _event(data: Dictionary, event_id: String) -> bool:
-	var events: Array = _screenplay(data).i01_events
-	if events.has(event_id):
-		return false
-	events.append(event_id)
-	_apply_consequence(data, event_id)
-	return true
-
-
 ## Applies one checked I-01 action on a candidate copy. Returns ok/message and
 ## the event ids written, so the caller can record them in the chronicle.
 static func apply(data: Dictionary, action: String, villager_positions: Dictionary = {}) -> Dictionary:
@@ -414,12 +406,9 @@ static func apply(data: Dictionary, action: String, villager_positions: Dictiona
 	if not why.is_empty():
 		return {"ok":false, "message":why}
 	var current := _screenplay(data)
-	# Stage only mission fields: a duplicate late in a multi-event action must
-	# not leave the cups, relationships or chronicle partially updated.
-	var s: Dictionary = {}
-	for key: String in KEYS:
-		s[key] = current[key]
-	s = s.duplicate(true)
+	var s: Dictionary = EventBatch.stage(current, KEYS)
+	if s.is_empty():
+		return {"ok":false, "message":"Ungültiger Missionszustand."}
 	var written: Array[String] = []
 	var message := ""
 	if action in ["i01_talk", "i01_help", "i01_yard"]:
@@ -483,16 +472,10 @@ static func apply(data: Dictionary, action: String, villager_positions: Dictiona
 		s.i01_topic = topic
 		s.i01 = "complete"
 		written.append("I-01.topic." + topic)
-	var existing_events := event_ids(data)
-	var pending_events: Dictionary = {}
+	if not EventBatch.commit(current, KEYS, s, "i01_events", written):
+		return {"ok":false, "message":"Ungültige oder bereits gespeicherte Handlung."}
 	for event_id: String in written:
-		if existing_events.has(event_id) or pending_events.has(event_id):
-			return {"ok":false, "message":"Dieses Ereignis ist bereits gespeichert."}
-		pending_events[event_id] = true
-	for key: String in KEYS:
-		current[key] = s[key]
-	for event_id: String in written:
-		_event(data, event_id)
+		_apply_consequence(data, event_id)
 	if action.begins_with("i01_topic_"):
 		message = str(topic_line(data).get("text", ""))
 	return {"ok":true, "message":message, "events":written}
