@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 200,
+  "version": 201,
   "tasks": [
     {
       "id": "K101",
@@ -944,6 +944,19 @@
       ],
       "access": "read",
       "note": "Actual bridge commit 925ff07bacb6da94d6537c97a2fea3551cf2c108, NVIDIA run 46092289505 observed in_progress; offline Foundation 46092293470 passed. N30 reads exact #177 only, residual wheel/refile failure, no duplicate LOD request. No completion or quota assertion."
+    },
+    {
+      "id": "VIS-YOUTH-CAPTURE-ON-DEMAND",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "4d518cb8600a4a3636e10dd9c02d9b88b412e776",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/youth_outfit_review.gd",
+        ".github/workflows/aeterna-youth-cap-binding.yml"
+      ],
+      "access": "edit",
+      "note": "Independent follow-up to #193: actual run 46065635264 timed out in graphical capture after skin checks 548/548 and zero civilian cap weight changes. Preserve existing cameras, pose, six settle frames and twelve timing frames by default; optional on-demand mode skips unobserved rasterization and labels capture-only evidence. Add phase logging and per-image provenance; no model, asset or gate modification. Isolated branch only; RQG visual/device pending."
     }
   ]
 }
