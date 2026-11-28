@@ -207,6 +207,7 @@ func _simulation() -> Dictionary:
 	check(kinds.has("purchase") or kinds.has("haggle"), "the observed event stream shows trade")
 	check(kinds.has("conversation"), "the observed event stream shows a conversation")
 
+	_test_staff_duty_boundary(saved_text)
 	_test_weather_in_transit(saved_text)
 
 	# At night the streets empty, guards stay out.
@@ -320,6 +321,26 @@ func _simulation() -> Dictionary:
 		"midday": midday, "stats_after_36h": a.state.stats, "budget_frames": frames, "budget_deferred_frames": unfinished,
 		"budget_worst_usec": worst, "events_processed_36h": a.summary().processed, "spoken_lines": spoken, "voiced_lines": voiced,
 		"audio_status": "text_only_until_voice_pool_recordings_land" if voiced == 0 else "voiced", "measurement": "desktop CPU, headless"}
+
+func _test_staff_duty_boundary(saved_text: String) -> void:
+	var city := Life.new()
+	if not city.load_state(JSON.parse_string(saved_text)):
+		check(false, "Market duty fixture loads")
+		return
+	var time: int = city.state.now
+	for number in city.state.businesses.size():
+		var vendor: int = city._vendor_of(number, time)
+		if vendor < 0:
+			continue
+		var business: Dictionary = city.state.businesses[number]
+		var worker: Dictionary = city.state.residents[vendor]
+		var end: int = worker.until
+		check(city._staff_member_present(business, vendor, end-1), "Vendor serves until the last second of duty")
+		check(not city._staff_member_present(business, vendor, end), "Expired vendor cannot serve even before the wake event")
+		check(city._vendor_of(number, end) != vendor, "Vendor lookup excludes the expired employee")
+		return
+	check(false, "Market duty fixture has an active vendor")
+
 
 ## A real mid-day city, not a synthetic resident state. Preserve the walking
 ## route and slot reservation; only shorten an exposed activity's deadline.
