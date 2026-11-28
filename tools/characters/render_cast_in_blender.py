@@ -43,7 +43,7 @@ def setup_studio(center,height):
     scene.world=bpy.data.worlds.new("Neutral review world");scene.world.use_nodes=True
     bg=scene.world.node_tree.nodes.get("Background")
     bg.inputs[0].default_value=(.17,.19,.22,1);bg.inputs[1].default_value=.6
-    scene.render.engine="CYCLES";scene.cycles.samples=5;scene.cycles.use_denoising=True
+    scene.render.engine="CYCLES";scene.cycles.samples=5;scene.cycles.use_denoising=getattr(bpy.app.build_options,"openimagedenoise",False)
     scene.render.threads_mode="FIXED";scene.render.threads=2
     scene.view_settings.view_transform="AgX"
     scene.render.image_settings.file_format="JPEG";scene.render.image_settings.quality=88
@@ -120,13 +120,14 @@ def render_one(entry,source,out,dyes,hairs):
     captures={}
     for kind,target,scale,res,offset in [
         ("full",target,height*1.13,(300,430),Vector((.14,-3,.09))),
-        ("face",head,height*.35,(330,380),Vector((.16,-3,.04)))]:
+        ("face",head,height*.35,(330,380),Vector((.16,-3,.04))),
+        ("profile",head,height*.35,(330,380),Vector((2.8,-.85,.04)))]:
         cam.location=target+offset*height;cam.rotation_euler=(target-cam.location).to_track_quat("-Z","Y").to_euler();cam.data.ortho_scale=scale
         scene.render.resolution_x,scene.render.resolution_y=res
         dst=out/(entry["id"]+"-"+kind+".jpg");scene.render.filepath=str(dst);bpy.ops.render.render(write_still=True)
         if not dst.exists() or dst.stat().st_size<1000:raise ValueError("missing rendered frame")
         captures[kind]={"file":dst.name,"sha256":hashlib.sha256(dst.read_bytes()).hexdigest()}
-    return {"id":entry["id"],"role":entry.get("role",""),"look_age":entry.get("look_age"),"source":source.name,
+    return {"id":entry["id"],"role":entry.get("role",""),"look_age":entry.get("look_age"),"source":source.name,"model_family":entry.get("model_family"),
             "source_sha256":hashlib.sha256(source.read_bytes()).hexdigest(),"armatures":len(rigs),
             "triangles":sum(len(o.data.loop_triangles) for o in meshes),"visible_parts":parts,
             "applied_shape_controls":sorted(applied),"unsupported_authored_face_controls":sorted(set(face)-applied),
@@ -142,7 +143,13 @@ def main():
     roster=[]
     for id,entry in people.items():
         data={**entry,"id":id,"file":f'frontier_{entry["kind"]}_0.glb'}
-        if id in ("julia","silvanus"):data["file"]=f"frontier_parent_{id}_0.glb"
+        if id in ("julia","silvanus"):
+            # VillagePerson selects a dedicated parent only if all four tiers are installed.
+            dedicated=all((a.models/f"frontier_parent_{id}_{tier}.glb").is_file() for tier in range(4))
+            family=f"parent_{id}" if dedicated else entry["kind"]
+            if not all((a.models/f"frontier_{family}_{tier}.glb").is_file() for tier in range(4)):
+                raise ValueError(f"{id}: no complete parent or civilian LOD family")
+            data.update(file=f"frontier_{family}_0.glb",model_family=family)
         if id=="sextus":data.update(file="unit_legacy_blacksmith_0.glb",original_owner_asset=True)
         if id=="vibius":data.update(file="unit_legacy_tunic_villager_0.glb",original_owner_asset=True)
         roster.append(data)
