@@ -27,7 +27,7 @@ jobs:
           git rev-parse HEAD > artifacts/character-phase1/source.txt
           git hash-object prototype/assets/characters/frontier_legionary_0.glb | tee artifacts/character-phase1/original-rig.txt
           test "$(cat artifacts/character-phase1/original-rig.txt)" = a40e2a1e710dfb809fbecb48b77c640dcdfec6e7
-          git ls-tree -r HEAD prototype/scripts/character_core prototype/scenes/character_core prototype/tests/character_core_phase1_test.gd > artifacts/character-phase1/source-blobs.txt
+          git ls-tree -r HEAD prototype/scripts/character_core prototype/scenes/character_core prototype/tests/character_core_phase1_test.gd prototype/tests/character_equipment_phase2_test.gd > artifacts/character-phase1/source-blobs.txt
           cd "$RUNNER_TEMP/godot"
           base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
           file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
@@ -66,21 +66,7 @@ jobs:
           timeout --kill-after=10s 420s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/character_equipment_phase2_test.gd 2>&1 | tee artifacts/character-phase1/equipment.log || status=$?
           test "$status" -eq 0
           grep -Fxq CHARACTER_PHASE2_PASS artifacts/character-phase1/equipment.log
-          grep -Eq '^CHARACTER_PHASE2_RESULT checks=[1-9][0-9]* failures=0
-        shell: bash
-        run: |
-          set -euo pipefail
-          timeout --kill-after=10s 120s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --quit-after 120 res://scenes/character_core/phase1_review.tscn 2>&1 | tee artifacts/character-phase1/review-scene.log
-          ! grep -Eq 'SCRIPT ERROR:|Parse Error:|^ERROR:' artifacts/character-phase1/review-scene.log
-      - name: Retain actual engine evidence
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: imperathen-phase2a-${{ github.run_id }}
-          path: artifacts/character-phase1/
-          if-no-files-found: warn
-          retention-days: 14
- artifacts/character-phase1/equipment.log
+          grep -Eq '^CHARACTER_PHASE2_RESULT checks=[1-9][0-9]* failures=0$' artifacts/character-phase1/equipment.log
           ! grep -Eq 'SCRIPT ERROR:|Parse Error:|^ERROR:|^CHARACTER_PHASE2_FAIL' artifacts/character-phase1/equipment.log
       - name: Verify the interactive review scene loads
         shell: bash
@@ -92,7 +78,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: imperathen-phase1-${{ github.run_id }}
+          name: imperathen-phase2a-${{ github.run_id }}
           path: artifacts/character-phase1/
           if-no-files-found: warn
           retention-days: 14
