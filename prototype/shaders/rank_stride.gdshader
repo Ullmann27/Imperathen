@@ -31,6 +31,23 @@ float upper_lean(float phase, int mode) {
 	return 0.006*sin(TAU*phase);
 }
 
+// Same two sagittal hinges as FarRanks.guard_vertex and the source company
+// rig. Both use Godot model axes (Blender x,z,-y).
+vec3 rotate_guard_x(vec3 p, float angle) {
+	return vec3(p.x, cos(angle)*p.y - sin(angle)*p.z, sin(angle)*p.y + cos(angle)*p.z);
+}
+
+vec3 guard_vertex(vec3 p) {
+	vec3 hip = vec3(.105,.89,0.0);
+	vec3 knee = vec3(.119,.49,.012);
+	vec3 upper = hip + rotate_guard_x(p-hip,radians(-17.0));
+	vec3 shin = knee + rotate_guard_x(p-knee,radians(27.0));
+	vec3 lower = hip + rotate_guard_x(shin-hip,radians(-17.0));
+	float shin_weight = 1.0-smoothstep(.40,.58,p.y);
+	float leg_weight = smoothstep(0.0,.04,p.x)*(1.0-smoothstep(.22,.30,abs(p.x)))*(1.0-smoothstep(.75,.95,p.y));
+	return mix(p,mix(upper,lower,shin_weight),leg_weight)+vec3(0.0,.0000410085811,0.0);
+}
+
 void vertex() {
 	float phase = INSTANCE_CUSTOM.r + step_fraction*INSTANCE_CUSTOM.g;
 	int mode = int(round(INSTANCE_CUSTOM.a));
@@ -49,6 +66,7 @@ void vertex() {
 		float pelvis_weight = smoothstep(0.12, 0.78, VERTEX.y);
 		VERTEX += foot_offset(phase + offset, INSTANCE_CUSTOM.b, stance[mode-1], clearance[mode-1]) * leg + vec3(0.0, lift*pelvis_weight, 0.0);
 	} else {
+		if (mode >= 6 && mode <= 8) { VERTEX = guard_vertex(VERTEX); }
 		float lean = upper_lean(phase, mode);
 		float weight = smoothstep(0.65, 1.18, VERTEX.y);
 		vec3 upper = VERTEX - vec3(0.0, 0.8, 0.0);

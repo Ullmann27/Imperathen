@@ -114,6 +114,11 @@ func _run() -> void:
 					check(proxy.size() == 2 and not near.is_empty() and not deformed.is_empty(), "LOD %d %s %.6f %s samples real feet" % [lod,pose,phase,side])
 					if proxy.size()!=2 or near.is_empty() or deformed.is_empty():
 						continue
+					if pose == "block":
+						var x := -.126 if side == "R" else .126
+						var guard_error := maxf((proxy[0] as Vector3).distance_to(Ranks.guard_vertex(Vector3(x,.011,-.065))), (proxy[1] as Vector3).distance_to(Ranks.guard_vertex(Vector3(x,.011,.175))))
+						check(guard_error <= .002, "LOD %d %s %.6f %s authored guard hinge agrees with real rig %.6f m" % [lod,pose,phase,side,guard_error])
+						row["guard_transform_error_" + side + "_m"] = guard_error
 					var proxy_far := 0.0
 					var proxy_near := 0.0
 					var skin_far := 0.0

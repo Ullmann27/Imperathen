@@ -49,6 +49,24 @@ static func foot_offset(phase: float, gait: String) -> Vector3:
 	return Vector3(0,float(CLEARANCE[gait])*pow(sin(PI*u),2),z)
 
 
+## Shared company source (art/soldiers/build.py): brace clips bend the
+## left thigh -17 degrees and shin +27 degrees, with a grounded pelvis.
+## Foot vertices follow both hinges; the upper leg blends across the knee.
+## The tiny lift is the source's .011 m floor minus the lowest transformed
+## canonical sole, not a per-model fitted correction.
+static func guard_vertex(vertex: Vector3) -> Vector3:
+	var hip := Vector3(.105, .89, 0.0)
+	var knee := Vector3(.119, .49, .012)
+	var thigh_rotation := Basis(Vector3.RIGHT, deg_to_rad(-17.0))
+	var shin_rotation := Basis(Vector3.RIGHT, deg_to_rad(27.0))
+	var upper := hip + thigh_rotation * (vertex - hip)
+	var shin := knee + shin_rotation * (vertex - knee)
+	var lower := hip + thigh_rotation * (shin - hip)
+	var shin_weight := 1.0 - smoothstep(.40, .58, vertex.y)
+	var leg_weight := smoothstep(0.0, .04, vertex.x) * (1.0 - smoothstep(.22, .30, absf(vertex.x))) * (1.0 - smoothstep(.75, .95, vertex.y))
+	return vertex.lerp(upper.lerp(lower, shin_weight), leg_weight) + Vector3.UP * .0000410085811
+
+
 static func deformed_vertex(vertex: Vector3, gait: Color, fraction: float) -> Vector3:
 	# CPU mirror for numeric regression. A GPU capture is still required to
 	# approve the shader/material/mesh combination on the visible play path.
@@ -67,6 +85,8 @@ static func deformed_vertex(vertex: Vector3, gait: Color, fraction: float) -> Ve
 		var lift := -.068-.062*cos(TAU*phase*2.0) if mode == 2 else -.088-.035*cos(TAU*phase*2.0)
 		var pelvis_weight := smoothstep(.12,.78,vertex.y)
 		return vertex+foot_offset(phase+phase_offset,name)*leg+Vector3.UP*lift*pelvis_weight
+	if mode >= 6 and mode <= 8:
+		vertex = guard_vertex(vertex)
 	var lean := _upper_lean(phase,mode)
 	var weight := smoothstep(.65,1.18,vertex.y)
 	var pivot := Vector3(0,.8,0)

@@ -1,7 +1,7 @@
-name: Aeterna actual tribal shoe topology and combined formation regression
+name: Aeterna authored guard pose and tribal topology regression
 on:
   push:
-    branches: ['fix/aeterna-tribal-sole-topology-20261128']
+    branches: ['fix/aeterna-tribal-guard-pose-20261128']
 permissions:
   contents: read
 jobs:
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
-          fetch-depth: 2
+          fetch-depth: 3
       - name: Reproduce actual committed GLB from exact predecessor asset
         shell: bash
         run: |
@@ -27,6 +27,13 @@ jobs:
           test "$(git hash-object "$RUNNER_TEMP/forest-spear-original.glb")" = b370b05dc12f5e5863c2368dc693fc5718fa1b0c
           node tools/art/refine_tribal_sole_topology.mjs "$RUNNER_TEMP/forest-spear-original.glb" "$RUNNER_TEMP/forest-spear-refined.glb" b370b05dc12f5e5863c2368dc693fc5718fa1b0c | tee artifacts/formation-contact-trace/sole-topology.log
           cmp "$RUNNER_TEMP/forest-spear-refined.glb" prototype/assets/germanic_warriors/forest_spear_far.glb
+          for record in 'forest_swordsman 73ecda41fd70fefc1541e1a2631b4a40aa37d5d8' 'forest_skirmisher 39d931b313aac79e68f979df472ce59710d7e689'; do
+            read -r family expected <<< "$record"
+            git show 65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de:prototype/assets/germanic_warriors/${family}_far.glb > "$RUNNER_TEMP/$family-original.glb"
+            test "$(git hash-object "$RUNNER_TEMP/$family-original.glb")" = "$expected"
+            node tools/art/refine_tribal_sole_topology.mjs "$RUNNER_TEMP/$family-original.glb" "$RUNNER_TEMP/$family-refined.glb" "$expected" | tee -a artifacts/formation-contact-trace/sole-topology.log
+            cmp "$RUNNER_TEMP/$family-refined.glb" "prototype/assets/germanic_warriors/${family}_far.glb"
+          done
       - name: Validate source-derived campaign registry
         run: |
           python3 tools/story/validate_campaign_arc.py
