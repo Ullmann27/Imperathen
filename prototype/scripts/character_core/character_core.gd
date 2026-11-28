@@ -26,9 +26,9 @@ const Ground = preload("res://scripts/visuals/authored_ground.gd")
 @export var spine_name: StringName = &"Spine"
 @export var head_name: StringName = &"Head"
 @export var leg_names: Array[StringName] = [&"Thigh_L",&"Shin_L",&"Foot_L",&"Thigh_R",&"Shin_R",&"Foot_R"]
-@onready var _rig_root: Node3D = $RigRoot
-@onready var _tree: AnimationTree = $AnimationTree
-@onready var _feet: FootPlacement = $FootPlacement
+@onready var _rig_root: Node3D = get_node_or_null("RigRoot") as Node3D
+@onready var _tree: AnimationTree = get_node_or_null("AnimationTree") as AnimationTree
+@onready var _feet: FootPlacement = get_node_or_null("FootPlacement") as FootPlacement
 var _graph: LocomotionGraph = LocomotionGraph.new()
 var _skeleton: Skeleton3D
 var _animator: AnimationPlayer
@@ -52,11 +52,14 @@ func _ready() -> void:
 	if not _valid:
 		set_physics_process(false)
 		command_rejected.emit("Original character rig, animation or bone contract invalid")
-		push_error("CharacterCore: original rig contract invalid")
+		# Invalid adapter scenes are rejected, not allowed to continue processing.
+		push_warning("CharacterCore: original rig contract invalid")
 		return
 	rig_bound.emit(_skeleton)
 
 func _bind_rig() -> bool:
+	if not is_instance_valid(_rig_root) or not is_instance_valid(_tree) or not is_instance_valid(_feet):
+		return false
 	if _rig_root.get_child_count() != 1 or not (walk_speed>0.0 and run_speed>walk_speed and sprint_speed>run_speed):
 		return false
 	var model: Node3D = _rig_root.get_child(0) as Node3D
@@ -83,7 +86,7 @@ func _bind_rig() -> bool:
 	return true
 
 func is_character_ready() -> bool:
-	return _valid
+	return _valid and is_instance_valid(_rig_root) and is_instance_valid(_tree) and is_instance_valid(_feet) and is_instance_valid(_skeleton) and is_instance_valid(_animator)
 
 func request_motion(world_direction: Vector3, amount: float, gait: int = Gait.WALK) -> bool:
 	if not world_direction.is_finite() or not is_finite(amount) or gait not in [Gait.WALK,Gait.RUN,Gait.SPRINT]:
@@ -124,26 +127,29 @@ func set_speed_multiplier(value: float) -> bool:
 	return true
 
 func set_ik_enabled(value: bool) -> void:
-	if is_instance_valid(_feet):
+	if is_character_ready():
 		_feet.set_enabled(value)
 
 func set_look_target(world_point: Vector3) -> void:
-	_feet.set_look_target(world_point)
+	if is_character_ready():
+		_feet.set_look_target(world_point)
 
 func clear_look_target() -> void:
-	_feet.clear_look_target()
+	if is_character_ready():
+		_feet.clear_look_target()
 
 func set_upper_body_clip(clip: StringName, weight: float) -> bool:
-	return _graph.set_upper_body_clip(clip,weight)
+	return is_character_ready() and _graph.set_upper_body_clip(clip,weight)
 
 func clear_upper_body() -> void:
-	_graph.clear_upper_body()
+	if is_character_ready():
+		_graph.clear_upper_body()
 
 func get_character_skeleton() -> Skeleton3D:
-	return _skeleton
+	return _skeleton if is_character_ready() else null
 
 func get_animation_tree() -> AnimationTree:
-	return _tree
+	return _tree if is_character_ready() else null
 
 func get_motion_state() -> int:
 	return _state
@@ -155,16 +161,18 @@ func get_yaw_rate() -> float:
 	return _yaw_rate
 
 func get_foot_contact(side: int) -> Dictionary:
-	return _feet.get_contact(side)
+	return _feet.get_contact(side) if is_character_ready() else {}
 
 func get_pelvis_offset() -> float:
-	return _feet.get_pelvis_offset()
+	return _feet.get_pelvis_offset() if is_character_ready() else 0.0
 
 func get_upper_filter_paths() -> Array[NodePath]:
+	if not is_character_ready():
+		return []
 	return _graph.get_upper_filter_paths()
 
 func get_bone_world_transform(bone_name: StringName) -> Transform3D:
-	if not is_instance_valid(_skeleton):
+	if not is_character_ready():
 		return Transform3D(Basis.IDENTITY,Vector3.INF)
 	var bone: int = _skeleton.find_bone(String(bone_name))
 	if bone < 0:
@@ -267,6 +275,14 @@ func _try_step_up(horizontal: Vector3) -> bool:
 
 func _physics_process(delta: float) -> void:
 	if not _valid or not is_finite(delta) or delta<=0.0:
+		return
+	if not is_character_ready():
+		_valid = false
+		set_physics_process(false)
+		if is_instance_valid(_tree):
+			_tree.active = false
+		command_rejected.emit("CharacterCore dependency removed")
+		push_warning("CharacterCore: dependency removed during movement")
 		return
 	var direction: Vector3 = _direction if _motion_allowed else Vector3.ZERO
 	var amount: float = _amount if _motion_allowed else 0.0

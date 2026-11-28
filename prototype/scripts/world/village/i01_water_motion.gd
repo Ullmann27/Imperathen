@@ -8,6 +8,9 @@ const BASE := Vector3(.13,.3725,.10)
 const AXLE := Vector3(.13,1.68,.103)
 const BUCKET_HANDLE := Vector3(0,.4275,0)
 const BUCKET_LIP := Vector3(0,.3075,0)
+const STREAM_NEAR_DISTANCE := 8.0
+const STREAM_FAR_DISTANCE := 18.0
+const STREAM_MIN_STRENGTH := .001
 var well: Node3D
 var hanging: Node3D
 var parts: Array[Dictionary] = []
@@ -54,7 +57,10 @@ func _cylinder(id: String, radius: float, material: Material) -> MeshInstance3D:
 	return item
 
 func bind_well() -> bool:
-	var regional: Node3D = root.get_parent().get("regional")
+	if not is_instance_valid(root) or not is_instance_valid(root.get_parent()):
+		finish()
+		return false
+	var regional := root.get_parent().get("regional") as Node3D
 	var current := regional.get("water_well") as Node3D if is_instance_valid(regional) else null
 	if is_instance_valid(current) and current == well and parts.size() == BUCKET_PARTS.size() \
 		and is_instance_valid(hanging) and is_instance_valid(crank) and not winding_parts.is_empty():
@@ -105,6 +111,9 @@ func bind_well() -> bool:
 
 ## The existing axle, wound rope and crank rotate by the actual lift distance.
 func windlass(lift_m: float) -> Vector3:
+	if not is_finite(lift_m):
+		finish()
+		return Vector3.INF
 	if not bind_well():
 		return Vector3.INF
 	_active = true
@@ -122,6 +131,9 @@ func bucket_base() -> Transform3D:
 	return well.global_transform*Transform3D(Basis.IDENTITY,BASE) if is_instance_valid(well) else Transform3D.IDENTITY
 
 func bucket_at(pose: Transform3D, filled: float, tilt: float = 0.0) -> void:
+	if not _finite_transform(pose) or not is_finite(filled) or not is_finite(tilt):
+		finish()
+		return
 	if not bind_well():
 		return
 	_active = true
@@ -131,12 +143,19 @@ func bucket_at(pose: Transform3D, filled: float, tilt: float = 0.0) -> void:
 			node.global_transform = pose*part.offset
 	hanging.hide()
 	_line(rope,well.to_global(AXLE),pose*BUCKET_HANDLE,1.0)
-	bucket_surface.global_transform = Transform3D(pose.basis.orthonormalized(),pose*Vector3(0,lerpf(.03,.26,clampf(filled,0,1)),0))
-	bucket_surface.visible = filled > .01 and tilt < .45
+	var water_level := clampf(filled,0.0,1.0)
+	bucket_surface.global_transform = Transform3D(pose.basis.orthonormalized(),pose*Vector3(0,lerpf(.03,.26,water_level),0))
+	bucket_surface.visible = filled > .01 and absf(tilt) < .45
+
+func _finite_transform(pose: Transform3D) -> bool:
+	return pose.origin.is_finite() and pose.basis.x.is_finite() and pose.basis.y.is_finite() and pose.basis.z.is_finite()
 
 func _line(item: MeshInstance3D, start: Vector3, finish: Vector3, width: float) -> void:
+	if not is_instance_valid(item):
+		return
 	var delta := finish-start
-	if not start.is_finite() or not finish.is_finite() or delta.length_squared()<.000001 or width<=.001:
+	if not start.is_finite() or not finish.is_finite() \
+		or not is_finite(width) or delta.length_squared()<.000001 or width<=STREAM_MIN_STRENGTH:
 		item.hide()
 		return
 	var basis := Basis(Quaternion(Vector3.UP,delta.normalized())).scaled_local(Vector3(width,delta.length(),width))
@@ -144,17 +163,37 @@ func _line(item: MeshInstance3D, start: Vector3, finish: Vector3, width: float) 
 	item.show()
 
 func water_between(start: Vector3, finish: Vector3, strength: float) -> void:
-	if strength <= .001 or not start.is_finite() or not finish.is_finite() or start.y <= finish.y:
+	if not is_finite(strength) or strength <= STREAM_MIN_STRENGTH or not start.is_finite() \
+		or not finish.is_finite() or start.y <= finish.y:
 		clear_stream()
 		return
+	var midpoint := start.lerp(finish,.5)
+	var camera: Camera3D
+	if is_instance_valid(root) and root.is_inside_tree():
+		var viewport := root.get_viewport()
+		camera = viewport.get_camera_3d() if is_instance_valid(viewport) else null
+	var distance := camera.global_position.distance_to(midpoint) if is_instance_valid(camera) else 0.0
+	var segment_count := _stream_segment_count(distance)
+	var flow_strength := clampf(strength,0.0,1.0)
 	var previous := start
 	for i in stream.size():
-		var t := float(i+1)/float(stream.size())
+		if i >= segment_count:
+			stream[i].hide()
+			continue
+		var t := float(i+1)/float(segment_count)
 		var next := start.lerp(finish,t)
 		# A short accelerating downward arc, not a beam floating in space.
 		next.y += (start.y-finish.y)*.45*t*(1.0-t)
-		_line(stream[i],previous,next,strength)
+		_line(stream[i],previous,next,flow_strength)
 		previous = next
+
+func _stream_segment_count(distance: float) -> int:
+	if stream.is_empty():
+		return 0
+	if not is_finite(distance) or distance <= STREAM_NEAR_DISTANCE:
+		return stream.size()
+	var ratio := .5 if distance <= STREAM_FAR_DISTANCE else .25
+	return mini(stream.size(), maxi(1, ceili(float(stream.size())*ratio)))
 
 func clear_stream() -> void:
 	for item: MeshInstance3D in stream:
