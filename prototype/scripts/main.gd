@@ -1648,11 +1648,13 @@ func _open_world_workshop() -> void:
 	_world_workshop.return_requested.connect(_leave_world_workshop)
 	world.set_active(false)
 	world.hide()
-	# Keep the inactive world parented for deterministic teardown on quit.
-	# Its Camera and Environment must not compete with the workshop.
+	# Reuse the city lifecycle: parking the actual world outside the tree
+	# removes its WorldEnvironment, lights, physics and camera authority.
+	# Main's existing _exit_tree frees a detached world when closing the app.
 	world.process_mode = Node.PROCESS_MODE_DISABLED
 	var old_camera := world.get_node("WorldCamera") as Camera3D
 	old_camera.current = false
+	remove_child(world)
 	ui.hide()
 	ui.process_mode = Node.PROCESS_MODE_DISABLED
 	screen = "world_workshop"
@@ -1672,9 +1674,11 @@ func _leave_world_workshop() -> void:
 	_world_workshop.hide()
 	_world_workshop.set_controls_visible(false)
 	_world_workshop.process_mode = Node.PROCESS_MODE_DISABLED
+	remove_child(_world_workshop)
 	_world_workshop.queue_free()
 	_world_workshop = null
 	_workshop_paused_for_focus = false
+	add_child(world)
 	world.process_mode = Node.PROCESS_MODE_INHERIT
 	ui.process_mode = Node.PROCESS_MODE_INHERIT
 	world.show()

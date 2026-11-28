@@ -51,7 +51,7 @@ func _run() -> void:
 			tiers += asset.meshes.size()
 		_check(tiers == 21, "All 21 real LOD meshes imported")
 		_check(workshop.camera.current and not (original_world.get_node("WorldCamera") as Camera3D).current, "Workshop owns the camera")
-		_check(not original_world.visible and original_world.process_mode == Node.PROCESS_MODE_DISABLED, "Existing village is parked")
+		_check(not original_world.visible and original_world.process_mode == Node.PROCESS_MODE_DISABLED and not original_world.is_inside_tree(), "Existing village and its environment are parked outside the tree")
 		_check(workshop.settlement.profile == game.ui.get_quality(), "Existing graphics preference preserved")
 		for view in range(4):
 			workshop.set_view_mode(view)
