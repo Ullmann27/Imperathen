@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 204,
+  "version": 207,
   "tasks": [
     {
       "id": "K101",
@@ -949,7 +949,7 @@
     {
       "id": "VIS-YOUTH-CAPTURE-ON-DEMAND",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "4d518cb8600a4a3636e10dd9c02d9b88b412e776",
       "run_id": "46092542037",
       "scope": [
@@ -957,7 +957,20 @@
         ".github/workflows/aeterna-youth-cap-binding.yml"
       ],
       "access": "edit",
-      "note": "Independent follow-up to #193: actual run 46065635264 timed out in graphical capture after skin checks 548/548 and zero civilian cap weight changes. Preserve existing cameras, pose, six settle frames and twelve timing frames by default; optional on-demand mode skips unobserved rasterization and labels capture-only evidence. Add phase logging and per-image provenance; no model, asset or gate modification. Isolated branch only; RQG visual/device pending. Actual PR #198, two commits a88e6fc5b2fc162b56aaa54b75a9b1b640bd9515 and 6723fbbded93f9b8f8012a7afa4ac3125c71d293; compare ahead 2 behind 0, exactly 2 files +62/-9. Workflow 46092542037 observed in progress, all ten views required per pass, partial hashes preserved, identical GLBs labelled control-only. No claimed successful render or fix."
+      "note": "Run 46092542037/job 140816542849 success at 6723fbb: 20/20 image SHA256 and ZIP digest independently verified (artifact 15242451105, 59879123585802e4b71dcd7a36acf96ad8dd03d5f52f65f14cb73090417054dc). Both 548/548 skin checks pass; all 4 civilian asset hashes unchanged, zero cap changes. Actual visual inspection: both outfits' front views show identical wall, side blocked by NPC, table obscures lower body in 3/4 and walk. Face visible; V2 is control only. Armoured attack edge excess 0.42575m, not fixed. Capture execution succeeded but RQG rejected; studio follow-up required."
+    },
+    {
+      "id": "VIS-YOUTH-STUDIO-EVIDENCE",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "6723fbbded93f9b8f8012a7afa4ac3125c71d293",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/youth_outfit_review.gd",
+        ".github/workflows/aeterna-youth-cap-binding.yml"
+      ],
+      "access": "edit",
+      "note": "Independent controlled studio with original youth assets, exact LOD0 path, full body front/side/three-quarter, face, march and attack. Preserve gameplay captures and skin gates; prevent identical outfit frames. No runtime or asset modification; same isolated PR #198."
     }
   ]
 }
