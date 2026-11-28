@@ -181,7 +181,9 @@ func _run() -> void:
 		return
 	_sync(props, message, first)
 	await _settle()
-	_check(note.get_child_count() == 1 and note.get_child(0).scene_file_path == Documents.ENTRIES.sextus_note.model, "Actual original wax tablet instance")
+	if not _check(note.get_child_count() == 1 and note.get_child(0).scene_file_path == Documents.ENTRIES.sextus_note.model, "Actual original wax tablet instance"):
+		_finish()
+		return
 	_check_pose(note, first, "Hand_R", Vector3(0,-.10,.05), "Message route")
 	_check(not armful.visible, "No phantom armful on message route")
 	var note_id := note.get_instance_id()
