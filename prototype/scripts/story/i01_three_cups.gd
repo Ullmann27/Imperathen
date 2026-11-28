@@ -413,7 +413,13 @@ static func apply(data: Dictionary, action: String, villager_positions: Dictiona
 	var why := reason(data, action, villager_positions)
 	if not why.is_empty():
 		return {"ok":false, "message":why}
-	var s := _screenplay(data)
+	var current := _screenplay(data)
+	# Stage only mission fields: a duplicate late in a multi-event action must
+	# not leave the cups, relationships or chronicle partially updated.
+	var s: Dictionary = {}
+	for key: String in KEYS:
+		s[key] = current[key]
+	s = s.duplicate(true)
 	var written: Array[String] = []
 	var message := ""
 	if action in ["i01_talk", "i01_help", "i01_yard"]:
@@ -477,10 +483,18 @@ static func apply(data: Dictionary, action: String, villager_positions: Dictiona
 		s.i01_topic = topic
 		s.i01 = "complete"
 		written.append("I-01.topic." + topic)
-		message = str(topic_line(data).get("text", ""))
+	var existing_events := event_ids(data)
+	var pending_events: Dictionary = {}
 	for event_id: String in written:
-		if not _event(data, event_id):
+		if existing_events.has(event_id) or pending_events.has(event_id):
 			return {"ok":false, "message":"Dieses Ereignis ist bereits gespeichert."}
+		pending_events[event_id] = true
+	for key: String in KEYS:
+		current[key] = s[key]
+	for event_id: String in written:
+		_event(data, event_id)
+	if action.begins_with("i01_topic_"):
+		message = str(topic_line(data).get("text", ""))
 	return {"ok":true, "message":message, "events":written}
 
 

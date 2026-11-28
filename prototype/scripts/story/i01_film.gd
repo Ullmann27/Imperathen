@@ -51,13 +51,14 @@ static func vid_a(data: Dictionary) -> Dictionary:
 	for option: Dictionary in I01.slice().get("steps", {}).get("i01_choice", {}).get("options", []):
 		choices.append({"label":str(option.label), "action_id":str(option.id)})
 	var path := str(data.get("village", {}).get("childhood", {}).get("screenplay", {}).get("i01_path", ""))
-	var reaction := {"talk":"I01_A_REACT_TALK", "help":"I01_A_REACT_HELP", "yard":"I01_A_REACT_YARD"}.get(path, "I01_A_REACT_HELP") as String
 	var beats: Array[Dictionary] = [
 		_beat("i01_a_table", "i01_table_detail", "I01_A_TABLE", 7.0, "julia"),
 		_beat("i01_a_joke", "i01_shelf_cups", "I01_A_JOKE", 8.0, "silvanus"),
 		_beat("i01_a_bed", "i01_bed", "I01_A_BED", 8.0, "julia"),
-		_choice_beat("i01_a_choice", "i01_choice", "Was tust du zuerst?", "i01_choice", choices),
-		_beat("i01_a_react", "mission_dialogue", reaction, 5.0, "julia")]
+		_choice_beat("i01_a_choice", "i01_choice", "Was tust du zuerst?", "i01_choice", choices)]
+	var reaction_id := {"talk":"I01_A_REACT_TALK", "help":"I01_A_REACT_HELP", "yard":"I01_A_REACT_YARD"}.get(path, "") as String
+	if not reaction_id.is_empty():
+		beats.append(_beat("i01_a_react", "mission_dialogue", reaction_id, 5.0, "julia"))
 	var objective := I01.current_step(data) if not path.is_empty() else {}
 	return {"id":VID_A, "version":3, "origin_id":"italia", "source_mission_id":"I-01",
 		"film_id":"I-01.VID-A", "title":"Ein Morgen zu Hause", "location":LOCATION, "chapter":CHAPTER,
