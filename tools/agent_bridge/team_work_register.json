@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 229,
+  "version": 230,
   "tasks": [
     {
       "id": "K101",
@@ -1143,14 +1143,14 @@
       "id": "CITY-FORUM-MORTAR-REVIEW",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "8a8256a30145918739312588d70c4585768fa568",
-      "run_id": null,
+      "run_id": "46106720404",
       "scope": [
         "prototype/scripts/world/city_exploration.gd",
         "prototype/tests/roman_city_visual_capture.gd"
       ],
-      "note": "Independent actual city visual defect from run 46101992690, artifact 15245677495 ZIP SHA256 verified; 6 real 1280x720 captures. Bright travertine mortar visibly dominates joints; builder explicitly intended dark mortar but uses STONE. Isolated runtime material override only for exact Forum_Worn_Stonework Travertine surface; copy source material, preserve texture/geometry/collision/LOD, verify targeted surface and capture hashes, no visual acceptance pending comparison. Base city builder, runtime and capture blobs match baseline. No external API or owner asset transfer."
+      "note": "Independent actual city visual defect from run 46101992690, artifact 15245677495 ZIP SHA256 verified; 6 real 1280x720 captures. Bright travertine mortar visibly dominates joints; builder explicitly intended dark mortar but uses STONE. Isolated runtime material override only for exact Forum_Worn_Stonework Travertine surface; copy source material, preserve texture/geometry/collision/LOD, verify targeted surface and capture hashes, no visual acceptance pending comparison. Base city builder, runtime and capture blobs match baseline. No external API or owner asset transfer. Actual commit 154a5ee4359d77b6552b6cecaee279c9b0adb995 on fix/aeterna-city-mortar-20261128, PR #199, compared exactly 2 files +44/-3. Actual graphical job 140861015179 and ARM64 candidate 140861014945 in progress, no engine/visual/device pass claim. Other CI runs are automatic, no manual duplicates."
     }
   ]
 }
