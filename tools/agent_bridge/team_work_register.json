@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 210,
+  "version": 211,
   "tasks": [
     {
       "id": "K101",
@@ -975,15 +975,15 @@
     {
       "id": "VIS-YOUTH-PRODUCTION-PARITY",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "a67c4bc7629948d8b5c14a0cd708791e5fb03cc7",
-      "run_id": null,
+      "run_id": "46101989464",
       "scope": [
         "prototype/tests/youth_outfit_skin_test.gd",
         ".github/workflows/aeterna-youth-cap-binding.yml"
       ],
       "access": "edit",
-      "note": "PR #198 isolated follow-up. Match actual APK staging order, hash all armoured/civil LODs, capture source motion receipt; retain thresholds and collect exact worst edge endpoints, skin bindings and clip phase. Keep render evidence even if existing skin gate fails, then fail workflow. No runtime/model patch or visual acceptance."
+      "note": "PR #198 isolated follow-up. Match actual APK staging order, hash all armoured/civil LODs, capture source motion receipt; retain thresholds and collect exact worst edge endpoints, skin bindings and clip phase. Keep render evidence even if existing skin gate fails, then fail workflow. No runtime/model patch or visual acceptance. Actual commit bd4af0b2b33cfcb6cb753386915ad4bf40596c0c, exact lease a67c4bc, compare ahead 1 behind 0, two files +24/-8. Actual focused push run 46101989464 in_progress; automatic QA 46101992721 and full candidate 46101992690 in_progress; do not duplicate. Previous QA 239 run 46097601677 success, artifact 15244532056, signed v2/v3 ARM64, 768366773 APK bytes. Previous studio V1/V2 had 3380 LOD0 and 542 LOD2 severe edge samples for unretargeted armour, civil 0; existing 548/548 checks per pass do not gate armoured tears. No acceptance."
     }
   ]
 }
