@@ -141,6 +141,18 @@ class Mesh:
         for f in [(0,3,2,1),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7),(4,5,6,7)]:
             self.face([p[i] for i in f],mat)
 
+    def strip_x(self,x0,x1,section,mat):
+        """Closed prism along X; section is a counter-clockwise Y/Z polygon."""
+        if x1<=x0 or len(section)<3:
+            raise ValueError("Invalid street strip")
+        a=[(x0,y,z) for y,z in section]
+        b=[(x1,y,z) for y,z in section]
+        self.face(list(reversed(a)),mat)
+        self.face(b,mat)
+        for i in range(len(section)):
+            j=(i+1)%len(section)
+            self.face([a[i],a[j],b[j],b[i]],mat)
+
     def solid_box(self,center,size,angle=0):
         """Collider-only box: one simple body for a group of small visible parts."""
         cx,cy,cz=center; sx,sy,sz=[v*.5 for v in size]
@@ -464,6 +476,37 @@ class SurfaceTiles:
                     self.tiles[i,j].origin=origin
                 tile=self.tiles[i,j]
                 tile.box(((a+b)*.5-tile.origin[0],(c+d)*.5-tile.origin[1],cz),(b-a,d-c,sz),mat)
+
+    def kerb(self,x0,x1,y,mat):
+        # The old rectangular 0.65 m kerb ended 7.5 cm before the 0.11 m
+        # street, so a capsule leaving it could catch the next vertical edge.
+        # Keep the 0.16 m crown, outer footprint and the crossing opening.
+        # Its outer side rises 0.16/0.20 (38.66 degrees); its inner side
+        # meets the existing road top continuously at y=-58/-72.
+        sign=1 if y>-65 else -1
+        inner=-58.0 if sign>0 else -72.0
+        section=[(inner,0.0),(y+sign*.325,0.0),
+                 (y+sign*.125,KERB_TOP),(y-sign*.125,KERB_TOP),
+                 (inner,.11)]
+        if sign<0:
+            section.reverse()
+        if self.physical:
+            self.collider.strip_x(x0,x1,section,mat)
+        ymin=min(p[0] for p in section); ymax=max(p[0] for p in section)
+        rows=[j for j in range(len(TILE_Y)-1) if TILE_Y[j]<=ymin and ymax<=TILE_Y[j+1]]
+        if len(rows)!=1:
+            raise ValueError("Kerb crosses a tile Y boundary")
+        j=rows[0]
+        for i in range(len(TILE_X)-1):
+            a,b=max(x0,TILE_X[i]),min(x1,TILE_X[i+1])
+            if b-a<1e-6:
+                continue
+            if (i,j) not in self.tiles:
+                origin=((TILE_X[i]+TILE_X[i+1])*.5,(TILE_Y[j]+TILE_Y[j+1])*.5)
+                self.tiles[i,j]=Mesh('%s_Tile_%d_%d'%(self.name,i,j),False,(origin[0],origin[1],0))
+                self.tiles[i,j].origin=origin
+            tile=self.tiles[i,j]
+            tile.strip_x(a-tile.origin[0],b-tile.origin[0],[(sy-tile.origin[1],sz) for sy,sz in section],mat)
 
     def place(self,key,category,era=-100):
         install(key,self.collider)
@@ -1006,15 +1049,11 @@ def ground():
     m=SurfaceTiles('Main_Streets','Main_Streets')
     m.box((0,-65,.055),(835,14,.11),PAVING)
     m.box((-100,0,.055),(13,655,.11),PAVING)
-    # Kerbs are solid: 0.16 m above the ground, 0.05 m above the paving. They
-    # used to be 0.32 m visual-only boxes that feet sank into, and ran straight
-    # across the north-south street. The heights are chosen for the player
-    # capsule (radius 0.24 m): from the paving the 0.05 m edge is a walkable
-    # slope; a 0.11 m edge (first attempt, 0.22 m kerb) meets the capsule at
-    # about 45 degrees, where the controller neither steps nor slides.
+    # Solid bevels connect the 0.16 m kerb crown to both ground and road.
+    # No vertical 7.5 cm gap, no new collision layer and no changed street opening.
     for y in (-72.4,-57.6):
         for x0,x1 in ((-407.5,-106.5),(-93.5,407.5)):
-            m.box(((x0+x1)*.5,y,KERB_TOP*.5),(x1-x0,.65,KERB_TOP),STONE)
+            m.kerb(x0,x1,y,STONE)
     m.place('streets','road')
     # Nothing but people may stand in the two 14/13 m main streets.
     add_obstacle('Main_Streets_east_west','main_street',plan_rect(-417.5,-72.725,417.5,-57.275,0,4))

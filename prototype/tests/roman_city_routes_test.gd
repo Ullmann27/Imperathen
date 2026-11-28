@@ -203,21 +203,26 @@ func _routes(scene: Node3D, profile: String) -> Dictionary:
 	var fraction := _sweep(scene, shape, direct_from, direct_to)
 	var contact := direct_from.lerp(direct_to, fraction)
 	_check(fraction < 1.0 and absf(contact.x - 18.64) <= 0.15, profile + ": the original Apotheca blocks the old direct crossing")
-	var query := PhysicsShapeQueryParameters3D.new()
-	query.shape = shape
-	query.collision_mask = 1
-	query.exclude = [scene.player.get_rid()]
-	query.transform = Transform3D(Basis.IDENTITY, Vector3(18.9, (SWEEP_LOW + SWEEP_HIGH) * 0.5, -10.0))
-	var found := false
+	# ConcavePolygonShape3D is a surface, not a solid volume. An overlap
+	# centered inside a thin wall can report no hit. Identify the first
+	# actual wall surface with rays approaching it from the unobstructed side.
+	var found := true
 	var collider_names: Array[String] = []
-	for hit: Dictionary in scene.get_world_3d().direct_space_state.intersect_shape(query, 32):
-		var collider: Node = hit.get("collider") as Node
-		if is_instance_valid(collider):
-			var name_in_scene := String(collider.name)
-			collider_names.append(name_in_scene)
-			if name_in_scene.begins_with("QuarterCollision_NorthJunction_") and name_in_scene.contains("Apotheca"):
-				found = true
-	_check(found, profile + ": the direct obstruction is the actual imported Apotheca wall, not an invisible blocker " + str(collider_names))
+	for height: float in [0.55, 0.90, 1.25]:
+		var query := PhysicsRayQueryParameters3D.create(Vector3(18.35, height, -10.0), Vector3(19.35, height, -10.0), 1, [scene.player.get_rid()])
+		query.hit_back_faces = true
+		var hit: Dictionary = scene.get_world_3d().direct_space_state.intersect_ray(query)
+		var name_in_scene := ""
+		var exact := false
+		if not hit.is_empty():
+			var collider := hit.get("collider") as StaticBody3D
+			if is_instance_valid(collider):
+				name_in_scene = String(collider.name)
+				var surface: Vector3 = hit.position
+				exact = name_in_scene.begins_with("QuarterCollision_NorthJunction_") and name_in_scene.contains("Apotheca") and absf(surface.x - 18.88) <= 0.05
+		collider_names.append(name_in_scene)
+		_check(exact, "%s: actual imported Apotheca wall at height %.2f (first collider %s)" % [profile, height, name_in_scene])
+		found = found and exact
 	print("ROMAN_CITY_FORUM_CONTACT ", profile, " x=", contact.x, " colliders=", collider_names)
 	result["forum_straight_wall"] = {"blocked": fraction < 1.0, "source_verified": found}
 	return result
@@ -367,6 +372,8 @@ func _controller(scene: Node3D) -> Dictionary:
 	_check(out.largest_lift <= City.MAX_STEP+0.01, "controller: no frame lifts the body above the step limit on the kerb (%.3f m)" % out.largest_lift)
 	var back: Dictionary = await _walk(scene, out.end, Vector2(0, 1), 600, func(p: Vector3) -> bool: return p.z >= 61.0)
 	_check(back.end.z >= 60.7, "controller: player walks back over the kerb onto the street (z %.2f)" % back.end.z)
+	_check(absf(back.highest_floor-KERB_TOP) < 0.01, "controller: returning player stands on the unchanged kerb crown")
+	_check(back.largest_lift <= City.MAX_STEP+0.01, "controller: returning player remains within step limit")
 	result["kerb"] = {"out_z":snappedf(out.end.z, 0.01), "back_z":snappedf(back.end.z, 0.01), "highest_floor_m":snappedf(out.highest_floor, 0.001),
 		"largest_frame_lift_m":snappedf(maxf(out.largest_lift, back.largest_lift), 0.001)}
 	# 2. Straight at the counter of a market anchor stall.

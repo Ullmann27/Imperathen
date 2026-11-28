@@ -421,25 +421,78 @@ class RomanCityLayoutTest(unittest.TestCase):
 
     def test_main_street_kerbs_are_solid_low_and_open_at_the_crossing(self):
         collider = next(c for c in self.city.colliders if c.name == "Main_Streets_collision")
-        records = self.city.boxes[id(collider.data)]
-        kerbs = [r for r in records if abs(r[1][1] - 0.65) < 1e-9]
-        self.assertEqual(len(kerbs), 4)
-        ns = MAIN_STREETS["north_south"]
-        for (cx, cy, cz), (sx, sy, sz), _angle, physical in kerbs:
-            with self.subTest(kerb=(cx, cy)):
-                self.assertTrue(physical, "kerb has no collider")
-                top = cz + sz / 2
-                self.assertAlmostEqual(cz - sz / 2, 0.0)
-                self.assertLessEqual(top, PLAYER_STEP - 0.02, "kerb is too high to step onto from the ground")
-                self.assertGreater(top, 0.11, "kerb does not rise above the paving")
-                self.assertTrue(cx + sx / 2 <= ns[0] + 1e-9 or cx - sx / 2 >= ns[2] - 1e-9,
-                                "kerb crosses the north-south street")
-        # Every visible surface box of the streets has collision.
         tiles = [o for o in self.city.objects if o.parent is self.city.groups["Main_Streets"]]
-        self.assertTrue(all(r[3] for r in records))
-        visual_volume = sum(sx * sy * sz for tile in tiles for (_c, (sx, sy, sz), _a, _p) in self.city.boxes[id(tile.data)])
-        solid_volume = sum(sx * sy * sz for (_c, (sx, sy, sz), _a, _p) in records)
-        self.assertAlmostEqual(visual_volume, solid_volume, delta=1e-6 * solid_volume)
+
+        def faces(obj, physical):
+            vertices, indices = (obj.data.cv, obj.data.cf) if physical else (obj.data.v, obj.data.f)
+            return [[transform(obj, vertices[i]) for i in face] for face in indices]
+
+        solid = faces(collider, True)
+        visual = [f for tile in tiles for f in faces(tile, False)]
+
+        def upward(rows):
+            result = []
+            for face in rows:
+                a, b, c = (Vector(p) for p in face[:3])
+                normal = (b-a).cross(c-a)
+                if normal[2] <= 1e-12:
+                    continue
+                bounds = tuple(tuple(fn(p[k] for p in face) for k in range(2)) for fn in (min, max))
+                result.append((a, normal, bounds))
+            return result
+
+        def height(rows, x, y):
+            heights = []
+            for a, n, ((x0, y0), (x1, y1)) in rows:
+                # The tested street boxes and kerb strips are rectangular
+                # in XY; all their top polygons have constant X/Y bounds.
+                if x0-1e-8 <= x <= x1+1e-8 and y0-1e-8 <= y <= y1+1e-8:
+                    heights.append(a[2]-(n[0]*(x-a[0])+n[1]*(y-a[1]))/n[2])
+            return max(heights, default=0.0)
+
+        def volume(rows):
+            return sum(sum(Vector(face[0])[k]*Vector(face[i]).cross(Vector(face[i+1]))[k]
+                           for k in range(3))/6.0
+                       for face in rows for i in range(1,len(face)-1))
+
+        physical_top = upward(solid)
+        visual_top = upward(visual)
+        crowns = []
+        for face in solid:
+            if all(abs(p[2]-.16)<1e-9 for p in face) and max(p[1] for p in face)-min(p[1] for p in face)>.24:
+                if max(p[0] for p in face)-min(p[0] for p in face)>100:
+                    crowns.append((min(p[0] for p in face),max(p[0] for p in face),
+                                   round(sum(p[1] for p in face)/len(face),6)))
+        self.assertEqual(sorted(crowns),sorted((a,b,y) for a,b in ((-407.5,-106.5),(-93.5,407.5))
+                                               for y in (-72.4,-57.6)))
+        self.assertLessEqual(.16,PLAYER_STEP-.02)
+        self.assertGreater(.16,.11)
+        # Actual rendered and collision triangles preserve exactly the same
+        # closed volume, rather than only comparing the former box records.
+        solid_volume=volume(solid)
+        self.assertGreater(solid_volume,0.0)
+        self.assertAlmostEqual(volume(visual),solid_volume,delta=1e-6*solid_volume)
+        for x in (-380,-272.01,-271.99,-250,-136.01,-135.99,-130,-60,-.01,.01,136.01,150,300,390):
+            for centre in (-72.4,-57.6):
+                with self.subTest(x=x,kerb=centre):
+                    ys=[centre-.8+i*.01 for i in range(161)]
+                    heights=[height(physical_top,x,y) for y in ys]
+                    self.assertAlmostEqual(max(heights),.16,places=7)
+                    for y,h in zip(ys,heights):
+                        self.assertAlmostEqual(height(visual_top,x,y),h,places=7)
+                    # No 7.5 cm notch between the street and curb and no
+                    # facet steeper than the real controller's 46 degree floor.
+                    self.assertLessEqual(max(abs(b-a) for a,b in zip(heights,heights[1:])),
+                                         .01*math.tan(math.radians(46))+1e-8)
+                    inner=-72.0 if centre<-65 else -58.0
+                    self.assertAlmostEqual(height(physical_top,x,inner),.11,places=7)
+                    outer=centre-.325 if centre<-65 else centre+.325
+                    self.assertAlmostEqual(height(physical_top,x,outer),0.0,places=7)
+        for i in range(129):
+            x=-106.4+i*.1
+            for y in (-72.4,-57.6):
+                self.assertLessEqual(height(physical_top,x,y),.11+1e-9,
+                                     "kerb crosses the north-south street")
 
 
 if __name__ == "__main__":
