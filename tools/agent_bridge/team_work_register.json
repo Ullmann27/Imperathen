@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 300,
+  "version": 301,
   "tasks": [
     {
       "id": "K101",
@@ -1456,9 +1456,10 @@
         "AGENTS.md",
         "ARCHITEKTUR_INDEX.md",
         "tools/architecture/build_index.mjs",
-        "tools/architecture/test_index.mjs"
+        "tools/architecture/test_index.mjs",
+        ".github/workflows/architecture-index.yml"
       ],
-      "note": "User requests root AGENTS/index setup, one documentation/tooling module only. Preserve existing AGENTS and append new hygiene rules; deterministic index of actual tracked production script declarations and autoloads; generator and independent fixtures; no runtime/UID/cache/project.godot changes or main merge. Setup branch setup/architecture-foundation targets current consolidated integration, not main. Phase1 exists separately #208 at 7ad8e47ca5bd6b7f2fb9eef078c1c85173fdee9b; focused run46117066995 success, no automatic merge. No new workflow or external costs."
+      "note": "User requests root AGENTS/index setup, one documentation/tooling module only. Preserve existing AGENTS and append new hygiene rules; deterministic index of actual tracked production script declarations and autoloads; generator and independent fixtures; no runtime/UID/cache/project.godot changes or main merge. Setup branch setup/architecture-foundation targets current consolidated integration, not main. Phase1 exists separately #208 at 7ad8e47ca5bd6b7f2fb9eef078c1c85173fdee9b; focused run46117066995 success, no automatic merge. Read-only Node index workflow required because direct 264-file connector retrieval exceeds tool call ceiling. Bootstrap from pinned checkout, verify fixtures, publish declaration-only log, then require fresh index on relevant PRs. No external paid service, no CI write permission."
     }
   ]
 }
