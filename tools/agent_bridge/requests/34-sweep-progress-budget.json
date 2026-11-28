@@ -1,0 +1,10 @@
+{
+  "revision": "65fd1e53dcb9de04b1a3a254f4b6c3d1a33e00de",
+  "task": "N34 NEW independent post-fix review, not N21/N24 position/phase diagnosis, N30 wheel attribution, N31/N32 foot geometry or N33 youth. Actual Godot run 46104088321: swept-circle root travel against actual occupied body circles yields 28/28 focused, 27/27 slot authority, 411/411 battle command, 146/146 battle rules, 133/133 muster; regular 84/87 and large 20/22 (remaining independent static LOD and wheel attribution). All original position/phase gates pass. Candidate includes C agents in start-of-tick grid, later agents see earlier moves; original spacing/contact solver remains. Before shared integration, review NEW risks of the actual implemented algorithm: bounded grid candidate coverage under sequential moves, deterministic UID order and progress when two opposing columns must pass or move around each other, starvation/freeze and worst-case candidate cost at 180 agents. Distinguish intentional blocking from pathological lack of progress. Read the actual pinned code and tests. Propose ONE standalone deterministic Godot negative-control/progress regression or complete small instrumentation diff without modifying existing tests, gates, runtime motion limits, caps, rules or LOD budgets. Include adversarial cases for both orderings, broadphase cell crossings, initially overlapping outward separation, dense but passable route, and count measured candidate iterations (if code provides a legitimate observable; otherwise specify exact instrumentation design and uncertainty). Do not invent benchmark results, engine APIs or call count. No claim of physical Fold7 performance; no execution. Return a compact complete unified diff OR a precise experiment if API support insufficient; at most 1200 words plus code, no reasoning transcript. No editing active wheel/youth branches or resubmitting previous task.",
+  "files": [
+    "prototype/scripts/formation/formation_agents.gd",
+    "prototype/tests/formation_contact_trace_test.gd",
+    "prototype/scripts/formation/formation_levels.gd"
+  ],
+  "max_tokens": 12288
+}

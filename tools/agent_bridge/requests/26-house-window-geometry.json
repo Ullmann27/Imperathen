@@ -1,0 +1,10 @@
+{
+  "revision": "1b87724a9fe62c751d02a04668f8c924b7c7c7a0",
+  "task": "46021975525: 7989 Prüfungen nach Parser-Reparatur, drei Fehler an sichtbaren Fensteröffnungen (zweimal Süd, einmal Ost). Prüfe Wandsegmente, Fensteranker, Ray-/Kollisionsprüfung. Minimaler vollständiger Patch mit Regression; kein erhöhtes Toleranzlimit oder ausgeschlossener Ray. Bei Originalmesh-Fehler konkreten Blender-Export-/Messvertrag liefern, keine erfundenen Assets. Begrenze die finale Antwort auf einen vollständigen, prüfbaren Patch mit knapper Begründung; keine internen Denkspuren.",
+  "files": [
+    "prototype/scripts/world/village/house_interiors.gd",
+    "prototype/scripts/world/village/household_designs.gd",
+    "prototype/tests/house_interiors_test.gd"
+  ],
+  "max_tokens": 8192
+}

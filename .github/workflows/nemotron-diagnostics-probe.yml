@@ -1,0 +1,43 @@
+name: Nemotron bridge diagnostic and single connectivity probe
+on:
+  push:
+    branches: ['fix/aeterna-nemotron-bridge-diagnostics-20261127']
+    paths:
+      - '.github/workflows/nemotron-diagnostics-probe.yml'
+permissions:
+  contents: read
+concurrency:
+  group: imperathen-nemotron-engineering
+  cancel-in-progress: false
+jobs:
+  offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tools/agent_bridge -p 'test_*.py' -v
+          python3 tools/agent_bridge/plan_batch.py
+  probe:
+    needs: offline
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Single bounded probe without project sources
+        env:
+          NVIDIA_API_KEY: ${{ secrets.IMPERATHEN_ROME_NVIDIA || secrets.IMPERATHEN_NVIDIA || secrets.IMPERATEN_ROME_NVIDIA || secrets.IMPERATEN_NVIDIA || secrets.IMPERATHENROME_NVIDIA || secrets.IMPERATENROME_NVIDIA || secrets.IMPERATUM_NVIDIA || secrets.NVIDIA_API_KEY }}
+        run: python3 tools/agent_bridge/nemotron_bridge.py --probe --output artifacts/nemotron-probe
+      - name: Preserve sanitized diagnostic
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: nemotron-probe-${{ github.run_id }}
+          path: artifacts/nemotron-probe/
+          if-no-files-found: warn
+          retention-days: 14

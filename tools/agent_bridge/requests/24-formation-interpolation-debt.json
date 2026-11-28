@@ -1,0 +1,12 @@
+{
+  "revision": "158e22df72a8fafb1ab690bd55011a16f27b801d",
+  "task": "Nach PR #177 / Lauf 46026104912: Slot 19/19, Befehle 411/411, Regeln 146/146, jedoch balanced/180 Positionssprung 0,6322 m/Frame, Phasensprung 0,1408, Foot-LOD 0,0858 m; very_high Foot-LOD 0,0928 m. Untersuche genau einen belegbaren Bewegungs-/Interpolationsfehler. Erhalte Identität, Regelautorität, alle Grenzen und 60/180 Gates. Vollständiger kleiner Unified Diff und Regression, keine Wiederholung des alten N21-Vorschlags ohne neue Evidenz. Begrenze die finale Antwort auf einen vollständigen, prüfbaren Patch mit knapper Begründung; keine internen Denkspuren.",
+  "files": [
+    "prototype/scripts/formation/formation_agents.gd",
+    "prototype/scripts/tactics/valley_scene.gd",
+    "prototype/scripts/visuals/soldier_visual.gd",
+    "prototype/scripts/visuals/far_ranks.gd",
+    "prototype/tests/formation_agents_test.gd"
+  ],
+  "max_tokens": 12288
+}

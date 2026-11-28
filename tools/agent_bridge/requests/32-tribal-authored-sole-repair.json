@@ -1,0 +1,12 @@
+{
+  "revision": "2612b01b00951facf8ce77303325903b6189e77a",
+  "task": "N32 NEW repair-design task based on completed N31 experiment; do NOT repeat N31 test or blindly use its patch. Actual Godot run 46103635941: 141/173 checks, all 32 static forest_spear cases exceed 40mm (idle 83.102mm, block 92.799mm), both LOD0/1 and all sampled phases. Block: left proxy-to-real-skinned-sole 129.014mm, right actual-sole-to-far 128.751mm. Thus a real geometry/coordinate contract mismatch is proven, not merely stale phase. The actual existing Blender exporter freezes LOD3 in idle and bakes all surfaces into one material; near/mid are authored rigs. The original formation gate must remain 0.04m. Design a minimal new authoring/validation experiment to correct true family-specific sole geometry and near/mid/far correspondence (not move the entire character, fabricate sole vertices, or tune to arbitrary probe points). Use actual skin bind matrices and mesh transforms, exact authored far vertex positions, production gait CPU mirror, physically meaningful foot-to-foot correspondence and shared root coordinates. Preserve all equipment, visual silhouette, animation and draw/triangle budgets. Existing common heel/toe proxy is not evidence of actual sole; retain original gate AND independently verify actual geometry. Return a COMPLETE small unified diff for a new standalone Godot measurement/helper only if executable from the supplied source; otherwise give precise Blender/export algorithm and reproducible steps with required inputs. Explicitly identify what remains unknown without GLBs; no binary claims, no guessed API, no changing existing tests or runtime, no private assets, no execution claim. Limit final answer to at most 1200 words plus one compact complete diff, no reasoning transcript. Scope separate from body-sweep and wheel edits.",
+  "files": [
+    "prototype/tests/tribal_lod_contract_test.gd",
+    "prototype/scripts/visuals/valley_tribal_soldier.gd",
+    "prototype/scripts/visuals/soldier_visual.gd",
+    "prototype/scripts/visuals/far_ranks.gd",
+    "prototype/scripts/visuals/authored_ground.gd"
+  ],
+  "max_tokens": 12288
+}

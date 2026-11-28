@@ -1,0 +1,11 @@
+{
+  "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+  "task": "AETERNA Schritt 01.4, unabhängige Read-only-Analyse. Der ältere Full-Fold7-Lauf 46038086118 hatte valley_muster 1/37 Fehler: eigenständiger germanischer Schwertkämpfer mit Kleidung, Waffe und Schild. Keine neue Modellproduktion. Prüfe genau die Herkunfts-/Katalog-/Scene-Referenzen und die Laufzeitwahl des TribalFigure; grenze das von N24 Formationsinterpolation ab. Aktuelle Reproduktion erforderlich; keine Behauptung über getestete Figuren. Liefere kleinsten begründbaren Patch oder ein eindeutiges Repro-Experiment mit unveränderten Identitäts- und Bewegungsgrenzen.",
+  "files": [
+    "prototype/tests/valley_muster_test.gd",
+    "prototype/scripts/tactics/valley_scene.gd",
+    "prototype/scripts/visuals/valley_tribal_soldier.gd",
+    "prototype/scripts/battle/soldier_roster.gd"
+  ],
+  "max_tokens": 4096
+}

@@ -1,0 +1,60 @@
+name: NVIDIA Nemotron engineering bridge
+on:
+  push:
+    branches: ['feat/aeterna-nemotron-fold7-quality-20261127']
+    paths:
+      - 'tools/agent_bridge/request.json'
+      - 'tools/agent_bridge/requests/**'
+      - 'tools/agent_bridge/batch.json'
+      - 'tools/agent_bridge/*.py'
+      - '.github/workflows/nemotron-engineering.yml'
+permissions:
+  contents: read
+concurrency:
+  group: imperathen-nemotron-engineering
+  cancel-in-progress: false
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Run offline bridge tests and validate bounded batch
+        id: plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tools/agent_bridge -p 'test_*.py' -v
+          matrix="$(python3 tools/agent_bridge/plan_batch.py)"
+          printf 'matrix=%s\n' "$matrix" >> "$GITHUB_OUTPUT"
+  consult:
+    needs: plan
+    name: Nemotron / ${{ matrix.task }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Ask NVIDIA for one independently reviewed engineering patch
+        env:
+          NVIDIA_API_KEY: ${{ secrets.IMPERATHEN_ROME_NVIDIA || secrets.IMPERATHEN_NVIDIA || secrets.IMPERATEN_ROME_NVIDIA || secrets.IMPERATEN_NVIDIA || secrets.IMPERATHENROME_NVIDIA || secrets.IMPERATENROME_NVIDIA || secrets.IMPERATUM_NVIDIA || secrets.NVIDIA_API_KEY }}
+          REQUEST_PATH: ${{ matrix.request_path }}
+        shell: bash
+        run: python3 tools/agent_bridge/nemotron_bridge.py --request "$REQUEST_PATH" --output artifacts/nemotron
+      - name: Save unexecuted engineering answer and provenance
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: nemotron-${{ matrix.task }}-${{ github.run_id }}
+          path: artifacts/nemotron/
+          if-no-files-found: warn
+          retention-days: 14

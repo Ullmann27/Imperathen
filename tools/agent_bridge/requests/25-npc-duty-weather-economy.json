@@ -1,0 +1,11 @@
+{
+  "revision": "2e761e544022d03b0a813ee7cbc0c3f095ce7329",
+  "task": "46020295723 commerce_transaction 245 Checks, fünf Fehler: ehemalige Wachen Severus/Valeria nach Holzcamp-Zuweisung nicht bei Arbeit, bezahlte Reparatur/Produktion unvollständig. Unterscheide deterministische Wetterpause und falschen Tätigkeits-/Wirtschaftszustand. Liefere vollständigen minimalen Patch oder belegte Testkorrektur mit echter Trocken-/Regen-Gegenprobe. Kein künstliches Buchen von Waren oder Arbeit, keine ausgeschalteten legitimen Pausen. Begrenze die finale Antwort auf einen vollständigen, prüfbaren Patch mit knapper Begründung; keine internen Denkspuren.",
+  "files": [
+    "prototype/scripts/domain/npc_behavior.gd",
+    "prototype/scripts/domain/village_economy.gd",
+    "prototype/scripts/story/village_life.gd",
+    "prototype/tests/commerce_transaction_test.gd"
+  ],
+  "max_tokens": 8192
+}

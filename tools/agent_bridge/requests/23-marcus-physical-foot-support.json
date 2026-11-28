@@ -1,0 +1,12 @@
+{
+  "revision": "2e761e544022d03b0a813ee7cbc0c3f095ce7329",
+  "task": "Tatsächlicher ARM64-Blocker: Marcus 60 Hz negativer Turn verletzt strikt 0,015 m Stützfußdrift (46021801237). Analysiere vollständig die gepinnten Quellen. get_bone_global_pose ist skelettlokal; Weltmessung = skeleton.global_transform * Pose. Isoliere genau eine reale Ursache und liefere kleinen vollständigen Unified Diff und reproduzierbare Regression. Keine Änderung von Support-Semantik, Grenzen, Rig oder GLBs ohne Messbeweis. Blender als Original-Rig- und Kontrollrender-Werkzeug berücksichtigen. Keine erfundenen Testdaten. Begrenze die finale Antwort auf einen vollständigen, prüfbaren Patch mit knapper Begründung; keine internen Denkspuren.",
+  "files": [
+    "prototype/scripts/visuals/character_motion.gd",
+    "prototype/scripts/visuals/village_person.gd",
+    "prototype/scripts/story/companion_follow.gd",
+    "prototype/tests/companion_turn_motion_test.gd",
+    "prototype/tests/motion_world_measurement.gd"
+  ],
+  "max_tokens": 12288
+}
