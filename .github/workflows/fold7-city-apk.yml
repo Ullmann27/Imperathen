@@ -27,7 +27,7 @@ permissions:
 
 concurrency:
   group: fold7-city-apk-${{ github.ref }}
-  cancel-in-progress: ${{ github.head_ref != 'integration/imperathen-unified-20261125' }}
+  cancel-in-progress: ${{ github.head_ref != 'integration/imperathen-unified-20261125' && !endsWith(github.ref, '--stand-zero') }}
 
 jobs:
   real-city-arm64-qa-apk:
