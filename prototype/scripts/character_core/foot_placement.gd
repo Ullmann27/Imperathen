@@ -53,11 +53,23 @@ func bind(body: CharacterBody3D, skeleton: Skeleton3D, pelvis: int, spine: int, 
 		leg_names: Array[StringName]) -> bool:
 	if leg_names.size() != 6 or not is_instance_valid(body) or not is_instance_valid(skeleton):
 		return false
+	# Check the adapter scene before creating native modifiers or dereferencing rays.
+	var left_ray: RayCast3D = get_node_or_null("LeftRay") as RayCast3D
+	var right_ray: RayCast3D = get_node_or_null("RightRay") as RayCast3D
+	var left_target: Marker3D = get_node_or_null("LeftTarget") as Marker3D
+	var right_target: Marker3D = get_node_or_null("RightTarget") as Marker3D
+	var left_pole: Marker3D = get_node_or_null("LeftPole") as Marker3D
+	var right_pole: Marker3D = get_node_or_null("RightPole") as Marker3D
+	var head_target: Marker3D = get_node_or_null("HeadTarget") as Marker3D
+	if left_ray == null or right_ray == null or left_target == null or right_target == null or left_pole == null or right_pole == null or head_target == null:
+		return false
+	if mini(pelvis,mini(spine,head)) < 0 or maxi(pelvis,maxi(spine,head)) >= skeleton.get_bone_count():
+		return false
 	_body = body
 	_skeleton = skeleton
 	_head_bone = head
-	var left: Leg = _make_leg(leg_names[0],leg_names[1],leg_names[2],$LeftRay,$LeftTarget,$LeftPole)
-	var right: Leg = _make_leg(leg_names[3],leg_names[4],leg_names[5],$RightRay,$RightTarget,$RightPole)
+	var left: Leg = _make_leg(leg_names[0],leg_names[1],leg_names[2],left_ray,left_target,left_pole)
+	var right: Leg = _make_leg(leg_names[3],leg_names[4],leg_names[5],right_ray,right_target,right_pole)
 	if left == null or right == null:
 		return false
 	_legs = [left,right]
@@ -92,7 +104,7 @@ func bind(body: CharacterBody3D, skeleton: Skeleton3D, pelvis: int, spine: int, 
 		var rest: Basis = skeleton.global_basis*skeleton.get_bone_global_rest(leg.foot).basis
 		leg.aligner.set("rest_up_local",(rest.inverse()*Vector3.UP).normalized())
 		skeleton.add_child(leg.aligner)
-	_head_target = $HeadTarget
+	_head_target = head_target
 	_head_look = LookAtModifier3D.new()
 	_head_look.name = "HeadLook"
 	_head_look.bone = head
