@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 285,
+  "version": 286,
   "tasks": [
     {
       "id": "K101",
@@ -1414,6 +1414,20 @@
         ".github/workflows/aeterna-city-resident-departure.yml"
       ],
       "note": "M28 actual city NPC movement: CityLife._haul_step explicitly waits 60s before departure, but resident view _target returns destination whenever is_walking=false, causing premature walking/retirement/respawn across walls during loading. Sample authoritative route origin until actual departure; maintain existing speed, bounded pool and six-metre catchup. Use consistent global distances and global physics ray/shape coordinates for translated city roots and observer in another hierarchy. Real CityLife anchor and imported resident fixture covers loading, departure, arrival, translated physical floor, bounded movement, no premature retirement, no mutation. Isolated push-only fix/aeterna-city-resident-departure-20261128; no integration until existing and focused Godot regressions pass. Actual three-file head527b5b4f71c0e4a70e16439c4ee43aa419dd20de; runtime049161c5 testdc73b709, +240/-13. Actual push-only run46115703248 in_progress, four focused Godot groups. No pass or integration claim."
+    },
+    {
+      "id": "CITY-MARKET-STAFF-AUTHORITY",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "7820c4c6d8f0cb9df550956c041ed08c53a0624e",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/domain/city_life.gd",
+        "prototype/tests/city_market_staff_test.gd",
+        ".github/workflows/aeterna-city-market-staff.yml"
+      ],
+      "note": "M28 authoritative city economy: current business_staffed/_vendor_of accepts an expired worker until its queued wake event is processed. Use half-open actual arrived duty interval consistently; during completion of a purchase retain original haggle participant only if still serving that business, otherwise select current staff (same pricing formula, conservation and real memory participant). Test actual business opening boundaries and shift handoff using existing CityLife roster, real transaction ledger, no fabricated staff. Preserve existing city simulation, trade and budget regressions; isolated push-only candidate, no APK."
     }
   ]
 }
