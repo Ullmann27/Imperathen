@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 257,
+  "version": 263,
   "tasks": [
     {
       "id": "K101",
@@ -774,10 +774,10 @@
         "prototype/tests/camera_collision_test.gd",
         ".github/workflows/aeterna-indoor-camera-spacing.yml"
       ],
-      "note": "PR #191 head 9d795174e8f71508d14c7bf58bcf3db889edbde6; actual run 46065957068/job 140731193724 success: CAMERA_COLLISION_RESULT checks=55 failures=0; artifact 15230359346. Corrected typed Array[RID] test invocation, not weakened collision thresholds. Independent visual and device review pending, no runtime integration claimed.",
+      "note": "PR #191 head 9d795174e8f71508d14c7bf58bcf3db889edbde6; actual run 46065957068/job 140731193724 success: CAMERA_COLLISION_RESULT checks=55 failures=0; artifact 15230359346. Corrected typed Array[RID] test invocation, not weakened collision thresholds. Independent visual and device review pending, no runtime integration claimed. | Independent actual log confirms 55/55; all three runtime/test blobs byte-identical between #191 head 9d795174 and shared 8a8256a. Technical scope complete, release edit lease for I02 wiring; separate visual/device review still open.",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "review_pending",
+      "status": "done",
       "run_id": "46065957068"
     },
     {
@@ -1274,19 +1274,19 @@
       "id": "I02-PRODUCTION-FIXTURE",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "done",
       "revision": "b34adfdf014625828bf13ec47e60a220b9732da5",
       "run_id": "46114021072",
       "scope": [
         "prototype/tests/i02_props_test.gd",
         ".github/workflows/aeterna-i02-basket-production.yml"
       ],
-      "note": "Actual Kimi run 46113029476 failed: original youth not staged, GLB height assertion used only first primitive (0.3083849549 vs actual all primitive max 0.308640450239), actor_position Vector2 passed to set_player_position Vector3; timeout124. New isolated successor fix/aeterna-i02-basket-qa-20261128. Correct fixture, stage exact original civil youth via existing authorized scripts, check exact LODs, real Hand_L and all geometry, preserve 1mm/0.2mm thresholds and existing checks. No change to original Kimi module, original GitLab branch, main or runtime wiring. No private asset publication, new provider requests or costs. Actual test required. | Actual repair #204 head 5ee56ef700e0b17e4201cd8afa67bab3c24df467; exact original module/GLB unchanged, test +77/-11, one production CI workflow. Observed targeted run 46114021072 in_progress. No pass or integration claim."
+      "note": "Actual Kimi run 46113029476 failed: original youth not staged, GLB height assertion used only first primitive (0.3083849549 vs actual all primitive max 0.308640450239), actor_position Vector2 passed to set_player_position Vector3; timeout124. New isolated successor fix/aeterna-i02-basket-qa-20261128. Correct fixture, stage exact original civil youth via existing authorized scripts, check exact LODs, real Hand_L and all geometry, preserve 1mm/0.2mm thresholds and existing checks. No change to original Kimi module, original GitLab branch, main or runtime wiring. No private asset publication, new provider requests or costs. Actual test required. | Actual repair #204 head 5ee56ef700e0b17e4201cd8afa67bab3c24df467; exact original module/GLB unchanged, test +77/-11, one production CI workflow. Observed targeted run 46114021072 in_progress. No pass or integration claim. | Actual run46114021072/job140883655537 at 5ee56ef7: original civil youth staged, original module and GLB hashes verified, corrected test 98b9aaba3aba7e0584513a39fa434feb66fbbe16; I02_PROPS_RESULT checks=96 failures=0, artifact15251037994. Independent technical review completed; runtime not yet wired. | Technical fixture accepted for exact-blob transfer to separate consolidation branch; no visual/device acceptance."
     },
     {
       "id": "FACIAL-LOD-NEUTRAL-LIFECYCLE",
       "owner": "Coordinator",
-      "status": "review_pending",
+      "status": "done",
       "revision": "8a8256a30145918739312588d70c4585768fa568",
       "run_id": "46114087278",
       "scope": [
@@ -1295,7 +1295,7 @@
         ".github/workflows/aeterna-facial-motion-lifecycle.yml"
       ],
       "access": "edit",
-      "note": "M15: facial_motion.advance currently returns at detail >=2 without neutralising previously uploaded shapes; same-identity rebinding retains values, root MeshInstance3D omitted. Implement one-shot LOD neutralisation, root mesh binding and Godot lifecycle regression (no lip-sync changes), isolated branch fix/aeterna-facial-lod-lifecycle-20261128. No release. | Actual draft #205 head 0bb3ed22ec0e90a3fd430a3d1cfa6d0b24cae715, module ebe187496e37ddd4ba3281bad7ae4c934291e364, test d7d45bbdf33009c068830d9ad121e2db4f38c7e7, workflow 650040b9df1b705cb661677ed6f7f8e1b956c047. Exact diff three paths +169/-5; mergeable. Actual targeted run 46114087278/job140883863178 success, exact head and source blobs in logs, Godot 4.7.2 FACIAL_LOD_RESULT checks=14 failures=0, FACIAL_LOD_PASS, artifact15250284819, existing automatic runs 46114087165/46114087252 observed (no duplicate dispatch). Test is engine ArrayMesh values, not original character/visual proof. No integration/device pass."
+      "note": "M15: facial_motion.advance currently returns at detail >=2 without neutralising previously uploaded shapes; same-identity rebinding retains values, root MeshInstance3D omitted. Implement one-shot LOD neutralisation, root mesh binding and Godot lifecycle regression (no lip-sync changes), isolated branch fix/aeterna-facial-lod-lifecycle-20261128. No release. | Actual draft #205 head 0bb3ed22ec0e90a3fd430a3d1cfa6d0b24cae715, module ebe187496e37ddd4ba3281bad7ae4c934291e364, test d7d45bbdf33009c068830d9ad121e2db4f38c7e7, workflow 650040b9df1b705cb661677ed6f7f8e1b956c047. Exact diff three paths +169/-5; mergeable. Actual targeted run 46114087278/job140883863178 success, exact head and source blobs in logs, Godot 4.7.2 FACIAL_LOD_RESULT checks=14 failures=0, FACIAL_LOD_PASS, artifact15250284819, existing automatic runs 46114087165/46114087252 observed (no duplicate dispatch). Test is engine ArrayMesh values, not original character/visual proof. No integration/device pass. | Independent actual 14/14 result and exact tested blobs reviewed; technical scope accepted for separate candidate transfer. Original character/visual/device review still open."
     },
     {
       "id": "I04-CARRY-RIG-LIFECYCLE",
@@ -1315,15 +1315,33 @@
       "id": "NPC-MEMORY-OBSERVATION-OVERLAP",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "8a8256a30145918739312588d70c4585768fa568",
-      "run_id": null,
+      "run_id": "46114516718",
       "scope": [
         "prototype/scripts/domain/npc_social_memory.gd",
         "prototype/tests/npc_social_memory_test.gd",
         ".github/workflows/aeterna-npc-memory-overlap.yml"
       ],
-      "note": "M28 living-world data integrity independent of Argon's new preview. Existing Social.advance adds full delta even when observation time intervals overlap, allowing duplicate seconds and premature friendship; malformed position arrays can create invalid perception or errors. Clip credited time to the unobserved suffix using last_contact, retain same fixed-step behavior, strict finite numeric 3D observation positions, validate shared time against last_contact. Add regression for overlap, replay, actual encounter threshold, serialized continuity and malformed observations; preserve all existing tests, schema, reward/quest contracts. New isolated branch fix/aeterna-npc-memory-overlap-20261128 only; no external calls or release."
+      "note": "M28 living-world data integrity independent of Argon's new preview. Existing Social.advance adds full delta even when observation time intervals overlap, allowing duplicate seconds and premature friendship; malformed position arrays can create invalid perception or errors. Clip credited time to the unobserved suffix using last_contact, retain same fixed-step behavior, strict finite numeric 3D observation positions, validate shared time against last_contact. Add regression for overlap, replay, actual encounter threshold, serialized continuity and malformed observations; preserve all existing tests, schema, reward/quest contracts. New isolated branch fix/aeterna-npc-memory-overlap-20261128 only; no external calls or release. | Actual runtime/test/CI draft #207, head 1f4143e4dfd331e562e27eeeda65b98e65ed8ce0, three files +143/-6. Actual run46114516718 observed in_progress; no pass yet."
+    },
+    {
+      "id": "NIGHT-CONSOLIDATION-I02-WORLD",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "077075ed08e1e90ee4b865d10bb66437f187b4ac",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/world/game_world.gd",
+        "prototype/scripts/world/village/i02_props.gd",
+        "prototype/tests/i02_props_test.gd",
+        "prototype/scripts/visuals/facial_motion.gd",
+        "prototype/tests/facial_motion_lifecycle_test.gd",
+        "prototype/tests/i02_world_props_test.gd",
+        ".github/workflows/aeterna-night-consolidation.yml"
+      ],
+      "note": "Single isolated accumulation candidate integration/aeterna-night-consolidated-20261128 from exact #200 head (both city corrections, technical focused and real render checks passed, full formation/device gates open). Include exact tested I02 module/test blobs from #204 (96/96 actual original civil youth) and facial module/test from #205 (14/14 actual). Wire I02 world-owned node, authoritative sync and finite moving world-space cinematic anchors in GameWorld; existing camera/other prop logic preserved. Actual GameWorld test both completion paths, root translation, LOD, ownership, no phantom, save/load; combined Godot/city verification before further integration. No CI-only source branches merged, no private assets published, main unchanged, no final APK. No duplicate full-build dispatch."
     }
   ]
 }
