@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 252,
+  "version": 254,
   "tasks": [
     {
       "id": "K101",
@@ -1261,14 +1261,14 @@
       "id": "FORMATION-STRIDE-CONTACT-TRACE",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "89e62f50d75a4a9cdc39efa0311cd9169b832670",
       "run_id": "46113829341",
       "scope": [
         "prototype/tests/formation_stride_contact_test.gd",
         ".github/workflows/aeterna-formation-stride-contact.yml"
       ],
-      "note": "Independent QA-only diagnostic after actual guard run 46108635420/job 140866957392. Original 40mm switch gate still fails four moving cases (49.0–52.3mm); no runtime/asset or gate edits. Sample every production Roman/tribal family at real near/mid rig, march/run/retreat phases including exact failing phases, compare canonical sole probes to actual far mesh CPU shader at identical phase, report side/heel/toe and actual imported skinned sole at worst phase. Existing static guard, formation and thresholds preserved; no integration claim. Isolated branch qa/aeterna-formation-stride-contact-20261128 from exact guard head. Do not merge QA-only workflow. Actual QA-only PR #203 head467d442aceee2a82a62346f3b18eadd351b4fd82, exact two new files +261/-0, real run46113829341 in_progress; no result yet."
+      "note": "Independent QA-only diagnostic after actual guard run 46108635420/job 140866957392. Original 40mm switch gate still fails four moving cases (49.0–52.3mm); no runtime/asset or gate edits. Sample every production Roman/tribal family at real near/mid rig, march/run/retreat phases including exact failing phases, compare canonical sole probes to actual far mesh CPU shader at identical phase, report side/heel/toe and actual imported skinned sole at worst phase. Existing static guard, formation and thresholds preserved; no integration claim. Isolated branch qa/aeterna-formation-stride-contact-20261128 from exact guard head. Do not merge QA-only workflow. Actual QA-only PR #203 head467d442aceee2a82a62346f3b18eadd351b4fd82, exact two new files +261/-0, real run46113829341 in_progress; no result yet. Actual run46113829341/job140883061151 completed: all 798 production samples, 3445 checks, 264 failures, max52.317mm. Four Roman families 54/114 fail each, forest_swordsman48/114; forest_spear/skirmisher114/114. 42 worst-case skin receipts. No runtime patch; original 40mm gate unchanged."
     },
     {
       "id": "I02-PRODUCTION-FIXTURE",
@@ -1296,6 +1296,20 @@
       ],
       "access": "edit",
       "note": "M15: facial_motion.advance currently returns at detail >=2 without neutralising previously uploaded shapes; same-identity rebinding retains values, root MeshInstance3D omitted. Implement one-shot LOD neutralisation, root mesh binding and Godot lifecycle regression (no lip-sync changes), isolated branch fix/aeterna-facial-lod-lifecycle-20261128. No release. | Actual draft #205 head 0bb3ed22ec0e90a3fd430a3d1cfa6d0b24cae715, module ebe187496e37ddd4ba3281bad7ae4c934291e364, test d7d45bbdf33009c068830d9ad121e2db4f38c7e7, workflow 650040b9df1b705cb661677ed6f7f8e1b956c047. Exact diff three paths +169/-5; mergeable. Actual targeted run 46114087278 in progress, existing automatic runs 46114087165/46114087252 observed (no duplicate dispatch). Test is engine ArrayMesh values, not original character/visual proof. No integration/device pass."
+    },
+    {
+      "id": "I04-CARRY-RIG-LIFECYCLE",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "8a8256a30145918739312588d70c4585768fa568",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/world/village/i04_props.gd",
+        "prototype/tests/i04_props_lifecycle_test.gd",
+        ".github/workflows/aeterna-i04-props-lifecycle.yml"
+      ],
+      "note": "M23 I04 forge carry lifecycle. Existing _ensure_hands returns on missing carrier/body without invalidating old still-live hand sockets, so props can remain attached to the wrong actor; process-only updates can lag actual skeleton. Replace cached disposable attachment nodes with current rig bone transform and skeleton_updated binding, clear/disconnect immediately on carrier loss/LOD change and hide absent props. Preserve original models, offsets, story authority, wood/tablet counts and existing I04 test. Add isolated real WorldModel path and imported VillagePerson rig regression for hand transforms, LOD, carrier swap/loss, no duplicate/phantom and no state mutation. New branch fix/aeterna-i04-props-lifecycle-20261128 only; no main, no new costs, no release."
     }
   ]
 }
