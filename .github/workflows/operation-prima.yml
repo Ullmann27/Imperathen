@@ -1,7 +1,7 @@
 name: Operation Prima – Menü bis I-02
 on:
   pull_request:
-    branches: ['feature/aeterna-character-equipment-phase2-20261128', 'feature/hoplite-operation-prima-i01', 'feature/hoplite-operation-genesis-universal-core']
+    branches: ['feature/aeterna-character-equipment-phase2-20261128', 'feature/hoplite-operation-prima-i01', 'feature/hoplite-operation-genesis-universal-core', 'feature/genesis-city-resident-integration-20261128']
     paths: ['prototype/**', 'tools/ci/operation_prima.sh', '.github/workflows/operation-prima.yml', 'ARCHITEKTUR_INDEX.md']
 permissions:
   contents: read
