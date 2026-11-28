@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 240,
+  "version": 241,
   "tasks": [
     {
       "id": "K101",
@@ -1226,6 +1226,21 @@
         ".github/workflows/aeterna-youth-armour-local-weights.yml"
       ],
       "note": "Actual source lookup evidence: engine reported uint16 weight codes, raw L1 differences exact one/two quantization steps. Match raw float weights via explicit engine-equivalent UINT16 encoding with exact code equality, strict source hash, named binding/connected edge and original coordinate/length tolerances; retain all local regression, seam, full Godot A/B and unchanged unrelated assets. If no exact unique candidate, stop with bounded evidence; no blanket tolerance widening. New isolated branch. Actual commit 8d915d6af14516ab2ff375a8599a313f54497e98; three-file compare. Verified Godot 4.7.2 tag ed1daf0bf001b61586d9930840f2f1394092c079: gltf_document.cpp:1661-1682 normalizes float32; rendering_server.cpp:839-854 truncates w*65535. Match exact integer codes, pin source hash dcb52e..., two additional tests, no tolerance widening. Actual CI 46108744734 in_progress, no repair/acceptance claim."
+    },
+    {
+      "id": "KIMI-DUO-I02-BASKET",
+      "owner": "Kimi",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "8a8256a30145918739312588d70c4585768fa568",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/world/village/i02_props.gd",
+        "prototype/scripts/world/village/i02_props.gd.uid",
+        "prototype/tests/i02_props_test.gd",
+        "prototype/tests/i02_props_test.gd.uid"
+      ],
+      "note": "GitLab Duo Kimi K3.1 Pro proposed M21/VIS-003 isolated I02 presentation. Exact GitHub/GitLab integration SHA 8a8256a verified, M21 queued, new paths absent and no active overlap. Use candidate/aeterna-i02-basket-20261128 on GitLab project 89577832; original neighbour_basket.glb blob 0c9043c91be9727e2d6c9c2dbe41f0ed46946c60, authoritative village_childhood carried neighbor_basket plus screenplay i02; pending alone does not grant item, correction retains, complete removes. Only new module/test and optional Godot UID files; no existing source/state/save/CI changes. Require actual hand/anchor transforms, LOD rebind, duplicate-free lifecycle, save/load/read-only state checks, no fabricated asset or test result. Coordinator transfers exact reviewed blobs and owns subsequent CI/runtime wiring with separate lease. Preparatory isolated work only; MENU remains blocked and no journey advancement. Reserved, not submitted/run/accepted; GitLab Duo user-mediated, no direct API dispatch."
     }
   ]
 }
